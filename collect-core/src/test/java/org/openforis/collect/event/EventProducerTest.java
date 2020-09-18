@@ -10,8 +10,11 @@ import static org.openforis.idm.testfixture.NodeDefinitionBuilder.entityDef;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.Test;
+import org.openforis.collect.event.EventProducer.EventProducerContext;
+import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.model.AbstractRecordTest;
 import org.openforis.collect.model.NodeChangeSet;
 import org.openforis.idm.model.Entity;
@@ -23,54 +26,51 @@ import org.openforis.idm.model.Entity;
  */
 public class EventProducerTest extends AbstractRecordTest {
 
-	private EventProducer eventProducer;
-	
 	@Override
 	public void init() {
 		super.init();
-		eventProducer = new EventProducer();
 	}
-	
+
 	@Test
 	public void testEventTypes() {
-		record(
-			rootEntityDef(
-				entityDef("tree",
-					attributeDef("tree_count")
-				).multiple()
-			)
-		);
-		assertEventTypes(updater.addEntity(record.getRootEntity(), "tree"),
-				EntityCreatedEvent.class, TextAttributeUpdatedEvent.class);
+		record(rootEntityDef(entityDef("tree", attributeDef("tree_count")).multiple()));
+		assertEventTypes(updater.addEntity(record.getRootEntity(), "tree"), EntityCreatedEvent.class,
+				TextAttributeUpdatedEvent.class);
 	}
-	
+
 	@Test
 	public void testEntityCollectionAddedEvent() {
-		record(
-			rootEntityDef(
-				entityDef("plot",
-					entityDef("tree",
-							attributeDef("tree_count")
-					).multiple()
-				).multiple()
-			)
-		);
-		assertEventTypes(updater.addEntity(record.getRootEntity(), "plot"),
-				EntityCreatedEvent.class, EntityCollectionCreatedEvent.class);
-		
+		record(rootEntityDef(entityDef("plot", entityDef("tree", attributeDef("tree_count")).multiple()).multiple()));
+		assertEventTypes(updater.addEntity(record.getRootEntity(), "plot"), EntityCreatedEvent.class,
+				EntityCollectionCreatedEvent.class);
+
 		Entity plot = entityByPath("/root/plot[1]");
-		assertEventTypes(updater.addEntity(plot, "tree"),
-				EntityCreatedEvent.class, TextAttributeUpdatedEvent.class);
-		
+		assertEventTypes(updater.addEntity(plot, "tree"), EntityCreatedEvent.class, TextAttributeUpdatedEvent.class);
+
 	}
-	
+
 	private void assertEventTypes(NodeChangeSet changeSet, Class<?>... expectedEventTypes) {
-		List<RecordEvent> events = eventProducer.produceFor(changeSet, "user_name");
+		final List<RecordEvent> events = new ArrayList<RecordEvent>();
+		EventProducer eventProducer = createEventProducer(events);
+		eventProducer.produceFor(changeSet);
+
 		List<Class<?>> actualEventTypes = new ArrayList<Class<?>>(events.size());
 		for (RecordEvent event : events) {
 			actualEventTypes.add(event.getClass());
 		}
 		assertEquals(Arrays.asList(expectedEventTypes), actualEventTypes);
+	}
+
+	private EventProducer createEventProducer(final List<RecordEvent> events) {
+		MessageSource messageSource = new MessageSource() {
+			@Override
+			public String getMessage(Locale locale, String code, Object... args) {
+				return null;
+			}
+		};
+		EventProducerContext context = new EventProducerContext(messageSource, Locale.ENGLISH, "user_name");
+		EventProducer eventProducer = new EventProducer(context, new EventListenerToList(events));
+		return eventProducer;
 	}
 
 }

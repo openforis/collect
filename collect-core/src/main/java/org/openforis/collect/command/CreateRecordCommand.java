@@ -3,43 +3,22 @@ package org.openforis.collect.command;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openforis.collect.event.RecordEvent;
-
-public class CreateRecordCommand implements Command<List<RecordEvent>> {
+public class CreateRecordCommand extends RecordCommand {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private int surveyId;
-	private String username;
+	private boolean preview;
 	private String formVersion;
 	private List<String> keyValues = new ArrayList<String>();
 	
-	public CreateRecordCommand() {
-		super();
+	public void setPreview(boolean preview) {
+		this.preview = preview;
 	}
 	
-	public CreateRecordCommand(int surveyId, String username) {
-		this();
-		this.surveyId = surveyId;
-		this.username = username;
-	}
-
-	public int getSurveyId() {
-		return surveyId;
+	public boolean isPreview() {
+		return preview;
 	}
 	
-	public void setSurveyId(int surveyId) {
-		this.surveyId = surveyId;
-	}
-	
-	public String getUsername() {
-		return username;
-	}
-	
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
 	public String getFormVersion() {
 		return formVersion;
 	}

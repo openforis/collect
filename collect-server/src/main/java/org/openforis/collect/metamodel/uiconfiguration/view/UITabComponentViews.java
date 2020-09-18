@@ -8,22 +8,23 @@ import org.openforis.collect.metamodel.ui.UIField;
 import org.openforis.collect.metamodel.ui.UIFormComponent;
 import org.openforis.collect.metamodel.ui.UIFormSection;
 import org.openforis.collect.metamodel.ui.UITable;
+import org.openforis.collect.metamodel.view.ViewContext;
 
 public abstract class UITabComponentViews {
 
-	public static List<UITabComponentView<?>> fromObjects(List<UIFormComponent> components) {
+	public static List<UITabComponentView<?>> fromObjects(List<UIFormComponent> components, ViewContext context) {
 		List<UITabComponentView<?>> views = new ArrayList<UITabComponentView<?>>(components.size());
 		for (UIFormComponent c : components) {
 			if (c instanceof UIField) {
 				if (c instanceof UICodeField) {
-					views.add(new UICodeFieldView((UICodeField) c));
+					views.add(new UICodeFieldView((UICodeField) c, context));
 				} else {
-					views.add(new UIFieldView((UIField) c));
+					views.add(new UIFieldView((UIField) c, context));
 				}
 			} else if (c instanceof UIFormSection) {
-				views.add(new UIFieldSetView((UIFormSection) c));
+				views.add(new UIFieldSetView((UIFormSection) c, context));
 			} else {
-				views.add(new UITableView((UITable) c));
+				views.add(new UITableView((UITable) c, context));
 			}
 		}
 		return views;

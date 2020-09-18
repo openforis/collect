@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.EntityAddChange;
 import org.openforis.collect.model.NodeChange;
@@ -46,16 +47,14 @@ public class RecordGenerator {
 	RecordUpdater recordUpdater = new RecordUpdater();
 	
 	@Transactional
-	public CollectRecord generate(int surveyId, NewRecordParameters parameters, List<String> recordKeyValues) {
-		CollectSurvey survey = surveyManager.getById(surveyId);
+	public CollectRecord generate(CollectSurvey survey, NewRecordParameters parameters) {
 		List<AttributeDefinition> keyDefs = getKeyAttributeDefs(survey);
-		RecordKey recordKey = new RecordKey(keyDefs, recordKeyValues);
-		return generate(surveyId, parameters, recordKey);
+		RecordKey recordKey = new RecordKey(keyDefs, parameters.getRecordKey());
+		return generate(survey, parameters, recordKey);
 	}
 	
 	@Transactional
-	public CollectRecord generate(int surveyId, NewRecordParameters parameters, RecordKey recordKey) {
-		CollectSurvey survey = surveyManager.getById(surveyId);
+	public CollectRecord generate(CollectSurvey survey, NewRecordParameters parameters, RecordKey recordKey) {
 		User user = loadUser(parameters.getUserId(), parameters.getUsername());
 		
 		EntityDefinition rootEntityDef = StringUtils.isBlank(parameters.getRootEntityName()) ?
@@ -63,19 +62,22 @@ public class RecordGenerator {
 				: survey.getSchema().getRootEntityDefinition(parameters.getRootEntityName());
 				
 		CollectRecord record = createRecord(survey, rootEntityDef, parameters.getVersionName(), 
-				user, recordKey);
-		
+				parameters.getStep(), user, recordKey);
+		record.setPreview(parameters.isPreview());
+
 		if (parameters.isAddSecondLevelEntities()) {
 			addSecondLevelEntities(record, recordKey);
 		}
-		recordManager.save(record);
+		if (!record.isPreview()) {
+			recordManager.save(record);
+		}
 		return record;
 	}
 	
 	private CollectRecord createRecord(CollectSurvey survey, EntityDefinition rootEntityDef, 
-			String versionName, User user, RecordKey recordKey) {
+			String versionName, Step step, User user, RecordKey recordKey) {
 		String rootEntityName = rootEntityDef.getName();
-		CollectRecord record = recordManager.create(survey, rootEntityName, user, versionName);
+		CollectRecord record = recordManager.create(survey, rootEntityName, user, versionName, null, step);
 		if (recordKey.isNotEmpty()) {
 			setRecordKeyValues(record, recordKey);
 		}
@@ -185,6 +187,8 @@ public class RecordGenerator {
 		private Integer userId;
 		private String rootEntityName;
 		private String versionName;
+		private Step step = Step.ENTRY;
+		private boolean preview;
 		private boolean addSecondLevelEntities = false;
 		private boolean onlyUnanalyzedSamplingPoints = false;
 		private List<String> recordKey = new ArrayList<String>();
@@ -219,6 +223,22 @@ public class RecordGenerator {
 		
 		public void setVersionName(String versionName) {
 			this.versionName = versionName;
+		}
+		
+		public Step getStep() {
+			return step;
+		}
+		
+		public void setStep(Step step) {
+			this.step = step;
+		}
+		
+		public boolean isPreview() {
+			return preview;
+		}
+		
+		public void setPreview(boolean preview) {
+			this.preview = preview;
 		}
 		
 		public boolean isAddSecondLevelEntities() {

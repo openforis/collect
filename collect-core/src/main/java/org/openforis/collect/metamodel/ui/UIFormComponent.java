@@ -22,4 +22,8 @@ public interface UIFormComponent extends Identifiable {
 	
 	void setRow(int row);
 	
+	boolean isHideWhenNotRelevant();
+	
+	void setHideWhenNotRelevant(boolean hide);
+	
 }

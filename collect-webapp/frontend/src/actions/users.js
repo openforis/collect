@@ -7,7 +7,7 @@ export const INVALIDATE_USERS = 'INVALIDATE_USERS'
 export const DELETE_USER = 'DELETE_USER'
 export const DELETE_USERS = 'DELETE_USERS'
 export const USERS_DELETED = 'USERS_DELETED'
-export const UDPATE_USER = 'UDPATE_USER'
+export const UPDATE_USER = 'UPDATE_USER'
 export const RECEIVE_USER = 'RECEIVE_USER'
 
 function requestUsers() {

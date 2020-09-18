@@ -1,8 +1,5 @@
 package org.openforis.collect.event;
 
-import java.util.Date;
-import java.util.List;
-
 /**
  * 
  * @author D. Wiell
@@ -11,17 +8,32 @@ import java.util.List;
  */
 public class DateAttributeUpdatedEvent extends AttributeUpdatedEvent {
 
-	private final Date date;
+	private Integer day;
+	private Integer month;
+	private Integer year;
 
-	public DateAttributeUpdatedEvent(String surveyName, Integer recordId,
-			RecordStep step, String definitionId, List<String> ancestorIds,
-			String nodeId, Date date, Date timestamp, String userName) {
-		super(surveyName, recordId, step, definitionId, ancestorIds, nodeId,
-				timestamp, userName);
-		this.date = date;
+	public Integer getYear() {
+		return year;
 	}
 
-	public Date getDate() {
-		return date;
+	public void setYear(Integer year) {
+		this.year = year;
 	}
+
+	public Integer getMonth() {
+		return month;
+	}
+
+	public void setMonth(Integer month) {
+		this.month = month;
+	}
+
+	public Integer getDay() {
+		return day;
+	}
+
+	public void setDay(Integer day) {
+		this.day = day;
+	}
+
 }

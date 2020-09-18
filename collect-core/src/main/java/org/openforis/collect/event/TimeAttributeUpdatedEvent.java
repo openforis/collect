@@ -1,7 +1,6 @@
 package org.openforis.collect.event;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * 
@@ -11,17 +10,13 @@ import java.util.List;
  */
 public class TimeAttributeUpdatedEvent extends AttributeUpdatedEvent {
 
-	private final Date time;
-
-	public TimeAttributeUpdatedEvent(String surveyName, Integer recordId,
-			RecordStep step, String definitionId, List<String> ancestorIds,
-			String nodeId, Date time, Date timestamp, String userName) {
-		super(surveyName, recordId, step, definitionId, ancestorIds, nodeId,
-				timestamp, userName);
-		this.time = time;
-	}
+	private Date time;
 
 	public Date getTime() {
 		return time;
+	}
+	
+	public void setTime(Date time) {
+		this.time = time;
 	}
 }

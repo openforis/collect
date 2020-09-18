@@ -15,7 +15,9 @@ import static org.openforis.idm.testfixture.NodeDefinitionBuilder.entityDef;
 
 import org.junit.Test;
 import org.openforis.collect.utils.Dates;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
@@ -555,8 +557,9 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		Attribute<?, ?> trigger = record.findNodeByPath("/root/trigger");
 		NodeChangeSet nodeChangeSet = update(trigger, "5");
 		EntityChange rootEntityChange = (EntityChange) nodeChangeSet.getChange(record.getRootEntity());
-		assertNull(rootEntityChange.getChildrenRelevance().get("deprecated"));
-		assertNull(rootEntityChange.getChildrenRelevance().get("since"));
+		EntityDefinition rootEntityDef = record.getRootEntity().getDefinition();
+		assertNull(rootEntityChange.getChildrenRelevance().get(rootEntityDef.getChildDefinition("deprecated").getId()));
+		assertNull(rootEntityChange.getChildrenRelevance().get(rootEntityDef.getChildDefinition("since").getId()));
 	}
 	
 	@Test
@@ -580,10 +583,12 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		
 		//expected: attribute2 and attribute3 become not relevant
 		EntityChange rootEntityChange = (EntityChange) nodeChangeSet.getChange(record.getRootEntity());
-		Boolean attribute2Relevance = rootEntityChange.getChildrenRelevance().get("attribute2");
+		NodeDefinition attribute2Def = record.getRootEntity().getDefinition().getChildDefinition("attribute2");
+		Boolean attribute2Relevance = rootEntityChange.getChildrenRelevance().get(attribute2Def.getId());
 		assertNotNull(attribute2Relevance);
 		assertFalse(attribute2Relevance);
-		Boolean attribute3Relevance = rootEntityChange.getChildrenRelevance().get("attribute3");
+		NodeDefinition attribute3Def = record.getRootEntity().getDefinition().getChildDefinition("attribute3");
+		Boolean attribute3Relevance = rootEntityChange.getChildrenRelevance().get(attribute3Def.getId());
 		assertNotNull(attribute3Relevance);
 		assertFalse(attribute3Relevance);
 	}
@@ -655,16 +660,17 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 			attribute("dependent", null)
 		);
 		Entity rootEntity = record.getRootEntity();
-		assertEquals(ValidationResultFlag.OK, rootEntity.getMinCountValidationResult("dependent"));
+		NodeDefinition dependentDef = rootEntity.getDefinition().getChildDefinition("dependent");
+		assertEquals(ValidationResultFlag.OK, rootEntity.getMinCountValidationResult(dependentDef));
 
 		Attribute<?, ?> source = record.findNodeByPath("/root/source");
 
 		NodeChangeSet nodeChangeSet = update(source, "1");
 		EntityChange rootEntityChange = (EntityChange) nodeChangeSet.getChange(rootEntity);
 		assertNotNull(rootEntityChange);
-		ValidationResultFlag dependentValidationResult = rootEntityChange.getChildrenMinCountValidation().get("dependent");
+		ValidationResultFlag dependentValidationResult = rootEntityChange.getChildrenMinCountValidation().get(dependentDef.getId());
 		assertEquals(ValidationResultFlag.ERROR, dependentValidationResult);
-		assertEquals(ValidationResultFlag.ERROR, rootEntity.getMinCountValidationResult("dependent"));
+		assertEquals(ValidationResultFlag.ERROR, rootEntity.getMinCountValidationResult(dependentDef));
 	}
 	
 	@Test
@@ -681,16 +687,17 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 			attribute("dependent", null)
 		);
 		Entity rootEntity = record.getRootEntity();
-		assertEquals(ValidationResultFlag.OK, rootEntity.getMinCountValidationResult("dependent"));
+		NodeDefinition dependentDef = rootEntity.getDefinition().getChildDefinition("dependent");
+		assertEquals(ValidationResultFlag.OK, rootEntity.getMinCountValidationResult(dependentDef));
 
 		Attribute<?, ?> source = record.findNodeByPath("/root/source");
 
 		NodeChangeSet nodeChangeSet = update(source, "1");
 		EntityChange rootEntityChange = (EntityChange) nodeChangeSet.getChange(rootEntity);
 		assertNotNull(rootEntityChange);
-		ValidationResultFlag dependentValidationResult = rootEntityChange.getChildrenMinCountValidation().get("dependent");
+		ValidationResultFlag dependentValidationResult = rootEntityChange.getChildrenMinCountValidation().get(dependentDef.getId());
 		assertEquals(ValidationResultFlag.ERROR, dependentValidationResult);
-		assertEquals(ValidationResultFlag.ERROR, rootEntity.getMinCountValidationResult("dependent"));
+		assertEquals(ValidationResultFlag.ERROR, rootEntity.getMinCountValidationResult(dependentDef));
 	}
 	
 	@Test
@@ -716,18 +723,16 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 			)
 		);
 		Entity rootEntity = record.getRootEntity();
+		NodeDefinition timeStudyDef = rootEntity.getDefinition().getChildDefinition("time_study");
 		
-		assertEquals(ValidationResultFlag.ERROR, rootEntity.getMaxCountValidationResult("time_study"));
-		
-//		EntityDefinition timeStudyDef = (EntityDefinition) survey.getSchema().getDefinitionByPath("/root/time_study");
-//		Integer timeStudyMaxCount = rootEntityChange.getMaxCountByChildDefinitionId().get(timeStudyDef);
+		assertEquals(ValidationResultFlag.ERROR, rootEntity.getMaxCountValidationResult(timeStudyDef));
 		
 		NodeChangeSet changeSet = updater.deleteNode(record.findNodeByPath("/root/time_study[1]"));
 		EntityChange rootEntityChange = (EntityChange) changeSet.getChange(rootEntity);
 		assertNotNull(rootEntityChange);
-		ValidationResultFlag maxTimeStudyCountValidation = rootEntityChange.getChildrenMaxCountValidation().get("time_study");
+		ValidationResultFlag maxTimeStudyCountValidation = rootEntityChange.getChildrenMaxCountValidation().get(timeStudyDef.getId());
 		assertEquals(ValidationResultFlag.OK, maxTimeStudyCountValidation);
-		assertEquals(ValidationResultFlag.OK, rootEntity.getMaxCountValidationResult("time_study"));
+		assertEquals(ValidationResultFlag.OK, rootEntity.getMaxCountValidationResult(timeStudyDef));
 	}
 	
 }

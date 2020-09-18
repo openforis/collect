@@ -106,7 +106,7 @@ export default class AbstractService {
     _sendJson(url, data, method) {
         return fetch(this.BASE_URL + url, {
             credentials: 'include',
-            method: method,
+            method,
             headers: {
               'Content-Type': 'application/json'
             },

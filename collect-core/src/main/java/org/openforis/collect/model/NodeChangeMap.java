@@ -216,7 +216,7 @@ public class NodeChangeMap implements NodeChangeSet {
 	public void addRelevanceChanges(Set<NodePointer> pointers) {
 		for (NodePointer nodePointer : pointers) {
 			EntityChange change = prepareEntityChange(nodePointer.getEntity());
-			change.setRelevance(nodePointer.getChildName(), nodePointer.areNodesRelevant());
+			change.setRelevance(nodePointer.getChildDefinitionId(), nodePointer.areNodesRelevant());
 		}
 	}
 
@@ -236,12 +236,12 @@ public class NodeChangeMap implements NodeChangeSet {
 
 	public void addMinCountValidationResultChange(NodePointer nodePointer, ValidationResultFlag minCountResult) {
 		EntityChange change = prepareEntityChange(nodePointer.getEntity());
-		change.setMinCountValidation(nodePointer.getChildName(), minCountResult);
+		change.setMinCountValidation(nodePointer.getChildDefinitionId(), minCountResult);
 	}
 
 	public void addMaxCountValidationResultChange(NodePointer nodePointer, ValidationResultFlag maxCountResult) {
 		EntityChange change = prepareEntityChange(nodePointer.getEntity());
-		change.setMaxCountValidation(nodePointer.getChildName(), maxCountResult);
+		change.setMaxCountValidation(nodePointer.getChildDefinitionId(), maxCountResult);
 	}
 
 	public void addValidationResultChange(Attribute<?, ?> attribute, ValidationResults validationResults) {

@@ -17,38 +17,44 @@ public class TaxonAttributeUpdatedEvent extends AttributeUpdatedEvent {
 	private String languageCode;
 	private String languageVariety;
 
-	public TaxonAttributeUpdatedEvent(String surveyName, Integer recordId,
-			RecordStep step, String definitionId, List<String> ancestorIds,
-			String nodeId, String code, String scientificName,
-			String vernacularName, String languageCode, String languageVariety,
-			Date timestamp, String userName) {
-		super(surveyName, recordId, step, definitionId, ancestorIds, nodeId,
-				timestamp, userName);
-		this.code = code;
-		this.scientificName = scientificName;
-		this.vernacularName = vernacularName;
-		this.languageCode = languageCode;
-		this.languageVariety = languageVariety;
-	}
-
 	public String getCode() {
 		return code;
+	}
+	
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public String getScientificName() {
 		return scientificName;
 	}
+	
+	public void setScientificName(String scientificName) {
+		this.scientificName = scientificName;
+	}
 
 	public String getVernacularName() {
 		return vernacularName;
+	}
+	
+	public void setVernacularName(String vernacularName) {
+		this.vernacularName = vernacularName;
 	}
 
 	public String getLanguageCode() {
 		return languageCode;
 	}
+	
+	public void setLanguageCode(String languageCode) {
+		this.languageCode = languageCode;
+	}
 
 	public String getLanguageVariety() {
 		return languageVariety;
+	}
+	
+	public void setLanguageVariety(String languageVariety) {
+		this.languageVariety = languageVariety;
 	}
 
 }

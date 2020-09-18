@@ -1,19 +1,19 @@
 package org.openforis.collect.event;
 
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.model.AttributeAddChange;
 import org.openforis.collect.model.AttributeChange;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.EntityAddChange;
+import org.openforis.collect.model.EntityChange;
 import org.openforis.collect.model.NodeChange;
 import org.openforis.collect.model.NodeChangeSet;
 import org.openforis.collect.model.NodeDeleteChange;
@@ -23,7 +23,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
-import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.BooleanAttribute;
 import org.openforis.idm.model.BooleanValue;
@@ -50,68 +50,93 @@ import org.openforis.idm.model.TimeAttribute;
  */
 public class EventProducer {
 
-	public List<RecordEvent> produceFor(CollectRecord record, final String userName) {
-		final List<RecordEvent> events = new ArrayList<RecordEvent>();
-		
+	private EventProducerContext context;
+	private EventListener consumer;
+
+	public EventProducer(EventProducerContext context, EventListener consumer) {
+		super();
+		this.context = context;
+		this.consumer = consumer;
+	}
+	
+	public void produceFor(Object obj) {
+		if (obj instanceof CollectRecord) {
+			produceFor((CollectRecord) obj);
+		} else if (obj instanceof NodeChangeSet) {
+			produceFor((NodeChangeSet) obj);
+		} else {
+			throw new IllegalArgumentException("Cannot produce events for object of type " + obj.getClass().getName());
+		}
+	}
+	
+	public void produceFor(CollectRecord record) {
 		final Integer recordId = record.getId();
 		final RecordStep recordStep = record.getStep().toRecordStep();
-		
+
 		record.getRootEntity().traverse(new NodeVisitor() {
 			public void visit(Node<? extends NodeDefinition> node, int idx) {
 				NodeDefinition nodeDef = node.getDefinition();
 				List<String> ancestorIds = getAncestorIds(nodeDef, node.getAncestorIds());
-				EventFactory factory = new EventFactory(recordId, recordStep, ancestorIds, node, userName);
+				EventFactory factory = new EventFactory(recordId, recordStep, ancestorIds, node);
 				if (node instanceof Entity) {
-					events.addAll(factory.entityCreated());
+					Entity entity = (Entity) node;
+					factory.entityCreated(entity.getRelevanceByDefinitionId(), entity.getMinCountByDefinitionId(),
+							entity.getMaxCountByDefinitionId(), entity.getMinCountValidationResultByDefinitionId(),
+							entity.getMaxCountValidationResultByDefinitionId());
 				} else if (node instanceof Attribute) {
 					if (nodeDef.isMultiple()) {
-						events.addAll(factory.attributeCreated());
+						factory.attributeCreated();
 					} else {
-						events.addAll(factory.attributeUpdated());
+						factory.attributeUpdated();
 					}
 				}
 			}
 		});
-		return events;
-	}
-	
-	public List<RecordEvent> produceFor(NodeChangeSet changeSet, String userName) {
-		return toEvents(changeSet, userName);
 	}
 
-	private List<RecordEvent> toEvents(NodeChangeSet changeSet, String userName) {
-		List<RecordEvent> events = new ArrayList<RecordEvent>();
-		List<NodeChange<?>> changes = changeSet.getChanges();
-		for (NodeChange<?> change : changes) {
-			events.addAll(toEvent(change, userName));
+	public void produceFor(NodeChangeSet changeSet) {
+		notifyEvents(changeSet);
+	}
+
+	private void notifyEvents(NodeChangeSet changeSet) {
+		for (NodeChange<?> change : changeSet.getChanges()) {
+			notifyEvents(change);
 		}
-		return events;
 	}
 
-	private List<? extends RecordEvent> toEvent(NodeChange<?> change, String userName) {
+	private void notifyEvents(NodeChange<?> change) {
 		Node<?> node = change.getNode();
 		List<String> ancestorIds = getAncestorIds(node.getDefinition(), change.getAncestorIds());
 		Integer recordId = change.getRecordId();
 		RecordStep recordStep = change.getRecordStep().toRecordStep();
 
-		EventFactory factory = new EventFactory(recordId, recordStep, ancestorIds, node, userName);
+		EventFactory factory = new EventFactory(recordId, recordStep, ancestorIds, node);
 
-		if (change instanceof EntityAddChange) {
-			return factory.entityCreated();
+		if (change instanceof EntityChange) {
+			EntityChange entityChange = (EntityChange) change;
+			if (change instanceof EntityAddChange) {
+				factory.entityCreated(entityChange.getChildrenRelevance(),
+						entityChange.getMinCountByChildDefinitionId(), entityChange.getMaxCountByChildDefinitionId(),
+						entityChange.getChildrenMinCountValidation(), entityChange.getChildrenMaxCountValidation());
+			} else {
+				factory.entityUpdated(entityChange.getChildrenRelevance(),
+						entityChange.getMinCountByChildDefinitionId(), entityChange.getMaxCountByChildDefinitionId(),
+						entityChange.getChildrenMinCountValidation(), entityChange.getChildrenMaxCountValidation());
+			}
 		} else if (change instanceof AttributeChange) {
 			if (change instanceof AttributeAddChange) {
-				return factory.attributeCreated();
+				factory.attributeCreated();
 			} else {
-				return factory.attributeUpdated();
+				factory.attributeUpdated();
 			}
 		} else if (change instanceof NodeDeleteChange) {
 			if (node instanceof Entity) {
-				return factory.entityDeleted();
+				factory.entityDeleted();
 			} else {
-				return factory.attributeDeleted();
+				factory.attributeDeleted();
 			}
 		}
-		return emptyList();
+
 	}
 
 	private List<String> getAncestorIds(NodeDefinition nodeDef, List<Integer> ancestorEntityIds) {
@@ -123,16 +148,16 @@ public class EventProducer {
 			int parentId = ancestorEntityIds.get(0);
 			ancestorIds.add(getNodeCollectionId(parentId, nodeDef));
 		}
-		
+
 		List<EntityDefinition> ancestorDefs = nodeDef.getAncestorEntityDefinitions();
 		for (int ancestorIdx = 0; ancestorIdx < ancestorEntityIds.size(); ancestorIdx++) {
 			int ancestorEntityId = ancestorEntityIds.get(ancestorIdx);
 			EntityDefinition ancestorDef = ancestorDefs.get(ancestorIdx);
 			ancestorIds.add(String.valueOf(ancestorEntityId));
-			boolean inCollection = ! ancestorDef.isRoot() && ancestorDef.isMultiple();
+			boolean inCollection = !ancestorDef.isRoot() && ancestorDef.isMultiple();
 			if (inCollection) {
 				Integer ancestorParentId = ancestorEntityIds.get(ancestorIdx + 1);
-				ancestorIds.add(getNodeCollectionId(ancestorParentId, ancestorDef)); 
+				ancestorIds.add(getNodeCollectionId(ancestorParentId, ancestorDef));
 			}
 		}
 		return ancestorIds;
@@ -141,167 +166,246 @@ public class EventProducer {
 	private String getNodeCollectionId(int parentId, NodeDefinition memberDef) {
 		return parentId + "|" + memberDef.getId();
 	}
-	
+
 	private String getNodeCollectionDefinitionId(EntityDefinition parentDef, NodeDefinition memberDef) {
 		return parentDef.getId() + "|" + memberDef.getId();
-	}	
+	}
 
 	private class EventFactory {
-		Node<?> node;
-		List<String> ancestorIds;
 		Integer recordId;
 		RecordStep recordStep;
-
-		Survey survey;
-		String surveyName;
-		NodeDefinition nodeDef;
-		int definitionId;
-		int nodeId;
+		List<String> ancestorIds;
+		Node<?> node;
 		Date timestamp;
-		String userName;
-		
-		EventFactory(Integer recordId, RecordStep recordStep,  List<String> ancestorIds, Node<?> node, String userName) {
+
+		EventFactory(Integer recordId, RecordStep recordStep, List<String> ancestorIds,
+				Node<?> node) {
 			this.recordId = recordId;
 			this.recordStep = recordStep;
 			this.ancestorIds = ancestorIds;
 			this.node = node;
-			this.userName = userName;
-			
-			this.survey = node.getSurvey();
-			this.surveyName = survey.getName();
-			this.nodeDef = node.getDefinition();
-			this.definitionId = nodeDef.getId();
-			this.nodeId = node.getInternalId();
 			this.timestamp = new Date();
 		}
-		
-		List<? extends RecordEvent> entityCreated() {
-			List<RecordEvent> events = new ArrayList<RecordEvent>();
+
+		void entityCreated(Map<Integer, Boolean> relevanceByChildDefinitionId,
+				Map<Integer, Integer> minCountByChildDefinitionId, Map<Integer, Integer> maxCountByChildDefinitionId,
+				Map<Integer, ValidationResultFlag> minCountValidationByChildDefinitionId,
+				Map<Integer, ValidationResultFlag> maxCountValidationByChildDefinitionId) {
 			Entity entity = (Entity) node;
-			if (entity.isRoot()) {
-				events.add(new RootEntityCreatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						String.valueOf(nodeId), timestamp, userName));
-			} else {
-				 events.add(new EntityCreatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						ancestorIds, String.valueOf(nodeId), timestamp, userName));
-			}
-			//add node collection created events
-			for (NodeDefinition childDef : ((EntityDefinition) nodeDef).getChildDefinitions()) {
+			EntityCreatedEvent entityEvent = entity.isRoot() ? new RootEntityCreatedEvent() : new EntityCreatedEvent();
+			fillRecordEvent(entityEvent);
+			entityEvent.setChildrenRelevanceByDefinitionId(relevanceByChildDefinitionId);
+			entityEvent.setChildrenMinCountByDefinitionId(minCountByChildDefinitionId);
+			entityEvent.setChildrenMaxCountByDefinitionId(maxCountByChildDefinitionId);
+			entityEvent.setChildrenMinCountValidationByDefinitionId(minCountValidationByChildDefinitionId);
+			entityEvent.setChildrenMaxCountValidationByDefinitionId(maxCountValidationByChildDefinitionId);
+			consumer.onEvent(entityEvent);
+
+			// add node collection created events
+			EntityDefinition entityDef = (EntityDefinition) node.getDefinition();
+			for (NodeDefinition childDef : entityDef.getChildDefinitions()) {
 				if (childDef.isMultiple()) {
-					String collectionId = getNodeCollectionId(nodeId, childDef);
+					String collectionId = getNodeCollectionId(entityDef.getId(), childDef);
 					String collectionDefId = getNodeCollectionDefinitionId(entity.getDefinition(), childDef);
-					if (childDef instanceof AttributeDefinition) {
-						events.add(new AttributeCollectionCreatedEvent(surveyName, recordId, recordStep, collectionDefId, 
-								ancestorIds, collectionId, timestamp, userName));
-					} else {
-						events.add(new EntityCollectionCreatedEvent(surveyName, recordId, recordStep, collectionDefId, 
-								ancestorIds, collectionId, timestamp, userName));
-					}
+					RecordEvent event = childDef instanceof AttributeDefinition ? new AttributeCollectionCreatedEvent()
+							: new EntityCollectionCreatedEvent();
+					event = fillRecordEvent(event);
+					event.setDefinitionId(collectionDefId);
+					event.setNodeId(collectionId);
+					consumer.onEvent(event);
 				}
 			}
-			return events;
 		}
-		
-		List<? extends RecordEvent> attributeCreated() {
-			List<RecordEvent> result = new ArrayList<RecordEvent>();
-			result.add(new AttributeCreatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						ancestorIds, String.valueOf(nodeId), timestamp, userName));
-			if (node.hasData()) {
-				result.addAll(attributeUpdated());
+
+		void entityUpdated(Map<Integer, Boolean> relevanceByChildDefinitionId,
+				Map<Integer, Integer> minCountByChildDefinitionId, Map<Integer, Integer> maxCountByChildDefinitionId,
+				Map<Integer, ValidationResultFlag> minCountValidationByChildDefinitionId,
+				Map<Integer, ValidationResultFlag> maxCountValidationByChildDefinitionId) {
+			for (Entry<Integer, Boolean> entry : relevanceByChildDefinitionId.entrySet()) {
+				relevanceUpdated(entry.getKey(), entry.getValue());
 			}
-			return result;
+			for (Entry<Integer, Integer> entry : minCountByChildDefinitionId.entrySet()) {
+				minCountUpdated(entry.getKey(), entry.getValue());
+			}
+			for (Entry<Integer, Integer> entry : maxCountByChildDefinitionId.entrySet()) {
+				maxCountUpdated(entry.getKey(), entry.getValue());
+			}
+			for (Entry<Integer, ValidationResultFlag> entry : minCountValidationByChildDefinitionId.entrySet()) {
+				minCountValidationUpdated(entry.getKey(), entry.getValue());
+			}
+			for (Entry<Integer, ValidationResultFlag> entry : maxCountValidationByChildDefinitionId.entrySet()) {
+				maxCountValidationUpdated(entry.getKey(), entry.getValue());
+			}
 		}
-		
-		List<? extends RecordEvent> attributeUpdated() {
+
+		void attributeCreated() {
+			consumer.onEvent(fillRecordEvent(new AttributeCreatedEvent()));
+			if (node.hasData()) {
+				attributeUpdated();
+			}
+		}
+
+		@SuppressWarnings("unchecked")
+		void attributeUpdated() {
 			AttributeUpdatedEvent event = null;
 			if (node instanceof BooleanAttribute) {
+				event = new BooleanAttributeUpdatedEvent();
 				BooleanValue value = ((BooleanAttribute) node).getValue();
-				event = new BooleanAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						ancestorIds, String.valueOf(nodeId), value.getValue(), timestamp, userName);
+				((BooleanAttributeUpdatedEvent) event).setValue(value.getValue());
 			} else if (node instanceof CodeAttribute) {
+				event = new CodeAttributeUpdatedEvent();
 				Code value = ((CodeAttribute) node).getValue();
-				event = new CodeAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						ancestorIds, String.valueOf(nodeId), value.getCode(), 
-						value.getQualifier(), timestamp, userName);
+				((CodeAttributeUpdatedEvent) event).setCode(value.getCode());
+				((CodeAttributeUpdatedEvent) event).setQualifier(value.getQualifier());
 			} else if (node instanceof CoordinateAttribute) {
+				event = new CoordinateAttributeUpdatedEvent();
 				Coordinate value = ((CoordinateAttribute) node).getValue();
-				event = new CoordinateAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						ancestorIds, String.valueOf(nodeId), value.getX(), value.getY(), value.getSrsId(), 
-						timestamp, userName);
+				((CoordinateAttributeUpdatedEvent) event).setX(value.getX());
+				((CoordinateAttributeUpdatedEvent) event).setY(value.getY());
+				((CoordinateAttributeUpdatedEvent) event).setSrsId(value.getSrsId());
 			} else if (node instanceof DateAttribute) {
 				org.openforis.idm.model.Date value = ((DateAttribute) node).getValue();
-				event = new DateAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						ancestorIds, String.valueOf(nodeId), value.toJavaDate(), timestamp, userName);
-			//TODO
+				event = new DateAttributeUpdatedEvent();
+				((DateAttributeUpdatedEvent) event).setDay(value.getDay());
+				((DateAttributeUpdatedEvent) event).setMonth(value.getMonth());
+				((DateAttributeUpdatedEvent) event).setYear(value.getYear());
+				// TODO
 //				} else if (node instanceof FileAttribute) {
 			} else if (node instanceof NumberAttribute<?, ?>) {
 				NumberAttribute<?, ?> attribute = (NumberAttribute<?, ?>) node;
 				Number value = attribute.getNumber();
-				Integer unitId = attribute.getUnitId();
-				Type valueType = ((NumericAttributeDefinition) nodeDef).getType();
-				switch(valueType) {
+				Type valueType = ((NumericAttributeDefinition) node.getDefinition()).getType();
+				switch (valueType) {
 				case INTEGER:
-					event = new IntegerAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-							ancestorIds, String.valueOf(nodeId), 
-							(Integer) value, unitId, timestamp, userName);
+					event = new IntegerAttributeUpdatedEvent();
 					break;
 				case REAL:
-					event = new DoubleAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-							ancestorIds, String.valueOf(nodeId), 
-							(Double) value, unitId, timestamp, userName);
+					event = new DoubleAttributeUpdatedEvent();
 					break;
 				default:
 					throw new IllegalArgumentException("Numeric type not supported: " + valueType);
 				}
+				((NumberAttributeUpdatedEvent<?>) event).setUnitId(attribute.getUnitId());
+				((NumberAttributeUpdatedEvent<Number>) event).setValue(value);
+
 			} else if (node instanceof NumericRangeAttribute<?, ?>) {
 				NumericRangeAttribute<?, ?> attribute = (NumericRangeAttribute<?, ?>) node;
 				Number from = attribute.getFrom();
 				Number to = attribute.getTo();
-				Integer unitId = attribute.getUnitId();
-				Type valueType = ((RangeAttributeDefinition) nodeDef).getType();
-				switch(valueType) {
+				Type valueType = ((RangeAttributeDefinition) node.getDefinition()).getType();
+				switch (valueType) {
 				case INTEGER:
-					event = new IntegerRangeAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-							ancestorIds, String.valueOf(nodeId), 
-							(Integer) from, (Integer) to, unitId, timestamp, userName);
+					event = new IntegerRangeAttributeUpdatedEvent();
 					break;
 				case REAL:
-					event = new DoubleRangeAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-							ancestorIds, String.valueOf(nodeId), 
-							(Double) from, (Double) to, unitId, timestamp, userName);
+					event = new DoubleRangeAttributeUpdatedEvent();
 					break;
 				default:
 					throw new IllegalArgumentException("Numeric type not supported: " + valueType);
 				}
+				((RangeAttributeUpdatedEvent<?>) event).setUnitId(attribute.getUnitId());
+				((RangeAttributeUpdatedEvent<Number>) event).setFrom(from);
+				((RangeAttributeUpdatedEvent<Number>) event).setTo(to);
 			} else if (node instanceof TaxonAttribute) {
 				TaxonAttribute taxonAttr = (TaxonAttribute) node;
-				event = new TaxonAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						ancestorIds, String.valueOf(nodeId), 
-						taxonAttr.getCode(), taxonAttr.getScientificName(), taxonAttr.getVernacularName(), taxonAttr.getLanguageCode(), 
-						taxonAttr.getLanguageVariety(), timestamp, userName);
+				TaxonAttributeUpdatedEvent taxonEvent = new TaxonAttributeUpdatedEvent();
+				taxonEvent.setCode(taxonAttr.getCode());
+				taxonEvent.setScientificName(taxonAttr.getScientificName());
+				taxonEvent.setVernacularName(taxonAttr.getVernacularName());
+				taxonEvent.setLanguageCode(taxonAttr.getLanguageCode());
+				taxonEvent.setLanguageVariety(taxonAttr.getLanguageVariety());
+				event = taxonEvent;
 			} else if (node instanceof TextAttribute) {
-				String text = ((TextAttribute) node).getText();
-				event = new TextAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						ancestorIds, String.valueOf(nodeId), text, timestamp, userName);
+				event = new TextAttributeUpdatedEvent();
+				((TextAttributeUpdatedEvent) event).setText(((TextAttribute) node).getText());
 			} else if (node instanceof TimeAttribute) {
+				event = new TimeAttributeUpdatedEvent();
 				Time value = ((TimeAttribute) node).getValue();
-				event = new DateAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						ancestorIds, String.valueOf(nodeId), value.toJavaDate(), timestamp, userName);
+				((TimeAttributeUpdatedEvent) event).setTime(value.toJavaDate());
 //			} else {
 //				TODO fail for not supported node types
 //				throw new IllegalArgumentException("Unexpected node type: " + node.getClass().getSimpleName());
 			}
-			return event == null ? Collections.<RecordEvent>emptyList() : Arrays.<RecordEvent>asList(event);
+			if (event != null) {
+				fillRecordEvent(event);
+				event.setValidationResults(
+						new ValidationResultsView((Attribute<?, ?>) node, context.messageSource, context.locale));
+				consumer.onEvent(event);
+			}
 		}
-		
-		List<? extends RecordEvent> entityDeleted() {
-			return asList(new EntityDeletedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-					ancestorIds, String.valueOf(nodeId), timestamp, userName));
+
+		void entityDeleted() {
+			EntityDeletedEvent event = new EntityDeletedEvent();
+			fillRecordEvent(event);
+			consumer.onEvent(event);
 		}
-		
-		List<? extends RecordEvent> attributeDeleted() {
-			return asList(new AttributeDeletedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId),
-					ancestorIds, String.valueOf(nodeId), timestamp, userName));	
+
+		void attributeDeleted() {
+			AttributeDeletedEvent event = new AttributeDeletedEvent();
+			fillRecordEvent(event);
+			consumer.onEvent(event);
+		}
+
+		private void relevanceUpdated(int childDefinitionId, boolean relevant) {
+			NodeRelevanceUpdatedEvent event = new NodeRelevanceUpdatedEvent();
+			event.setChildDefinitionId(childDefinitionId);
+			event.setRelevant(relevant);
+			consumer.onEvent(fillRecordEvent(event));
+		}
+
+		private void minCountUpdated(int childDefinitionId, int minCount) {
+			NodeMinCountUpdatedEvent event = new NodeMinCountUpdatedEvent();
+			event.setChildDefinitionId(childDefinitionId);
+			event.setCount(minCount);
+			consumer.onEvent(fillRecordEvent(event));
+		}
+
+		private void maxCountUpdated(int childDefinitionId, int maxCount) {
+			NodeMaxCountUpdatedEvent event = new NodeMaxCountUpdatedEvent();
+			event.setChildDefinitionId(childDefinitionId);
+			event.setCount(maxCount);
+			consumer.onEvent(fillRecordEvent(event));
+		}
+
+		private void minCountValidationUpdated(int childDefinitionId, ValidationResultFlag flag) {
+			NodeMinCountValidationUpdatedEvent event = new NodeMinCountValidationUpdatedEvent();
+			event.setChildDefinitionId(childDefinitionId);
+			event.setFlag(flag);
+			consumer.onEvent(fillRecordEvent(event));
+		}
+
+		private void maxCountValidationUpdated(int childDefinitionId, ValidationResultFlag flag) {
+			NodeMaxCountValidationUpdatedEvent event = new NodeMaxCountValidationUpdatedEvent();
+			event.setChildDefinitionId(childDefinitionId);
+			event.setFlag(flag);
+			consumer.onEvent(fillRecordEvent(event));
+		}
+
+		private <E extends RecordEvent> E fillRecordEvent(E event) {
+			event.setSurveyName(node.getSurvey().getName());
+			event.setRecordId(recordId);
+			event.setRecordStep(recordStep);
+			event.setDefinitionId(String.valueOf(node.getDefinition().getId()));
+			event.setAncestorIds(ancestorIds);
+			event.setNodeId(String.valueOf(node.getInternalId()));
+			event.setNodePath(node.getPath());
+			event.setParentEntityPath(node.getParent() == null ? null : node.getParent().getPath());
+			event.setTimestamp(timestamp);
+			event.setUserName(context.userName);
+			return event;
+		}
+	}
+
+	public static class EventProducerContext {
+		MessageSource messageSource;
+		Locale locale;
+		String userName;
+
+		public EventProducerContext(MessageSource messageSource, Locale locale, String userName) {
+			super();
+			this.messageSource = messageSource;
+			this.locale = locale;
+			this.userName = userName;
 		}
 	}
 

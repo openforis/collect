@@ -175,6 +175,7 @@ public class UIOptionsMigrator {
 		component.setColumn(oldUIOptions.getColumn(nodeDefn));
 		component.setColumnSpan(oldUIOptions.getColumnSpan(nodeDefn));
 		component.setRow(row);
+		component.setHideWhenNotRelevant(oldUIOptions.isHideWhenNotRelevant(nodeDefn));
 		parent.addChild(component);
 	}
 

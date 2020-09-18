@@ -685,6 +685,10 @@ public class Entity extends Node<EntityDefinition> {
 	public Boolean getRelevance(NodeDefinition childDef) {
 		return derivedStateCache.getRelevance(childDef);
 	}
+	
+	public Map<Integer,Boolean> getRelevanceByDefinitionId() {
+		return derivedStateCache.getRelevanceByDefinitionId();
+	}
 
 	public void setRelevant(String childName, boolean relevant) {
 		setRelevant(definition.getChildDefinition(childName), relevant);
@@ -708,6 +712,10 @@ public class Entity extends Node<EntityDefinition> {
 		return fixedCount == null ? derivedStateCache.getMinCount(defn): fixedCount;
 	}
 	
+	public Map<Integer,Integer> getMinCountByDefinitionId() {
+		return derivedStateCache.getMinCountByDefinitionId();
+	}
+	
 	public void setMinCount(NodeDefinition childDefn, int count) {
 		derivedStateCache.setMinCount(childDefn, count);
 	}
@@ -721,12 +729,20 @@ public class Entity extends Node<EntityDefinition> {
 		derivedStateCache.setMaxCount(childDefn, count);
 	}
 
+	public Map<Integer,Integer> getMaxCountByDefinitionId() {
+		return derivedStateCache.getMaxCountByDefinitionId();
+	}
+	
 	public ValidationResultFlag getMinCountValidationResult(String childName) {
 		return getMinCountValidationResult(definition.getChildDefinition(childName));
 	}
 	
 	public ValidationResultFlag getMinCountValidationResult(NodeDefinition childDef) {
 		return derivedStateCache.getMinCountValidationResult(childDef);
+	}
+	
+	public Map<Integer,ValidationResultFlag> getMinCountValidationResultByDefinitionId() {
+		return derivedStateCache.getMinCountValidationResultByDefinitionId();
 	}
 	
 	public void setMinCountValidationResult(String childName, ValidationResultFlag value) {
@@ -743,6 +759,10 @@ public class Entity extends Node<EntityDefinition> {
 	
 	public ValidationResultFlag getMaxCountValidationResult(NodeDefinition childDef) {
 		return derivedStateCache.getMaxCountValidationResult(childDef);
+	}
+	
+	public Map<Integer,ValidationResultFlag> getMaxCountValidationResultByDefinitionId() {
+		return derivedStateCache.getMaxCountValidationResultByDefinitionId();
 	}
 	
 	public void setMaxCountValidationResult(String childName, ValidationResultFlag value) {
@@ -889,12 +909,20 @@ public class Entity extends Node<EntityDefinition> {
 			return minCountByChildDefinition.get(childDefinition);
 		}
 		
+		private Map<Integer,Integer> getMinCountByDefinitionId() {
+			return toMapByDefinitionId(minCountByChildDefinition);
+		}
+		
 		private void setMinCount(NodeDefinition childDefinition, int count) {
 			minCountByChildDefinition.put(childDefinition, count);
 		}
 		
 		private Integer getMaxCount(NodeDefinition childDefinition) {
 			return maxCountByChildDefinition.get(childDefinition);
+		}
+		
+		private Map<Integer,Integer> getMaxCountByDefinitionId() {
+			return toMapByDefinitionId(maxCountByChildDefinition);
 		}
 		
 		private void setMaxCount(NodeDefinition childDefinition, Integer count) {
@@ -909,6 +937,10 @@ public class Entity extends Node<EntityDefinition> {
 		private Boolean getRelevance(NodeDefinition childDefinition) {
 			return relevanceByChildDefinition.get(childDefinition);
 		}
+		
+		private Map<Integer,Boolean> getRelevanceByDefinitionId() {
+			return toMapByDefinitionId(relevanceByChildDefinition);
+		}
 
 		private void setRelevant(NodeDefinition childDefinition, boolean flag) {
 			relevanceByChildDefinition.put(childDefinition, flag);
@@ -917,7 +949,11 @@ public class Entity extends Node<EntityDefinition> {
 		private ValidationResultFlag getMinCountValidationResult(NodeDefinition childDefinition) {
 			return minCountValidationResultByChildDefinition.get(childDefinition);
 		}
-
+		
+		private Map<Integer,ValidationResultFlag> getMinCountValidationResultByDefinitionId() {
+			return toMapByDefinitionId(minCountValidationResultByChildDefinition);
+		}
+		
 		private ValidationResultFlag setMinCountValidationResult(NodeDefinition childDefinition, ValidationResultFlag value) {
 			return minCountValidationResultByChildDefinition.put(childDefinition, value);
 		}
@@ -926,8 +962,20 @@ public class Entity extends Node<EntityDefinition> {
 			return maxCountValidationResultByChildDefinition.get(childDefinition);
 		}
 
+		private Map<Integer,ValidationResultFlag> getMaxCountValidationResultByDefinitionId() {
+			return toMapByDefinitionId(maxCountValidationResultByChildDefinition);
+		}
+		
 		private ValidationResultFlag setMaxCountValidationResult(NodeDefinition childDefinitionId, ValidationResultFlag value) {
 			return maxCountValidationResultByChildDefinition.put(childDefinitionId, value);
+		}
+
+		private <T> Map<Integer,T> toMapByDefinitionId(Map<NodeDefinition,T> map) {
+			Map<Integer,T> result = new HashMap<Integer,T>();
+			for (Entry<NodeDefinition,T> entry : map.entrySet()) {
+				result.put(entry.getKey().getId(), entry.getValue());
+			}
+			return result;
 		}
 
 	}

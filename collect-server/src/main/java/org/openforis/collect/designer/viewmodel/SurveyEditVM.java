@@ -103,6 +103,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private Window jobStatusPopUp;
 
 	private Step previewStep;
+	private boolean previewNewUi;
 
 	public static void redirectToSurveyEditPage(int surveyId) {
 		Executions.sendRedirect(Page.SURVEY_EDIT.getLocation() + "?id=" + surveyId);
@@ -536,6 +537,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 					params.put("versionId", Integer.toString(formVersion.getId()));
 				}
 				params.put("recordStep", previewStep.name());
+				params.put("newUi", Boolean.toString(previewNewUi));
 				openPopUp(Resources.Component.PREVIEW_POP_UP.getLocation(), true, params);
 
 				closePreviewPreferencesPopUp();
@@ -557,19 +559,25 @@ public class SurveyEditVM extends SurveyBaseVM {
 
 	@Command
 	public void showDataEntryPreview() throws SurveyStoreException {
-		showPreview(Step.ENTRY);
+		showPreview(Step.ENTRY, false);
 	}
 	
 	@Command
 	public void showDataCleansingPreview() throws SurveyStoreException {
-		showPreview(Step.CLEANSING);
+		showPreview(Step.CLEANSING, false);
 	}
 
-	public void showPreview(Step recordStep) throws SurveyStoreException {
+	@Command
+	public void showDataEntryPreviewNew() throws SurveyStoreException {
+		showPreview(Step.ENTRY, true);
+	}
+	
+	public void showPreview(Step recordStep, boolean newUi) throws SurveyStoreException {
 		if (! checkCanLeaveForm() ) {
 			return;
 		}
 		previewStep = recordStep;
+		previewNewUi = newUi;
 
 		if (survey.getId() == null || changed)  {
 			save(null, this::openPreviewPopUp);

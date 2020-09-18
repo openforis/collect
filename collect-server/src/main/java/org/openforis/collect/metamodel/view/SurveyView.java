@@ -31,21 +31,29 @@ public class SurveyView {
 	private SchemaView schema;
 	private List<CodeListView> codeLists = new ArrayList<CodeListView>();
 	private List<ModelVersionView> modelVersions = new ArrayList<ModelVersionView>();
+	private List<UnitView> units = new ArrayList<UnitView>();
 	private CeoApplicationOptions ceoApplicationOptions;
 	private UIConfiguration uiConfiguration;
 	private SurveyAvailability availability;
 	private Date creationDate;
 	private Date modifiedDate;
 	
-	public SurveyView(Integer id, String name, boolean temporary, SurveyTarget target) {
+	private ViewContext context;
+	
+	public SurveyView(Integer id, String name, boolean temporary, SurveyTarget target, ViewContext context) {
 		this.id = id;
 		this.name = name;
 		this.temporary = temporary;
 		this.target = target;
+		this.context = context;
 	}
 	
 	public SurveyView(CollectSurvey s) {
-		this(s.getId(), s.getName(), s.isTemporary(), s.getTarget());
+		this(s, new ViewContext(s.getDefaultLanguage()));
+	}
+	
+	public SurveyView(CollectSurvey s, ViewContext context) {
+		this(s.getId(), s.getName(), s.isTemporary(), s.getTarget(), context);
 		this.projectName = s.getProjectName();
 		this.description = s.getDescription();
 		this.defaultLanguage = s.getDefaultLanguage();
@@ -61,7 +69,7 @@ public class SurveyView {
 	}
 
 	public UIConfigurationView getUiConfiguration() {
-		return new UIConfigurationView(uiConfiguration);
+		return new UIConfigurationView(uiConfiguration, context);
 	}
 	
 	public void addCodeList(CodeListView codeListView) {
@@ -70,6 +78,10 @@ public class SurveyView {
 	
 	public void addModelVersion(ModelVersionView modelVersion) {
 		this.modelVersions.add(modelVersion);
+	}
+	
+	public void addUnit(UnitView unit) {
+		this.units.add(unit);
 	}
 
 	public Integer getId() {
@@ -174,6 +186,10 @@ public class SurveyView {
 	
 	public List<ModelVersionView> getModelVersions() {
 		return modelVersions;
+	}
+	
+	public List<UnitView> getUnits() {
+		return units;
 	}
 	
 	public SchemaView getSchema() {

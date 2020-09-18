@@ -1,13 +1,14 @@
 package org.openforis.collect.metamodel.uiconfiguration.view;
 
 import org.openforis.collect.metamodel.ui.UIFormSection;
+import org.openforis.collect.metamodel.view.ViewContext;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 
 public class UIFieldSetView extends UITabContentContainerView<UIFormSection> implements UITabComponentView<UIFormSection> {
 
-	public UIFieldSetView(UIFormSection uiObject) {
-		super(uiObject);
+	public UIFieldSetView(UIFormSection uiObject, ViewContext context) {
+		super(uiObject, context);
 	}
 	
 	@Override

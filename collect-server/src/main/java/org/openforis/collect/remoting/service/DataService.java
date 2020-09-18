@@ -23,9 +23,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.ProxyContext;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.event.EventProducer;
+import org.openforis.collect.event.EventProducer.EventProducerContext;
 import org.openforis.collect.event.EventQueue;
 import org.openforis.collect.event.RecordDeletedEvent;
 import org.openforis.collect.event.RecordEvent;
+import org.openforis.collect.event.EventListenerToList;
 import org.openforis.collect.event.RecordStep;
 import org.openforis.collect.event.RecordTransaction;
 import org.openforis.collect.io.data.BulkRecordMoveJob;
@@ -131,7 +133,7 @@ public class DataService {
 
 	@Secured(USER)
 	public RecordProxy loadRecord(int id, Integer stepNumber) {
-		SessionState sessionState = sessionManager.getSessionState();
+		SessionState sessionState = getSessionState();
 		final CollectSurvey survey = sessionState.getActiveSurvey();
 		Step step = stepNumber == null ? null: Step.valueOf(stepNumber);
 		CollectRecord record = step == null ? recordManager.load(survey, id) : recordManager.load(survey, id, step);
@@ -241,8 +243,8 @@ public class DataService {
 		CollectRecord record = recordManager.instantiateRecord(activeSurvey, rootEntityName, user, versionName, recordStep);
 		NodeChangeSet changeSet = recordManager.initializeRecord(record);
 
-		List<RecordEvent> events = new EventProducer().produceFor(changeSet, user.getUsername());
-		sessionManager.onEvents(events);
+		EventProducerContext context = new EventProducer.EventProducerContext(messageSource, sessionState.getLocale(), user.getUsername());
+		new EventProducer(context, sessionManager).produceFor(changeSet);
 		
 		sessionManager.setActiveRecord(record);
 		prepareRecordIndexing();
@@ -300,9 +302,10 @@ public class DataService {
 			recordIndexService.temporaryIndex(activeRecord);
 		}
 		
-		String userName = sessionManager.getSessionState().getUser().getUsername();
-		List<RecordEvent> events = new EventProducer().produceFor(changeSet, userName);
-		sessionManager.onEvents(events);
+		SessionState sessionState = sessionManager.getSessionState();
+		String userName = sessionState.getUser().getUsername();
+		EventProducerContext context = new EventProducer.EventProducerContext(messageSource, sessionState.getLocale(), userName);
+		new EventProducer(context, sessionManager).produceFor(changeSet);
 		
 		NodeChangeSetProxy result = new NodeChangeSetProxy(activeRecord, changeSet, getProxyContext());
 		if ( requestSet.isAutoSave() ) {
@@ -609,7 +612,10 @@ public class DataService {
 		if (! eventQueue.isEnabled()) {
 			return;
 		}
-		List<RecordEvent> events = new EventProducer().produceFor(record, userName);
+		SessionState sessionState = getSessionState();
+		EventProducerContext context = new EventProducer.EventProducerContext(messageSource, sessionState.getLocale(), userName);
+		final List<RecordEvent> events = new ArrayList<RecordEvent>();
+		new EventProducer(context, new EventListenerToList(events)).produceFor(record);
 		eventQueue.publish(new RecordTransaction(record.getSurvey().getName(), record.getId(), record.getStep().toRecordStep(), events));
 	}
 	
@@ -647,8 +653,7 @@ public class DataService {
 	}
 	
 	protected SessionState getSessionState() {
-		SessionState sessionState = getSessionManager().getSessionState();
-		return sessionState;
+		return getSessionManager().getSessionState();
 	}
 
 	protected RecordSessionManager getSessionManager() {

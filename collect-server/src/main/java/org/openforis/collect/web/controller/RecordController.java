@@ -31,10 +31,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.ProxyContext;
 import org.openforis.collect.concurrency.CollectJobManager;
+import org.openforis.collect.event.EventListenerToList;
 import org.openforis.collect.event.EventProducer;
+import org.openforis.collect.event.EventProducer.EventProducerContext;
 import org.openforis.collect.event.EventQueue;
 import org.openforis.collect.event.RecordDeletedEvent;
-import org.openforis.collect.event.RecordEvent;
 import org.openforis.collect.event.RecordStep;
 import org.openforis.collect.event.RecordTransaction;
 import org.openforis.collect.io.SurveyBackupJob;
@@ -93,6 +94,7 @@ import org.openforis.collect.utils.MediaTypes;
 import org.openforis.collect.utils.Proxies;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.controller.RecordStatsGenerator.RecordsStats;
+import org.openforis.collect.web.manager.RecordProviderSession;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.collect.web.ws.AppWS;
 import org.openforis.commons.web.HttpResponses;
@@ -148,6 +150,8 @@ public class RecordController extends BasicController implements Serializable {
 	private UserGroupManager userGroupManager;
 	@Autowired
 	private CollectJobManager jobManager;
+	@Autowired
+	private RecordProviderSession recordProviderSession;
 	@Autowired
 	private RecordStatsGenerator recordStatsGenerator;
 	@Autowired
@@ -319,11 +323,12 @@ public class RecordController extends BasicController implements Serializable {
 		if (user == null) {
 			user = loadUser(params.getUserId(), params.getUsername());
 		}
-		CollectSurvey survey = surveyManager.getById(surveyId);
+		CollectSurvey survey = params.isPreview() ? surveyManager.loadSurvey(surveyId) : surveyManager.getById(surveyId);
 		params.setRootEntityName(ObjectUtils.defaultIfNull(params.getRootEntityName(), survey.getSchema().getFirstRootEntityDefinition().getName()));
 		params.setVersionName(ObjectUtils.defaultIfNull(params.getVersionName(), survey.getLatestVersion() != null ? survey.getLatestVersion().getName(): null));
 		params.setUserId(user.getId());
-		CollectRecord record = recordGenerator.generate(surveyId, params, params.getRecordKey());
+		CollectRecord record = recordGenerator.generate(survey, params);
+		recordProviderSession.putRecord(record);
 		return toProxy(record);
 	}
 	
@@ -652,8 +657,11 @@ public class RecordController extends BasicController implements Serializable {
 		if (! eventQueue.isEnabled()) {
 			return;
 		}
-		List<RecordEvent> events = new EventProducer().produceFor(record, userName);
-		eventQueue.publish(new RecordTransaction(record.getSurvey().getName(), record.getId(), record.getStep().toRecordStep(), events));
+		SessionState sessionState = sessionManager.getSessionState(); 
+		EventProducerContext context = new EventProducer.EventProducerContext(messageSource, sessionState.getLocale(), userName);
+		EventListenerToList consumer = new EventListenerToList();
+		new EventProducer(context, consumer).produceFor(record);
+		eventQueue.publish(new RecordTransaction(record.getSurvey().getName(), record.getId(), record.getStep().toRecordStep(), consumer.getList()));
 	}
 	
 	private void publishRecordDeletedEvent(CollectRecord record, RecordStep recordStep, String userName) {

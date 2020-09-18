@@ -23,11 +23,11 @@ import org.openforis.idm.model.Node;
  */
 public class EntityChange extends NodeChange<Entity> {
 	
-	protected Map<String, Boolean> relevanceByChildName;
+	protected Map<Integer, Boolean> relevanceByChildDefinitionId;
 	protected Map<Integer, Integer> minCountByChildDefinitionId;
 	protected Map<Integer, Integer> maxCountByChildDefinitionId;
-	protected Map<String, ValidationResultFlag> minCountValidationByChildName;
-	protected Map<String, ValidationResultFlag> maxCountValidationByChildName;
+	protected Map<Integer, ValidationResultFlag> minCountValidationByChildDefinitionId;
+	protected Map<Integer, ValidationResultFlag> maxCountValidationByChildDefinitionId;
 	
 	public EntityChange(Entity node) {
 		super(node.getRecord().getId(), node.getAncestorIds(), node);
@@ -35,29 +35,29 @@ public class EntityChange extends NodeChange<Entity> {
 		int numChildren = childDefs.size();
 		minCountByChildDefinitionId = new HashMap<Integer, Integer>(numChildren);
 		maxCountByChildDefinitionId = new HashMap<Integer, Integer>(numChildren);
-		minCountValidationByChildName = new HashMap<String, ValidationResultFlag>(numChildren);
-		maxCountValidationByChildName = new HashMap<String, ValidationResultFlag>(numChildren);
-		relevanceByChildName = new HashMap<String, Boolean>(numChildren);
+		minCountValidationByChildDefinitionId = new HashMap<Integer, ValidationResultFlag>(numChildren);
+		maxCountValidationByChildDefinitionId = new HashMap<Integer, ValidationResultFlag>(numChildren);
+		relevanceByChildDefinitionId = new HashMap<Integer, Boolean>(numChildren);
 	}
 	
 	public void merge(EntityChange newChange) {
 		minCountByChildDefinitionId.putAll(newChange.getMinCountByChildDefinitionId());
 		maxCountByChildDefinitionId.putAll(newChange.getMaxCountByChildDefinitionId());
-		minCountValidationByChildName.putAll(newChange.getChildrenMinCountValidation());
-		maxCountValidationByChildName.putAll(newChange.getChildrenMaxCountValidation());
-		relevanceByChildName.putAll(newChange.getChildrenRelevance());
+		minCountValidationByChildDefinitionId.putAll(newChange.getChildrenMinCountValidation());
+		maxCountValidationByChildDefinitionId.putAll(newChange.getChildrenMaxCountValidation());
+		relevanceByChildDefinitionId.putAll(newChange.getChildrenRelevance());
 	}
 	
-	public Map<String, Boolean> getChildrenRelevance() {
-		return CollectionUtils.unmodifiableMap(relevanceByChildName);
+	public Map<Integer, Boolean> getChildrenRelevance() {
+		return CollectionUtils.unmodifiableMap(relevanceByChildDefinitionId);
 	}
 
-	public void setRelevance(String childName, Boolean relevant) {
-		relevanceByChildName.put(childName, relevant);
+	public void setRelevance(int childDefinitionId, Boolean relevant) {
+		relevanceByChildDefinitionId.put(childDefinitionId, relevant);
 	}
 	
-	public void setChildrenRelevance(Map<String, Boolean> map) {
-		relevanceByChildName = map;
+	public void setChildrenRelevance(Map<Integer, Boolean> map) {
+		relevanceByChildDefinitionId = map;
 	}
 
 	public Map<Integer, Integer> getMinCountByChildDefinitionId() {
@@ -76,20 +76,20 @@ public class EntityChange extends NodeChange<Entity> {
 		maxCountByChildDefinitionId.put(childDefinitionId, count);
 	}
 	
-	public Map<String, ValidationResultFlag> getChildrenMinCountValidation() {
-		return CollectionUtils.unmodifiableMap(minCountValidationByChildName);
+	public Map<Integer, ValidationResultFlag> getChildrenMinCountValidation() {
+		return CollectionUtils.unmodifiableMap(minCountValidationByChildDefinitionId);
 	}
 
-	public void setMinCountValidation(String childName, ValidationResultFlag minCountValid) {
-		minCountValidationByChildName.put(childName, minCountValid);
+	public void setMinCountValidation(int childDefinitionId, ValidationResultFlag minCountValid) {
+		minCountValidationByChildDefinitionId.put(childDefinitionId, minCountValid);
 	}
 
-	public Map<String, ValidationResultFlag> getChildrenMaxCountValidation() {
-		return CollectionUtils.unmodifiableMap(maxCountValidationByChildName);
+	public Map<Integer, ValidationResultFlag> getChildrenMaxCountValidation() {
+		return CollectionUtils.unmodifiableMap(maxCountValidationByChildDefinitionId);
 	}
 
-	public void setMaxCountValidation(String childName, ValidationResultFlag maxCountValid) {
-		maxCountValidationByChildName.put(childName, maxCountValid);
+	public void setMaxCountValidation(int childDefinitionId, ValidationResultFlag maxCountValid) {
+		maxCountValidationByChildDefinitionId.put(childDefinitionId, maxCountValid);
 	}
 	
 	public Set<Node<?>> extractChangedNodes() {
@@ -100,10 +100,10 @@ public class EntityChange extends NodeChange<Entity> {
 		return result;
 	}
 	
-	private Set<Node<?>> extractNodes(Set<String> childNames) {
+	private Set<Node<?>> extractNodes(Set<Integer> childDefinitionIds) {
 		Set<Node<?>> result = new HashSet<Node<?>>();
-		for (String childName : childNames) {
-			NodeDefinition childDef = getNode().getDefinition().getChildDefinition(childName);
+		for (Integer childDefinitionId : childDefinitionIds) {
+			NodeDefinition childDef = getNode().getDefinition().getChildDefinition(childDefinitionId);
 			if (childDef instanceof AttributeDefinition) {
 				result.addAll(node.getChildren(childDef));
 			}
@@ -117,15 +117,15 @@ public class EntityChange extends NodeChange<Entity> {
 		int result = super.hashCode();
 		result = prime
 				* result
-				+ ((maxCountValidationByChildName == null) ? 0
-						: maxCountValidationByChildName.hashCode());
+				+ ((maxCountValidationByChildDefinitionId == null) ? 0
+						: maxCountValidationByChildDefinitionId.hashCode());
 		result = prime
 				* result
-				+ ((minCountValidationByChildName == null) ? 0
-						: minCountValidationByChildName.hashCode());
+				+ ((minCountValidationByChildDefinitionId == null) ? 0
+						: minCountValidationByChildDefinitionId.hashCode());
 		result = prime
 				* result
-				+ ((relevanceByChildName == null) ? 0 : relevanceByChildName
+				+ ((relevanceByChildDefinitionId == null) ? 0 : relevanceByChildDefinitionId
 						.hashCode());
 		result = prime
 				* result
@@ -147,22 +147,22 @@ public class EntityChange extends NodeChange<Entity> {
 		if (getClass() != obj.getClass())
 			return false;
 		EntityChange other = (EntityChange) obj;
-		if (maxCountValidationByChildName == null) {
-			if (other.maxCountValidationByChildName != null)
+		if (maxCountValidationByChildDefinitionId == null) {
+			if (other.maxCountValidationByChildDefinitionId != null)
 				return false;
-		} else if (!maxCountValidationByChildName
-				.equals(other.maxCountValidationByChildName))
+		} else if (!maxCountValidationByChildDefinitionId
+				.equals(other.maxCountValidationByChildDefinitionId))
 			return false;
-		if (minCountValidationByChildName == null) {
-			if (other.minCountValidationByChildName != null)
+		if (minCountValidationByChildDefinitionId == null) {
+			if (other.minCountValidationByChildDefinitionId != null)
 				return false;
-		} else if (!minCountValidationByChildName
-				.equals(other.minCountValidationByChildName))
+		} else if (!minCountValidationByChildDefinitionId
+				.equals(other.minCountValidationByChildDefinitionId))
 			return false;
-		if (relevanceByChildName == null) {
-			if (other.relevanceByChildName != null)
+		if (relevanceByChildDefinitionId == null) {
+			if (other.relevanceByChildDefinitionId != null)
 				return false;
-		} else if (!relevanceByChildName.equals(other.relevanceByChildName))
+		} else if (!relevanceByChildDefinitionId.equals(other.relevanceByChildDefinitionId))
 			return false;
 		if (minCountByChildDefinitionId == null) {
 			if (other.minCountByChildDefinitionId != null)

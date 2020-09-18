@@ -1,49 +1,41 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import SockJsClient from 'react-stomp'
 
 import Constants from '../Constants'
 import { fetchSurveySummaries } from 'actions/surveys'
 import { recordLocked, recordUnlocked } from '../datamanagement/actions'
+import EventQueue from '../model/event/EventQueue'
+import { RecordEventWrapper } from '../model/event/RecordEvent'
 
 const eventsDestination = '/events'
 
 const messageTypes = {
-    surveysUpdated: 'SURVEYS_UPDATED',
-    recordLocked: 'RECORD_LOCKED',
-    recordUnlocked: 'RECORD_UNLOCKED',
+  surveysUpdated: 'SURVEYS_UPDATED',
+  recordLocked: 'RECORD_LOCKED',
+  recordUnlocked: 'RECORD_UNLOCKED',
+  recordUpdated: 'RECORD_UPDATED',
 }
 
-const handleMessage = (props, message) => {
-    switch (message.type) {
-        case messageTypes.surveysUpdated:
-            props.fetchSurveySummaries()
-            break
-        case messageTypes.recordLocked:
-            props.recordLocked(message.recordId, message.lockedBy)
-            break
-        case messageTypes.recordUnlocked:
-            props.recordUnlocked(message.recordId)
-            break
-        default:
-    }
+const handlersByType = {
+  [messageTypes.surveysUpdated]: fetchSurveySummaries,
+  [messageTypes.recordLocked]: (message) => recordLocked(message.recordId, message.lockedBy),
+  [messageTypes.recordUnlocked]: (message) => recordUnlocked(message.recordId),
+  [messageTypes.recordUpdated]: (message) => () => {
+    const eventWrapper = new RecordEventWrapper(message.event)
+    EventQueue.publish('recordEvent', eventWrapper.event)
+  },
 }
 
-const AppWebSocket = props => {
-    return <SockJsClient url={`${Constants.BASE_URL}ws`}
-        topics={[eventsDestination]}
-        onMessage={message => handleMessage(props, message)} />
+const AppWebSocket = () => {
+  const dispatch = useDispatch()
+
+  const onMessage = (message) => {
+    const handler = handlersByType[message.type]
+    dispatch(handler(message))
+  }
+
+  return <SockJsClient url={`${Constants.BASE_URL}ws`} topics={[eventsDestination]} onMessage={onMessage} />
 }
 
-function mapStateToProps(state) {
-    return state
-}
-
-export default connect(
-    mapStateToProps,
-    {
-        fetchSurveySummaries,
-        recordLocked,
-        recordUnlocked
-    }
-)(AppWebSocket)
+export default AppWebSocket

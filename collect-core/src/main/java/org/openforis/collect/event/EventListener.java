@@ -1,7 +1,5 @@
 package org.openforis.collect.event;
 
-import java.util.List;
-
 /**
  * 
  * @author D. Wiell
@@ -10,6 +8,6 @@ import java.util.List;
  */
 public interface EventListener {
 
-	void onEvents(List<? extends RecordEvent> events);
+	void onEvent(RecordEvent event);
 	
 }

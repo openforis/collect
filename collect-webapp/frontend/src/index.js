@@ -1,41 +1,35 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react'
+import ReactDOM from 'react-dom'
 import { HashRouter, Route, Switch } from 'react-router-dom'
 import thunkMiddleware from 'redux-thunk'
-import { createLogger } from 'redux-logger'
 import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
 
-import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/css/bootstrap.css'
 
 // Containers
 import App from 'App'
 
 // Pages
-import Signin from 'scenes/Pages/Signin/'
-import Register from 'scenes/Pages/Register/'
-import Page404 from 'scenes/Pages/Page404/'
-import Page500 from 'scenes/Pages/Page500/'
+import Signin from 'scenes/Pages/Signin'
+import Register from 'scenes/Pages/Register'
+import Page404 from 'scenes/Pages/Page404'
+import Page500 from 'scenes/Pages/Page500'
 
 import rootReducer from 'reducers'
 import Startup from 'common/containers/Startup'
 import SessionTimeoutVerifier from 'common/containers/SessionTimeoutVerifier'
 import Labels from 'utils/Labels'
 
-const loggerMiddleware = createLogger({
-  predicate: () => process.env.NODE_ENV === 'development'
-})
-
 const store = createStore(
   rootReducer,
   applyMiddleware(
-    thunkMiddleware, // lets us dispatch() functions
-    loggerMiddleware // neat middleware that logs actions
+    thunkMiddleware // lets us dispatch() functions
   )
 )
 
 Labels.initialize(() => {
-  ReactDOM.render((
+  ReactDOM.render(
     <Provider store={store}>
       <SessionTimeoutVerifier>
         <Startup>
@@ -50,8 +44,7 @@ Labels.initialize(() => {
           </HashRouter>
         </Startup>
       </SessionTimeoutVerifier>
-    </Provider>
-  ), document.getElementById('root'))
+    </Provider>,
+    document.getElementById('root')
+  )
 })
-
-

@@ -1,26 +1,36 @@
-import React, { Component } from 'react'
-import classnames from 'classnames';
-import { Label, Input } from 'reactstrap';
+import React from 'react'
+import { Checkbox } from '@material-ui/core'
 
-export default class BooleanField extends Component {
+import AbstractField from './AbstractField'
+import FieldValidationFeedback from './FieldValidationFeedback'
+import FieldLoadingSpinner from './FieldLoadingSpinner'
 
-    constructor(props) {
-        super(props)
+export default class BooleanField extends AbstractField {
+  constructor() {
+    super()
 
-        this.state = {
-            selected: false
-        }
+    this.onChange = this.onChange.bind(this)
+  }
 
-        this.handleInputChange = this.handleInputChange.bind(this)
-    }
+  extractValueFromProps() {
+    const attr = this.getSingleAttribute()
+    return { value: attr.fields[0].value }
+  }
+  
+  onChange(event) {
+    this.onAttributeUpdate({ value: { value: event.target.checked }, debounced: false })
+  }
 
-    handleInputChange(event) {
-        this.setState({...this.state, selected: event.target.checked})
-    }
-
-    render() {
-        return (
-            <Input id="checkbox" type="checkbox" onChange={this.handleInputChange} />
-        )
-    }
+  render() {
+    const { dirty, value: valueState = {}, errors, warnings } = this.state
+    const { value } = valueState || {}
+    const checked = value || false
+    return (
+      <div>
+        <Checkbox color="primary" checked={checked} onChange={this.onChange} />
+        {dirty && <FieldLoadingSpinner />}
+        <FieldValidationFeedback errors={errors} warnings={warnings} />
+      </div>
+    )
+  }
 }

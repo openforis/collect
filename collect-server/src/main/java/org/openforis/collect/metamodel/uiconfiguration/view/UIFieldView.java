@@ -2,13 +2,14 @@ package org.openforis.collect.metamodel.uiconfiguration.view;
 
 import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.metamodel.ui.UIField;
+import org.openforis.collect.metamodel.view.ViewContext;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 
 public class UIFieldView<O extends UIField> extends UIModelObjectView<O> implements UITabComponentView<O> {
 
-	public UIFieldView(O uiObject) {
-		super(uiObject);
+	public UIFieldView(O uiObject, ViewContext context) {
+		super(uiObject, context);
 	}
 	
 	@Override

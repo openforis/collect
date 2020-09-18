@@ -13,6 +13,8 @@ import Arrays from 'utils/Arrays';
 import L from 'utils/Labels';
 import RouterUtils from 'utils/RouterUtils';
 
+const NAME_SUFFIX = '_copy'
+
 class SurveyClonePage extends Component {
 
     constructor(props) {
@@ -48,11 +50,19 @@ class SurveyClonePage extends Component {
     }
 
     findUnusedSurveyName(surveys, surveySummary) {
-        let newNameBase = surveySummary.name + '_copy'
-        let count = 1
+        const isNameDuplicate = name => Arrays.contains(surveys, s => s.name === name)
+
+        const newNameBase = surveySummary.name + 
+            (surveySummary.name.endsWith(NAME_SUFFIX) ? '' : NAME_SUFFIX)
+
         let newName = newNameBase
-        while (Arrays.contains(surveys, s => s.name === newName)) {
-            newName = newNameBase + '_' + (count++)
+
+        if (isNameDuplicate(newName)) {
+            // add count suffix to name if duplicate
+            let count = 1    
+            while (isNameDuplicate(newName)) {
+                newName = newNameBase + '_' + (count ++)
+            }    
         }
         return newName
     }

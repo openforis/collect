@@ -169,6 +169,15 @@
 <!-- 		<constructor-arg ref="eventQueue" /> -->
 <!-- 	</bean> -->
 	
+	<bean id="cachedRecordProvider" class="org.openforis.collect.manager.CachedRecordProvider">
+		<constructor-arg ref="recordManager" />
+	</bean>
+	
+	<bean id="recordProviderSession" class="org.openforis.collect.web.manager.RecordProviderSession" 
+		scope="session">
+		<constructor-arg ref="cachedRecordProvider" />
+	</bean>
+	
 	<bean id="commandDispatcher" class="org.openforis.collect.command.SpringCommandDispatcher" 
-		init-method="init" />
+		init-method="init" scope="session" />
 </beans>

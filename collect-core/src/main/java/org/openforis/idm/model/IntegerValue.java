@@ -9,6 +9,10 @@ import org.openforis.idm.metamodel.Unit;
  */
 public class IntegerValue extends NumberValue<Integer> {
 
+	public IntegerValue(Integer value) {
+		this(value, null);
+	}
+	
 	public IntegerValue(Integer value, Unit unit) {
 		super(value, unit);
 	}

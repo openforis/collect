@@ -78,13 +78,15 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		CollectRecord record = createTestRecord(survey);
 		Entity cluster = record.getRootEntity();
 		{
-			NodeChangeSet changeSet = recordUpdater.addEntity(cluster, "time_study");
+			EntityDefinition entityDefinition = (EntityDefinition) cluster.getDefinition().getChildDefinition("time_study");
+			int entityDefinitionId = entityDefinition.getId();
+			NodeChangeSet changeSet = recordUpdater.addEntity(cluster, entityDefinition);
 			assertEquals(4, changeSet.size());
 			
-			changeSet = recordUpdater.addEntity(cluster, "time_study");
+			changeSet = recordUpdater.addEntity(cluster, entityDefinition);
 			assertEquals(5, changeSet.size());
 			{
-				Entity timeStudy = (Entity) cluster.getChild("time_study", 2);
+				Entity timeStudy = (Entity) cluster.getChild(entityDefinition, 2);
 				NodeChange<?> timeStudyChange = changeSet.getChange(timeStudy); 
 				assertTrue(timeStudyChange instanceof EntityAddChange);
 			}
@@ -92,11 +94,11 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 				NodeChange<?> clusterChange = changeSet.getChange(cluster);
 				assertTrue(clusterChange instanceof EntityChange);
 				EntityChange clusterEntityChange = (EntityChange) clusterChange;
-				Map<String, ValidationResultFlag> childrenMinCountValid = clusterEntityChange.getChildrenMinCountValidation();
-				ValidationResultFlag plotMinCountValid = childrenMinCountValid.get("time_study");
+				Map<Integer, ValidationResultFlag> childrenMinCountValid = clusterEntityChange.getChildrenMinCountValidation();
+				ValidationResultFlag plotMinCountValid = childrenMinCountValid.get(entityDefinitionId);
 				assertNull(plotMinCountValid);
-				Map<String, ValidationResultFlag> childrenMaxCountValid = clusterEntityChange.getChildrenMaxCountValidation();
-				ValidationResultFlag plotMaxCountValid = childrenMaxCountValid.get("time_study");
+				Map<Integer, ValidationResultFlag> childrenMaxCountValid = clusterEntityChange.getChildrenMaxCountValidation();
+				ValidationResultFlag plotMaxCountValid = childrenMaxCountValid.get(entityDefinitionId);
 				assertEquals(ValidationResultFlag.ERROR, plotMaxCountValid);
 			}
 		}
@@ -107,7 +109,9 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		CollectSurvey survey = loadSurvey();
 		CollectRecord record = createTestRecord(survey);
 		Entity cluster = record.getRootEntity();
-		Entity timeStudy = (Entity) cluster.getChild("time_study", 0);
+		EntityDefinition entityDefinition = (EntityDefinition) cluster.getDefinition().getChildDefinition("time_study");
+		int entityDefinitionId = entityDefinition.getId();
+		Entity timeStudy = (Entity) cluster.getChild(entityDefinition, 0);
 		
 		NodeChangeSet changeSet = recordUpdater.deleteNode(timeStudy);
 		assertEquals(2, changeSet.size());
@@ -121,11 +125,11 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 			NodeChange<?> clusterChange = changeSet.getChange(cluster);
 			assertTrue(clusterChange instanceof EntityChange);
 			EntityChange clusterEntityChange = (EntityChange) clusterChange;
-			Map<String, ValidationResultFlag> childrenMinCountValid = clusterEntityChange.getChildrenMinCountValidation();
-			ValidationResultFlag timeStudyMinCountValid = childrenMinCountValid.get("time_study");
+			Map<Integer, ValidationResultFlag> childrenMinCountValid = clusterEntityChange.getChildrenMinCountValidation();
+			ValidationResultFlag timeStudyMinCountValid = childrenMinCountValid.get(entityDefinitionId);
 			assertEquals(ValidationResultFlag.ERROR, timeStudyMinCountValid);
-			Map<String, ValidationResultFlag> childrenMaxCountValid = clusterEntityChange.getChildrenMaxCountValidation();
-			ValidationResultFlag timeStudyMaxCountValid = childrenMaxCountValid.get("time_study");
+			Map<Integer, ValidationResultFlag> childrenMaxCountValid = clusterEntityChange.getChildrenMaxCountValidation();
+			ValidationResultFlag timeStudyMaxCountValid = childrenMaxCountValid.get(entityDefinitionId);
 			assertNull(timeStudyMaxCountValid);
 		}
 	}
@@ -136,30 +140,33 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		CollectRecord record = createTestRecord(survey);
 		record.setStep(Step.CLEANSING);
 		Entity cluster = record.getRootEntity();
-		int missingCount = cluster.getMissingCount("time_study");
+		String entityName = "time_study";
+		EntityDefinition entityDefinition = (EntityDefinition) cluster.getDefinition().getChildDefinition(entityName);
+		int missingCount = cluster.getMissingCount(entityDefinition);
 		assertEquals(0, missingCount);
-		Entity timeStudy = (Entity) cluster.getChild("time_study", 0);
+		Entity timeStudy = (Entity) cluster.getChild(entityDefinition, 0);
+		int entityDefinitionId = entityDefinition.getId();
 		{
 			//delete node (min count error expected)
 			NodeChangeSet changeSet = recordUpdater.deleteNode(timeStudy);
-			int missingCount2 = cluster.getMissingCount("time_study");
+			int missingCount2 = cluster.getMissingCount(entityName);
 			assertEquals(1, missingCount2);
 			NodeChange<?> clusterChange = changeSet.getChange(cluster);
 			assertTrue(clusterChange instanceof EntityChange);
 			EntityChange clusterEntityChange = (EntityChange) clusterChange;
-			Map<String, ValidationResultFlag> childrenMinCountValid = clusterEntityChange.getChildrenMinCountValidation();
-			ValidationResultFlag timeStudyMinCountValid = childrenMinCountValid.get("time_study");
+			Map<Integer, ValidationResultFlag> childrenMinCountValid = clusterEntityChange.getChildrenMinCountValidation();
+			ValidationResultFlag timeStudyMinCountValid = childrenMinCountValid.get(entityDefinitionId);
 			assertEquals(ValidationResultFlag.ERROR, timeStudyMinCountValid);
 		}
 		{
 			//approve missing value (min count warning expected)
-			NodeChangeSet changeSet = recordUpdater.approveMissingValue(cluster, "time_study");
+			NodeChangeSet changeSet = recordUpdater.approveMissingValue(cluster, entityName);
 			NodeChange<?> clusterChange = changeSet.getChange(cluster);
 			assertTrue(clusterChange instanceof EntityChange);
 			assertEquals(cluster, clusterChange.getNode());
 			EntityChange clusterEntityChange = (EntityChange) clusterChange;
-			Map<String, ValidationResultFlag> childrenMinCountValid = clusterEntityChange.getChildrenMinCountValidation();
-			ValidationResultFlag timeStudyMinCountValid = childrenMinCountValid.get("time_study");
+			Map<Integer, ValidationResultFlag> childrenMinCountValid = clusterEntityChange.getChildrenMinCountValidation();
+			ValidationResultFlag timeStudyMinCountValid = childrenMinCountValid.get(entityDefinitionId);
 			assertEquals(ValidationResultFlag.WARNING, timeStudyMinCountValid);
 		}
 	}
