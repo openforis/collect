@@ -1,15 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<name>Open Foris Collect</name>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
 	<version>3.26.20-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>Open Foris Collect</name>
+	<description>Open Foris Collect is the main entry point for data collected in field-based inventories. It provides a fast, easy, flexible way to set up a survey with a user-friendly interface. Collect handles multiple data types and complex validation rules, all in a multilanguage environment.</description>
+	<url>http://www.openforis.org/tools/collect.html</url>
 	<organization>
 		<name>Open Foris</name>
 		<url>www.openforis.org</url>
 	</organization>
-	<packaging>pom</packaging>
 
 	<modules>
 		<module>collect-base</module>
