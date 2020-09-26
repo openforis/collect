@@ -59,11 +59,11 @@ The project has been developed as a Maven project and it's divided into sub-modu
 * installbuilder.autoupdate.executable		Autoupdate executable file name (e.g. customize.run for Linux, customize.exe for Windows) (used by collect-autoupdater module)
 * installbuilder.autoupdate.output			Autoupdate output folder (default is ${installbuilder.home}/autoupdate/output)
 
+* collect.nexus.url 						URL of the Nexus repository where latest artifacts have been released (e.g. https://oss.sonatype.org/content/repositories/releases if Sonatype Central repository is used); it's used to retrieve the latest version available and to check if an update is needed, and to generate the links to the updaters.)
 * collect.autoupdater.ftp.host				FTP server host name (used by collect-updater module to upload the update.xml file)
 * collect.autoupdater.ftp.username 			FTP server username
 * collect.autoupdater.ftp.password			FTP server password
 * collect.autoupdater.ftp.remotefolder		FTP server remote folder (where to store the update.xml file)
-* collect.wiki.idm.expression-language.url	URL to be opened to have information on the IDM expression language
 
 ### How to release a new version:
 

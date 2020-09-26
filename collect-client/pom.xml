@@ -6,7 +6,7 @@
 		<artifactId>collect</artifactId>
 		<version>3.26.18-SNAPSHOT</version>
 	</parent>
-
+	<name>Open Foris Collect Client module (Flex)</name>
 	<artifactId>collect-client</artifactId>
 	<packaging>swf</packaging>
 

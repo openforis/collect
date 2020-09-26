@@ -7,6 +7,7 @@
 		<version>3.26.18-SNAPSHOT</version>
 	</parent>
 
+	<name>Open Foris Collect core module</name>
 	<artifactId>collect-core</artifactId>
 	<packaging>jar</packaging>
 

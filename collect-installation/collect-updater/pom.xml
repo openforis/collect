@@ -8,7 +8,9 @@
 	<artifactId>collect-updater</artifactId>
 	<packaging>pom</packaging>
 	<name>Open Foris Collect Updater</name>
-	<description>Module to create the updaters for Open Foris Collect</description>
+	<description>Module to create the updaters for Open Foris Collect.
+		Used only to support older installations of Collect and let them update to the latest version of the sotware.
+		It includes the installation of Java Runtime Environment (not performed by collect-updater-2 instead)</description>
 
 	<properties>
 		<!-- to avoid replacing relative path to images and other resources used 
@@ -159,6 +161,10 @@
 										<replacement>
 											<token>UPDATE_XML_URL</token>
 											<value>${collect.update_2.url}</value> <!-- use new url in update.ini -->
+										</replacement>
+										<replacement>
+											<token>NEXUS_URL</token>
+											<value>${collect.nexus.url}</value>
 										</replacement>
 									</replacements>
 								</configuration>

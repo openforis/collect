@@ -8,7 +8,7 @@
 	<artifactId>collect-saiku-installer</artifactId>
 	<packaging>pom</packaging>
 	<name>Open Foris Collect Saiku</name>
-	<description>Add Saiku webapp to Open Foris Collect</description>
+	<description>Adds Saiku webapp to Open Foris Collect</description>
 
 	<properties>
 		<!-- to avoid replacing relative path to images and other resources used 

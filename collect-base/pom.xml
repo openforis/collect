@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -7,6 +9,9 @@
 		<version>3.26.18-SNAPSHOT</version>
 	</parent>
 
+	<name>Open Foris Collect base module</name>
+	<description>This module is used to retrieve only basic information on the application (like its version).
+	It's used by collect-core and even by collect-control-panel (that doesn't depend on collect-core)</description>
 	<artifactId>collect-base</artifactId>
 	<packaging>jar</packaging>
 
@@ -32,10 +37,16 @@
 						<include>org/openforis/collect/info.properties</include>
 					</includes>
 					<regex>false</regex>
-					<!-- the name of the token to replace -->
-					<token>PROJECT_VERSION</token>
-					<!-- replace it with the maven project version -->
-					<value>${project.version}</value>
+					<replacements>
+						<replacement>
+							<token>PROJECT_VERSION</token>
+							<value>${project.version}</value>
+						</replacement>
+						<replacement>
+							<token>NEXUS_URL</token>
+							<value>${collect.nexus.url}</value>
+						</replacement>
+					</replacements>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -7,6 +7,7 @@
 		<version>3.26.18-SNAPSHOT</version>
 	</parent>
 
+	<name>Open Foris Collect webapp module</name>
 	<artifactId>collect-webapp</artifactId>
 	<packaging>war</packaging>
 
@@ -72,9 +73,7 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>3.3.0</version>
 				<executions>
 					<execution>
 						<id>prepare-war</id>

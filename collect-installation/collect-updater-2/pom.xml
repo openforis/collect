@@ -7,8 +7,8 @@
 	</parent>
 	<artifactId>collect-updater-2</artifactId>
 	<packaging>pom</packaging>
-	<name>Open Foris Collect Updater</name>
-	<description>Module to create the updaters for Open Foris Collect</description>
+	<name>Open Foris Collect Updater (latest)</name>
+	<description>Module to create the updaters for Open Foris Collect.</description>
 	
 	<properties>
 		<!-- to avoid replacing relative path to images and other resources used by the installer -->
@@ -149,6 +149,10 @@
 								<replacement>
 									<token>UPDATE_XML_URL</token>
 									<value>${collect.update_2.url}</value>
+								</replacement>
+								<replacement>
+									<token>NEXUS_URL</token>
+									<value>${collect.nexus.url}</value>
 								</replacement>
 							</replacements>
 						</configuration>

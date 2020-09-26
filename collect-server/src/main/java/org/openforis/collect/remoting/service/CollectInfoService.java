@@ -30,27 +30,28 @@ import org.w3c.dom.NodeList;
 @Component
 public class CollectInfoService {
 
-	private static final String LATEST_RELEASE_MAVEN_METADATA_URL = 
-			"http://www.openforis.org/nexus/service/local/repositories/releases/content/org/openforis/collect/collect-installer/maven-metadata.xml";
+	private static final String LATEST_RELEASE_METADATA_URL = Collect.NEXUS_URL
+			+ "/org/openforis/collect/collect/maven-metadata.xml";
+
 	private static final int RELEASE_FETCH_TIMEOUT = 10000;
-	
+
 	private static final String DEV_LOCAL_ADDRESS = "127.0.0.1";
 	private static final String DEV_REQUEST_LOCAL_ADDRESS = "0:0:0:0:0:0:0:1";
-	
+
 	@Autowired
 	private SaikuConfiguration saikuConfiguration;
-	
+
 	public CollectInfo getInfo() {
 		return new CollectInfo();
 	}
-	
+
 	public CollectCompleteInfo getCompleteInfo() {
 		Version latestRelease = latestRelease();
 		Version currentVersion = Collect.VERSION;
 		CollectCompleteInfo info = new CollectCompleteInfo(currentVersion, latestRelease);
 		return info;
 	}
-	
+
 	public CollectCompleteInfo getCompleteInfo(HttpServletRequest request) {
 		Version latestRelease = latestRelease();
 		Version currentVersion = Collect.VERSION;
@@ -58,7 +59,7 @@ public class CollectInfoService {
 		info.setSaikuUrl(determineSaikuUrl(request));
 		return info;
 	}
-	
+
 	public CollectInternalInfo getInternalInfo() {
 		return new CollectInternalInfo();
 	}
@@ -66,9 +67,9 @@ public class CollectInfoService {
 	private Version latestRelease() {
 		try {
 			CloseableHttpClient client = HttpClients.createDefault();
-			HttpGet request = new HttpGet(LATEST_RELEASE_MAVEN_METADATA_URL);
+			HttpGet request = new HttpGet(LATEST_RELEASE_METADATA_URL);
 			request.setConfig(RequestConfig.custom().setConnectTimeout(RELEASE_FETCH_TIMEOUT).build());
-			
+
 			CloseableHttpResponse response = client.execute(request);
 			try {
 				HttpEntity entity = response.getEntity();
@@ -85,9 +86,9 @@ public class CollectInfoService {
 					return new Version(release);
 				}
 			} finally {
-			    response.close();
+				response.close();
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 		}
 		return null;
 	}
@@ -97,7 +98,7 @@ public class CollectInfoService {
 		String host = determineHost(request);
 		return String.format("%s://%s/%s", protocol, host, saikuConfiguration.getContextPath());
 	}
-	
+
 	private String determineHost(HttpServletRequest request) {
 		String host = request.getHeader(HttpHeaders.HOST);
 		if (host == null) {

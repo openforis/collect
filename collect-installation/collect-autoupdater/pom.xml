@@ -73,10 +73,6 @@
 									<token>PROJECT_VERSION</token>
 									<value>${project.version}</value>
 								</replacement>
-								<replacement>
-									<token>UPDATE_XML_URL</token>
-									<value>${collect.update.url}</value>
-								</replacement>
 							</replacements>
 						</configuration>
 					</plugin>

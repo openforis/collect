@@ -25,7 +25,7 @@
 	</platformFileList>
 	<downloadLocationList>
 		<downloadLocation>
-			<url>http://www.openforis.org/nexus/service/local/repositories/releases/content/org/openforis/collect/collect-updater/PROJECT_VERSION/</url>
+			<url>NEXUS_URL/org/openforis/collect/collect-updater/PROJECT_VERSION/</url>
 		</downloadLocation>
 	</downloadLocationList>
 </installerInformation>
