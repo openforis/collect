@@ -28,7 +28,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<openforis.commons.version>0.1.22</openforis.commons.version>
+		<openforis.commons.version>0.1.24</openforis.commons.version>
 		<spring.version>5.2.7.RELEASE</spring.version>
 		<spring-security.version>5.3.3.RELEASE</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>
@@ -37,6 +37,7 @@
 		<slf4j.version>1.7.30</slf4j.version>
 	</properties>
 
+	<!-- 	
 	<distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>
@@ -47,7 +48,20 @@
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 	</distributionManagement>
-
+	-->
+ 	<distributionManagement>
+		<repository>
+			<id>openforis-releases</id>
+			<name>Open Foris Repository</name>
+			<url>http://www.openforis.org/nexus/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>openforis-snapshots</id>
+			<name>Open Foris Snapshots Repository</name>
+			<url>http://www.openforis.org/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+ 
 	<scm>
 		<url>https://github.com/openforis/collect</url>
 		<connection>scm:git:git@github.com:openforis/collect.git</connection>
@@ -58,7 +72,7 @@
 	<licenses>
 		<license>
 			<name>MIT License</name>
-			<url>https://raw.githubusercontent.com/openforis/collect/master/LICENSE.TXT</url>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
 		</license>
 	</licenses>
 
@@ -252,17 +266,17 @@
 				<artifactId>license-maven-plugin</artifactId>
 				<version>2.0.0</version>
 			</plugin>
-			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.8</version>
-				<extensions>true</extensions>
-				<configuration>
-					<serverId>ossrh</serverId>
-					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-					<autoReleaseAfterClose>true</autoReleaseAfterClose>
-				</configuration>
-			</plugin>
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.sonatype.plugins</groupId> -->
+<!-- 				<artifactId>nexus-staging-maven-plugin</artifactId> -->
+<!-- 				<version>1.6.8</version> -->
+<!-- 				<extensions>true</extensions> -->
+<!-- 				<configuration> -->
+<!-- 					<serverId>ossrh</serverId> -->
+<!-- 					<nexusUrl>https://oss.sonatype.org/</nexusUrl> -->
+<!-- 					<autoReleaseAfterClose>true</autoReleaseAfterClose> -->
+<!-- 				</configuration> -->
+<!-- 			</plugin> -->
 		</plugins>
 		<pluginManagement>
 			<plugins>

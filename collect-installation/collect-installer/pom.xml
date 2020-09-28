@@ -168,11 +168,11 @@
 								</replacement>
 								<replacement>
 									<token>UPDATE_XML_URL</token>
-									<value>${collect.update_2.url}</value>
+									<value>${collect.update_3.url}</value> <!-- always use latest update URL -->
 								</replacement>
 								<replacement>
 									<token>NEXUS_URL</token>
-									<value>${collect.nexus.url}</value>
+									<value>${openforis.nexus.url}</value>
 								</replacement>
 							</replacements>
 						</configuration>

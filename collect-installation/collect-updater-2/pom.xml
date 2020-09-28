@@ -28,7 +28,7 @@
 			<build>
 				<plugins>
 					
-					<!-- 1. copy webapp war file and libraries -->
+					<!-- 1a. copy webapp war file and libraries -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
@@ -88,6 +88,46 @@
 						</executions>
 					</plugin>
 					
+					<!-- 1b. iterate over platforms and copy autoupdater -->
+					<plugin>
+						<groupId>com.soebes.maven.plugins</groupId>
+						<artifactId>iterator-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>download-jre-autoupdater</id>
+								<phase>process-sources</phase>
+								<goals>
+									<goal>iterator</goal>
+								</goals>
+								<configuration>
+									<pluginExecutors>
+										<!-- copy autoupdater artifacts -->
+										<pluginExecutor>
+											<plugin>
+												<artifactId>maven-dependency-plugin</artifactId>
+											</plugin>
+											<goal>copy</goal>
+											<configuration>
+												<skip>${installer.skip}</skip>
+												<artifactItems>
+													<artifactItem>
+														<groupId>org.openforis.collect</groupId>
+														<artifactId>collect-autoupdater</artifactId>
+														<version>${project.version}</version>
+														<classifier>${installer.classifier}</classifier>
+														<type>${installer.artifact.type}</type>
+														<overWrite>false</overWrite>
+														<outputDirectory>${installer-build-path}</outputDirectory>
+														<destFileName>autoupdate-@item@.${installer.autoupdater.extension}</destFileName>
+													</artifactItem>
+												</artifactItems>
+											</configuration>
+										</pluginExecutor>
+									</pluginExecutors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 					<!-- 2. copy resource files -->
 					<plugin>
 						<artifactId>maven-resources-plugin</artifactId>
@@ -148,11 +188,11 @@
 								</replacement>
 								<replacement>
 									<token>UPDATE_XML_URL</token>
-									<value>${collect.update_2.url}</value>
+									<value>${collect.update_3.url}</value> <!-- use latest update URL -->
 								</replacement>
 								<replacement>
 									<token>NEXUS_URL</token>
-									<value>${collect.nexus.url}</value>
+									<value>${openforis.nexus.url.old}</value>
 								</replacement>
 							</replacements>
 						</configuration>

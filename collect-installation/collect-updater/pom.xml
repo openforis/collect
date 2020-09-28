@@ -160,11 +160,11 @@
 										</replacement>
 										<replacement>
 											<token>UPDATE_XML_URL</token>
-											<value>${collect.update_2.url}</value> <!-- use new url in update.ini -->
+											<value>${collect.update_3.url}</value> <!-- use latest update URL in update.ini -->
 										</replacement>
 										<replacement>
 											<token>NEXUS_URL</token>
-											<value>${collect.nexus.url}</value>
+											<value>${openforis.nexus.url.old}</value>
 										</replacement>
 									</replacements>
 								</configuration>
@@ -188,7 +188,6 @@
 										<!-- download and extract jre -->
 										<pluginExecutor>
 											<plugin>
-												<groupId>org.apache.maven.plugins</groupId>
 												<artifactId>maven-dependency-plugin</artifactId>
 											</plugin>
 											<goal>unpack</goal>
@@ -202,6 +201,28 @@
 														<type>zip</type>
 														<overWrite>false</overWrite>
 														<outputDirectory>${installer-build-path}/jre_files</outputDirectory>
+													</artifactItem>
+												</artifactItems>
+											</configuration>
+										</pluginExecutor>
+										<!-- copy autoupdater artifacts -->
+										<pluginExecutor>
+											<plugin>
+												<artifactId>maven-dependency-plugin</artifactId>
+											</plugin>
+											<goal>copy</goal>
+											<configuration>
+												<skip>${installer.skip}</skip>
+												<artifactItems>
+													<artifactItem>
+														<groupId>org.openforis.collect</groupId>
+														<artifactId>collect-autoupdater</artifactId>
+														<version>${project.version}</version>
+														<classifier>${installer.classifier}</classifier>
+														<type>${installer.artifact.type}</type>
+														<overWrite>false</overWrite>
+														<outputDirectory>${installer-build-path}</outputDirectory>
+														<destFileName>autoupdate-@item@.${installer.autoupdater.extension}</destFileName>
 													</artifactItem>
 												</artifactItems>
 											</configuration>

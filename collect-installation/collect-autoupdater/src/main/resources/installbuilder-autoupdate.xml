@@ -8,4 +8,5 @@
 	<requestedExecutionLevel>asInvoker</requestedExecutionLevel>
 	<logoImage>images/of-collect-logo-small.png</logoImage>
 	<createOsxBundleZip>1</createOsxBundleZip>
+	<enableSslSupport>1</enableSslSupport>
 </autoUpdateProject>

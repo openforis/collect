@@ -44,7 +44,7 @@
 						</replacement>
 						<replacement>
 							<token>NEXUS_URL</token>
-							<value>${collect.nexus.url}</value>
+							<value>${openforis.nexus.url}</value>
 						</replacement>
 					</replacements>
 				</configuration>

@@ -164,6 +164,47 @@ check_for_updates = 1</text>
 		<include>
 			<file>java.xml</file>
 		</include>
+		<!-- autoupdate -->
+		<component>
+			<name>autoupdater</name>
+			<description>replace autoupdater to perform updates</description>
+			<canBeEdited>0</canBeEdited>
+			<selected>1</selected>
+			<show>0</show>
+			<folderList>
+				<folder>
+					<name>autoupdater</name>
+					<destination>${installdir}/autoupdate</destination>
+					<platforms>windows linux linux-x64</platforms>
+					<distributionFileList>
+						<distributionFile
+							origin="autoupdate-${platform_name}.${platform_exec_suffix}" />
+					</distributionFileList>
+				</folder>
+				<folder>
+					<name>tempfiles</name>
+					<destination>${installdir}/temp</destination>
+					<platforms>osx</platforms>
+					<distributionFileList>
+						<distributionFile origin="autoupdate-osx.app.zip" />
+					</distributionFileList>
+				</folder>
+			</folderList>
+
+			<postInstallationActionList>
+				<unzip>
+					<destinationDirectory>${installdir}/autoupdate</destinationDirectory>
+					<zipFile>${installdir}/temp/autoupdate-osx.app.zip</zipFile>
+					<ruleList>
+						<platformTest type="osx" />
+					</ruleList>
+				</unzip>
+				<deleteFile>
+					<path>${installdir}/temp/</path>
+					<abortOnError>0</abortOnError>
+				</deleteFile>
+			</postInstallationActionList>
+		</component>
 	</componentList>
 	
     <preInstallationActionList>
