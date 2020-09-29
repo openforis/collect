@@ -1,16 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	
-	<name>Open Foris Collect</name>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
 	<version>3.13.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>Open Foris Collect</name>
+	<description>Open Foris Collect is the main entry point for data collected in field-based inventories. It provides a fast, easy, flexible way to set up a survey with a user-friendly interface. Collect handles multiple data types and complex validation rules, all in a multilanguage environment.</description>
+	<url>http://www.openforis.org/tools/collect.html</url>
 	<organization>
 		<name>Open Foris</name>
 		<url>www.openforis.org</url>
 	</organization>
-	<packaging>pom</packaging>
-
+	
 	<modules>
 		<module>collect-core</module>
 		<module>collect-rdb</module>
@@ -32,39 +35,29 @@
 	</properties>
 
 	<distributionManagement>
-		<repository>
-			<id>openforis-releases</id>
-			<name>Open Foris Repository</name>
-			<url>http://www.openforis.org/nexus/content/repositories/releases/</url>
-		</repository>
 		<snapshotRepository>
-			<id>openforis-snapshots</id>
-			<name>Open Foris Snapshots Repository</name>
-			<url>http://www.openforis.org/nexus/content/repositories/snapshots/</url>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
 	</distributionManagement>
-
+	
 	<scm>
 		<url>https://github.com/openforis/collect</url>
 		<connection>scm:git:git@github.com:openforis/collect.git</connection>
 		<developerConnection>scm:git:git@github.com:openforis/collect.git</developerConnection>
-		<tag>collect-3.13.1</tag>
+		<tag>HEAD</tag>
 	</scm>
 	
-	<profiles>
-		<profile>
-			<id>installer</id>
-			<modules>
-				<module>collect-assembly</module>
-				<module>collect-control-panel</module>
-				<module>collect-autoupdater</module>
-				<module>collect-installer</module>
-				<module>collect-updater</module>
-				<module>collect-updater-2</module>
-				<module>collect-saiku-installer</module>
-			</modules>
-		</profile>
-	</profiles>
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+		</license>
+	</licenses>
 	
 	<build>
 		<plugins>
@@ -149,6 +142,19 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
 				<version>2.5.1</version>
@@ -157,6 +163,17 @@
 					<releaseProfiles>installer,publishupdater</releaseProfiles>
 				</configuration>
 	    	</plugin>
+	    	<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.8</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
 <!-- 	    	<plugin> -->
 <!-- 				<groupId>com.soebes.maven.plugins.mlv</groupId> -->
 <!-- 				<artifactId>maven-license-verifier-plugin</artifactId> -->
