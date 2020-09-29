@@ -4,7 +4,10 @@
 	<vendor>Open Foris Initiative</vendor>
 	<version>VERSION_ID</version>
 	<logoImage>images/of-collect-logo-small.png</logoImage>
+	<installationLogFile>${installdir}/autoupdate/update.log
+	</installationLogFile>
 	<componentList>
+		<!-- webapps, lib -->
 		<component>
 			<name>default</name>
 			<description>Default Component</description>
@@ -13,157 +16,58 @@
 			<show>1</show>
 			<folderList>
 				<folder>
-					<name>programfiles</name>
-					<description>Program Files</description>
-					<destination>${installdir}</destination>
+					<name>webapps</name>
+					<description>Webapps</description>
+					<destination>${webapps_dir}</destination>
 					<platforms>all</platforms>
 					<distributionFileList>
-						<distributionDirectory>
-							<origin>images</origin>
-						</distributionDirectory>
-						<distributionDirectory>
-							<origin>lib</origin>
-						</distributionDirectory>
-						<distributionDirectory>
-							<origin>webapps</origin>
-						</distributionDirectory>
 						<distributionFile>
-							<origin>launcher.properties</origin>
+							<origin>collect.war</origin>
 						</distributionFile>
 					</distributionFileList>
 				</folder>
 				<folder>
-					<name>user_files</name>
-					<description>User configuration and data files</description>
-					<destination>${collect_root_user_dir}</destination>
+					<name>lib</name>
+					<description>Libs</description>
+					<destination>${installdir}/lib</destination>
 					<platforms>all</platforms>
 					<distributionFileList>
-						<distributionFile>
-							<allowWildcards>1</allowWildcards>
-							<origin>collect.properties</origin>
+						<distributionFile allowWildcards="1">
+							<origin>lib/*.jar</origin>
 						</distributionFile>
 					</distributionFileList>
 				</folder>
 			</folderList>
-			
+
 			<postInstallationActionList>
-        		<if>
-        			<conditionRuleList>
-				        <platformTest type="windows-x86" />
-				        <platformTest type="linux-x86" />
-				    </conditionRuleList>
-				    <conditionRuleEvaluationLogic>or</conditionRuleEvaluationLogic>
-	        		<actionList>
-		        		<propertiesFileSet>
-		        			<file>${installdir}/launcher.properties</file>
-		        			<key>additional_vm_parameters</key>
-		        			<value>-Xmx1024m -Duser.language=en -Duser.country=US</value>
-		        		</propertiesFileSet>
-	        		</actionList>
-	        		<elseActionList>
-		        		<propertiesFileSet>
-		        			<file>${installdir}/launcher.properties</file>
-		        			<key>additional_vm_parameters</key>
-		        			<value>-Xmx2048m -Duser.language=en -Duser.country=US</value>
-		        		</propertiesFileSet>
-	        		</elseActionList>
-        		</if>
-				
-				<!-- rename launcher.properties file according to the current platform -->
-        		<renameFile>
-        			<origin>${installdir}/launcher.properties</origin>
-        			<destination>${installdir}/launcher.properties</destination>
-        			<ruleList>
-		        		<platformTest type="osx" />
-					</ruleList>
-        		</renameFile>
-        		<renameFile>
-        			<origin>${installdir}/launcher.properties</origin>
-        			<destination>${installdir}/OpenForisCollect-launcher.run.properties</destination>
-        			<ruleList>
-		        		<platformTest type="linux" />
-		        		<platformTest type="linux-x64" />
-					</ruleList>
-        		</renameFile>
-        		<renameFile>
-        			<origin>${installdir}/launcher.properties</origin>
-        			<destination>${installdir}/OpenForisCollect-launcher.properties</destination>
-        			<ruleList>
-		        		<platformTest type="windows" />
-					</ruleList>
-        		</renameFile>
-        		<!-- end of rename launcher.properties -->
-        		
-        		<copyFile>
-        			<origin>${old_webapps_dir}/saiku.war</origin>
-        			<destination>${webapps_dir}</destination>
-        			<abortOnError>0</abortOnError>
-        			<showMessageOnError>0</showMessageOnError>
-        		</copyFile>
-        		<copyFile>
-        			<origin>${old_webapps_dir}/saiku</origin>
-        			<destination>${webapps_dir}</destination>
-        			<abortOnError>0</abortOnError>
-        			<showMessageOnError>0</showMessageOnError>
-        		</copyFile>
-        		
-        		<!-- start of move old startup/shutdown files into old_scripts folder -->
-        		<createDirectory>
-        			<path>${installdir}/old_scripts</path>
-        		</createDirectory>
-        		<copyFile>
-        			<origin>${installdir}/*.bat</origin>
-        			<destination>${installdir}/old_scripts</destination>
-        			<abortOnError>0</abortOnError>
-        			<showMessageOnError>0</showMessageOnError>
-        		</copyFile>
-        		<copyFile>
-        			<origin>${installdir}/*.cmd</origin>
-        			<destination>${installdir}/old_scripts</destination>
-        			<abortOnError>0</abortOnError>
-        			<showMessageOnError>0</showMessageOnError>
-        		</copyFile>
-        		<copyFile>
-        			<origin>${installdir}/*.bat</origin>
-        			<destination>${installdir}/old_scripts</destination>
-        			<abortOnError>0</abortOnError>
-        			<showMessageOnError>0</showMessageOnError>
-        		</copyFile>
-        		<deleteFile>
-        			<path>${installdir}/*.bat</path>
-        			<abortOnError>0</abortOnError>
-        			<showMessageOnError>0</showMessageOnError>
-        		</deleteFile>
-        		<deleteFile>
-        			<path>${installdir}/*.cmd</path>
-        			<abortOnError>0</abortOnError>
-        			<showMessageOnError>0</showMessageOnError>
-        		</deleteFile>
-        		<deleteFile>
-        			<path>${installdir}/*.sh</path>
-        			<abortOnError>0</abortOnError>
-        			<showMessageOnError>0</showMessageOnError>
-        		</deleteFile>
-        		<!-- end of move old script file into old_scripts folder -->
-        		
-        		<!-- create Log folder -->
-				<createDirectory>
-					<path>${log_dir}</path>
-				</createDirectory>
-				
+				<!-- create logs folder -->
+				<createDirectory path="${installdir}/logs"
+					abortOnError="0" />
+
+				<!-- delete old log folder -->
+				<deleteFile path="${installdir}/log" abortOnError="0" />
+				<deleteFile path="${collect_root_user_dir}/log"
+					abortOnError="0" />
+
+				<!-- Delete temporary files -->
+				<deleteFile>
+					<path>${webapps_dir}/collect</path>
+				</deleteFile>
+
+				<!-- Update update.ini file -->
 				<writeFile>
 					<path>update.ini</path>
 					<text>[Update]
 url = UPDATE_XML_URL
 version_id = VERSION_ID
 update_download_location = ${system_temp_directory}
-check_for_updates = 1</text>
+check_for_updates = 1
+					</text>
 				</writeFile>
+				<!-- delete temporary rollaback files -->
+				<deleteFile path="${project.rollbackBackupDirectory}" />
 			</postInstallationActionList>
 		</component>
-		<include>
-			<file>java.xml</file>
-		</include>
 		<!-- autoupdate -->
 		<component>
 			<name>autoupdater</name>
@@ -193,7 +97,8 @@ check_for_updates = 1</text>
 
 			<postInstallationActionList>
 				<unzip>
-					<destinationDirectory>${installdir}/autoupdate</destinationDirectory>
+					<destinationDirectory>${installdir}/autoupdate
+					</destinationDirectory>
 					<zipFile>${installdir}/temp/autoupdate-osx.app.zip</zipFile>
 					<ruleList>
 						<platformTest type="osx" />
@@ -206,212 +111,88 @@ check_for_updates = 1</text>
 			</postInstallationActionList>
 		</component>
 	</componentList>
-	
-    <preInstallationActionList>
-  		<createTimeStamp>
+	<preInstallationActionList>
+		<createTimeStamp>
 			<variable>timestamp</variable>
 			<format>%Y%m%d%H%M%S</format>
 		</createTimeStamp>
-		<pathManipulation>
-			<action>absolutize</action>
-			<path>..</path>
-			<variable>installdir</variable>
-		</pathManipulation>
-		<setInstallerVariable>
-			<name>collect_root_user_dir</name>
-			<value>${user_home_directory}/OpenForis/Collect</value>
-		</setInstallerVariable>
-    	<setInstallerVariable>
-			<name>backup_dir</name>
-			<value>${collect_root_user_dir}/backup/${timestamp}</value>
-		</setInstallerVariable>
-		<setInstallerVariable>
-			<name>data_dir</name>
-			<value>${collect_root_user_dir}/data</value>
-		</setInstallerVariable>
-        <setInstallerVariable>
-  			<name>log_dir</name>
-  			<value>${installdir}/logs</value> 
-  		</setInstallerVariable>
-		<setInstallerVariable>
-			<name>webapps_dir</name>
-			<value>${installdir}/webapps</value>
-		</setInstallerVariable>
-		<setInstallerVariable>
-			<name>old_tomcat_dir</name>
-			<value>../tomcat</value>
-		</setInstallerVariable>
-		<setInstallerVariable>
-			<name>old_data_dir</name>
-			<value>${old_tomcat_dir}/data</value>
-		</setInstallerVariable>
-		<setInstallerVariable>
-			<name>old_webapps_dir</name>
-			<value>${old_tomcat_dir}/webapps</value>
-		</setInstallerVariable>
-    	<!--  Java Launcher variables -->
-    	<setInstallerVariable>
-			<name>java_launcher_binary_name</name>
-			<value>OpenForisCollect-launcher.${platform_exec_suffix}</value>
-		</setInstallerVariable>
-		<setInstallerVariable>
-			<name>java_launcher_mainClass</name>
-			<value>org.openforis.collect.controlpanel.CollectControlPanel</value>
-		</setInstallerVariable>
-		<setInstallerVariable>
-			<name>java_launcher_classpath</name>
-			<value>lib/*;</value>
-		</setInstallerVariable>
-		<setInstallerVariable>
-			<name>java_launcher_startmenu_shortcut_icon</name>
-			<value>${installdir}/images/of-collect-logo.png</value>
-		</setInstallerVariable>
-		<setInstallerVariable>
-			<name>java_launcher_startmenu_shortcut_windows_icon</name>
-			<value>${installdir}/images/of-collect-logo.ico</value>
-		</setInstallerVariable>
-		<setInstallerVariable>
-			<name>java_launcher_osx_icon</name>
-			<value>${installdir}/images/of-collect-logo.icns</value>
-		</setInstallerVariable>
-		<setInstallerVariable>
-			<name>java_launcher_startmenu_shortcut_name</name>
-			<value>${project.fullName}</value>
-		</setInstallerVariable>
-    	<setInstallerVariable>
-			<name>java_launcher_startmenu_shortcut_name</name>
-			<value>${project.fullName}</value>
-		</setInstallerVariable>
-		<!-- End of Java Launcher variables -->
-		
-		<!-- guess Collect HTTP port and set it to server_http_port variable (default 8080),
-			block the update if the port is already in use -->
-		<if>
-			<conditionRuleList>
-				<fileExists path="${collect_root_user_dir}/collect.properties" />
-			</conditionRuleList>
-			<actionList>
-		    	<propertiesFileGet>
-				   <file>${collect_root_user_dir}/collect.properties</file>
-				   <key>collect.http_port</key>
-				   <variable>server_http_port</variable>
-				</propertiesFileGet>
-			</actionList>
-			<elseActionList>
-				<if>
-					<conditionRuleList>
-						<fileExists path="${installdir}/collect.properties" />
-					</conditionRuleList>
-					<actionList>
-				    	<propertiesFileGet>
-						   <file>${installdir}/collect.properties</file>
-						   <key>tomcat_http_port</key>
-						   <variable>server_http_port</variable>
-						</propertiesFileGet>
-					</actionList>
-					<elseActionList>
-						<setInstallerVariable>
-							<name>server_http_port</name>
-							<value>8080</value>
-						</setInstallerVariable>
-					</elseActionList>
-				</if>
-			</elseActionList>
-		</if>
+		<setInstallerVariable name="installdir"
+			value=".." />
+		<setInstallerVariable name="server_http_port"
+			value="8380" />
+		<setInstallerVariable
+			name="collect_root_user_dir"
+			value="${user_home_directory}/OpenForis/Collect" />
+		<setInstallerVariable name="backup_dir"
+			value="${collect_root_user_dir}/backup/${timestamp}" />
+		<setInstallerVariable name="data_dir"
+			value="${collect_root_user_dir}/data" />
+		<setInstallerVariable name="webapps_dir"
+			value="${installdir}/webapps" />
+		<propertiesFileGet>
+			<file>${collect_root_user_dir}/collect.properties</file>
+			<key>collect.http_port</key>
+			<variable>server_http_port</variable>
+			<showMessageOnError>0</showMessageOnError>
+			<abortOnError>0</abortOnError>
+		</propertiesFileGet>
 		<throwError>
-			<explanation>${project.fullName} is running</explanation>
-			<text>${project.fullName} is running on port ${server_http_port}. Shutdown ${project.fullName} before updating it.</text>
+			<explanation>Open Foris Collect is running</explanation>
+			<text>Open Foris Collect is running on port ${server_http_port}
+				Shutdown Collect before updating it.</text>
 			<ruleList>
 				<portTest>
 					<condition>cannot_bind</condition>
 					<port>${server_http_port}</port>
 				</portTest>
 			</ruleList>
-        </throwError>
+		</throwError>
 	</preInstallationActionList>
 	<readyToInstallActionList>
 		<createDirectory>
 			<path>${backup_dir}</path>
 		</createDirectory>
+		<!-- Backup data and webapp -->
 		<copyFile>
-			<origin>${old_data_dir}</origin>
-			<destination>${data_dir}</destination>
+			<origin>${webapps_dir}/collect.war</origin>
+			<destination>${backup_dir}/collect.war</destination>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
-			<ruleList>
-				<fileTest path="${data_dir}" condition="not_exists" />
-			</ruleList>
-        </copyFile>
-		<!-- Backup old data and webapp -->
-        <copyFile>
-			<origin>${old_tomcat_dir}/conf/Catalina/localhost/collect.xml</origin>
-			<destination>${backup_dir}/collect.xml</destination>
-			<abortOnError>0</abortOnError>
-			<showMessageOnError>0</showMessageOnError>
-        </copyFile>
-        <copyFile>
-			<origin>${old_data_dir}/collect.db</origin>
-			<destination>${backup_dir}/collect_old.db</destination>
-			<abortOnError>0</abortOnError>
-			<showMessageOnError>0</showMessageOnError>
-        </copyFile>
-        <copyFile>
+		</copyFile>
+		<copyFile>
 			<origin>${data_dir}/collect.db</origin>
 			<destination>${backup_dir}/collect.db</destination>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
-        </copyFile>
+		</copyFile>
 		<copyFile>
-			<origin>${old_webapps_dir}/collect.war</origin>
-			<destination>${backup_dir}/collect.war</destination>
+			<origin>${installdir}/lib/*.jar</origin>
+			<destination>${backup_dir}/lib</destination>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
-        </copyFile>
-        <!-- Delete temporary files -->
-        <deleteFile>
-  			<path>${webapps_dir}/collect</path>
+		</copyFile>
+		<copyFile>
+			<origin>${collect_root_user_dir}/collect.properties</origin>
+			<destination>${backup_dir}</destination>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
-  		</deleteFile>
+		</copyFile>
+		<!-- delete temporary files -->
+		<deleteFile>
+			<path>${webapps_dir}/collect</path>
+			<abortOnError>0</abortOnError>
+			<showMessageOnError>0</showMessageOnError>
+		</deleteFile>
+		<!-- delete old lib files -->
+		<deleteFile>
+			<path>${installdir}/lib/*.jar</path>
+		</deleteFile>
 	</readyToInstallActionList>
-	<finalPageActionList>
-		<showWarning>
-			<title>WARNING: new startup procedure!</title>
-			<text>Startup:
-From this version on, you will have to use the new "Open Foris Collect" shortcut from the Start menu to startup Collect: 
-a new Control Panel will appear.
-
-The old shortcuts (Startup Open Foris Collect, Shutdown Open Foris Collect) won't work anymore.
- 
-More information: 
-http://www.openforis.org/tools/collect/tutorials/installation.html</text>
-			<ruleList>
-        		<platformTest type="windows" />
-			</ruleList>
-		</showWarning>
-		<showWarning>
-			<title>WARNING: new startup procedure!</title>
-			<text>Startup:
-From this version on, you will have to use the new "Open Foris Collect" shortcut on your desktop to startup Collect: 
-a new Control Panel will appear.
-
-The old shortcuts (Startup Open Foris Collect, Shutdown Open Foris Collect) won't work anymore.
- 
-More information: 
-http://www.openforis.org/tools/collect/tutorials/installation.html</text>
-			<ruleList>
-        		<platformTest type="linux" />
-        		<platformTest type="linux-x64"/>
-        		<platformTest type="osx"/>
-			</ruleList>
-		</showWarning>
-	</finalPageActionList>
 	<requireInstallationByRootUser>0</requireInstallationByRootUser>
 	<requestedExecutionLevel>asInvoker</requestedExecutionLevel>
 	<defaultUnixDirectoryPermissions>777</defaultUnixDirectoryPermissions>
 	<defaultUnixFilePermissions>777</defaultUnixFilePermissions>
 	<enableRollback>1</enableRollback>
-	<rollbackBackupDirectory>${system_temp_directory}/${product_shortname}/backup</rollbackBackupDirectory>
 	<enableTimestamp>1</enableTimestamp>
 	<installationType>upgrade</installationType>
 	<overwritePolicy>always</overwritePolicy>

@@ -48,7 +48,7 @@ The project has been developed as a Maven project and it's divided into sub-modu
 
 ### Available Maven profiles
 
-* installer: 		builds the all the modules, including collect-installation and all its sub-modules (collect-assembly, collect-autoupdater, collect-control-panel, collect-installer, collect-updater, collect-updater-2, collect-saiku-updater).
+* installer: 		builds the all the modules, including collect-installation and all its sub-modules (collect-assembly, collect-autoupdater, collect-control-panel, collect-installer, collect-updater).
 * publishupdater:	publish the InstallBuilder autoupdater files in the specified collect.autoupdater.ftp.host/remotefolder
  
 

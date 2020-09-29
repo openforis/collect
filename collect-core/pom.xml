@@ -7,7 +7,8 @@
 		<version>3.26.20-SNAPSHOT</version>
 	</parent>
 
-	<name>Open Foris Collect core module</name>
+	<name>Open Foris Collect Core module</name>
+	<description>This module is used by Collect Desktop, Collect Mobile and Collect Earth. It manages the storage and update of surveys and records.</description>
 	<artifactId>collect-core</artifactId>
 	<packaging>jar</packaging>
 

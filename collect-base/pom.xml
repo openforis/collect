@@ -7,7 +7,7 @@
 		<version>3.26.20-SNAPSHOT</version>
 	</parent>
 
-	<name>Open Foris Collect base module</name>
+	<name>Open Foris Collect Base module</name>
 	<description>This module is used to retrieve only basic information on the application (like its version).
 	It's used by collect-core and even by collect-control-panel (that doesn't depend on collect-core)</description>
 	<artifactId>collect-base</artifactId>

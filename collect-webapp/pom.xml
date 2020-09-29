@@ -7,7 +7,7 @@
 		<version>3.26.20-SNAPSHOT</version>
 	</parent>
 
-	<name>Open Foris Collect webapp module</name>
+	<name>Open Foris Collect Webapp module</name>
 	<artifactId>collect-webapp</artifactId>
 	<packaging>war</packaging>
 
