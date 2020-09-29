@@ -14,9 +14,6 @@
 	<modules>
 		<module>collect-core</module>
 		<module>collect-rdb</module>
-		<module>collect-server</module>
-		<module>collect-client</module>
-		<module>collect-web</module>
 	</modules>
 
 	<properties>

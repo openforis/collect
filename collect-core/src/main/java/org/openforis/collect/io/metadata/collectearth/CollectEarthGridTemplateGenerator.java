@@ -138,7 +138,7 @@ public class CollectEarthGridTemplateGenerator  {
 				} catch(Exception e) {
 					//this may happen when there are duplicate values in the first row
 					headersFound = false;
-					csvReader.setHeadersRead(true);	
+//					csvReader.setHeadersRead(true);	
 				}
 			}
 			if( validationResults == null ){
