@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>3.13.1</version>
+	<version>3.13.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Open Foris Collect</name>
@@ -49,7 +49,7 @@
 		<url>https://github.com/openforis/collect</url>
 		<connection>scm:git:git@github.com:openforis/collect.git</connection>
 		<developerConnection>scm:git:git@github.com:openforis/collect.git</developerConnection>
-		<tag>v3.13.1b</tag>
+		<tag>HEAD</tag>
 	</scm>
 	
 	<licenses>
