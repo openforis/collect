@@ -14,6 +14,39 @@
 		<url>www.openforis.org</url>
 	</organization>
 	
+	<developers>
+		<developer>
+			<name>Gino Miceli</name>
+			<email>gino.miceli@google.com</email>
+			<organization>Google</organization>
+			<organizationUrl>http://www.google.com</organizationUrl>
+		</developer>
+		<developer>
+			<name>Cosimo Togna</name>
+			<email>cosimo.togna@fao.org</email>
+			<organization>FAO of the UN</organization>
+			<organizationUrl>http://www.fao.org</organizationUrl>
+		</developer>
+		<developer>
+			<name>Stefano Ricci</name>
+			<email>stefano.ricci@fao.org</email>
+			<organization>FAO of the UN</organization>
+			<organizationUrl>http://www.fao.org</organizationUrl>
+		</developer>
+		<developer>
+			<name>Alfonso Sanchez-Paus Diaz</name>
+			<email>alfonso.sanchezpausdiaz@fao.org</email>
+			<organization>FAO of the UN</organization>
+			<organizationUrl>http://www.fao.org</organizationUrl>
+		</developer>
+		<developer>
+			<name>Daniel Wiell</name>
+			<email>daniel.wiell@fao.org</email>
+			<organization>FAO of the UN</organization>
+			<organizationUrl>http://www.fao.org</organizationUrl>
+		</developer>
+	</developers>
+	
 	<modules>
 		<module>collect-core</module>
 		<module>collect-rdb</module>
