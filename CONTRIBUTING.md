@@ -28,22 +28,36 @@ The project has been developed as a Maven project and it's divided into sub-modu
 * publishupdater:	publish the InstallBuilder autoupdater files in the specified collect.autoupdater.ftp.host/remotefolder
 
 
-### Required Maven properties
+### Maven POM properties
+These properties can be specified in the Maven settings.xml file.
 
-#### VMWare InstallBuilder variables 
-They are used by collect-installer, collect-updater, collect-autoupdater.
+#### Mandatory properties
 
-* installbuilder.builder.executable			InstallBuilder Builder executable file name 
-* installbuilder.builder.output				InstallBuilder Builder output folder (default is ${installbuilder.home}/output)
-* installbuilder.autoupdate.executable		InstallBuilder AutoUpdate executable file name (e.g. customize.run for Linux, customize.exe for Windows) (used by collect-autoupdater module)
-* installbuilder.autoupdate.output			InstallBuilder AutoUpdate output folder (default is ${installbuilder.home}/autoupdate/output)
+Property Name | Description
+------------- | -------------
+collect.nexus.url | URL of the Nexus repository where latest artifacts have been released (e.g. https://oss.sonatype.org/content/repositories/releases if Sonatype Central repository is used); it's used to retrieve the latest version available and to check if an update is needed, and to generate the links to the updaters.)
+collect.update.url | URL of update.xml file (used by InstallBuilder AutoUpdate to retrieve the new updaters)
 
-* collect.nexus.url 						URL of the Nexus repository where latest artifacts have been released (e.g. https://oss.sonatype.org/content/repositories/releases if Sonatype Central repository is used); it's used to retrieve the latest version available and to check if an update is needed, and to generate the links to the updaters.)
-* collect.autoupdater.ftp.host				FTP server host name (used by collect-updater module to upload the update.xml file)
-* collect.autoupdater.ftp.username 			FTP server username
-* collect.autoupdater.ftp.password			FTP server password
-* collect.autoupdater.ftp.remotefolder		FTP server remote folder (where to store the update.xml file)
-* collect.update.url						URL of update.xml file (used by InstallBuilder AutoUpdate to retrieve the new updaters)
+#### VMWare InstallBuilder variables
+They are used by collect-installer, collect-updater and collect-autoupdater modules, running with "installer" profile enabled.
+
+Property Name | Description
+------------- | -------------
+installbuilder.builder.executable | InstallBuilder Builder executable file name (e.g. ${installbuilder.home}/bin/builder in Linux, ${installbuilder.home}/bin/builder.exe in Windows)
+installbuilder.builder.output | InstallBuilder Builder output folder (the default one is ${installbuilder.home}/output)
+installbuilder.autoupdate.executable | InstallBuilder AutoUpdate executable file name (e.g. customize.run for Linux, customize.exe for Windows) (used by collect-autoupdater module)
+installbuilder.autoupdate.output | InstallBuilder AutoUpdate output folder (the default one is ${installbuilder.home}/autoupdate/output)
+
+#### FTP update.xml uploader variables
+They are used by collect-updater module, running with "publishupdater" profile enabled.
+These variables are used to upload the update.xml file via FTP to the specified location (used by InstallBuilder AutoUpdater to fetch the new updaters).
+
+Property Name | Description
+------------- | -------------
+collect.autoupdater.ftp.host | FTP server host name (used by collect-updater module to upload the update.xml file)
+collect.autoupdater.ftp.username | FTP server username
+collect.autoupdater.ftp.password | FTP server password
+collect.autoupdater.ftp.remotefolder | FTP server remote folder (where to store the update.xml file)
 
 ### How to release a new version:
 
