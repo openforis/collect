@@ -28,55 +28,6 @@ Go to our [website](http://www.openforis.org/tools/collect.html) and download th
 
 Please register into our [Community Support Forum](http://www.openforis.org/support) and raise your question or feature request there. 
 
-## Getting Started with the development of Collect
-
-In order to build and run Collect, you will have to install first these software:
-* Java Development Kit (JDK) 8+
-* Apache Maven 3.6+
-* Node JS 12+
-
-The project has been developed as a Maven project and it's divided into sub-modules.
-
-### Default built modules
-
-* collect-base (basic environment classes used even by Collect Mobile)
-* collect-client (client side module, written in Adobe Flex)
-* collect-core (core functionalities, used even by Collect Earth and Collect Mobile)
-* collect-rdb (Relational DataBase generator module).
-* collect-server (server side module used by the web application).
-* collect-webapp (client side module, written in React JS and ZK).
-
-### Available Maven profiles
-
-* installer: 		builds the all the modules, including collect-installation and all its sub-modules (collect-assembly, collect-autoupdater, collect-control-panel, collect-installer, collect-updater).
-* publishupdater:	publish the InstallBuilder autoupdater files in the specified collect.autoupdater.ftp.host/remotefolder
- 
-
-### Required Maven properties
-
-* installbuilder.home						BitRock InstallBuilder home path (used by collect-installer and collect-udpater modules)
-* installbuilder.builder.executable			Builder executable file name 
-* installbuilder.autoupdate.executable		Autoupdate executable file name (e.g. customize.run for Linux, customize.exe for Windows) (used by collect-autoupdater module)
-* installbuilder.autoupdate.output			Autoupdate output folder (default is ${installbuilder.home}/autoupdate/output)
-
-* collect.nexus.url 						URL of the Nexus repository where latest artifacts have been released (e.g. https://oss.sonatype.org/content/repositories/releases if Sonatype Central repository is used); it's used to retrieve the latest version available and to check if an update is needed, and to generate the links to the updaters.)
-* collect.autoupdater.ftp.host				FTP server host name (used by collect-updater module to upload the update.xml file)
-* collect.autoupdater.ftp.username 			FTP server username
-* collect.autoupdater.ftp.password			FTP server password
-* collect.autoupdater.ftp.remotefolder		FTP server remote folder (where to store the update.xml file)
-
-### How to release a new version:
-
-The release of a new version can be done using the Maven Release Plugin.
-Just run the following commands: 
-
-```
-mvn release:prepare
-mvn release:perform
-```
-
-(All profiles are active during the release).
-
 ## License
 
 Collect and the rest of the Open Foris tools follow the MIT License, meaning that you can do anything you want with the code! Of course we appreciate references to our project, [Open Foris](www.openforis.org)
