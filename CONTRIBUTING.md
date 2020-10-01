@@ -35,7 +35,7 @@ These properties can be specified in the Maven settings.xml file.
 
 Property Name | Description
 ------------- | -------------
-collect.nexus.url | URL of the Nexus repository where latest artifacts have been released (e.g. https://oss.sonatype.org/content/repositories/releases if Sonatype Central repository is used); it's used to retrieve the latest version available and to check if an update is needed, and to generate the links to the updaters.)
+openforis.nexus.url | URL of the Nexus repository where latest artifacts have been released (e.g. https://oss.sonatype.org/content/repositories/releases if Sonatype Central repository is used); it's used to retrieve the latest version available and to check if an update is needed, and to generate the links to the updaters.)
 collect.update.url | URL of update.xml file (used by InstallBuilder AutoUpdate to retrieve the new updaters)
 
 #### VMWare InstallBuilder variables
