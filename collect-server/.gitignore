@@ -1,2 +1,3 @@
-/target/
 /${sys:catalina.base}
+/bin/
+/target/

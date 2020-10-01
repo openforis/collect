@@ -211,7 +211,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
+									<executable>${installbuilder.builder.executable}</executable>
 									<arguments>
 										<argument>build</argument>
 										<argument>${installer-build-path}/${installbuilder-updater-file-name}</argument>
@@ -227,7 +227,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
+									<executable>${installbuilder.builder.executable}</executable>
 									<arguments>
 										<argument>build</argument>
 										<argument>${installer-build-path}/${installbuilder-updater-file-name}</argument>
@@ -243,7 +243,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
+									<executable>${installbuilder.builder.executable}</executable>
 									<arguments>
 										<argument>build</argument>
 										<argument>${installer-build-path}/${installbuilder-updater-file-name}</argument>
@@ -259,7 +259,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
+									<executable>${installbuilder.builder.executable}</executable>
 									<arguments>
 										<argument>build</argument>
 										<argument>${installer-build-path}/${installbuilder-updater-file-name}</argument>

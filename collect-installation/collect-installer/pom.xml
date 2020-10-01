@@ -255,7 +255,7 @@
 											<goal>exec</goal>
 											<configuration>
 												<skip>${installer.skip}</skip>
-												<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
+												<executable>${installbuilder.builder.executable}</executable>
 												<arguments>
 													<argument>build</argument>
 													<argument>${installer-build-path}/${installbuilder-file-name}</argument>
