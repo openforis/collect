@@ -98,7 +98,7 @@
 											</plugin>
 											<goal>exec</goal>
 											<configuration>
-												<executable>${installbuilder.home}/autoupdate/bin/${installbuilder.autoupdate.executable}</executable>
+												<executable>${installbuilder.autoupdate.executable}</executable>
 												<arguments>
 													<argument>build</argument>
 													<argument>${installer-build-path}/${installbuilder-autoupdate-configuration-file-name}</argument>
