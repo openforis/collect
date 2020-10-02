@@ -1,4 +1,5 @@
 import AbstractService from './AbstractService'
+import { AttributeDefinition } from '../model/Survey'
 
 export default class CommandService extends AbstractService {
   addAttribute(record, parentEntityId, attrDef) {
@@ -13,9 +14,13 @@ export default class CommandService extends AbstractService {
     return this.postJson('command/record/attribute/new', command)
   }
 
-  updateAttribute(attribute, attributeType, valueByField) {
+  updateAttribute(attribute, valueByField) {
     const { record, definition, parent } = attribute
-
+	const { attributeType } = definition
+	const numericType = attributeType === AttributeDefinition.Types.NUMBER
+		? definition.numericType
+		: null
+	
     const command = {
       surveyId: record.survey.id,
       recordId: record.id,
@@ -24,6 +29,7 @@ export default class CommandService extends AbstractService {
       nodeDefId: definition.id,
       nodePath: attribute.path,
       attributeType,
+      numericType,
       valueByField,
     }
     return this.postJson('command/record/attribute', command)

@@ -36,7 +36,7 @@ export class RecordUpdater {
 
   handleRecordEventReceived(event) {
     const record = this.record
-    if (record && record.id == event.recordId && record.step == event.recordStep) {
+    if (record && record.id === event.recordId && record.step === event.recordStep) {
       const survey = record.survey
       const definition = survey.schema.getDefinitionById(Number(event.definitionId))
       const parentEntity = event.parentEntityPath ? record.getNodeByPath(event.parentEntityPath) : record.rootEntity

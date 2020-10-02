@@ -67,17 +67,14 @@ export default class AbstractField extends Component {
   }
 
   onAttributeUpdate({ value, debounced = true }) {
-    const { fieldDef } = this.props
-
     this.setState({ value, dirty: true })
-
-    const attrType = fieldDef.attributeDefinition.attributeType
+	
     const attr = this.getSingleAttribute()
     if (this.attributeUpdatedDebounced) {
       this.attributeUpdatedDebounced.cancel()
     }
     this.attributeUpdatedDebounced = debounce(debounced ? 1000 : 0, false, () =>
-      ServiceFactory.commandService.updateAttribute(attr, attrType, value)
+      ServiceFactory.commandService.updateAttribute(attr, value)
     )
     this.attributeUpdatedDebounced()
   }
