@@ -122,7 +122,7 @@ public class CommandController {
 		return submitCommand(command);
 	}
 
-	@RequestMapping(value = "record/node", method = DELETE, consumes = APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "record/node/delete", method = POST, consumes = APPLICATION_JSON_VALUE)
 	@Transactional
 	public @ResponseBody Object deleteNode(@RequestBody DeleteNodeCommand command) {
 		return submitCommand(command);

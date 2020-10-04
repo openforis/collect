@@ -16,11 +16,9 @@ export default class CommandService extends AbstractService {
 
   updateAttribute(attribute, valueByField) {
     const { record, definition, parent } = attribute
-	const { attributeType } = definition
-	const numericType = attributeType === AttributeDefinition.Types.NUMBER
-		? definition.numericType
-		: null
-	
+    const { attributeType } = definition
+    const numericType = attributeType === AttributeDefinition.Types.NUMBER ? definition.numericType : null
+
     const command = {
       surveyId: record.survey.id,
       recordId: record.id,
@@ -45,5 +43,17 @@ export default class CommandService extends AbstractService {
     }
 
     return this.postJson('command/record/entity', command)
+  }
+
+  deleteNode(node) {
+    const { record } = node
+    const command = {
+      surveyId: record.survey.id,
+      recordId: record.id,
+      recordStep: record.step,
+      nodeDefId: node.definition.id,
+      nodePath: node.path,
+    }
+    return this.postJson('command/record/node/delete', command)
   }
 }

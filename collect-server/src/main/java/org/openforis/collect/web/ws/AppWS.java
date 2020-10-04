@@ -34,11 +34,15 @@ public class AppWS {
 	}
 
 	private void sendMessage(final Message message, int delay) {
-		new Timer().schedule(new TimerTask() {
-			public void run() {
-				messageSender.send(message);
-			}
-		}, delay);
+		if (delay > 0) {
+			new Timer().schedule(new TimerTask() {
+				public void run() {
+					messageSender.send(message);
+				}
+			}, delay);
+		} else {
+			messageSender.send(message);
+		}
 	}
 	
 	public static class SurveyUpdateMessage extends Message {
