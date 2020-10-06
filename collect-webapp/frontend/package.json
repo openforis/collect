@@ -16,6 +16,7 @@
     "@material-ui/pickers": "^3.2.10",
     "bootstrap": "^4.5.2",
     "chart.js": "^2.9.3",
+    "clsx": "^1.1.1",
     "formik": "^2.1.5",
     "hoek": "^6.1.3",
     "i18n-react": "^0.7.0",

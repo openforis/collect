@@ -1,8 +1,10 @@
 import { Attribute, Entity } from './Record'
 
 import {
+  AttributeDeletedEvent,
   AttributeUpdatedEvent,
   EntityCreatedEvent,
+  EntityDeletedEvent,
   BooleanAttributeUpdatedEvent,
   CodeAttributeUpdatedEvent,
   CoordinateAttributeUpdatedEvent,
@@ -58,6 +60,8 @@ export class RecordUpdater {
         }
         this._setValueInAttribute(attr, event)
         attr.validationResults = event.validationResults
+      } else if (event instanceof AttributeDeletedEvent || event instanceof EntityDeletedEvent) {
+        parentEntity.removeChild(node)
       } else if (event instanceof NodeRelevanceUpdatedEvent) {
         node.childrenRelevanceByDefinitionId[event.childDefinitionId] = event.relevant
       } else if (event instanceof NodeMinCountUpdatedEvent) {

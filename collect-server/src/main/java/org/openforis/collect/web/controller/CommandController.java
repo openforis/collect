@@ -14,7 +14,8 @@ import org.openforis.collect.command.Command;
 import org.openforis.collect.command.CommandDispatcher;
 import org.openforis.collect.command.CreateRecordCommand;
 import org.openforis.collect.command.CreateRecordPreviewCommand;
-import org.openforis.collect.command.DeleteNodeCommand;
+import org.openforis.collect.command.DeleteAttributeCommand;
+import org.openforis.collect.command.DeleteEntityCommand;
 import org.openforis.collect.command.DeleteRecordCommand;
 import org.openforis.collect.command.RecordCommand;
 import org.openforis.collect.command.UpdateAttributeCommand;
@@ -115,16 +116,22 @@ public class CommandController {
 		UpdateAttributeCommand<?> command = commandWrapper.toCommand(survey);
 		return submitCommand(command);
 	}
-
+	
+	@RequestMapping(value = "record/attiribute/delete", method = POST, consumes = APPLICATION_JSON_VALUE)
+	@Transactional
+	public @ResponseBody Object deleteAttribute(@RequestBody DeleteAttributeCommand command) {
+		return submitCommand(command);
+	}
+	
 	@RequestMapping(value = "record/entity", method = POST, consumes = APPLICATION_JSON_VALUE)
 	@Transactional
 	public @ResponseBody Object addEntity(@RequestBody AddEntityCommand command) {
 		return submitCommand(command);
 	}
 
-	@RequestMapping(value = "record/node/delete", method = POST, consumes = APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "record/entity/delete", method = POST, consumes = APPLICATION_JSON_VALUE)
 	@Transactional
-	public @ResponseBody Object deleteNode(@RequestBody DeleteNodeCommand command) {
+	public @ResponseBody Object deleteEntity(@RequestBody DeleteEntityCommand command) {
 		return submitCommand(command);
 	}
 

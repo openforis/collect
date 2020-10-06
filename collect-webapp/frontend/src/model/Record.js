@@ -79,6 +79,11 @@ export class Node extends Serializable {
   calculateIndex() {
     return this.parent.childrenByDefinitionId[this.definition.id].indexOf(this)
   }
+
+  updatePath() {
+    this.index = this.calculateIndex()
+    this.path = this.calculatePath()
+  }
 }
 
 export class Entity extends Node {
@@ -147,6 +152,15 @@ export class Entity extends Node {
     child.path = child.calculatePath()
   }
 
+  removeChild(child) {
+    let children = this.childrenByDefinitionId[child.definition.id]
+    if (children == null) {
+      return
+    }
+    children.splice(child.index, 1)
+    children.slice(child.index).forEach((child) => child.updatePath())
+  }
+
   getChildrenByChildName(childName) {
     const childDef = this.definition.getChildDefinitionByName(childName)
     return this.getChildrenByDefinitionId(childDef.id)
@@ -154,6 +168,13 @@ export class Entity extends Node {
 
   getChildrenByDefinitionId(childDefId) {
     return this.childrenByDefinitionId[childDefId] || []
+  }
+
+  updatePath() {
+    super.updatePath()
+    Object.entries(this.childrenByDefinitionId).forEach(([childDefId, children]) => {
+      children.forEach((child) => child.updatePath())
+    })
   }
 }
 

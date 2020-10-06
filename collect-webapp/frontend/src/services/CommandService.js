@@ -45,15 +45,23 @@ export default class CommandService extends AbstractService {
     return this.postJson('command/record/entity', command)
   }
 
-  deleteNode(node) {
+  _createDeleteNodeCommand(node) {
     const { record } = node
-    const command = {
+    return {
       surveyId: record.survey.id,
       recordId: record.id,
       recordStep: record.step,
       nodeDefId: node.definition.id,
       nodePath: node.path,
     }
-    return this.postJson('command/record/node/delete', command)
+  }
+  deleteAttribute(node) {
+    const command = this._createDeleteNodeCommand(node)
+    return this.postJson('command/record/attribute/delete', command)
+  }
+
+  deleteEntity(node) {
+    const command = this._createDeleteNodeCommand(node)
+    return this.postJson('command/record/entity/delete', command)
   }
 }

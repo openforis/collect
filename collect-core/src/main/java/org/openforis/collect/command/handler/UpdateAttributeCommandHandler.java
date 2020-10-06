@@ -11,7 +11,7 @@ public class UpdateAttributeCommandHandler<C extends UpdateAttributeCommand<?>> 
 	@Override
 	public RecordCommandResult executeForResult(C command) {
 		CollectRecord record = findRecord(command);
-		Attribute<?, Value> attribute = findAttribute(command, record);
+		Attribute<?, Value> attribute = findNode(command, record);
 		NodeChangeSet nodeChangeSet = recordUpdater.updateAttribute(attribute, command.getValue());
 		return new RecordCommandResult(record, nodeChangeSet);
 	}

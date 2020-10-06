@@ -8,6 +8,10 @@ body {
   cursor: pointer;
 }
 
+.tab-content {
+  overflow-y: auto;
+}
+
 /* ==== end of Reactstrap style ==== */
 
 header .breadcrumb-wrapper {

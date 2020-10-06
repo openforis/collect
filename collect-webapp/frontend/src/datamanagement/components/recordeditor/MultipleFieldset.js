@@ -37,7 +37,7 @@ export default class MultipleFieldset extends EntityCollectionComponent {
 
   handleDeleteButtonClick() {
     const selectedEntity = this.getSelectedEntity()
-    this.commandService.deleteNode(selectedEntity)
+    this.commandService.deleteEntity(selectedEntity)
   }
 
   handleTabClick(tabId) {
