@@ -153,7 +153,7 @@ export class Entity extends Node {
   }
 
   removeChild(child) {
-    let children = this.childrenByDefinitionId[child.definition.id]
+    const children = this.childrenByDefinitionId[child.definition.id]
     if (children == null) {
       return
     }

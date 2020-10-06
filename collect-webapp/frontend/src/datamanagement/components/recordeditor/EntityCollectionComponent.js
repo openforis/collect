@@ -2,6 +2,7 @@ import { Component } from 'react'
 import ServiceFactory from 'services/ServiceFactory'
 import EventQueue from 'model/event/EventQueue'
 import { EntityCreatedEvent } from 'model/event/RecordEvent'
+import { EntityDeletedEvent } from '../../../model/event/RecordEvent'
 
 export default class EntityCollectionComponent extends Component {
   commandService = ServiceFactory.commandService
@@ -40,8 +41,9 @@ export default class EntityCollectionComponent extends Component {
       return
     }
     const { record } = parentEntity
+
     if (
-      event instanceof EntityCreatedEvent &&
+      (event instanceof EntityCreatedEvent || event instanceof EntityDeletedEvent) &&
       event.recordId === record.id &&
       event.recordStep === record.step &&
       event.parentEntityPath === parentEntity.path &&

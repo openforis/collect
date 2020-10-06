@@ -110,7 +110,12 @@ public class EventProducer {
 		Integer recordId = change.getRecordId();
 		RecordStep recordStep = change.getRecordStep().toRecordStep();
 
-		EventFactory factory = new EventFactory(recordId, recordStep, ancestorIds, node);
+		String parentEntityPath = change instanceof NodeDeleteChange 
+				? ((NodeDeleteChange) change).getParentEntityPath() 
+				: node.getParent() == null 
+					? null 
+					: node.getParent().getPath();
+		EventFactory factory = new EventFactory(recordId, recordStep, ancestorIds, parentEntityPath, node);
 
 		if (change instanceof EntityChange) {
 			EntityChange entityChange = (EntityChange) change;
@@ -130,11 +135,7 @@ public class EventProducer {
 				factory.attributeUpdated();
 			}
 		} else if (change instanceof NodeDeleteChange) {
-			if (node instanceof Entity) {
-				factory.entityDeleted();
-			} else {
-				factory.attributeDeleted();
-			}
+			factory.nodeDeleted();
 		}
 
 	}
@@ -175,14 +176,20 @@ public class EventProducer {
 		Integer recordId;
 		RecordStep recordStep;
 		List<String> ancestorIds;
+		String parentEntityPath;
 		Node<?> node;
 		Date timestamp;
 
-		EventFactory(Integer recordId, RecordStep recordStep, List<String> ancestorIds,
+		EventFactory(Integer recordId, RecordStep recordStep, List<String> ancestorIds, Node<?> node) {
+			this(recordId, recordStep, ancestorIds, node.getParent().getPath(), node);
+		}
+		
+		EventFactory(Integer recordId, RecordStep recordStep, List<String> ancestorIds, String parentEntityPath,
 				Node<?> node) {
 			this.recordId = recordId;
 			this.recordStep = recordStep;
 			this.ancestorIds = ancestorIds;
+			this.parentEntityPath = parentEntityPath;
 			this.node = node;
 			this.timestamp = new Date();
 		}
@@ -334,14 +341,8 @@ public class EventProducer {
 			}
 		}
 
-		void entityDeleted() {
-			EntityDeletedEvent event = new EntityDeletedEvent();
-			fillRecordEvent(event);
-			consumer.onEvent(event);
-		}
-
-		void attributeDeleted() {
-			AttributeDeletedEvent event = new AttributeDeletedEvent();
+		void nodeDeleted() {
+			RecordEvent event = node instanceof Entity ? new EntityDeletedEvent() : new AttributeDeletedEvent();
 			fillRecordEvent(event);
 			consumer.onEvent(event);
 		}
@@ -389,7 +390,7 @@ public class EventProducer {
 			event.setAncestorIds(ancestorIds);
 			event.setNodeId(String.valueOf(node.getInternalId()));
 			event.setNodePath(node.getPath());
-			event.setParentEntityPath(node.getParent() == null ? null : node.getParent().getPath());
+			event.setParentEntityPath(parentEntityPath);
 			event.setTimestamp(timestamp);
 			event.setUserName(context.userName);
 			return event;

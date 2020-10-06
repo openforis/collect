@@ -13,16 +13,23 @@ import org.openforis.idm.model.Node;
  */
 public class NodeDeleteChange extends NodeChange<Node<?>> {
 	
-	private Step step;
+	private final Step step;
+	private final String parentEntityPath;
 
-	public NodeDeleteChange(Integer recordId, Step step, List<Integer> ancestoIds, Node<?> node) {
+	public NodeDeleteChange(Integer recordId, Step step, List<Integer> ancestoIds, String parentEntityPath,
+			Node<?> node) {
 		super(recordId, ancestoIds, node);
 		this.step = step;
+		this.parentEntityPath = parentEntityPath;
 	}
 	
 	@Override
 	public Step getRecordStep() {
 		return step;
+	}
+	
+	public String getParentEntityPath() {
+		return parentEntityPath;
 	}
 	
 }
