@@ -1,55 +1,61 @@
-import React, { Component } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap'
 import classnames from 'classnames'
 
 import Tab from './Tab'
 
-export default class TabSet extends Component {
-  constructor(props) {
-    super()
-    const { tabSetDef } = props
-    const { tabs } = tabSetDef
-    const firstTabId = tabs.length > 0 ? tabs[0].id : null
-    this.toggle = this.toggle.bind(this)
-    this.state = {
-      activeTab: firstTabId,
+const TabSetContent = (props) => {
+  const { tabSetDef, parentEntity } = props
+  const { tabs: tabDefs } = tabSetDef
+
+  const hasTabs = Boolean(tabDefs.length)
+  const firstTabDefId = hasTabs ? tabDefs[0].id : null
+
+  const [activeTab, setActiveTab] = useState(firstTabDefId)
+
+  const wrapperRef = useRef()
+
+  useEffect(() => {
+    adjustSize()
+  }, [wrapperRef])
+
+  const adjustSize = () => {
+    const wrapper = wrapperRef.current
+    if (wrapper) {
+      const totalHeight = wrapper.parentElement.clientHeight
+      wrapper.style.height = totalHeight + 'px'
+
+      const [navTabEl, tabContentEl] = wrapper.children
+      if (tabContentEl) {
+        const height = totalHeight - navTabEl.clientHeight
+        tabContentEl.style.height = height + 'px'
+      }
     }
   }
 
-  toggle(tabId) {
-    if (this.state.activeTab !== tabId) {
-      this.setState({ activeTab: tabId })
-    }
-  }
-
-  render() {
-    const { tabSetDef, parentEntity } = this.props
-    const { activeTab } = this.state
-
-    return (
-      <>
-        <Nav tabs>
-          {tabSetDef.tabs.map((tabDef) => (
-            <NavItem key={tabDef.id}>
-              <NavLink
-                className={classnames({ active: activeTab === tabDef.id })}
-                onClick={() => {
-                  this.toggle(tabDef.id)
-                }}
-              >
-                {tabDef.label}
-              </NavLink>
-            </NavItem>
-          ))}
-        </Nav>
-        <TabContent activeTab={activeTab}>
-          {tabSetDef.tabs.map((tabDef) => (
-            <TabPane key={tabDef.id} tabId={tabDef.id}>
-              <Tab tabDef={tabDef} parentEntity={parentEntity} />
-            </TabPane>
-          ))}
-        </TabContent>
-      </>
-    )
-  }
+  return hasTabs ? (
+    <div className="tabset-wrapper" ref={wrapperRef}>
+      <Nav tabs>
+        {tabDefs.map((tabDef) => (
+          <NavItem key={tabDef.id}>
+            <NavLink
+              className={classnames({ active: activeTab === tabDef.id })}
+              onClick={() => setActiveTab(tabDef.id)}
+            >
+              {tabDef.label}
+            </NavLink>
+          </NavItem>
+        ))}
+      </Nav>
+      <TabContent activeTab={activeTab}>
+        {tabDefs.map((tabDef) => (
+          <TabPane key={tabDef.id} tabId={tabDef.id}>
+            <Tab tabDef={tabDef} parentEntity={parentEntity} />
+          </TabPane>
+        ))}
+      </TabContent>
+    </div>
+  ) : null
 }
+
+export default TabSetContent

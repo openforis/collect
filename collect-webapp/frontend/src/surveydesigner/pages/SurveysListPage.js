@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux'
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import {
@@ -7,6 +7,7 @@ import {
 } from 'reactstrap';
 
 import MaxAvailableSpaceContainer from 'common/components/MaxAvailableSpaceContainer';
+import TableResizeOnWindowResizeComponent from 'common/components/TableResizeOnWindowResizeComponent';
 import Dialogs from 'common/components/Dialogs';
 import * as Formatters from 'common/components/datatable/formatters';
 import UserGroupColumnEditor from 'common/components/surveydesigner/UserGroupColumnEditor';
@@ -17,16 +18,18 @@ import RouterUtils from 'utils/RouterUtils';
 import { changeUserGroup, publishSurvey, unpublishSurvey, deleteSurvey } from 'actions/surveys';
 import SurveyValidationResultDialog from '../components/SurveyValidationResultDialog';
 
-class SurveysListPage extends Component {
+class SurveysListPage extends React.Component {
 
-    constructor(props) {
-        super(props)
+    constructor() {
+        super()
 
         this.state = {
             selectedSurvey: null,
             selectedSurveys: [],
             selectedSurveyIds: []
         }
+
+        this.wrapperRef = React.createRef()
 
         this.handleCellEdit = this.handleCellEdit.bind(this)
         this.handleCloneButtonClick = this.handleCloneButtonClick.bind(this)
@@ -227,7 +230,8 @@ class SurveysListPage extends Component {
         const nonEditableRows = combinedSummaries.filter(s => loggedUser.canChangeSurveyUserGroup(s.userInGroupRole))
 
         return (
-            <MaxAvailableSpaceContainer ref="survey-list-container">
+            <MaxAvailableSpaceContainer ref={this.wrapperRef}>
+                <TableResizeOnWindowResizeComponent wrapperRef={this.wrapperRef} margin={108} />
                 {
                     validationResultShown &&
                     <SurveyValidationResultDialog />

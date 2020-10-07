@@ -1,3 +1,10 @@
+body,
+#root,
+.app-body,
+.app-loader.loaded {
+  height: 100vh;
+}
+
 body {
   overflow: hidden;
 }

@@ -1,9 +1,9 @@
 import React from 'react'
-import { AutoSizer, Column, Table as TableVirtualized } from 'react-virtualized'
+import { Column, Table as TableVirtualized } from 'react-virtualized'
 import { withStyles } from '@material-ui/core/styles'
 import clsx from 'clsx'
 import TableCell from '@material-ui/core/TableCell'
-import { Button, FormControl, FormGroup, FormLabel, IconButton } from '@material-ui/core'
+import { Button, FormControl, FormLabel, IconButton } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
 
 import EntityCollectionComponent from './EntityCollectionComponent'
@@ -76,7 +76,7 @@ class MuiVirtualizedTable extends React.PureComponent {
   }
 
   headerRenderer = ({ label, columnIndex }) => {
-    const { headerHeight, classes } = this.props
+    const { classes } = this.props
 
     return (
       <TableCell
