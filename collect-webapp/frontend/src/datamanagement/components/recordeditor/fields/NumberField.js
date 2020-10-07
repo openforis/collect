@@ -4,11 +4,13 @@ import { Input } from 'reactstrap'
 
 import AbstractField from './AbstractField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
-import FieldValidationFeedback from './FieldValidationFeedback'
+import FieldValidationTooltip from './FieldValidationTooltip'
 
 export default class NumberField extends AbstractField {
   constructor(props) {
     super(props)
+
+    this.fieldId = `number-field-${new Date().getTime()}`
 
     this.onTextValueChange = this.onTextValueChange.bind(this)
     this.onUnitChange = this.onUnitChange.bind(this)
@@ -62,12 +64,15 @@ export default class NumberField extends AbstractField {
         <>
           <div style={hasPrecisions ? { display: 'grid', gridTemplateColumns: '1fr 150px' } : null}>
             <Input
+              id={this.fieldId}
               type="number"
               invalid={Boolean(errors || warnings)}
               className={warnings ? 'warning' : ''}
               value={text}
               onChange={this.onTextValueChange}
             />
+            <FieldValidationTooltip target={this.fieldId} errors={errors} warnings={warnings} />
+
             {hasPrecisions && (
               <FormControl>
                 <InputLabel>Unit</InputLabel>
@@ -86,7 +91,6 @@ export default class NumberField extends AbstractField {
           </div>
           {dirty && <FieldLoadingSpinner />}
         </>
-        <FieldValidationFeedback errors={errors} warnings={warnings} />
       </div>
     )
   }

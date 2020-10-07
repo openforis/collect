@@ -2,13 +2,14 @@ import React from 'react'
 import { Checkbox } from '@material-ui/core'
 
 import AbstractField from './AbstractField'
-import FieldValidationFeedback from './FieldValidationFeedback'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
+import FieldValidationTooltip from './FieldValidationTooltip'
 
 export default class BooleanField extends AbstractField {
   constructor() {
     super()
 
+    this.fieldId = `boolean-field-${new Date().getTime()}`
     this.onChange = this.onChange.bind(this)
   }
 
@@ -16,7 +17,7 @@ export default class BooleanField extends AbstractField {
     const attr = this.getSingleAttribute()
     return { value: attr.fields[0].value }
   }
-  
+
   onChange(event) {
     this.onAttributeUpdate({ value: { value: event.target.checked }, debounced: false })
   }
@@ -27,9 +28,14 @@ export default class BooleanField extends AbstractField {
     const checked = value || false
     return (
       <div>
-        <Checkbox color="primary" checked={checked} onChange={this.onChange} />
+        <Checkbox
+          id={this.fieldId}
+          color={Boolean(errors) || Boolean(warnings) ? 'secondary' : 'primary'}
+          checked={checked}
+          onChange={this.onChange}
+        />
         {dirty && <FieldLoadingSpinner />}
-        <FieldValidationFeedback errors={errors} warnings={warnings} />
+        <FieldValidationTooltip target={this.fieldId} errors={errors} warnings={warnings} />
       </div>
     )
   }
