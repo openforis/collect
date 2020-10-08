@@ -54,7 +54,7 @@ export default class MultipleFieldset extends EntityCollectionComponent {
     const selectedEntity = this.getSelectedEntity()
 
     return (
-      <div>
+      <>
         <label>Select a {itemDef.label}:</label>
         <Input
           type="select"
@@ -79,7 +79,7 @@ export default class MultipleFieldset extends EntityCollectionComponent {
             <TabSetContent tabSetDef={itemDef} parentEntity={selectedEntity} />
           </>
         )}
-      </div>
+      </>
     )
   }
 }

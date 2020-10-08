@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap'
 import classnames from 'classnames'
 
+import { MultipleFieldsetDefinition } from 'model/ui/MultipleFieldsetDefinition'
 import { useWindowResize } from 'common/hooks/useWindowResize'
 
 import Tab from './Tab'
@@ -52,11 +53,19 @@ const TabSetContent = (props) => {
         ))}
       </Nav>
       <TabContent activeTab={activeTab}>
-        {tabDefs.map((tabDef) => (
-          <TabPane key={tabDef.id} tabId={tabDef.id}>
-            <Tab tabDef={tabDef} parentEntity={parentEntity} />
-          </TabPane>
-        ))}
+        {tabDefs.map((tabDef) => {
+          const onlyOneMultipleFieldset =
+            tabDef.items.length === 1 && tabDef.items[0] instanceof MultipleFieldsetDefinition
+          return (
+            <TabPane
+              key={tabDef.id}
+              tabId={tabDef.id}
+              className={classnames({ 'only-one-multiple-fieldset': onlyOneMultipleFieldset })}
+            >
+              <Tab tabDef={tabDef} parentEntity={parentEntity} />
+            </TabPane>
+          )
+        })}
       </TabContent>
     </div>
   ) : null

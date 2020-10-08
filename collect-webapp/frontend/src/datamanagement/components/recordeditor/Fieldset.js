@@ -4,16 +4,16 @@ import FormItems from './FormItems'
 import TabSetContent from './TabSetContent'
 
 const Fieldset = (props) => {
-  const { fieldsetDef, parentEntity } = props
+  const { itemDef, parentEntity } = props
 
-  const entityDefinition = fieldsetDef.entityDefinition
+  const entityDefinition = itemDef.entityDefinition
   const entity = parentEntity ? parentEntity.getSingleChild(entityDefinition.id) : null
 
   return entity ? (
     <fieldset>
-      <legend>{fieldsetDef.label}</legend>
-      <FormItems itemDefs={fieldsetDef.items} parentEntity={entity} />
-      <TabSetContent tabSetDef={fieldsetDef} parentEntity={entity} />
+      <legend>{itemDef.label}</legend>
+      <FormItems itemDefs={itemDef.items} parentEntity={entity} />
+      <TabSetContent tabSetDef={itemDef} parentEntity={entity} />
     </fieldset>
   ) : null
 }

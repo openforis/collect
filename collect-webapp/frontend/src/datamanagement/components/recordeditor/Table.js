@@ -3,7 +3,7 @@ import { Column, Table as TableVirtualized } from 'react-virtualized'
 import { withStyles } from '@material-ui/core/styles'
 import clsx from 'clsx'
 import TableCell from '@material-ui/core/TableCell'
-import { Button, FormControl, FormLabel, IconButton } from '@material-ui/core'
+import { Button, IconButton } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
 
 import EntityCollectionComponent from './EntityCollectionComponent'
@@ -149,8 +149,8 @@ export default class Table extends EntityCollectionComponent {
     const { headingColumns } = itemDef
 
     return (
-      <FormControl component="fieldset">
-        <FormLabel component="legend">{itemDef.entityDefinition.label}</FormLabel>
+      <fieldset>
+        <legend>{itemDef.entityDefinition.label}</legend>
         <VirtualizedTable
           headingColumns={headingColumns}
           rowCount={entities.length}
@@ -160,7 +160,7 @@ export default class Table extends EntityCollectionComponent {
         <Button variant="outlined" color="primary" onClick={this.handleNewButtonClick}>
           Add
         </Button>
-      </FormControl>
+      </fieldset>
     )
   }
 }

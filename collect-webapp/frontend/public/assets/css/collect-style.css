@@ -16,8 +16,12 @@ body {
 }
 
 .tab-pane {
-  height: 100%;
+  height: calc(100% - 32px);
   overflow-y: auto;
+}
+
+.tab-pane.only-one-multiple-fieldset {
+  overflow-y: hidden;
 }
 
 /* ==== end of Reactstrap style ==== */

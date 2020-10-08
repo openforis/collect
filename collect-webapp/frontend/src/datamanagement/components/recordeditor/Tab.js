@@ -11,10 +11,10 @@ const Tab = (props) => {
   }
 
   return (
-    <div>
+    <>
       <FormItems itemDefs={tabDef.items} parentEntity={parentEntity} />
       <TabSetContent tabSetDef={tabDef} parentEntity={parentEntity} />
-    </div>
+    </>
   )
 }
 
