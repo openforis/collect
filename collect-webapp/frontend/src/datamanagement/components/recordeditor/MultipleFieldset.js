@@ -1,27 +1,19 @@
 import React from 'react'
-import classnames from 'classnames'
-import { Button, Input, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap'
+import { Button, Input } from 'reactstrap'
 
-import Tab from './Tab'
 import FormItems from './FormItems'
 import EntityCollectionComponent from './EntityCollectionComponent'
+import TabSetContent from './TabSetContent'
 
 export default class MultipleFieldset extends EntityCollectionComponent {
-  constructor(props) {
+  constructor() {
     super()
-    const { itemDef } = props
-
-    const { tabs } = itemDef
-    const firstTabId = tabs.length > 0 ? tabs[0].id : null
-
     this.state = {
       ...this.state,
       selectedEntityIndex: -1,
-      activeTab: firstTabId,
     }
 
     this.handleDeleteButtonClick = this.handleDeleteButtonClick.bind(this)
-    this.handleTabClick = this.handleTabClick.bind(this)
   }
 
   getSelectedEntity() {
@@ -38,12 +30,6 @@ export default class MultipleFieldset extends EntityCollectionComponent {
   handleDeleteButtonClick() {
     const selectedEntity = this.getSelectedEntity()
     this.commandService.deleteEntity(selectedEntity)
-  }
-
-  handleTabClick(tabId) {
-    if (this.state.activeTab !== tabId) {
-      this.setState({ activeTab: tabId })
-    }
   }
 
   render() {
@@ -88,34 +74,10 @@ export default class MultipleFieldset extends EntityCollectionComponent {
           </Button>
         )}
         {selectedEntity && (
-          <div>
+          <>
             <FormItems itemDefs={itemDef.items} parentEntity={selectedEntity} />
-            {itemDef.tabs.length > 0 && (
-              <>
-                <Nav tabs>
-                  {itemDef.tabs.map((tabDef) => (
-                    <NavItem key={tabDef.id}>
-                      <NavLink
-                        className={classnames({ active: this.state.activeTab === tabDef.id })}
-                        onClick={() => {
-                          this.handleTabClick(tabDef.id)
-                        }}
-                      >
-                        {tabDef.label}
-                      </NavLink>
-                    </NavItem>
-                  ))}
-                </Nav>
-                <TabContent activeTab={this.state.activeTab}>
-                  {itemDef.tabs.map((tabDef) => (
-                    <TabPane key={tabDef.id} tabId={tabDef.id}>
-                      <Tab tabDef={tabDef} parentEntity={selectedEntity} />
-                    </TabPane>
-                  ))}
-                </TabContent>{' '}
-              </>
-            )}
-          </div>
+            <TabSetContent tabSetDef={itemDef} parentEntity={selectedEntity} />
+          </>
         )}
       </div>
     )

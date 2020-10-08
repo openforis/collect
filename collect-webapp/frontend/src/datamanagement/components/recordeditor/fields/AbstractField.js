@@ -51,12 +51,10 @@ export default class AbstractField extends Component {
     return { errors, warnings }
   }
 
-  getSingleAttribute(parentEntity) {
-    if (!parentEntity) {
-      parentEntity = this.props.parentEntity
-    }
+  getSingleAttribute(parentEntityParam) {
+    const { parentEntity: parentEntityProps, fieldDef } = this.props
+    const parentEntity = parentEntityParam || parentEntityProps
     if (parentEntity) {
-      const { fieldDef } = this.props
       const attrDef = fieldDef.attributeDefinition
       if (attrDef.multiple) {
         throw new Error('Expected single attribute, found multiple: ' + attrDef.name)

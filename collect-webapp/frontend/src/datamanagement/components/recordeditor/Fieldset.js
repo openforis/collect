@@ -1,39 +1,21 @@
-import React, { useState } from 'react'
-import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap'
-import classnames from 'classnames'
-import Tab from './Tab'
+import React from 'react'
+
 import FormItems from './FormItems'
+import TabSetContent from './TabSetContent'
 
 const Fieldset = (props) => {
   const { fieldsetDef, parentEntity } = props
 
-  const [activeTab, setActiveTab] = useState(null)
+  const entityDefinition = fieldsetDef.entityDefinition
+  const entity = parentEntity ? parentEntity.getSingleChild(entityDefinition.id) : null
 
-  return (
+  return entity ? (
     <fieldset>
       <legend>{fieldsetDef.label}</legend>
-      <FormItems itemDefs={fieldsetDef.items} parentEntity={parentEntity} />
-      <Nav tabs>
-        {fieldsetDef.tabs.map((tabDef) => (
-          <NavItem key={tabDef.id}>
-            <NavLink
-              className={classnames({ active: activeTab === tabDef.id })}
-              onClick={() => setActiveTab(tabDef.id)}
-            >
-              {tabDef.label}
-            </NavLink>
-          </NavItem>
-        ))}
-      </Nav>
-      <TabContent activeTab={activeTab}>
-        {fieldsetDef.tabs.map((tabDef) => (
-          <TabPane key={tabDef.id} tabId={tabDef.id}>
-            <Tab tabDef={tabDef} parentEntity={parentEntity} />
-          </TabPane>
-        ))}
-      </TabContent>
+      <FormItems itemDefs={fieldsetDef.items} parentEntity={entity} />
+      <TabSetContent tabSetDef={fieldsetDef} parentEntity={entity} />
     </fieldset>
-  )
+  ) : null
 }
 
 export default Fieldset

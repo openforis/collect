@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap'
 import classnames from 'classnames'
 
+import { useWindowResize } from 'common/hooks/useWindowResize'
+
 import Tab from './Tab'
 
 const TabSetContent = (props) => {
@@ -14,10 +16,6 @@ const TabSetContent = (props) => {
   const [activeTab, setActiveTab] = useState(firstTabDefId)
 
   const wrapperRef = useRef()
-
-  useEffect(() => {
-    adjustSize()
-  }, [wrapperRef])
 
   const adjustSize = () => {
     const wrapper = wrapperRef.current
@@ -32,6 +30,12 @@ const TabSetContent = (props) => {
       }
     }
   }
+
+  useWindowResize(adjustSize)
+
+  useEffect(() => {
+    adjustSize()
+  }, [wrapperRef])
 
   return hasTabs ? (
     <div className="tabset-wrapper" ref={wrapperRef}>
