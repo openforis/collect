@@ -17,6 +17,7 @@ import {
   NodeMinCountValidationUpdatedEvent,
   NodeMaxCountUpdatedEvent,
   NodeMaxCountValidationUpdatedEvent,
+  RecordEvent,
 } from './event/RecordEvent'
 
 import EventQueue from './event/EventQueue'
@@ -29,11 +30,11 @@ export class RecordUpdater {
 
     this.handleRecordEventReceived = this.handleRecordEventReceived.bind(this)
 
-    EventQueue.subscribe('recordEvent', this.handleRecordEventReceived)
+    EventQueue.subscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
   }
 
   destroy() {
-    EventQueue.unsubscribe('recordEvent', this.handleRecordEventReceived)
+    EventQueue.unsubscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
   }
 
   handleRecordEventReceived(event) {

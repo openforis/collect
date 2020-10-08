@@ -3,7 +3,7 @@ import { Container, Fade } from 'reactstrap'
 
 import FormItem from './FormItem'
 import EventQueue from '../../../model/event/EventQueue'
-import { NodeRelevanceUpdatedEvent } from '../../../model/event/RecordEvent'
+import { NodeRelevanceUpdatedEvent, RecordEvent } from '../../../model/event/RecordEvent'
 
 export default class FormItems extends Component {
   constructor(props) {
@@ -13,11 +13,11 @@ export default class FormItems extends Component {
   }
 
   componentDidMount() {
-    EventQueue.subscribe('recordEvent', this.handleRecordEventReceived)
+    EventQueue.subscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
   }
 
   componentWillUnmount() {
-    EventQueue.unsubscribe('recordEvent', this.handleRecordEventReceived)
+    EventQueue.unsubscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
   }
 
   handleRecordEventReceived(event) {

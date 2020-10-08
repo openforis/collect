@@ -2,7 +2,7 @@ import { Component } from 'react'
 import ServiceFactory from 'services/ServiceFactory'
 import EventQueue from 'model/event/EventQueue'
 import { EntityCreatedEvent } from 'model/event/RecordEvent'
-import { EntityDeletedEvent } from '../../../model/event/RecordEvent'
+import { EntityDeletedEvent, RecordEvent } from '../../../model/event/RecordEvent'
 
 export default class EntityCollectionComponent extends Component {
   commandService = ServiceFactory.commandService
@@ -21,13 +21,13 @@ export default class EntityCollectionComponent extends Component {
   }
 
   componentDidMount() {
-    EventQueue.subscribe('recordEvent', this.handleRecordEventReceived)
+    EventQueue.subscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
 
     this.setState({ entities: this.determineEntities() })
   }
 
   componentWillUnmount() {
-    EventQueue.unsubscribe('recordEvent', this.handleRecordEventReceived)
+    EventQueue.unsubscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
   }
 
   determineEntities() {

@@ -5,8 +5,8 @@ import SockJsClient from 'react-stomp'
 import Constants from '../Constants'
 import { fetchSurveySummaries } from 'actions/surveys'
 import { recordLocked, recordUnlocked } from '../datamanagement/actions'
-import EventQueue from '../model/event/EventQueue'
-import { RecordEventWrapper } from '../model/event/RecordEvent'
+import EventQueue from 'model/event/EventQueue'
+import { RecordEvent, RecordEventWrapper } from 'model/event/RecordEvent'
 
 const eventsDestination = '/events'
 
@@ -23,7 +23,7 @@ const handlersByType = {
   [messageTypes.recordUnlocked]: (message) => recordUnlocked(message.recordId),
   [messageTypes.recordUpdated]: (message) => () => {
     const eventWrapper = new RecordEventWrapper(message.event)
-    EventQueue.publish('recordEvent', eventWrapper.event)
+    EventQueue.publish(RecordEvent.TYPE, eventWrapper.event)
   },
 }
 

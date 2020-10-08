@@ -1,9 +1,9 @@
 import { Component } from 'react'
 import { debounce } from 'throttle-debounce'
 
-import { AttributeUpdatedEvent } from 'model/event/RecordEvent'
+import { AttributeUpdatedEvent, RecordEvent } from 'model/event/RecordEvent'
 import EventQueue from 'model/event/EventQueue'
-import ServiceFactory from '../../../../services/ServiceFactory'
+import ServiceFactory from 'services/ServiceFactory'
 
 export default class AbstractField extends Component {
   constructor() {
@@ -20,7 +20,7 @@ export default class AbstractField extends Component {
     this.handleRecordEventReceived = this.handleRecordEventReceived.bind(this)
     this.onAttributeUpdate = this.onAttributeUpdate.bind(this)
 
-    EventQueue.subscribe('recordEvent', this.handleRecordEventReceived)
+    EventQueue.subscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
   }
 
   componentDidMount() {
@@ -28,7 +28,7 @@ export default class AbstractField extends Component {
   }
 
   componentWillUnmount() {
-    EventQueue.unsubscribe('recordEvent', this.handleRecordEventReceived)
+    EventQueue.unsubscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
   }
 
   updateStateFromProps() {
@@ -68,7 +68,7 @@ export default class AbstractField extends Component {
 
   onAttributeUpdate({ value, debounced = true }) {
     this.setState({ value, dirty: true })
-	
+
     const attr = this.getSingleAttribute()
     if (this.attributeUpdatedDebounced) {
       this.attributeUpdatedDebounced.cancel()

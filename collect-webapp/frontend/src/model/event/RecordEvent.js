@@ -12,6 +12,8 @@ export class RecordEvent extends Event {
   timestamp
   userName
 
+  static TYPE = 'recordEvent'
+
   constructor(jsonObj) {
     super()
     if (jsonObj) {
@@ -24,7 +26,7 @@ export class RecordEvent extends Event {
    * (NaN ids are for entity containers)
    */
   get parentEntityId() {
-    let result = this.ancestorIds.find((id) => !isNaN(id))
+    const result = this.ancestorIds.find((id) => !isNaN(id))
     return result ? parseInt(result, 10) : NaN
   }
 }
