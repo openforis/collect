@@ -3,7 +3,7 @@ import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap'
 import classnames from 'classnames'
 
 import { MultipleFieldsetDefinition } from 'model/ui/MultipleFieldsetDefinition'
-import { useWindowResize } from 'common/hooks/useWindowResize'
+import { useWindowResize } from 'common/hooks'
 
 import Tab from './Tab'
 

@@ -9,6 +9,7 @@ export class RecordEvent extends Event {
   definitionId
   ancestorIds
   nodeId
+  nodePath
   timestamp
   userName
 
@@ -28,6 +29,22 @@ export class RecordEvent extends Event {
   get parentEntityId() {
     const result = this.ancestorIds.find((id) => !isNaN(id))
     return result ? parseInt(result, 10) : NaN
+  }
+
+  isRelativeToRecord(record) {
+    return this.recordId === record.id && this.recordStep === record.step
+  }
+
+  isRelativeToNode(node) {
+    return this.isRelativeToRecord(node.record) && this.nodePath === node.path
+  }
+
+  isRelativeToNodes({ parentEntity, nodeDefId }) {
+    return (
+      this.isRelativeToRecord(parentEntity.record) &&
+      this.parentEntityPath === parentEntity.path &&
+      Number(this.definitionId) === nodeDefId
+    )
   }
 }
 

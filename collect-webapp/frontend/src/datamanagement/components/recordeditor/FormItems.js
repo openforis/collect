@@ -45,12 +45,7 @@ export default class FormItems extends React.Component {
   handleRecordEventReceived(event) {
     const { parentEntity } = this.props
 
-    if (
-      event instanceof NodeRelevanceUpdatedEvent &&
-      event.recordId === parentEntity.record.id &&
-      event.recordStep === parentEntity.record.step &&
-      Number(event.nodeId) === parentEntity.id
-    ) {
+    if (event instanceof NodeRelevanceUpdatedEvent && event.isRelativeToNode(parentEntity)) {
       this.forceUpdate()
     }
   }

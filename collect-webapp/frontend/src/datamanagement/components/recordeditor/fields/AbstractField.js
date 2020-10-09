@@ -82,15 +82,11 @@ export default class AbstractField extends Component {
     if (!parentEntity) {
       return
     }
-    if (event instanceof AttributeUpdatedEvent) {
-      if (
-        event.recordId === parentEntity.record.id &&
-        event.recordStep === parentEntity.record.step &&
-        event.parentEntityPath === parentEntity.path &&
-        Number(event.definitionId) === fieldDef.attributeDefinitionId
-      ) {
-        this.handleAttributeUpdatedEvent(event)
-      }
+    if (
+      event instanceof AttributeUpdatedEvent &&
+      event.isRelativeToNodes({ parentEntity, nodeDefId: fieldDef.attributeDefinitionId })
+    ) {
+      this.handleAttributeUpdatedEvent(event)
     }
   }
 

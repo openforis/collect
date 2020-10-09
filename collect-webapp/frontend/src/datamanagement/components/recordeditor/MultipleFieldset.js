@@ -27,6 +27,12 @@ export default class MultipleFieldset extends EntityCollectionComponent {
     this.setState({ selectedEntityIndex: entities.length - 1 })
   }
 
+  onSelectedEntityChange(event) {
+    const selectedEntityIndex = Number(event.target.value)
+    // unmount and remount components
+    this.setState({ selectedEntityIndex: -1 }, () => this.setState({ selectedEntityIndex }))
+  }
+
   handleDeleteButtonClick() {
     const selectedEntity = this.getSelectedEntity()
     this.commandService.deleteEntity(selectedEntity)
@@ -60,7 +66,7 @@ export default class MultipleFieldset extends EntityCollectionComponent {
           type="select"
           id="entityDropdown"
           style={{ display: 'inline-block', width: '200px' }}
-          onChange={(event) => this.setState({ selectedEntityIndex: Number(event.target.value) })}
+          onChange={(event) => this.onSelectedEntityChange(event)}
           value={selectedEntityIndex}
         >
           {entityOptions}

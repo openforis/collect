@@ -35,17 +35,17 @@ export class TabContainers {
   }
 
   static createItemsFromJSON(jsonObj, parentUIModelObject) {
-    const items = []
-    for (var i = 0; i < jsonObj.length; i++) {
-      const itemJsonObj = jsonObj[i]
+    return jsonObj.reduce((itemsAcc, itemJsonObj) => {
       const { type, attributeType, id } = itemJsonObj
       const formItemClass = getFormItemClass(type, attributeType)
       if (formItemClass) {
         const item = new formItemClass(id, parentUIModelObject)
         item.fillFromJSON(itemJsonObj)
-        items.push(item)
+        itemsAcc.push(item)
+      } else {
+        console.log(`Unsopported attribute type: ${attributeType}`)
       }
-    }
-    return items
+      return itemsAcc
+    }, [])
   }
 }

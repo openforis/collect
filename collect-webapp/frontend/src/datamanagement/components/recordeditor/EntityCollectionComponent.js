@@ -40,14 +40,9 @@ export default class EntityCollectionComponent extends Component {
     if (!parentEntity) {
       return
     }
-    const { record } = parentEntity
-
     if (
       (event instanceof EntityCreatedEvent || event instanceof EntityDeletedEvent) &&
-      event.recordId === record.id &&
-      event.recordStep === record.step &&
-      event.parentEntityPath === parentEntity.path &&
-      Number(event.definitionId) === itemDef.entityDefinition.id
+      event.isRelativeToNodes({ parentEntity, nodeDefId: itemDef.entityDefinitionId })
     ) {
       this.setState({ entities: this.determineEntities() }, () => this.onEntitiesUpdated())
     }
