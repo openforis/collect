@@ -18,6 +18,7 @@ export class Survey extends Serializable {
   modelVersions = []
   codeLists = []
   units = []
+  spatialReferenceSystems = []
   uiConfiguration
   temporary
   published
@@ -43,6 +44,11 @@ export class Survey extends Serializable {
       const unit = new Unit(this)
       unit.fillFromJSON(unitJsonObj)
       return unit
+    })
+    this.spatialReferenceSystems = jsonObj.spatialReferenceSystems.map((srsJsonObj) => {
+      const srs = new SpatialReferenceSystem(this)
+      srs.fillFromJSON(srsJsonObj)
+      return srs
     })
     this.languages = jsonObj.languages
     this.modelVersions = jsonObj.modelVersions
@@ -92,6 +98,17 @@ export class Unit extends Serializable {
   }
 }
 
+export class SpatialReferenceSystem extends Serializable {
+  id
+  label
+  description
+
+  constructor(survey) {
+    super()
+    this.survey = survey
+  }
+}
+
 export class Schema extends Serializable {
   survey
   rootEntities = []
@@ -134,6 +151,11 @@ export class NodeDefinition extends SurveyObject {
   label
   multiple
 
+  static Types = {
+    ENTITY: 'ENTITY',
+    ATTRIBUTE: 'ATTRIBUTE',
+  }
+
   constructor(id, survey, parent) {
     super(id)
     this.survey = survey
@@ -156,20 +178,13 @@ export class EntityDefinition extends NodeDefinition {
     super.fillFromJSON(jsonObj)
 
     this.children = jsonObj.children.map((nodeJsonObj) => {
+      const { id, type, attributeType } = nodeJsonObj
       let nodeDef
-      if (nodeJsonObj.type === 'ENTITY') {
-        nodeDef = new EntityDefinition(nodeJsonObj.id, this.survey, this)
+      if (type === NodeDefinition.Types.ENTITY) {
+        nodeDef = new EntityDefinition(id, this.survey, this)
       } else {
-        switch (nodeJsonObj.attributeType) {
-          case 'CODE':
-            nodeDef = new CodeAttributeDefinition(nodeJsonObj.id, this.survey, this)
-            break
-          case 'NUMERIC':
-            nodeDef = new NumericAttributeDefinition(nodeJsonObj.id, this.survey, this)
-            break
-          default:
-            nodeDef = new AttributeDefinition(nodeJsonObj.id, this.survey, this)
-        }
+        const nodeDefClass = attributeDefinitionClassByType[attributeType] || AttributeDefinition
+        nodeDef = new nodeDefClass(id, this.survey, this)
       }
       nodeDef.fillFromJSON(nodeJsonObj)
       return nodeDef
@@ -236,6 +251,9 @@ export class EntityDefinition extends NodeDefinition {
 export class AttributeDefinition extends NodeDefinition {
   key
   attributeType
+  fieldNames
+  fieldLabels
+  mandatoryFieldNames
 
   static Types = {
     BOOLEAN: 'BOOLEAN',
@@ -245,14 +263,41 @@ export class AttributeDefinition extends NodeDefinition {
     NUMBER: 'NUMBER',
     TEXT: 'TEXT',
   }
+
+  getFieldLabel(fieldName) {
+    const index = this.fieldNames.indexOf(fieldName)
+    return this.fieldLabels[index]
+  }
 }
 
 export class CodeAttributeDefinition extends AttributeDefinition {
   codeListId
   parentCodeAttributeDefinitionId
+  mandatoryFieldNames = ['code']
+}
+
+export class CoordinateAttributeDefinition extends AttributeDefinition {
+  fieldsOrder
+  showSrsField
+  includeAltitudeField
+  includeAccuracyField
+
+  static FieldsOrder = {
+    SRS_X_Y: 'SRS_X_Y',
+    SRS_Y_X: 'SRS_Y_X',
+    X_Y_SRS: 'X_Y_SRS',
+    Y_X_SRS: 'Y_X_SRS',
+  }
 }
 
 export class NumericAttributeDefinition extends AttributeDefinition {
   numericType
   precisions
+  mandatoryFieldNames = ['value']
+}
+
+const attributeDefinitionClassByType = {
+  [AttributeDefinition.Types.CODE]: CodeAttributeDefinition,
+  [AttributeDefinition.Types.COORDINATE]: CoordinateAttributeDefinition,
+  [AttributeDefinition.Types.NUMBER]: NumericAttributeDefinition,
 }

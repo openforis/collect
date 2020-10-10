@@ -2,16 +2,9 @@ import { Attribute, Entity } from './Record'
 
 import {
   AttributeDeletedEvent,
-  AttributeUpdatedEvent,
+  AttributeValueUpdatedEvent,
   EntityCreatedEvent,
   EntityDeletedEvent,
-  BooleanAttributeUpdatedEvent,
-  CodeAttributeUpdatedEvent,
-  CoordinateAttributeUpdatedEvent,
-  DateAttributeUpdatedEvent,
-  DoubleAttributeUpdatedEvent,
-  IntegerAttributeUpdatedEvent,
-  TextAttributeUpdatedEvent,
   NodeRelevanceUpdatedEvent,
   NodeMinCountUpdatedEvent,
   NodeMinCountValidationUpdatedEvent,
@@ -53,13 +46,13 @@ export class RecordUpdater {
         newEntity.childrenMinCountValidationByDefinitionId = event.childrenMinCountValidationByDefinitionId
         newEntity.childrenMaxCountValidationByDefinitionId = event.childrenMaxCountValidationByDefinitionId
         parentEntity.addChild(newEntity)
-      } else if (event instanceof AttributeUpdatedEvent) {
+      } else if (event instanceof AttributeValueUpdatedEvent) {
         let attr = node
         if (attr == null) {
           attr = new Attribute(record, definition, parentEntity)
           parentEntity.addChild(attr)
         }
-        this._setValueInAttribute(attr, event)
+        attr.value = event.value
         attr.validationResults = event.validationResults
       } else if (event instanceof AttributeDeletedEvent || event instanceof EntityDeletedEvent) {
         parentEntity.removeChild(node)
@@ -74,28 +67,6 @@ export class RecordUpdater {
       } else if (event instanceof NodeMaxCountValidationUpdatedEvent) {
         node.childrenMaxCountValidationByDefinitionId[event.childDefinitionId] = event.flag
       }
-    }
-  }
-
-  _setValueInAttribute(attr, event) {
-    if (event instanceof BooleanAttributeUpdatedEvent) {
-      attr.setFieldValue(0, event.value)
-    } else if (event instanceof CodeAttributeUpdatedEvent) {
-      attr.setFieldValue(0, event.code)
-      attr.setFieldValue(1, event.qualifier)
-    } else if (event instanceof CoordinateAttributeUpdatedEvent) {
-      attr.setFieldValue(0, event.x)
-      attr.setFieldValue(1, event.y)
-      attr.setFieldValue(2, event.srsId)
-    } else if (event instanceof DateAttributeUpdatedEvent) {
-      attr.setFieldValue(0, event.year)
-      attr.setFieldValue(1, event.month)
-      attr.setFieldValue(2, event.day)
-    } else if (event instanceof IntegerAttributeUpdatedEvent || event instanceof DoubleAttributeUpdatedEvent) {
-      attr.setFieldValue(0, event.value)
-      attr.setFieldValue(1, event.unitId)
-    } else if (event instanceof TextAttributeUpdatedEvent) {
-      attr.setFieldValue(0, event.text)
     }
   }
 }

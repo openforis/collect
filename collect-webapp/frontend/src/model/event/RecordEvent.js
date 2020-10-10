@@ -52,60 +52,31 @@ export class AttributeEvent extends RecordEvent {}
 
 export class AttributeDeletedEvent extends RecordEvent {}
 
-export class AttributeUpdatedEvent extends AttributeEvent {}
-
-export class BooleanAttributeUpdatedEvent extends AttributeUpdatedEvent {
+export class AttributeValueUpdatedEvent extends AttributeEvent {
   value
 }
 
-export class CodeAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  code
-  qualifier
-}
+export class BooleanAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
-export class CoordinateAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  x
-  y
-  srsId
-}
+export class CodeAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
-export class DateAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  date
-}
+export class CoordinateAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
-export class DoubleAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  value
-}
+export class DateAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
-export class DoubleRangeAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  from
-  to
-}
+export class DoubleAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
-export class IntegerAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  value
-}
+export class DoubleRangeAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
-export class IntegerRangeAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  from
-  to
-}
+export class IntegerAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
-export class TaxonAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  code
-  scientificName
-  vernacularName
-  languageCode
-  languageVariety
-}
+export class IntegerRangeAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
-export class TextAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  text
-}
+export class TaxonAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
-export class TimeAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  time
-}
+export class TextAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
+
+export class TimeAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
 export class NodeRelevanceUpdatedEvent extends RecordEvent {
   childDefinitionId

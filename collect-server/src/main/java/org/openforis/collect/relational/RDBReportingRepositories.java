@@ -20,7 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openforis.collect.event.AttributeCreatedEvent;
 import org.openforis.collect.event.AttributeEvent;
-import org.openforis.collect.event.AttributeUpdatedEvent;
+import org.openforis.collect.event.AttributeValueUpdatedEvent;
 import org.openforis.collect.event.BooleanAttributeUpdatedEvent;
 import org.openforis.collect.event.CodeAttributeUpdatedEvent;
 import org.openforis.collect.event.CoordinateAttributeUpdatedEvent;
@@ -28,7 +28,6 @@ import org.openforis.collect.event.DateAttributeUpdatedEvent;
 import org.openforis.collect.event.EntityCreatedEvent;
 import org.openforis.collect.event.EntityDeletedEvent;
 import org.openforis.collect.event.NumberAttributeUpdatedEvent;
-import org.openforis.collect.event.NumericAttributeUpdatedEvent;
 import org.openforis.collect.event.RangeAttributeUpdatedEvent;
 import org.openforis.collect.event.RecordDeletedEvent;
 import org.openforis.collect.event.RecordEvent;
@@ -72,6 +71,14 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
+import org.openforis.idm.model.BooleanValue;
+import org.openforis.idm.model.Code;
+import org.openforis.idm.model.Coordinate;
+import org.openforis.idm.model.NumberValue;
+import org.openforis.idm.model.NumericRange;
+import org.openforis.idm.model.TaxonOccurrence;
+import org.openforis.idm.model.TextValue;
+import org.openforis.idm.model.Time;
 
 /**
  * 
@@ -88,13 +95,14 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	private CollectLocalRDBStorageManager localRDBStorageManager;
 	private MondrianSchemaStorageManager mondrianSchemaStorageManager;
 	private SaikuDatasourceStorageManager saikuDatasourceStorageManager;
-	
+
 	private RelationalSchemaConfig rdbConfig = RelationalSchemaConfig.createDefault();
 	private Map<String, RelationalSchema> relationalSchemaDefinitionBySurvey;
 	private Map<String, String> mondrianSchemaDefinitionBySurvey;
-	
-	public RDBReportingRepositories(SurveyManager surveyManager, RecordManager recordManager, 
-			CollectLocalRDBStorageManager localRDBStorageManager, MondrianSchemaStorageManager mondrianSchemaStorageManager,
+
+	public RDBReportingRepositories(SurveyManager surveyManager, RecordManager recordManager,
+			CollectLocalRDBStorageManager localRDBStorageManager,
+			MondrianSchemaStorageManager mondrianSchemaStorageManager,
 			SaikuDatasourceStorageManager saikuDatasourceStorageManager) {
 		this.surveyManager = surveyManager;
 		this.recordManager = recordManager;
@@ -116,16 +124,17 @@ public class RDBReportingRepositories implements ReportingRepositories {
 			initializeMondrianSchemaDefinition(survey, survey.getDefaultLanguage());
 		}
 	}
-	
+
 	@Override
 	public void createRepositories(String surveyName, String preferredLanguage, ProgressListener progressListener) {
 		initializeRelationalSchemaDefinition(surveyName);
 		ProcessProgressListener processProgressListener = new ProcessProgressListener(RecordStep.values().length);
 		for (RecordStep step : RecordStep.values()) {
 			try {
-				createRepository(surveyName, step, preferredLanguage, new ProcessStepProgressListener(processProgressListener, progressListener));
+				createRepository(surveyName, step, preferredLanguage,
+						new ProcessStepProgressListener(processProgressListener, progressListener));
 				processProgressListener.stepCompleted();
-			} catch(CollectRdbException e) {
+			} catch (CollectRdbException e) {
 				LOG.error("Error generating RDB for survey " + surveyName, e);
 			}
 		}
@@ -134,17 +143,18 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	}
 
 	@Override
-	public void createRepository(final String surveyName, final RecordStep recordStep, final String preferredLanguage, final ProgressListener progressListener) {
+	public void createRepository(final String surveyName, final RecordStep recordStep, final String preferredLanguage,
+			final ProgressListener progressListener) {
 		localRDBStorageManager.deleteRDBFile(surveyName, recordStep);
-		
+
 		updateMondrianSchemaFile(surveyName, preferredLanguage);
-		
+
 		if (saikuDatasourceStorageManager.isSaikuAvailable()) {
 			writeSaikuDatasource(surveyName, recordStep);
 		}
-		
+
 		final RelationalSchema relationalSchema = getOrInitializeRelationalSchemaDefinition(surveyName);
-		
+
 		withConnection(surveyName, recordStep, new Callback() {
 			public void execute(Connection connection) {
 				RelationalSchemaCreator relationalSchemaCreator = new JooqRelationalSchemaCreator();
@@ -173,7 +183,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	private void writeSaikuDatasource(String surveyName, RecordStep recordStep) {
 		saikuDatasourceStorageManager.writeDatasourceFile(surveyName, recordStep);
 	}
-	
+
 	private void deleteSaikuDatasources(String surveyName) {
 		if (saikuDatasourceStorageManager.isSaikuAvailable()) {
 			for (RecordStep recordStep : RecordStep.values()) {
@@ -189,28 +199,28 @@ public class RDBReportingRepositories implements ReportingRepositories {
 			String schema = mondrianSchemaDefinitionBySurvey.get(surveyName);
 			FileUtils.write(file, schema, OpenForisIOUtils.UTF_8);
 		} catch (IOException e) {
-			throw new RuntimeException("Error generating mondrian schema for survey : "+ surveyName, e);
+			throw new RuntimeException("Error generating mondrian schema for survey : " + surveyName, e);
 		}
 	}
 
-	private void insertRecords(String surveyName, RecordStep recordStep, 
-			RelationalSchema targetSchema, Connection targetConn,
-			ProgressListener progressListener) throws CollectRdbException {
+	private void insertRecords(String surveyName, RecordStep recordStep, RelationalSchema targetSchema,
+			Connection targetConn, ProgressListener progressListener) throws CollectRdbException {
 		ProcessProgressListener processProgressListener = new ProcessProgressListener(2);
 		CollectSurvey survey = surveyManager.get(surveyName);
 		DatabaseExporter databaseUpdater = createRDBUpdater(targetSchema, targetConn);
-		
+
 		databaseUpdater.insertReferenceData(new ProcessStepProgressListener(processProgressListener, progressListener));
 		processProgressListener.stepCompleted();
-		
+
 		RecordFilter recordFilter = new RecordFilter(survey);
 		Step step = Step.fromRecordStep(recordStep);
 		recordFilter.setStepGreaterOrEqual(step);
 		List<CollectRecordSummary> summaries = recordManager.loadSummaries(recordFilter);
-		
-		ProcessStepProgressListener recordInsertProcessListener = new ProcessStepProgressListener(processProgressListener, progressListener);
+
+		ProcessStepProgressListener recordInsertProcessListener = new ProcessStepProgressListener(
+				processProgressListener, progressListener);
 		recordInsertProcessListener.progressMade(new Progress(0, summaries.size()));
-		
+
 		long processedRecords = 0;
 		for (CollectRecordSummary summary : summaries) {
 			CollectRecord record = recordManager.load(survey, summary.getId(), step, false);
@@ -234,7 +244,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		}
 		relationalSchemaDefinitionBySurvey.remove(surveyName);
 		mondrianSchemaStorageManager.deleteSchemaFile(surveyName);
-		deleteSaikuDatasources(surveyName);			
+		deleteSaikuDatasources(surveyName);
 	}
 
 	@Override
@@ -253,7 +263,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 			}
 		});
 	}
-	
+
 	@Override
 	public List<String> getRepositoryPaths(String surveyName) {
 		List<String> result = new ArrayList<String>();
@@ -269,7 +279,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		String path = rdbFile.getAbsolutePath();
 		return path;
 	}
-	
+
 	@Override
 	public ReportingRepositoryInfo getInfo(String surveyName) {
 		Date rdbFileDate = localRDBStorageManager.getRDBFileDate(surveyName, RecordStep.ENTRY);
@@ -285,9 +295,8 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		}
 	}
 
-	private RelationalSchema getOrInitializeRelationalSchemaDefinition(
-			final String surveyName) {
-		if (! relationalSchemaDefinitionBySurvey.containsKey(surveyName)) {
+	private RelationalSchema getOrInitializeRelationalSchemaDefinition(final String surveyName) {
+		if (!relationalSchemaDefinitionBySurvey.containsKey(surveyName)) {
 			initializeRelationalSchemaDefinition(surveyName);
 		}
 		return relationalSchemaDefinitionBySurvey.get(surveyName);
@@ -310,10 +319,11 @@ public class RDBReportingRepositories implements ReportingRepositories {
 			throw new RuntimeException("Error processing RDB generation events", e);
 		} finally {
 			try {
-				if (connection != null) { 
+				if (connection != null) {
 					connection.close();
 				}
-			} catch (SQLException e) {}
+			} catch (SQLException e) {
+			}
 		}
 	}
 
@@ -325,78 +335,77 @@ public class RDBReportingRepositories implements ReportingRepositories {
 			Connection c = DriverManager.getConnection(connectionUrl);
 			return c;
 		} catch (Exception e) {
-			throw new CollectRdbException(String.format("Error creating connection to RDB for survey %s", surveyName), e);
+			throw new CollectRdbException(String.format("Error creating connection to RDB for survey %s", surveyName),
+					e);
 		}
 	}
 
-	private RelationalSchema getRelatedRelationalSchema(
-			RecordTransaction recordTransaction) {
+	private RelationalSchema getRelatedRelationalSchema(RecordTransaction recordTransaction) {
 		String surveyName = recordTransaction.getSurveyName();
 		CollectSurvey survey = surveyManager.get(surveyName);
 		return survey == null ? null : relationalSchemaDefinitionBySurvey.get(survey.getName());
 	}
-	
+
 	private void initializeRelationalSchemaDefinition(String surveyName) {
 		initializeRelationalSchemaDefinition(surveyManager.get(surveyName));
 	}
-	
+
 	private void initializeRelationalSchemaDefinition(CollectSurvey survey) {
 		try {
 			RelationalSchemaGenerator schemaGenerator = new RelationalSchemaGenerator(rdbConfig);
 			RelationalSchema relationalSchema = schemaGenerator.generateSchema(survey, survey.getName());
 			relationalSchemaDefinitionBySurvey.put(survey.getName(), relationalSchema);
-		} catch(CollectRdbException e) {
+		} catch (CollectRdbException e) {
 			LOG.error("Error generating relational schema for survey " + survey.getName(), e);
 		}
 	}
-	
+
 	private void initializeMondrianSchemaDefinition(CollectSurvey survey, String preferredLanguage) {
 		try {
-			boolean schemaLess = true; //TODO
+			boolean schemaLess = true; // TODO
 			String schemaName = schemaLess ? "" : survey.getName();
-			NewMondrianSchemaGenerator schemaGenerator = new NewMondrianSchemaGenerator(survey, 
-					ObjectUtils.defaultIfNull(preferredLanguage, survey.getDefaultLanguage()), 
-					schemaName, rdbConfig);
+			NewMondrianSchemaGenerator schemaGenerator = new NewMondrianSchemaGenerator(survey,
+					ObjectUtils.defaultIfNull(preferredLanguage, survey.getDefaultLanguage()), schemaName, rdbConfig);
 			String mondrianSchema = schemaGenerator.generateXMLSchema();
 			mondrianSchemaDefinitionBySurvey.put(survey.getName(), mondrianSchema);
-		} catch(CollectRdbException e) {
+		} catch (CollectRdbException e) {
 			LOG.error("Error generating relational schema for survey " + survey.getName(), e);
 		}
 	}
-	
+
 	private JooqDatabaseExporter createRDBUpdater(RelationalSchema schema, Connection targetConn) {
 		return new JooqDatabaseExporter(schema, targetConn);
 	}
-	
+
 	private interface Callback {
-		
+
 		void execute(Connection connection);
-		
+
 	}
-	
+
 	private class EventHandler {
-		
+
 		private RecordEvent recordEvent;
 		private RelationalSchema rdbSchema;
 		private CollectSurvey survey;
 		private RDBUpdater rdbUpdater;
-		
-		public EventHandler(RecordEvent recordEvent,
-				RelationalSchema rdbSchema, CollectSurvey survey, RDBUpdater rdbUpdater) {
+
+		public EventHandler(RecordEvent recordEvent, RelationalSchema rdbSchema, CollectSurvey survey,
+				RDBUpdater rdbUpdater) {
 			super();
 			this.recordEvent = recordEvent;
 			this.rdbSchema = rdbSchema;
 			this.survey = survey;
 			this.rdbUpdater = rdbUpdater;
 		}
-		
+
 		public void handle() {
 			if (recordEvent instanceof EntityCreatedEvent) {
 				insertEntity();
 			} else if (recordEvent instanceof AttributeEvent) {
 				if (recordEvent instanceof AttributeCreatedEvent) {
 					insertAttribute();
-				} else if (recordEvent instanceof AttributeUpdatedEvent) {
+				} else if (recordEvent instanceof AttributeValueUpdatedEvent) {
 					updateAttributeData();
 				} else {
 					deleteAttribute();
@@ -409,13 +418,11 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		}
 
 		private void insertEntity() {
-			rdbUpdater.insertEntity(recordEvent.getRecordId(), getParentEntityId(), 
-					getNodeId(), getDefinitionId());
+			rdbUpdater.insertEntity(recordEvent.getRecordId(), getParentEntityId(), getNodeId(), getDefinitionId());
 		}
-		
+
 		private void insertAttribute() {
-			rdbUpdater.insertAttribute(recordEvent.getRecordId(), getParentEntityId(), 
-					getNodeId(), getDefinitionId());
+			rdbUpdater.insertAttribute(recordEvent.getRecordId(), getParentEntityId(), getNodeId(), getDefinitionId());
 		}
 
 		private void updateAttributeData() {
@@ -432,84 +439,114 @@ public class RDBReportingRepositories implements ReportingRepositories {
 			}
 			NodeDefinition tableNodeDef = dataTable.getNodeDefinition();
 
-			BigInteger pkValue = DataTableDataExtractor.getTableArtificialPK(recordEvent.getRecordId(), tableNodeDef, rowNodeId);
+			BigInteger pkValue = DataTableDataExtractor.getTableArtificialPK(recordEvent.getRecordId(), tableNodeDef,
+					rowNodeId);
 			List<ColumnValuePair<DataColumn, ?>> columnValuePairs = toColumnValuePairs(dataTable, def);
 			rdbUpdater.updateEntityData(dataTable, pkValue, columnValuePairs);
 		}
 
 		@SuppressWarnings("unchecked")
-		public List<ColumnValuePair<DataColumn, ?>> toColumnValuePairs(
-				DataTable dataTable, AttributeDefinition attributeDef) {
+		public List<ColumnValuePair<DataColumn, ?>> toColumnValuePairs(DataTable dataTable,
+				AttributeDefinition attributeDef) {
 			List<DataColumn> dataColumns = dataTable.getDataColumns(attributeDef);
 			List<ColumnValuePair<DataColumn, ?>> columnValuePairs = new ArrayList<ColumnValuePair<DataColumn, ?>>();
 			if (recordEvent instanceof BooleanAttributeUpdatedEvent) {
-				columnValuePairs.add(new ColumnValuePair<DataColumn, Boolean>(dataColumns.get(0), ((BooleanAttributeUpdatedEvent) recordEvent).getValue()));
+				BooleanValue value = ((BooleanAttributeUpdatedEvent) recordEvent).getValue();
+				Boolean valueBoolean = value == null ? null : value.getValue();
+				columnValuePairs.add(new ColumnValuePair<DataColumn, Boolean>(dataColumns.get(0), valueBoolean));
 			} else if (recordEvent instanceof CodeAttributeUpdatedEvent) {
 				CodeAttributeUpdatedEvent evt = (CodeAttributeUpdatedEvent) recordEvent;
+				Code value = evt.getValue();
 				CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) attributeDef;
 				DataColumn codeColumn = dataTable.getDataColumn(codeAttrDef.getCodeFieldDefinition());
 				DataColumn qualifierColumn = dataTable.getDataColumn(codeAttrDef.getQualifierFieldDefinition());
-				columnValuePairs.add(new ColumnValuePair<DataColumn, String>(codeColumn, evt.getCode()));
+				String code = value == null ? null : value.getCode();
+				columnValuePairs.add(new ColumnValuePair<DataColumn, String>(codeColumn, code));
 				if (qualifierColumn != null) {
-					columnValuePairs.add(new ColumnValuePair<DataColumn, String>(qualifierColumn, evt.getQualifier()));	
+					String qualifier = value == null ? null : value.getQualifier();
+					columnValuePairs.add(new ColumnValuePair<DataColumn, String>(qualifierColumn, qualifier));
 				}
 			} else if (recordEvent instanceof CoordinateAttributeUpdatedEvent) {
 				CoordinateAttributeDefinition coordinateAttrDef = (CoordinateAttributeDefinition) attributeDef;
-				CoordinateAttributeUpdatedEvent e = (CoordinateAttributeUpdatedEvent) recordEvent;
+				CoordinateAttributeUpdatedEvent event = (CoordinateAttributeUpdatedEvent) recordEvent;
+				Coordinate value = event.getValue();
+				Double x = value == null ? null : value.getX();
+				Double y = value == null ? null : value.getY();
+				String srsId = value == null ? null : value.getSrsId();
+				DataColumn xColumn = dataTable.getDataColumn(coordinateAttrDef.getXField());
+				DataColumn yColumn = dataTable.getDataColumn(coordinateAttrDef.getYField());
+				DataColumn srsIdColumn = dataTable.getDataColumn(coordinateAttrDef.getSrsIdField());
 				columnValuePairs = Arrays.<ColumnValuePair<DataColumn, ?>>asList(
-						new ColumnValuePair<DataColumn, Double>(dataTable.getDataColumn(coordinateAttrDef.getXField()), e.getX()),
-						new ColumnValuePair<DataColumn, Double>(dataTable.getDataColumn(coordinateAttrDef.getYField()), e.getX()),
-						new ColumnValuePair<DataColumn, String>(dataTable.getDataColumn(coordinateAttrDef.getSrsIdField()), e.getSrsId())
-				);
+						new ColumnValuePair<DataColumn, Double>(xColumn, x),
+						new ColumnValuePair<DataColumn, Double>(yColumn, y),
+						new ColumnValuePair<DataColumn, String>(srsIdColumn, srsId));
 			} else if (recordEvent instanceof DateAttributeUpdatedEvent) {
-				Integer year = ((DateAttributeUpdatedEvent) recordEvent).getYear();
-				Integer month = ((DateAttributeUpdatedEvent) recordEvent).getMonth();
-				Integer day = ((DateAttributeUpdatedEvent) recordEvent).getDay();
-				org.openforis.idm.model.Date date = year != null && month != null && day != null 
-						? new org.openforis.idm.model.Date(year, month, day)
-						: null;
-				columnValuePairs.add(new ColumnValuePair<DataColumn, Date>(dataColumns.get(0), date == null ? null : date.toJavaDate()));
-			} else if (recordEvent instanceof NumericAttributeUpdatedEvent) {
-				NumericAttributeUpdatedEvent<?> numericAttributeUpdatedEvent = (NumericAttributeUpdatedEvent<?>) recordEvent;
+				org.openforis.idm.model.Date value = ((DateAttributeUpdatedEvent) recordEvent).getValue();
+				columnValuePairs.add(new ColumnValuePair<DataColumn, Date>(dataColumns.get(0),
+						value == null ? null : value.toJavaDate()));
+			} else if (recordEvent instanceof NumberAttributeUpdatedEvent) {
+				NumberAttributeUpdatedEvent<NumberValue<Number>> event = (NumberAttributeUpdatedEvent<NumberValue<Number>>) recordEvent;
+				NumberValue<Number> value = event.getValue();
 				NumberAttributeDefinition numberAttrDef = (NumberAttributeDefinition) attributeDef;
 				FieldDefinition<Integer> unitIdFieldDef = numberAttrDef.getUnitIdFieldDefinition();
 				DataColumn unitColumn = dataTable.getDataColumn(unitIdFieldDef);
 				if (unitColumn != null) {
-					columnValuePairs.add(new ColumnValuePair<DataColumn, Integer>(unitColumn, numericAttributeUpdatedEvent.getUnitId()));
+					Integer unitId = value.getUnit() == null ? null : value.getUnit().getId();
+					columnValuePairs.add(new ColumnValuePair<DataColumn, Integer>(unitColumn, unitId));
 				}
-				if (recordEvent instanceof NumberAttributeUpdatedEvent) {
-					DataColumn valueColumn = dataTable.getDataColumn(((NumberAttributeDefinition) attributeDef).getValueFieldDefinition());
-					Number value = ((NumberAttributeUpdatedEvent<?>) recordEvent).getValue();
-					columnValuePairs.add(new ColumnValuePair<DataColumn, Number>(valueColumn, value));
-				} else if (recordEvent instanceof RangeAttributeUpdatedEvent) {
-					Number from = ((RangeAttributeUpdatedEvent<Number>) recordEvent).getFrom();
-					DataColumn fromColumn = dataTable.getDataColumn(((RangeAttributeDefinition) attributeDef).getFromFieldDefinition());
-					columnValuePairs.add(new ColumnValuePair<DataColumn, Number>(fromColumn, from));
-					Number to = ((RangeAttributeUpdatedEvent<Number>) recordEvent).getTo();
-					DataColumn toColumn = dataTable.getDataColumn(((RangeAttributeDefinition) attributeDef).getToFieldDefinition());
-					columnValuePairs.add(new ColumnValuePair<DataColumn, Number>(toColumn, to));
+				DataColumn valueColumn = dataTable.getDataColumn(numberAttrDef.getValueFieldDefinition());
+				Number numberValue = value == null ? null : value.getValue();
+				columnValuePairs.add(new ColumnValuePair<DataColumn, Number>(valueColumn, numberValue));
+			} else if (recordEvent instanceof RangeAttributeUpdatedEvent) {
+				NumericRange<Number> value = ((RangeAttributeUpdatedEvent<NumericRange<Number>>) recordEvent)
+						.getValue();
+				NumberAttributeDefinition numberAttrDef = (NumberAttributeDefinition) attributeDef;
+				FieldDefinition<Integer> unitIdFieldDef = numberAttrDef.getUnitIdFieldDefinition();
+				DataColumn unitColumn = dataTable.getDataColumn(unitIdFieldDef);
+				if (unitColumn != null) {
+					Integer unitId = value.getUnit() == null ? null : value.getUnit().getId();
+					columnValuePairs.add(new ColumnValuePair<DataColumn, Integer>(unitColumn, unitId));
 				}
+				Number from = value == null ? null : value.getFrom();
+				RangeAttributeDefinition rangeAttrDef = (RangeAttributeDefinition) attributeDef;
+				DataColumn fromColumn = dataTable.getDataColumn(rangeAttrDef.getFromFieldDefinition());
+				columnValuePairs.add(new ColumnValuePair<DataColumn, Number>(fromColumn, from));
+				Number to = value == null ? null : value.getTo();
+				DataColumn toColumn = dataTable.getDataColumn(rangeAttrDef.getToFieldDefinition());
+				columnValuePairs.add(new ColumnValuePair<DataColumn, Number>(toColumn, to));
 			} else if (recordEvent instanceof TaxonAttributeUpdatedEvent) {
 				TaxonAttributeUpdatedEvent evt = (TaxonAttributeUpdatedEvent) recordEvent;
+				TaxonOccurrence value = evt.getValue();
 				TaxonAttributeDefinition taxonAttrDef = (TaxonAttributeDefinition) attributeDef;
 				DataColumn codeColumn = dataTable.getDataColumn(taxonAttrDef.getCodeFieldDefinition());
-				DataColumn scientificNameColumn = dataTable.getDataColumn(taxonAttrDef.getScientificNameFieldDefinition());
-				DataColumn vernacularNameColumn = dataTable.getDataColumn(taxonAttrDef.getVernacularNameFieldDefinition());
+				DataColumn scientificNameColumn = dataTable
+						.getDataColumn(taxonAttrDef.getScientificNameFieldDefinition());
+				DataColumn vernacularNameColumn = dataTable
+						.getDataColumn(taxonAttrDef.getVernacularNameFieldDefinition());
 				DataColumn languageCodeColumn = dataTable.getDataColumn(taxonAttrDef.getLanguageCodeFieldDefinition());
-				DataColumn languageVarietyColumn = dataTable.getDataColumn(taxonAttrDef.getLanguageVarietyFieldDefinition());
+				DataColumn languageVarietyColumn = dataTable
+						.getDataColumn(taxonAttrDef.getLanguageVarietyFieldDefinition());
+				String scientificName = value == null ? null : value.getScientificName();
+				String vernacularName = value == null ? null : value.getVernacularName();
+				String langCode = value == null ? null : value.getLanguageCode();
+				String langVariety = value == null ? null : value.getLanguageVariety();
 				columnValuePairs = Arrays.<ColumnValuePair<DataColumn, ?>>asList(
-						new ColumnValuePair<DataColumn, String>(codeColumn, evt.getCode()),
-						new ColumnValuePair<DataColumn, String>(scientificNameColumn, evt.getScientificName()),
-						new ColumnValuePair<DataColumn, String>(vernacularNameColumn, evt.getVernacularName()),
-						new ColumnValuePair<DataColumn, String>(languageCodeColumn, evt.getLanguageCode()),
-						new ColumnValuePair<DataColumn, String>(languageVarietyColumn, evt.getLanguageVariety())
-				);
+						new ColumnValuePair<DataColumn, String>(codeColumn, value == null ? null : value.getCode()),
+						new ColumnValuePair<DataColumn, String>(scientificNameColumn, scientificName),
+						new ColumnValuePair<DataColumn, String>(vernacularNameColumn, vernacularName),
+						new ColumnValuePair<DataColumn, String>(languageCodeColumn, langCode),
+						new ColumnValuePair<DataColumn, String>(languageVarietyColumn, langVariety));
 			} else if (recordEvent instanceof TextAttributeUpdatedEvent) {
-				columnValuePairs.add(new ColumnValuePair<DataColumn, String>(dataColumns.get(0), ((TextAttributeUpdatedEvent) recordEvent).getText()));
+				TextValue value = ((TextAttributeUpdatedEvent) recordEvent).getValue();
+				String valueText = value == null ? null : value.getValue();
+				columnValuePairs.add(new ColumnValuePair<DataColumn, String>(dataColumns.get(0), valueText));
 			} else if (recordEvent instanceof TimeAttributeUpdatedEvent) {
-				columnValuePairs.add(new ColumnValuePair<DataColumn, Date>(dataColumns.get(0), ((TimeAttributeUpdatedEvent) recordEvent).getTime()));
+				Time value = ((TimeAttributeUpdatedEvent) recordEvent).getValue();
+				Date valueDate = value == null ? null : value.toJavaDate();
+				columnValuePairs.add(new ColumnValuePair<DataColumn, Date>(dataColumns.get(0), valueDate));
 			} else {
-				throw new UnsupportedOperationException("Unsupported record event type: " + recordEvent.getClass().getName());
+				throw new UnsupportedOperationException(
+						"Unsupported record event type: " + recordEvent.getClass().getName());
 			}
 			return columnValuePairs;
 		}
@@ -517,7 +554,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		private void deleteEntity() {
 			rdbUpdater.deleteEntity(recordEvent.getRecordId(), getNodeId(), getDefinitionId());
 		}
-		
+
 		private void deleteAttribute() {
 			rdbUpdater.deleteAttribute(recordEvent.getRecordId(), getNodeId(), getDefinitionId());
 		}
@@ -525,7 +562,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		private void deleteRecord() {
 			rdbUpdater.deleteRecordData(recordEvent.getRecordId(), getDefinitionId());
 		}
-		
+
 		private Integer getParentEntityId() {
 			String definitionId = recordEvent.getDefinitionId();
 			NodeDefinition def = survey.getSchema().getDefinitionById(Integer.parseInt(definitionId));

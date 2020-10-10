@@ -21,6 +21,7 @@ import org.openforis.collect.command.RecordCommand;
 import org.openforis.collect.command.UpdateAttributeCommand;
 import org.openforis.collect.command.UpdateBooleanAttributeCommand;
 import org.openforis.collect.command.UpdateCodeAttributeCommand;
+import org.openforis.collect.command.UpdateCoordinateAttributeCommand;
 import org.openforis.collect.command.UpdateDateAttributeCommand;
 import org.openforis.collect.command.UpdateIntegerAttributeCommand;
 import org.openforis.collect.command.UpdateRealAttributeCommand;
@@ -36,6 +37,7 @@ import org.openforis.collect.web.ws.AppWS.RecordEventMessage;
 import org.openforis.commons.web.Response;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
@@ -43,6 +45,7 @@ import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.model.BooleanValue;
 import org.openforis.idm.model.Code;
+import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.IntegerValue;
 import org.openforis.idm.model.RealValue;
@@ -116,13 +119,13 @@ public class CommandController {
 		UpdateAttributeCommand<?> command = commandWrapper.toCommand(survey);
 		return submitCommand(command);
 	}
-	
+
 	@RequestMapping(value = "record/attiribute/delete", method = POST, consumes = APPLICATION_JSON_VALUE)
 	@Transactional
 	public @ResponseBody Object deleteAttribute(@RequestBody DeleteAttributeCommand command) {
 		return submitCommand(command);
 	}
-	
+
 	@RequestMapping(value = "record/entity", method = POST, consumes = APPLICATION_JSON_VALUE)
 	@Transactional
 	public @ResponseBody Object addEntity(@RequestBody AddEntityCommand command) {
@@ -159,7 +162,7 @@ public class CommandController {
 		}
 		return result;
 	}
-	
+
 	private CollectSurvey getSurvey(RecordCommand command) {
 		return surveyManager.getOrLoadSurveyById(command.getSurveyId());
 	}
@@ -205,12 +208,26 @@ public class CommandController {
 		Map<String, Object> valueByField;
 
 		Value extractValue(CollectSurvey survey) {
+			if (valueByField == null) {
+				return null;
+			}
 			switch (attributeType) {
 			case BOOLEAN:
 				return new BooleanValue((Boolean) valueByField.get(BooleanAttributeDefinition.VALUE_FIELD));
 			case CODE:
 				return new Code((String) valueByField.get(CodeAttributeDefinition.CODE_FIELD),
 						(String) valueByField.get(CodeAttributeDefinition.QUALIFIER_FIELD));
+			case COORDINATE:
+				Number xValue = (Number) valueByField.get(CoordinateAttributeDefinition.X_FIELD_NAME);
+				Number yValue = (Number) valueByField.get(CoordinateAttributeDefinition.Y_FIELD_NAME);
+				Number altitudeValue = (Number) valueByField.get(CoordinateAttributeDefinition.ALTITUDE_FIELD_NAME);
+				Number accuracyValue = (Number) valueByField.get(CoordinateAttributeDefinition.ACCURACY_FIELD_NAME);
+				String srsId = (String) valueByField.get(CoordinateAttributeDefinition.SRS_FIELD_NAME);
+				Double x = xValue == null ? null : xValue.doubleValue();
+				Double y = yValue == null ? null : yValue.doubleValue();
+				Double altitude = altitudeValue == null ? null : altitudeValue.doubleValue();
+				Double accuracy = accuracyValue == null ? null : accuracyValue.doubleValue();
+				return new Coordinate(x, y, srsId, altitude, accuracy);
 			case DATE:
 				return new Date((Integer) valueByField.get(DateAttributeDefinition.YEAR_FIELD_NAME),
 						(Integer) valueByField.get(DateAttributeDefinition.MONTH_FIELD_NAME),
@@ -218,11 +235,9 @@ public class CommandController {
 			case NUMBER:
 				Integer unitId = (Integer) valueByField.get(NumberAttributeDefinition.UNIT_FIELD);
 				Unit unit = unitId == null ? null : survey.getUnit(unitId);
-				return numericType == Type.INTEGER
-						? new IntegerValue(
-								((Number) valueByField.get(NumberAttributeDefinition.VALUE_FIELD)).intValue(), unit)
-						: new RealValue(
-								((Number) valueByField.get(NumberAttributeDefinition.VALUE_FIELD)).doubleValue(), unit);
+				Number number = (Number) valueByField.get(NumberAttributeDefinition.VALUE_FIELD);
+				return numericType == Type.INTEGER ? new IntegerValue(number == null ? null : number.intValue(), unit)
+						: new RealValue(number == null ? null : number.doubleValue(), unit);
 			case TEXT:
 				return new TextValue((String) valueByField.get(TextAttributeDefinition.VALUE_FIELD));
 			default:
@@ -250,6 +265,8 @@ public class CommandController {
 				return UpdateBooleanAttributeCommand.class;
 			case CODE:
 				return UpdateCodeAttributeCommand.class;
+			case COORDINATE:
+				return UpdateCoordinateAttributeCommand.class;
 			case DATE:
 				return UpdateDateAttributeCommand.class;
 			case NUMBER:

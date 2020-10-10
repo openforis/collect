@@ -1,7 +1,7 @@
 import { Component } from 'react'
 import { debounce } from 'throttle-debounce'
 
-import { AttributeUpdatedEvent, RecordEvent } from 'model/event/RecordEvent'
+import { AttributeValueUpdatedEvent, RecordEvent } from 'model/event/RecordEvent'
 import EventQueue from 'model/event/EventQueue'
 import ServiceFactory from 'services/ServiceFactory'
 
@@ -32,11 +32,13 @@ export default class AbstractField extends Component {
   }
 
   updateStateFromProps() {
-    this.setState({ dirty: false, value: this.extractValueFromProps(), ...this.extractValidationFromProps() })
+    const value = this.extractValueFromProps()
+    this.setState({ dirty: false, value, ...this.extractValidationFromProps() })
   }
 
   extractValueFromProps() {
-    return null
+    const attr = this.getSingleAttribute()
+    return attr.value
   }
 
   extractValidationFromProps() {
@@ -83,7 +85,7 @@ export default class AbstractField extends Component {
       return
     }
     if (
-      event instanceof AttributeUpdatedEvent &&
+      event instanceof AttributeValueUpdatedEvent &&
       event.isRelativeToNodes({ parentEntity, nodeDefId: fieldDef.attributeDefinitionId })
     ) {
       this.handleAttributeUpdatedEvent(event)

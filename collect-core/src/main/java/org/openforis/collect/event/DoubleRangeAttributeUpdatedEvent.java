@@ -1,16 +1,13 @@
 package org.openforis.collect.event;
 
+import org.openforis.idm.model.RealRange;
+
 /**
  * 
  * @author D. Wiell
  * @author S. Ricci
  *
  */
-public class DoubleRangeAttributeUpdatedEvent extends
-		RangeAttributeUpdatedEvent<Double> {
-
-	public DoubleRangeAttributeUpdatedEvent() {
-		super(Double.class);
-	}
+public class DoubleRangeAttributeUpdatedEvent extends RangeAttributeUpdatedEvent<RealRange> {
 
 }

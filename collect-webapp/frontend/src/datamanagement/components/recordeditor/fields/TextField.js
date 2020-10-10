@@ -14,11 +14,6 @@ export default class TextField extends AbstractField {
     this.onChange = this.onChange.bind(this)
   }
 
-  extractValueFromProps() {
-    const attr = this.getSingleAttribute()
-    return { value: attr.fields[0].value }
-  }
-
   onChange(event) {
     this.onAttributeUpdate({ value: { value: event.target.value } })
   }
@@ -30,17 +25,15 @@ export default class TextField extends AbstractField {
 
     return (
       <div>
-        <>
-          <Input
-            id={this.fieldId}
-            invalid={Boolean(errors || warnings)}
-            className={warnings ? 'warning' : ''}
-            value={text}
-            onChange={this.onChange}
-          />
-          <FieldValidationTooltip target={this.fieldId} errors={errors} warnings={warnings} />
-          {dirty && <FieldLoadingSpinner />}
-        </>
+        <Input
+          id={this.fieldId}
+          invalid={Boolean(errors || warnings)}
+          className={warnings ? 'warning' : ''}
+          value={text}
+          onChange={this.onChange}
+        />
+        <FieldValidationTooltip target={this.fieldId} errors={errors} warnings={warnings} />
+        {dirty && <FieldLoadingSpinner />}
       </div>
     )
   }

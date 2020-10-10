@@ -26,17 +26,6 @@ export default class DateField extends AbstractField {
     this.onChange = this.onChange.bind(this)
   }
 
-  extractValueFromProps() {
-    const attr = this.getSingleAttribute()
-    const value = attr.empty
-      ? null
-      : attr.definition.fieldNames.reduce((valueAcc, fieldName, index) => {
-          valueAcc[fieldName] = attr.fields[index].value
-          return valueAcc
-        }, {})
-    return value
-  }
-
   onChange(date) {
     if (isNaN(date)) {
       return
@@ -51,21 +40,19 @@ export default class DateField extends AbstractField {
 
     return (
       <div>
-        <>
-          <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <KeyboardDatePicker
-              id={this.fieldId}
-              variant="dialog"
-              inputVariant="outlined"
-              format={Dates.DATE_FORMAT}
-              margin="none"
-              value={selectedDate}
-              onChange={this.onChange}
-              className={warnings ? 'warning' : ''}
-            />
-          </MuiPickersUtilsProvider>
-          {dirty && <FieldLoadingSpinner />}
-        </>
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <KeyboardDatePicker
+            id={this.fieldId}
+            variant="dialog"
+            inputVariant="outlined"
+            format={Dates.DATE_FORMAT}
+            margin="none"
+            value={selectedDate}
+            onChange={this.onChange}
+            className={warnings ? 'warning' : ''}
+          />
+        </MuiPickersUtilsProvider>
+        {dirty && <FieldLoadingSpinner />}
         <FieldValidationTooltip target={this.fieldId} errors={errors} warnings={warnings} />
       </div>
     )

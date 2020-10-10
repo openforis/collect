@@ -32,6 +32,7 @@ public class SurveyView {
 	private List<CodeListView> codeLists = new ArrayList<CodeListView>();
 	private List<ModelVersionView> modelVersions = new ArrayList<ModelVersionView>();
 	private List<UnitView> units = new ArrayList<UnitView>();
+	private List<SpatialReferenceSystemView> spatialReferenceSystems = new ArrayList<SpatialReferenceSystemView>();
 	private CeoApplicationOptions ceoApplicationOptions;
 	private UIConfiguration uiConfiguration;
 	private SurveyAvailability availability;
@@ -82,6 +83,10 @@ public class SurveyView {
 	
 	public void addUnit(UnitView unit) {
 		this.units.add(unit);
+	}
+
+	public void addSpatialReferenceSystem(SpatialReferenceSystemView srs) {
+		this.spatialReferenceSystems.add(srs);
 	}
 
 	public Integer getId() {
@@ -190,6 +195,10 @@ public class SurveyView {
 	
 	public List<UnitView> getUnits() {
 		return units;
+	}
+	
+	public List<SpatialReferenceSystemView> getSpatialReferenceSystems() {
+		return spatialReferenceSystems;
 	}
 	
 	public SchemaView getSchema() {

@@ -6,17 +6,21 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.designer.metamodel.AttributeType;
+import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.ui.UIModelObject;
+import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.uiconfiguration.view.Views;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserInGroup;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.AttributeDefinition.FieldLabel;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLabel;
 import org.openforis.idm.metamodel.CodeListService;
+import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -24,6 +28,7 @@ import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.Precision;
+import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.Unit;
 
 /**
@@ -55,6 +60,11 @@ public class SurveyViewGenerator {
 
 	public SurveyView generateView(final CollectSurvey survey, UserGroup userGroup,
 			UserInGroup.UserGroupRole userInSurveyGroupRole) {
+		String defaultLanguage = survey.getDefaultLanguage();
+		CollectAnnotations annotations = survey.getAnnotations();
+		// TODO use UIConfiguration instead
+		UIOptions uiOptions = survey.getUIOptions();
+
 		final SurveyView surveyView = new SurveyView(survey, new ViewContext(languageCode));
 
 		if (userGroup != null) {
@@ -87,14 +97,22 @@ public class SurveyViewGenerator {
 			versionView.setDate(version.getDate());
 			surveyView.addModelVersion(versionView);
 		}
-		
+
 		for (Unit unit : survey.getUnits()) {
 			UnitView unitView = new UnitView();
 			unitView.setId(unit.getId());
 			unitView.setConversionFactor(unit.getConversionFactor());
-			unitView.setAbbreviation(unit.getAbbreviation(languageCode, survey.getDefaultLanguage()));
-			unitView.setLabel(unit.getLabel(languageCode, survey.getDefaultLanguage()));
+			unitView.setAbbreviation(unit.getAbbreviation(languageCode, defaultLanguage));
+			unitView.setLabel(unit.getLabel(languageCode, defaultLanguage));
 			surveyView.addUnit(unitView);
+		}
+
+		for (SpatialReferenceSystem srs : survey.getSpatialReferenceSystems()) {
+			SpatialReferenceSystemView srsView = new SpatialReferenceSystemView();
+			srsView.setId(srs.getId());
+			srsView.setLabel(srs.getLabel(languageCode, defaultLanguage));
+			srsView.setDescription(srs.getDescription(languageCode, defaultLanguage));
+			surveyView.addSpatialReferenceSystem(srsView);
 		}
 
 		final Map<Integer, NodeDefView> viewById = new HashMap<Integer, NodeDefView>();
@@ -107,8 +125,8 @@ public class SurveyViewGenerator {
 				if (def instanceof EntityDefinition) {
 					view = new EntityDefView(((EntityDefinition) def).isRoot(), id, name, label, def.isMultiple());
 				} else {
-					boolean qualifier = survey.getAnnotations().isQualifier((AttributeDefinition) def);
-					boolean showInSummary = survey.getAnnotations().isShowInSummary((AttributeDefinition) def);
+					boolean qualifier = annotations.isQualifier((AttributeDefinition) def);
+					boolean showInSummary = annotations.isShowInSummary((AttributeDefinition) def);
 
 					if (def instanceof CodeAttributeDefinition) {
 						CodeAttributeDefinition attrDef = (CodeAttributeDefinition) def;
@@ -116,21 +134,39 @@ public class SurveyViewGenerator {
 						view = new CodeAttributeDefView(id, name, label, AttributeType.valueOf(attrDef),
 								attrDef.getFieldNames(), attrDef.isKey(), attrDef.isMultiple(), showInSummary,
 								qualifier, codeListId);
+					} else if (def instanceof CoordinateAttributeDefinition) {
+						CoordinateAttributeDefinition attrDef = (CoordinateAttributeDefinition) def;
+						CoordinateAttributeDefView attrDefView = new CoordinateAttributeDefView(id, name, label,
+								AttributeType.valueOf(attrDef), attrDef.getFieldNames(), attrDef.isKey(),
+								attrDef.isMultiple(), showInSummary, qualifier);
+						attrDefView.setFieldsOrder(uiOptions.getFieldsOrder(attrDef));
+						attrDefView.setShowSrsField(annotations.isShowSrsField(attrDef));
+						attrDefView.setIncludeAccuracyField(annotations.isIncludeCoordinateAccuracy(attrDef));
+						attrDefView.setIncludeAltitudeField(annotations.isIncludeCoordinateAltitude(attrDef));
+						view = attrDefView;
 					} else if (def instanceof NumberAttributeDefinition) {
 						NumberAttributeDefinition attrDef = (NumberAttributeDefinition) def;
 						List<Precision> precisions = attrDef.getPrecisionDefinitions();
 						List<PrecisionView> precisionViews = Views.fromObjects(precisions, PrecisionView.class);
-						view = new NumberAttributeDefView(id, name, label, AttributeType.valueOf(attrDef),
-								attrDef.getFieldNames(), attrDef.isKey(), attrDef.isMultiple(), showInSummary,
-								qualifier);
-						((NumericAttributeDefView) view).setNumericType(attrDef.getType());
-						((NumericAttributeDefView) view).setPrecisions(precisionViews);
+						NumericAttributeDefView attrDefView = new NumberAttributeDefView(id, name, label,
+								AttributeType.valueOf(attrDef), attrDef.getFieldNames(), attrDef.isKey(),
+								attrDef.isMultiple(), showInSummary, qualifier);
+						attrDefView.setNumericType(attrDef.getType());
+						attrDefView.setPrecisions(precisionViews);
+						view = attrDefView;
 					} else {
 						AttributeDefinition attrDef = (AttributeDefinition) def;
 						view = new AttributeDefView(id, name, label, AttributeType.valueOf(attrDef),
 								attrDef.getFieldNames(), attrDef.isKey(), attrDef.isMultiple(), showInSummary,
 								qualifier);
 					}
+					AttributeDefinition attrDef = ((AttributeDefinition) def);
+					List<FieldLabel> fieldLabels = attrDef.getFieldLabels();
+					List<String> fieldLabelsView = new ArrayList<String>(fieldLabels.size());
+					for (String fieldName: ((AttributeDefinition) def).getFieldNames()) {
+						fieldLabelsView.add(attrDef.getFieldLabel(fieldName, languageCode));
+					}
+					((AttributeDefView) view).setFieldLabels(fieldLabelsView);
 				}
 				UIModelObject uiModelObject = survey.getUIConfiguration().getModelObjectByNodeDefinitionId(def.getId());
 				view.setHideWhenNotRelevant(uiModelObject != null && uiModelObject.isHideWhenNotRelevant());

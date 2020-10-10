@@ -13,11 +13,6 @@ export default class BooleanField extends AbstractField {
     this.onChange = this.onChange.bind(this)
   }
 
-  extractValueFromProps() {
-    const attr = this.getSingleAttribute()
-    return { value: attr.fields[0].value }
-  }
-
   onChange(event) {
     this.onAttributeUpdate({ value: { value: event.target.checked }, debounced: false })
   }

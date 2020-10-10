@@ -4,6 +4,7 @@ import { AttributeDefinition } from 'model/Survey'
 
 import BooleanField from './fields/BooleanField'
 import CodeField from './fields/CodeField'
+import CoordinateField from './fields/CoordinateField'
 import DateField from './fields/DateField'
 import NumberField from './fields/NumberField'
 import TextField from './fields/TextField'
@@ -11,6 +12,7 @@ import TextField from './fields/TextField'
 const FIELD_COMPONENTS_BY_TYPE = {
   [AttributeDefinition.Types.BOOLEAN]: BooleanField,
   [AttributeDefinition.Types.CODE]: CodeField,
+  [AttributeDefinition.Types.COORDINATE]: CoordinateField,
   [AttributeDefinition.Types.DATE]: DateField,
   [AttributeDefinition.Types.NUMBER]: NumberField,
   [AttributeDefinition.Types.TEXT]: TextField,

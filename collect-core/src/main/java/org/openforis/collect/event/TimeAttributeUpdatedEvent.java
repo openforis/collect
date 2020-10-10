@@ -1,6 +1,6 @@
 package org.openforis.collect.event;
 
-import java.util.Date;
+import org.openforis.idm.model.Time;
 
 /**
  * 
@@ -8,15 +8,6 @@ import java.util.Date;
  * @author S. Ricci
  *
  */
-public class TimeAttributeUpdatedEvent extends AttributeUpdatedEvent {
+public class TimeAttributeUpdatedEvent extends AttributeValueUpdatedEvent<Time> {
 
-	private Date time;
-
-	public Date getTime() {
-		return time;
-	}
-	
-	public void setTime(Date time) {
-		this.time = time;
-	}
 }
