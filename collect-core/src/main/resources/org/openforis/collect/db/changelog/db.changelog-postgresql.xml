@@ -8,5 +8,6 @@
 <!--   <includeAll path="org/openforis/collect/db/changelog/standard"/> -->
 
   <include file="org/openforis/collect/db/changelog/standard/db.changelog.0001.xml" />
+  <include file="org/openforis/collect/db/changelog/standard/db.changelog.0002.xml" />
   
 </databaseChangeLog>

@@ -12,6 +12,7 @@ import java.util.List;
 import org.jooq.Configuration;
 import org.jooq.DeleteQuery;
 import org.jooq.Record;
+import org.jooq.Record1;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
@@ -33,6 +34,11 @@ public class UserDao extends MappingJooqDaoSupport<Integer, User, UserDSLContext
 
 	public UserDao() {
 		super(UserDao.UserDSLContext.class);
+	}
+	
+	public int countAll() {
+		Record1<Integer> result = dsl().selectCount().from(OFC_USER).fetchOne();
+		return (Integer) result.getValue(0);
 	}
 
 	@Override

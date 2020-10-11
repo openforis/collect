@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+	<changeSet id="update-admin-user-default-password" author="ricci" dbms="sqlite">
+
+		<comment>Update admin user default password into 'Collect123'</comment>
+
+		<sql>
+			UPDATE ofc_user 
+			SET password = 'd3c4a9060b814c0053765249b9df152a' 
+			WHERE 
+				username = 'admin' AND 
+				password = '21232f297a57a5a743894a0e4a801fc3'
+		</sql>
+
+	</changeSet>
+
+</databaseChangeLog>
