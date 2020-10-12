@@ -1,17 +1,9 @@
 package org.openforis.collect.command;
 
-public class UpdateTextAttributeCommand extends UpdateAttributeCommand {
+import org.openforis.idm.model.TextValue;
+
+public class UpdateTextAttributeCommand extends UpdateAttributeCommand<TextValue> {
 
 	private static final long serialVersionUID = 1L;
-	
-	private String value;
-
-	public String getValue() {
-		return value;
-	}
-	
-	public void setValue(String value) {
-		this.value = value;
-	}
 	
 }

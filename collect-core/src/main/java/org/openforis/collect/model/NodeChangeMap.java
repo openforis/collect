@@ -122,11 +122,13 @@ public class NodeChangeMap implements NodeChangeSet {
 	 * 
 	 * @param recordId 
 	 * @param ancestorIds 
+	 * @param parentEntityPath 
 	 * @param node
 	 * @return
 	 */
-	public NodeDeleteChange addNodeDeleteChange(Integer recordId, Step recordStep, List<Integer> ancestorIds, Node<?> node) {
-		NodeDeleteChange c = new NodeDeleteChange(recordId, recordStep, ancestorIds, node);
+	public NodeDeleteChange addNodeDeleteChange(Integer recordId, Step recordStep, List<Integer> ancestorIds,
+			String parentEntityPath, Node<?> node) {
+		NodeDeleteChange c = new NodeDeleteChange(recordId, recordStep, ancestorIds, parentEntityPath, node);
 		putChange(c); //overwrite change if already present
 		return c;
 	}

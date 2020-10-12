@@ -9,6 +9,7 @@ public class AttributeDefView extends NodeDefView {
 
 	private AttributeType attributeType;
 	private List<String> fieldNames;
+	private List<String> fieldLabels;
 	private boolean showInRecordSummaryList;
 	private boolean qualifier;
 	
@@ -36,4 +37,13 @@ public class AttributeDefView extends NodeDefView {
 	public boolean isQualifier() {
 		return qualifier;
 	}
+	
+	public List<String> getFieldLabels() {
+		return fieldLabels;
+	}
+	
+	public void setFieldLabels(List<String> fieldLabels) {
+		this.fieldLabels = fieldLabels;
+	}
+
 }

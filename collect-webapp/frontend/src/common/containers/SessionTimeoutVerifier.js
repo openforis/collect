@@ -93,7 +93,7 @@ class SessionTimeoutVerifier extends Component {
         const errorMessage = this.state.sessionExpired ? L.l('connection.sessionExpired'): L.l('connection.serverConnectionError.message')
             
         return (
-            <div>
+            <>
                 {this.props.children}
                 <Dialog open={! this.state.active} 
                     ignoreBackdropClick
@@ -112,7 +112,7 @@ class SessionTimeoutVerifier extends Component {
                         }
                     </DialogActions>
                 </Dialog>
-            </div>
+            </>
         )
     }
 }

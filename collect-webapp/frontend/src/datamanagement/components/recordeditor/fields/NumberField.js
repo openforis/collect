@@ -4,11 +4,13 @@ import { Input } from 'reactstrap'
 
 import AbstractField from './AbstractField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
-import FieldValidationFeedback from './FieldValidationFeedback'
+import FieldValidationTooltip from './FieldValidationTooltip'
 
 export default class NumberField extends AbstractField {
   constructor(props) {
     super(props)
+
+    this.fieldId = `number-field-${new Date().getTime()}`
 
     this.onTextValueChange = this.onTextValueChange.bind(this)
     this.onUnitChange = this.onUnitChange.bind(this)
@@ -16,13 +18,14 @@ export default class NumberField extends AbstractField {
 
   extractValueFromProps() {
     const { fieldDef } = this.props
-    const attrDef = fieldDef.attributeDefinition
-    const precisions = attrDef.precisions
     const attr = this.getSingleAttribute()
 
     if (!attr) {
       return null
     }
+
+    const attrDef = fieldDef.attributeDefinition
+    const precisions = attrDef.precisions
 
     const unitId = attr.fields[1].value
     let selectedUnitId
@@ -59,34 +62,34 @@ export default class NumberField extends AbstractField {
 
     return (
       <div>
-        <>
-          <div style={hasPrecisions ? { display: 'grid', gridTemplateColumns: '1fr 150px' } : null}>
-            <Input
-              type="number"
-              invalid={Boolean(errors || warnings)}
-              className={warnings ? 'warning' : ''}
-              value={text}
-              onChange={this.onTextValueChange}
-            />
-            {hasPrecisions && (
-              <FormControl>
-                <InputLabel>Unit</InputLabel>
-                <Select variant="outlined" native value={unitId} onChange={this.onUnitChange} label="Unit">
-                  {precisions.map((precision) => {
-                    const unit = attrDef.survey.units.find((unit) => unit.id === precision.unitId)
-                    return (
-                      <option key={unit.id} value={unit.id}>
-                        {unit.label}
-                      </option>
-                    )
-                  })}
-                </Select>
-              </FormControl>
-            )}
-          </div>
-          {dirty && <FieldLoadingSpinner />}
-        </>
-        <FieldValidationFeedback errors={errors} warnings={warnings} />
+        <div style={hasPrecisions ? { display: 'grid', gridTemplateColumns: '1fr 150px' } : null}>
+          <Input
+            id={this.fieldId}
+            type="number"
+            invalid={Boolean(errors || warnings)}
+            className={warnings ? 'warning' : ''}
+            value={text}
+            onChange={this.onTextValueChange}
+          />
+          <FieldValidationTooltip target={this.fieldId} errors={errors} warnings={warnings} />
+
+          {hasPrecisions && (
+            <FormControl>
+              <InputLabel>Unit</InputLabel>
+              <Select variant="outlined" native value={unitId} onChange={this.onUnitChange} label="Unit">
+                {precisions.map((precision) => {
+                  const unit = attrDef.survey.units.find((unit) => unit.id === precision.unitId)
+                  return (
+                    <option key={unit.id} value={unit.id}>
+                      {unit.label}
+                    </option>
+                  )
+                })}
+              </Select>
+            </FormControl>
+          )}
+        </div>
+        {dirty && <FieldLoadingSpinner />}
       </div>
     )
   }

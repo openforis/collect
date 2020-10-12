@@ -1,17 +1,19 @@
-import React, { Component } from 'react';
+import React from 'react'
+import classnames from 'classnames'
 
-export default class Preloader extends Component {
+const Preloader = (props) => {
+  const { children, loading } = props
 
-    render() {
-        const { loading } = this.props
-        
-        return <div className={loading ? '' : 'loaded'}>
-            <div className="loader-wrapper">
-                <div className="loader"></div>
-                <div className="loader-section section-left"></div>
-                <div className="loader-section section-right"></div>
-            </div>
-            {! loading && this.props.children}
-        </div>
-    }
+  return (
+    <div className={classnames('app-loader', { loaded: !loading })}>
+      <div className="loader-wrapper">
+        <div className="loader"></div>
+        <div className="loader-section section-left"></div>
+        <div className="loader-section section-right"></div>
+      </div>
+      {!loading && children}
+    </div>
+  )
 }
+
+export default Preloader

@@ -3,18 +3,15 @@ import { Input } from 'reactstrap'
 
 import AbstractField from './AbstractField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
-import FieldValidationFeedback from './FieldValidationFeedback'
+import FieldValidationTooltip from './FieldValidationTooltip'
 
 export default class TextField extends AbstractField {
   constructor() {
     super()
 
-    this.onChange = this.onChange.bind(this)
-  }
+    this.fieldId = `text-field-${new Date().getTime()}`
 
-  extractValueFromProps() {
-    const attr = this.getSingleAttribute()
-    return { value: attr.fields[0].value }
+    this.onChange = this.onChange.bind(this)
   }
 
   onChange(event) {
@@ -28,16 +25,15 @@ export default class TextField extends AbstractField {
 
     return (
       <div>
-        <>
-          <Input
-            invalid={Boolean(errors || warnings)}
-            className={warnings ? 'warning' : ''}
-            value={text}
-            onChange={this.onChange}
-          />
-          {dirty && <FieldLoadingSpinner />}
-        </>
-        <FieldValidationFeedback errors={errors} warnings={warnings} />
+        <Input
+          id={this.fieldId}
+          invalid={Boolean(errors || warnings)}
+          className={warnings ? 'warning' : ''}
+          value={text}
+          onChange={this.onChange}
+        />
+        <FieldValidationTooltip target={this.fieldId} errors={errors} warnings={warnings} />
+        {dirty && <FieldLoadingSpinner />}
       </div>
     )
   }

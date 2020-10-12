@@ -1,21 +1,13 @@
 package org.openforis.collect.event;
 
+import org.openforis.idm.model.BooleanValue;
+
 /**
  * 
  * @author D. Wiell
  * @author S. Ricci
  *
  */
-public class BooleanAttributeUpdatedEvent extends AttributeUpdatedEvent {
-
-	private Boolean value;
-
-	public Boolean getValue() {
-		return value;
-	}
-	
-	public void setValue(Boolean value) {
-		this.value = value;
-	}
+public class BooleanAttributeUpdatedEvent extends AttributeValueUpdatedEvent<BooleanValue> {
 
 }

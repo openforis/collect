@@ -1,26 +1,14 @@
 package org.openforis.collect.event;
 
+import org.openforis.idm.model.NumberValue;
+
 /**
  * 
  * @author D. Wiell
  * @author S. Ricci
  *
  */
-public abstract class NumberAttributeUpdatedEvent<T extends Number> extends
-		NumericAttributeUpdatedEvent<T> {
-
-	private T value;
-	
-	public NumberAttributeUpdatedEvent(Class<T> valueType) {
-		super(valueType);
-	}
-
-	public T getValue() {
-		return value;
-	}
-	
-	public void setValue(T value) {
-		this.value = value;
-	}
+public abstract class NumberAttributeUpdatedEvent<V extends NumberValue<? extends Number>>
+		extends AttributeValueUpdatedEvent<V> {
 
 }

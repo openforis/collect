@@ -44,11 +44,13 @@ public class SpringCommandDispatcher extends RegistryCommandDispatcher {
 		register(AddAttributeCommand.class, addNodeCommandHandler);
 		register(AddEntityCommand.class, addNodeCommandHandler);
 
-		UpdateAttributeCommandHandler updateAttributeCommandHandler = new UpdateAttributeCommandHandler<UpdateAttributeCommand>();
+		UpdateAttributeCommandHandler updateAttributeCommandHandler = new UpdateAttributeCommandHandler<UpdateAttributeCommand<?>>();
 		register(UpdateBooleanAttributeCommand.class, updateAttributeCommandHandler);
 		register(UpdateCodeAttributeCommand.class, updateAttributeCommandHandler);
+		register(UpdateCoordinateAttributeCommand.class, updateAttributeCommandHandler);
 		register(UpdateDateAttributeCommand.class, updateAttributeCommandHandler);
-		register(UpdateNumericAttributeCommand.class, updateAttributeCommandHandler);
+		register(UpdateIntegerAttributeCommand.class, updateAttributeCommandHandler);
+		register(UpdateRealAttributeCommand.class, updateAttributeCommandHandler);
 		register(UpdateTextAttributeCommand.class, updateAttributeCommandHandler);
 
 		DeleteNodeCommandHandler deleteNodeCommandHandler = new DeleteNodeCommandHandler();

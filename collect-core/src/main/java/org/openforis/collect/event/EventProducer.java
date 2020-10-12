@@ -26,10 +26,7 @@ import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.BooleanAttribute;
-import org.openforis.idm.model.BooleanValue;
-import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
-import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.DateAttribute;
 import org.openforis.idm.model.Entity;
@@ -39,7 +36,6 @@ import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.NumericRangeAttribute;
 import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TextAttribute;
-import org.openforis.idm.model.Time;
 import org.openforis.idm.model.TimeAttribute;
 
 /**
@@ -87,7 +83,7 @@ public class EventProducer {
 					if (nodeDef.isMultiple()) {
 						factory.attributeCreated();
 					} else {
-						factory.attributeUpdated();
+						factory.attributeValueUpdated();
 					}
 				}
 			}
@@ -110,7 +106,12 @@ public class EventProducer {
 		Integer recordId = change.getRecordId();
 		RecordStep recordStep = change.getRecordStep().toRecordStep();
 
-		EventFactory factory = new EventFactory(recordId, recordStep, ancestorIds, node);
+		String parentEntityPath = change instanceof NodeDeleteChange 
+				? ((NodeDeleteChange) change).getParentEntityPath() 
+				: node.getParent() == null 
+					? null 
+					: node.getParent().getPath();
+		EventFactory factory = new EventFactory(recordId, recordStep, ancestorIds, parentEntityPath, node);
 
 		if (change instanceof EntityChange) {
 			EntityChange entityChange = (EntityChange) change;
@@ -127,14 +128,10 @@ public class EventProducer {
 			if (change instanceof AttributeAddChange) {
 				factory.attributeCreated();
 			} else {
-				factory.attributeUpdated();
+				factory.attributeValueUpdated();
 			}
 		} else if (change instanceof NodeDeleteChange) {
-			if (node instanceof Entity) {
-				factory.entityDeleted();
-			} else {
-				factory.attributeDeleted();
-			}
+			factory.nodeDeleted();
 		}
 
 	}
@@ -175,14 +172,20 @@ public class EventProducer {
 		Integer recordId;
 		RecordStep recordStep;
 		List<String> ancestorIds;
+		String parentEntityPath;
 		Node<?> node;
 		Date timestamp;
 
-		EventFactory(Integer recordId, RecordStep recordStep, List<String> ancestorIds,
+		EventFactory(Integer recordId, RecordStep recordStep, List<String> ancestorIds, Node<?> node) {
+			this(recordId, recordStep, ancestorIds, node.getParent().getPath(), node);
+		}
+		
+		EventFactory(Integer recordId, RecordStep recordStep, List<String> ancestorIds, String parentEntityPath,
 				Node<?> node) {
 			this.recordId = recordId;
 			this.recordStep = recordStep;
 			this.ancestorIds = ancestorIds;
+			this.parentEntityPath = parentEntityPath;
 			this.node = node;
 			this.timestamp = new Date();
 		}
@@ -241,40 +244,24 @@ public class EventProducer {
 		void attributeCreated() {
 			consumer.onEvent(fillRecordEvent(new AttributeCreatedEvent()));
 			if (node.hasData()) {
-				attributeUpdated();
+				attributeValueUpdated();
 			}
 		}
 
-		@SuppressWarnings("unchecked")
-		void attributeUpdated() {
-			AttributeUpdatedEvent event = null;
-			if (node instanceof BooleanAttribute) {
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		void attributeValueUpdated() {
+			AttributeValueUpdatedEvent event = null;
+			Attribute attribute = (Attribute) node;
+			if (attribute instanceof BooleanAttribute) {
 				event = new BooleanAttributeUpdatedEvent();
-				BooleanValue value = ((BooleanAttribute) node).getValue();
-				((BooleanAttributeUpdatedEvent) event).setValue(value.getValue());
-			} else if (node instanceof CodeAttribute) {
+			} else if (attribute instanceof CodeAttribute) {
 				event = new CodeAttributeUpdatedEvent();
-				Code value = ((CodeAttribute) node).getValue();
-				((CodeAttributeUpdatedEvent) event).setCode(value.getCode());
-				((CodeAttributeUpdatedEvent) event).setQualifier(value.getQualifier());
-			} else if (node instanceof CoordinateAttribute) {
+			} else if (attribute instanceof CoordinateAttribute) {
 				event = new CoordinateAttributeUpdatedEvent();
-				Coordinate value = ((CoordinateAttribute) node).getValue();
-				((CoordinateAttributeUpdatedEvent) event).setX(value.getX());
-				((CoordinateAttributeUpdatedEvent) event).setY(value.getY());
-				((CoordinateAttributeUpdatedEvent) event).setSrsId(value.getSrsId());
-			} else if (node instanceof DateAttribute) {
-				org.openforis.idm.model.Date value = ((DateAttribute) node).getValue();
+			} else if (attribute instanceof DateAttribute) {
 				event = new DateAttributeUpdatedEvent();
-				((DateAttributeUpdatedEvent) event).setDay(value.getDay());
-				((DateAttributeUpdatedEvent) event).setMonth(value.getMonth());
-				((DateAttributeUpdatedEvent) event).setYear(value.getYear());
-				// TODO
-//				} else if (node instanceof FileAttribute) {
-			} else if (node instanceof NumberAttribute<?, ?>) {
-				NumberAttribute<?, ?> attribute = (NumberAttribute<?, ?>) node;
-				Number value = attribute.getNumber();
-				Type valueType = ((NumericAttributeDefinition) node.getDefinition()).getType();
+			} else if (attribute instanceof NumberAttribute<?, ?>) {
+				Type valueType = ((NumericAttributeDefinition) attribute.getDefinition()).getType();
 				switch (valueType) {
 				case INTEGER:
 					event = new IntegerAttributeUpdatedEvent();
@@ -285,14 +272,8 @@ public class EventProducer {
 				default:
 					throw new IllegalArgumentException("Numeric type not supported: " + valueType);
 				}
-				((NumberAttributeUpdatedEvent<?>) event).setUnitId(attribute.getUnitId());
-				((NumberAttributeUpdatedEvent<Number>) event).setValue(value);
-
-			} else if (node instanceof NumericRangeAttribute<?, ?>) {
-				NumericRangeAttribute<?, ?> attribute = (NumericRangeAttribute<?, ?>) node;
-				Number from = attribute.getFrom();
-				Number to = attribute.getTo();
-				Type valueType = ((RangeAttributeDefinition) node.getDefinition()).getType();
+			} else if (attribute instanceof NumericRangeAttribute<?, ?>) {
+				Type valueType = ((RangeAttributeDefinition) attribute.getDefinition()).getType();
 				switch (valueType) {
 				case INTEGER:
 					event = new IntegerRangeAttributeUpdatedEvent();
@@ -303,45 +284,27 @@ public class EventProducer {
 				default:
 					throw new IllegalArgumentException("Numeric type not supported: " + valueType);
 				}
-				((RangeAttributeUpdatedEvent<?>) event).setUnitId(attribute.getUnitId());
-				((RangeAttributeUpdatedEvent<Number>) event).setFrom(from);
-				((RangeAttributeUpdatedEvent<Number>) event).setTo(to);
-			} else if (node instanceof TaxonAttribute) {
-				TaxonAttribute taxonAttr = (TaxonAttribute) node;
-				TaxonAttributeUpdatedEvent taxonEvent = new TaxonAttributeUpdatedEvent();
-				taxonEvent.setCode(taxonAttr.getCode());
-				taxonEvent.setScientificName(taxonAttr.getScientificName());
-				taxonEvent.setVernacularName(taxonAttr.getVernacularName());
-				taxonEvent.setLanguageCode(taxonAttr.getLanguageCode());
-				taxonEvent.setLanguageVariety(taxonAttr.getLanguageVariety());
-				event = taxonEvent;
-			} else if (node instanceof TextAttribute) {
+			} else if (attribute instanceof TaxonAttribute) {
+				event = new TaxonAttributeUpdatedEvent();
+			} else if (attribute instanceof TextAttribute) {
 				event = new TextAttributeUpdatedEvent();
-				((TextAttributeUpdatedEvent) event).setText(((TextAttribute) node).getText());
-			} else if (node instanceof TimeAttribute) {
+			} else if (attribute instanceof TimeAttribute) {
 				event = new TimeAttributeUpdatedEvent();
-				Time value = ((TimeAttribute) node).getValue();
-				((TimeAttributeUpdatedEvent) event).setTime(value.toJavaDate());
 //			} else {
 //				TODO fail for not supported node types
 //				throw new IllegalArgumentException("Unexpected node type: " + node.getClass().getSimpleName());
 			}
 			if (event != null) {
+				event.setValue(attribute.getValue());
 				fillRecordEvent(event);
 				event.setValidationResults(
-						new ValidationResultsView((Attribute<?, ?>) node, context.messageSource, context.locale));
+						new ValidationResultsView(attribute, context.messageSource, context.locale));
 				consumer.onEvent(event);
 			}
 		}
 
-		void entityDeleted() {
-			EntityDeletedEvent event = new EntityDeletedEvent();
-			fillRecordEvent(event);
-			consumer.onEvent(event);
-		}
-
-		void attributeDeleted() {
-			AttributeDeletedEvent event = new AttributeDeletedEvent();
+		void nodeDeleted() {
+			RecordEvent event = node instanceof Entity ? new EntityDeletedEvent() : new AttributeDeletedEvent();
 			fillRecordEvent(event);
 			consumer.onEvent(event);
 		}
@@ -389,7 +352,7 @@ public class EventProducer {
 			event.setAncestorIds(ancestorIds);
 			event.setNodeId(String.valueOf(node.getInternalId()));
 			event.setNodePath(node.getPath());
-			event.setParentEntityPath(node.getParent() == null ? null : node.getParent().getPath());
+			event.setParentEntityPath(parentEntityPath);
 			event.setTimestamp(timestamp);
 			event.setUserName(context.userName);
 			return event;

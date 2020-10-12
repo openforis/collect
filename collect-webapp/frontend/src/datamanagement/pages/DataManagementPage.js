@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 
 import {
@@ -8,15 +8,16 @@ import {
 import FormControl from '@material-ui/core/FormControl'
 import FormHelperText from '@material-ui/core/FormHelperText'
 
-import RecordDataTable from 'datamanagement/components/RecordDataTable'
 import MaxAvailableSpaceContainer from 'common/components/MaxAvailableSpaceContainer'
-import Workflow from 'model/Workflow'
+import TableResizeOnWindowResizeComponent from 'common/components/TableResizeOnWindowResizeComponent';import Workflow from 'model/Workflow'
+import Dialogs from 'common/components/Dialogs'
+import SurveyLanguagesSelect from 'common/components/SurveyLanguagesSelect'
+
+import RecordDataTable from 'datamanagement/components/RecordDataTable'
+import NewRecordParametersDialog from 'datamanagement/components/NewRecordParametersDialog'
+
 import ServiceFactory from 'services/ServiceFactory'
 import Arrays from 'utils/Arrays'
-import Containers from 'common/components/Containers'
-import Dialogs from 'common/components/Dialogs'
-import SurveyLanguagesSelect from '../../common/components/SurveyLanguagesSelect'
-import NewRecordParametersDialog from 'datamanagement/components/NewRecordParametersDialog'
 import L from 'utils/Labels'
 import RouterUtils from 'utils/RouterUtils'
 
@@ -32,14 +33,14 @@ const INITIAL_STATE = {
 	newRecordParametersDialogOpen: false
 }
 
-class DataManagementPage extends Component {
+class DataManagementPage extends React.Component {
 
 	constructor(props) {
 		super(props)
-
-		this.mainContainer = React.createRef()
 	
 		this.state = INITIAL_STATE
+
+		this.wrapperRef = React.createRef()
 
 		this.handleRowSelect = this.handleRowSelect.bind(this)
 		this.handleAllRowsSelect = this.handleAllRowsSelect.bind(this)
@@ -60,37 +61,12 @@ class DataManagementPage extends Component {
 		this.handleDemoteAnalysisToCleansingButtonClick = this.handleDemoteAnalysisToCleansingButtonClick.bind(this)
 		this.handleDemoteCleansingToEntryButtonClick = this.handleDemoteCleansingToEntryButtonClick.bind(this)
 		this.handleMoveRecordsJobCompleted = this.handleMoveRecordsJobCompleted.bind(this)
-		this.handleWindowResize = this.handleWindowResize.bind(this)
-		this.updateTableHeight = this.updateTableHeight.bind(this)
 		this.handleSurveyLanguageChange = this.handleSurveyLanguageChange.bind(this)
 	}
 
 	componentWillReceiveProps(nextProps) {
 		if (this.props.survey && nextProps.survey && this.props.survey.id !== nextProps.survey.id) {
 			this.setState(INITIAL_STATE)
-		}
-	}
-
-	componentDidMount() {
-		this.handleWindowResize()
-		window.addEventListener("resize", this.handleWindowResize)
-	}
-
-	componentWillUnmount() {
-		window.removeEventListener("resize", this.handleWindowResize)
-	}
-
-	componentDidUpdate() {
-		this.updateTableHeight()
-	}
-
-	handleWindowResize() {
-		this.updateTableHeight()
-	}
-
-	updateTableHeight() {
-		if (this.mainContainer.current) {
-			Containers.extendTableHeightToMaxAvailable(this.mainContainer.current, 120)
 		}
 	}
 
@@ -270,7 +246,8 @@ class DataManagementPage extends Component {
 		}
 
 		return (
-			<MaxAvailableSpaceContainer ref={this.mainContainer}>
+			<MaxAvailableSpaceContainer ref={this.wrapperRef}>
+				<TableResizeOnWindowResizeComponent wrapperRef={this.wrapperRef} margin={124} />
 				<Row className="justify-content-between">
 					<Col md={2}>
 						{loggedUser.canCreateRecords(userRoleInSurveyGroup) &&

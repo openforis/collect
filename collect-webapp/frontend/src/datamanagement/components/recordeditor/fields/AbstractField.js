@@ -1,9 +1,9 @@
 import { Component } from 'react'
 import { debounce } from 'throttle-debounce'
 
-import { AttributeUpdatedEvent } from 'model/event/RecordEvent'
+import { AttributeValueUpdatedEvent, RecordEvent } from 'model/event/RecordEvent'
 import EventQueue from 'model/event/EventQueue'
-import ServiceFactory from '../../../../services/ServiceFactory'
+import ServiceFactory from 'services/ServiceFactory'
 
 export default class AbstractField extends Component {
   constructor() {
@@ -20,7 +20,7 @@ export default class AbstractField extends Component {
     this.handleRecordEventReceived = this.handleRecordEventReceived.bind(this)
     this.onAttributeUpdate = this.onAttributeUpdate.bind(this)
 
-    EventQueue.subscribe('recordEvent', this.handleRecordEventReceived)
+    EventQueue.subscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
   }
 
   componentDidMount() {
@@ -28,15 +28,17 @@ export default class AbstractField extends Component {
   }
 
   componentWillUnmount() {
-    EventQueue.unsubscribe('recordEvent', this.handleRecordEventReceived)
+    EventQueue.unsubscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
   }
 
   updateStateFromProps() {
-    this.setState({ dirty: false, value: this.extractValueFromProps(), ...this.extractValidationFromProps() })
+    const value = this.extractValueFromProps()
+    this.setState({ dirty: false, value, ...this.extractValidationFromProps() })
   }
 
   extractValueFromProps() {
-    return null
+    const attr = this.getSingleAttribute()
+    return attr.value
   }
 
   extractValidationFromProps() {
@@ -51,12 +53,10 @@ export default class AbstractField extends Component {
     return { errors, warnings }
   }
 
-  getSingleAttribute(parentEntity) {
-    if (!parentEntity) {
-      parentEntity = this.props.parentEntity
-    }
+  getSingleAttribute(parentEntityParam) {
+    const { parentEntity: parentEntityProps, fieldDef } = this.props
+    const parentEntity = parentEntityParam || parentEntityProps
     if (parentEntity) {
-      const { fieldDef } = this.props
       const attrDef = fieldDef.attributeDefinition
       if (attrDef.multiple) {
         throw new Error('Expected single attribute, found multiple: ' + attrDef.name)
@@ -67,17 +67,14 @@ export default class AbstractField extends Component {
   }
 
   onAttributeUpdate({ value, debounced = true }) {
-    const { fieldDef } = this.props
-
     this.setState({ value, dirty: true })
 
-    const attrType = fieldDef.attributeDefinition.attributeType
     const attr = this.getSingleAttribute()
     if (this.attributeUpdatedDebounced) {
       this.attributeUpdatedDebounced.cancel()
     }
     this.attributeUpdatedDebounced = debounce(debounced ? 1000 : 0, false, () =>
-      ServiceFactory.commandService.updateAttribute(attr, attrType, value)
+      ServiceFactory.commandService.updateAttribute(attr, value)
     )
     this.attributeUpdatedDebounced()
   }
@@ -87,15 +84,11 @@ export default class AbstractField extends Component {
     if (!parentEntity) {
       return
     }
-    if (event instanceof AttributeUpdatedEvent) {
-      if (
-        event.recordId === parentEntity.record.id &&
-        event.recordStep === parentEntity.record.step &&
-        event.parentEntityPath === parentEntity.path &&
-        Number(event.definitionId) === fieldDef.attributeDefinitionId
-      ) {
-        this.handleAttributeUpdatedEvent(event)
-      }
+    if (
+      event instanceof AttributeValueUpdatedEvent &&
+      event.isRelativeToNodes({ parentEntity, nodeDefId: fieldDef.attributeDefinitionId })
+    ) {
+      this.handleAttributeUpdatedEvent(event)
     }
   }
 

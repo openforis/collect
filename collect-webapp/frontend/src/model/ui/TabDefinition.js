@@ -15,7 +15,7 @@ export class TabDefinition extends UIModelObjectDefinition {
   }
 
   fillFromJSON(jsonObj) {
-    super.fillFromJSON(jsonObj)
+    super.fillFromJSON(jsonObj, { skipFields: ['children'] })
     this.tabs = TabContainers.createTabsFromJSON(jsonObj.tabs, this)
     this.items = TabContainers.createItemsFromJSON(jsonObj.children, this)
   }

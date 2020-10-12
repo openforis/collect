@@ -5,7 +5,7 @@ import DateFnsUtils from '@date-io/date-fns'
 import Dates from 'utils/Dates'
 import AbstractField from './AbstractField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
-import FieldValidationFeedback from './FieldValidationFeedback'
+import FieldValidationTooltip from './FieldValidationTooltip'
 
 const fromValueToDate = (value) => (value ? new Date(value.year, value.month - 1, value.day) : null)
 const fromDateToValue = (date) => {
@@ -21,27 +21,17 @@ export default class DateField extends AbstractField {
   constructor() {
     super()
 
-    this.onChange = this.onChange.bind(this)
-  }
+    this.fieldId = `date-field-${new Date().getTime()}`
 
-  extractValueFromProps() {
-    const attr = this.getSingleAttribute()
-    const value = attr.empty
-      ? null
-      : attr.definition.fieldNames.reduce((valueAcc, fieldName, index) => {
-          valueAcc[fieldName] = attr.fields[index].value
-          return valueAcc
-        }, {})
-    return value
+    this.onChange = this.onChange.bind(this)
   }
 
   onChange(date) {
     if (isNaN(date)) {
       return
     }
-    this.onAttributeUpdate({
-      value: fromDateToValue(date),
-    })
+    const value = date === null ? null : fromDateToValue(date)
+    this.onAttributeUpdate({ value })
   }
 
   render() {
@@ -50,21 +40,20 @@ export default class DateField extends AbstractField {
 
     return (
       <div>
-        <>
-          <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <KeyboardDatePicker
-              variant="dialog"
-              inputVariant="outlined"
-              format={Dates.DATE_FORMAT}
-              margin="none"
-              value={selectedDate}
-              onChange={this.onChange}
-              className={warnings ? 'warning' : ''}
-            />
-          </MuiPickersUtilsProvider>
-          {dirty && <FieldLoadingSpinner />}
-        </>
-        <FieldValidationFeedback errors={errors} warnings={warnings} />
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <KeyboardDatePicker
+            id={this.fieldId}
+            variant="dialog"
+            inputVariant="outlined"
+            format={Dates.DATE_FORMAT}
+            margin="none"
+            value={selectedDate}
+            onChange={this.onChange}
+            className={warnings ? 'warning' : ''}
+          />
+        </MuiPickersUtilsProvider>
+        {dirty && <FieldLoadingSpinner />}
+        <FieldValidationTooltip target={this.fieldId} errors={errors} warnings={warnings} />
       </div>
     )
   }

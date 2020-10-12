@@ -1,53 +1,51 @@
-import { CodeFieldDefinition } from './CodeFieldDefinition';
-import { FieldDefinition } from './FieldDefinition';
-import { FieldsetDefinition } from './FieldsetDefinition';
-import { MultipleFieldsetDefinition } from './MultipleFieldsetDefinition';
-import { TabDefinition } from './TabDefinition';
-import { TableDefinition } from './TableDefinition';
+import { AttributeDefinition } from 'model/Survey'
+import { CodeFieldDefinition } from './CodeFieldDefinition'
+import { FieldDefinition } from './FieldDefinition'
+import { FieldsetDefinition } from './FieldsetDefinition'
+import { MultipleFieldsetDefinition } from './MultipleFieldsetDefinition'
+import { TabDefinition } from './TabDefinition'
+import { TableDefinition } from './TableDefinition'
+import FormItemTypes from './FormItemTypes'
+
+const getFormItemClass = (itemType, attributeType) => {
+  switch (itemType) {
+    case FormItemTypes.FIELD:
+      return attributeType === AttributeDefinition.Types.CODE ? CodeFieldDefinition : FieldDefinition
+    case FormItemTypes.FIELDSET:
+      return FieldsetDefinition
+    case FormItemTypes.MULTIPLE_FIELDSET:
+      return MultipleFieldsetDefinition
+    case FormItemTypes.TABLE:
+      return TableDefinition
+    default:
+      return null
+  }
+}
 
 export class TabContainers {
-	
-    static createTabsFromJSON(jsonArrObj, parentUIModelObject) {
-        var tabs = [];
-        for (var i = 0; i < jsonArrObj.length; i++) {
-            var itemJsonObj = jsonArrObj[i];
-            var item = new TabDefinition(itemJsonObj.id, parentUIModelObject);
-            item.fillFromJSON(itemJsonObj);
-            tabs.push(item);
-        }
-        return tabs;
+  static createTabsFromJSON(jsonArrObj, parentUIModelObject) {
+    var tabs = []
+    for (var i = 0; i < jsonArrObj.length; i++) {
+      var itemJsonObj = jsonArrObj[i]
+      var item = new TabDefinition(itemJsonObj.id, parentUIModelObject)
+      item.fillFromJSON(itemJsonObj)
+      tabs.push(item)
     }
-    
-    static createItemsFromJSON(jsonObj, parentUIModelObject) {
-        let items = [];
-        for (var i = 0; i < jsonObj.length; i++) {
-            var itemJsonObj = jsonObj[i];
-            var item;
-            switch(itemJsonObj.type) {
-            case 'FIELD':
-                if (itemJsonObj.attributeType === 'CODE') {
-                    item = new CodeFieldDefinition(itemJsonObj.id, parentUIModelObject);
-                } else {
-                    item = new FieldDefinition(itemJsonObj.id, parentUIModelObject);
-                }
-                break;
-            case 'FIELDSET':
-                item = new FieldsetDefinition(itemJsonObj.id, parentUIModelObject);
-                break;
-            case 'MULTIPLE_FIELDSET':
-                item = new MultipleFieldsetDefinition(itemJsonObj.id, parentUIModelObject);
-                break;
-            case 'TABLE':
-                item = new TableDefinition(itemJsonObj.jd, parentUIModelObject);
-                break;
-            default:
-                item = null;
-            }
-            if (item != null) {
-                item.fillFromJSON(itemJsonObj);
-                items.push(item);
-            }
-        }
-        return items;
-    }
+    return tabs
+  }
+
+  static createItemsFromJSON(jsonObj, parentUIModelObject) {
+    return jsonObj.reduce((itemsAcc, itemJsonObj) => {
+      const { type, attributeType, id } = itemJsonObj
+      const formItemClass = getFormItemClass(type, attributeType)
+      if (formItemClass) {
+        const item = new formItemClass(id, parentUIModelObject)
+        item.fillFromJSON(itemJsonObj)
+        itemsAcc.push(item)
+      } else {
+        console.log(`Unsopported attribute type: ${attributeType}`)
+      }
+      return itemsAcc
+    }, [])
+  }
 }

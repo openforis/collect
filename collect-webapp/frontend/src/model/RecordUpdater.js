@@ -1,20 +1,16 @@
 import { Attribute, Entity } from './Record'
 
 import {
-  AttributeUpdatedEvent,
+  AttributeDeletedEvent,
+  AttributeValueUpdatedEvent,
   EntityCreatedEvent,
-  BooleanAttributeUpdatedEvent,
-  CodeAttributeUpdatedEvent,
-  CoordinateAttributeUpdatedEvent,
-  DateAttributeUpdatedEvent,
-  DoubleAttributeUpdatedEvent,
-  IntegerAttributeUpdatedEvent,
-  TextAttributeUpdatedEvent,
+  EntityDeletedEvent,
   NodeRelevanceUpdatedEvent,
   NodeMinCountUpdatedEvent,
   NodeMinCountValidationUpdatedEvent,
   NodeMaxCountUpdatedEvent,
   NodeMaxCountValidationUpdatedEvent,
+  RecordEvent,
 } from './event/RecordEvent'
 
 import EventQueue from './event/EventQueue'
@@ -27,16 +23,16 @@ export class RecordUpdater {
 
     this.handleRecordEventReceived = this.handleRecordEventReceived.bind(this)
 
-    EventQueue.subscribe('recordEvent', this.handleRecordEventReceived)
+    EventQueue.subscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
   }
 
   destroy() {
-    EventQueue.unsubscribe('recordEvent', this.handleRecordEventReceived)
+    EventQueue.unsubscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
   }
 
   handleRecordEventReceived(event) {
     const record = this.record
-    if (record && record.id == event.recordId && record.step == event.recordStep) {
+    if (record && event.isRelativeToRecord(record)) {
       const survey = record.survey
       const definition = survey.schema.getDefinitionById(Number(event.definitionId))
       const parentEntity = event.parentEntityPath ? record.getNodeByPath(event.parentEntityPath) : record.rootEntity
@@ -50,14 +46,16 @@ export class RecordUpdater {
         newEntity.childrenMinCountValidationByDefinitionId = event.childrenMinCountValidationByDefinitionId
         newEntity.childrenMaxCountValidationByDefinitionId = event.childrenMaxCountValidationByDefinitionId
         parentEntity.addChild(newEntity)
-      } else if (event instanceof AttributeUpdatedEvent) {
+      } else if (event instanceof AttributeValueUpdatedEvent) {
         let attr = node
         if (attr == null) {
           attr = new Attribute(record, definition, parentEntity)
           parentEntity.addChild(attr)
         }
-        this._setValueInAttribute(attr, event)
+        attr.value = event.value
         attr.validationResults = event.validationResults
+      } else if (event instanceof AttributeDeletedEvent || event instanceof EntityDeletedEvent) {
+        parentEntity.removeChild(node)
       } else if (event instanceof NodeRelevanceUpdatedEvent) {
         node.childrenRelevanceByDefinitionId[event.childDefinitionId] = event.relevant
       } else if (event instanceof NodeMinCountUpdatedEvent) {
@@ -69,28 +67,6 @@ export class RecordUpdater {
       } else if (event instanceof NodeMaxCountValidationUpdatedEvent) {
         node.childrenMaxCountValidationByDefinitionId[event.childDefinitionId] = event.flag
       }
-    }
-  }
-
-  _setValueInAttribute(attr, event) {
-    if (event instanceof BooleanAttributeUpdatedEvent) {
-      attr.setFieldValue(0, event.value)
-    } else if (event instanceof CodeAttributeUpdatedEvent) {
-      attr.setFieldValue(0, event.code)
-      attr.setFieldValue(1, event.qualifier)
-    } else if (event instanceof CoordinateAttributeUpdatedEvent) {
-      attr.setFieldValue(0, event.x)
-      attr.setFieldValue(1, event.y)
-      attr.setFieldValue(2, event.srsId)
-    } else if (event instanceof DateAttributeUpdatedEvent) {
-      attr.setFieldValue(0, event.year)
-      attr.setFieldValue(1, event.month)
-      attr.setFieldValue(2, event.day)
-    } else if (event instanceof IntegerAttributeUpdatedEvent || event instanceof DoubleAttributeUpdatedEvent) {
-      attr.setFieldValue(0, event.value)
-      attr.setFieldValue(1, event.unitId)
-    } else if (event instanceof TextAttributeUpdatedEvent) {
-      attr.setFieldValue(0, event.text)
     }
   }
 }

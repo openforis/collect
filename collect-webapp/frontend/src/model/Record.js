@@ -1,5 +1,5 @@
 import Serializable from './Serializable'
-import { EntityDefinition } from './Survey'
+import { CoordinateAttributeDefinition, EntityDefinition } from './Survey'
 
 export class Record extends Serializable {
   id
@@ -79,6 +79,11 @@ export class Node extends Serializable {
   calculateIndex() {
     return this.parent.childrenByDefinitionId[this.definition.id].indexOf(this)
   }
+
+  updatePath() {
+    this.index = this.calculateIndex()
+    this.path = this.calculatePath()
+  }
 }
 
 export class Entity extends Node {
@@ -110,12 +115,15 @@ export class Entity extends Node {
       const def = this.record.survey.schema.getDefinitionById(defId)
       const childrenJsonObj = jsonObj.childrenByDefinitionId[defId]
       childrenJsonObj.forEach((childJsonObj) => {
-        let child
+        let childClass
         if (def instanceof EntityDefinition) {
-          child = new Entity(this.record, def, this)
+          childClass = Entity
+        } else if (def instanceof CoordinateAttributeDefinition) {
+          childClass = CoordinateAttribute
         } else {
-          child = new Attribute(this.record, def, this)
+          childClass = Attribute
         }
+        const child = new childClass(this.record, def, this)
         child.fillFromJSON(childJsonObj)
         this.addChild(child)
       })
@@ -147,6 +155,15 @@ export class Entity extends Node {
     child.path = child.calculatePath()
   }
 
+  removeChild(child) {
+    const children = this.childrenByDefinitionId[child.definition.id]
+    if (children == null) {
+      return
+    }
+    children.splice(child.index, 1)
+    children.slice(child.index).forEach((child) => child.updatePath())
+  }
+
   getChildrenByChildName(childName) {
     const childDef = this.definition.getChildDefinitionByName(childName)
     return this.getChildrenByDefinitionId(childDef.id)
@@ -154,6 +171,13 @@ export class Entity extends Node {
 
   getChildrenByDefinitionId(childDefId) {
     return this.childrenByDefinitionId[childDefId] || []
+  }
+
+  updatePath() {
+    super.updatePath()
+    Object.entries(this.childrenByDefinitionId).forEach(([childDefId, children]) => {
+      children.forEach((child) => child.updatePath())
+    })
   }
 }
 
@@ -165,38 +189,72 @@ export class Attribute extends Node {
 
     this.fields = []
     jsonObj.fields.forEach((fieldJsonObj) => {
-      let field = new Field()
+      const field = new Field()
       field.fillFromJSON(fieldJsonObj)
       this.fields.push(field)
     })
   }
 
-  get allFieldsFilled() {
-    for (var i = 0; i < this.fields.length; i++) {
-      let field = this.fields[i]
-      if (field.value == null) {
-        return false
-      }
+  isAllFieldsEmpty() {
+    if (!this.fields) {
+      return true
     }
-    return true
+    return this.fields.every((field) => !field.value)
   }
 
-  setFieldValue(fieldIdx, value) {
+  isEmpty() {
+    if (!this.fields) {
+      return true
+    }
+    const fields = this.fields
+    const mandatoryFieldNames = this.definition.mandatoryFieldNames
+    if (!mandatoryFieldNames) {
+      return false
+    }
+    return this.definition.fieldNames.some(
+      (fieldName, index) => mandatoryFieldNames.includes(fieldName) && fields[index].value === null
+    )
+  }
+
+  set value(value) {
     if (this.fields == null) {
       this.fields = []
     }
-    while (this.fields.length <= fieldIdx) {
-      this.fields.push(new Field())
-    }
-    this.fields[fieldIdx].value = value
+    const fields = this.fields
+    this.definition.fieldNames.forEach((fieldName, index) => {
+      let field = fields[index]
+      if (!field) {
+        field = new Field()
+        fields.push(field)
+      }
+      field.value = value[fieldName]
+    })
+  }
+
+  get value() {
+    const $this = this
+    return $this.isAllFieldsEmpty()
+      ? null
+      : $this.definition.fieldNames.reduce((valueAcc, fieldName, index) => {
+          valueAcc[fieldName] = $this.fields[index].value
+          return valueAcc
+        }, {})
   }
 
   get humanReadableValue() {
     return this.fields && this.fields.length ? this.fields[0].value || '' : ''
   }
+}
 
-  get empty() {
-    return !this.fields || this.fields.find((field) => !field.value)
+export class CoordinateAttribute extends Attribute {
+  get value() {
+    return super.value
+  }
+
+  set value(value) {
+    // Workaround: Coordinate field "srsId" matches field "srs" in the attribute
+    const { srsId: srs, ...other } = value
+    super.value = { ...other, srs }
   }
 }
 

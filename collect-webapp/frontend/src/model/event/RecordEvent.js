@@ -9,8 +9,11 @@ export class RecordEvent extends Event {
   definitionId
   ancestorIds
   nodeId
+  nodePath
   timestamp
   userName
+
+  static TYPE = 'recordEvent'
 
   constructor(jsonObj) {
     super()
@@ -24,67 +27,56 @@ export class RecordEvent extends Event {
    * (NaN ids are for entity containers)
    */
   get parentEntityId() {
-    let result = this.ancestorIds.find((id) => !isNaN(id))
+    const result = this.ancestorIds.find((id) => !isNaN(id))
     return result ? parseInt(result, 10) : NaN
+  }
+
+  isRelativeToRecord(record) {
+    return this.recordId === record.id && this.recordStep === record.step
+  }
+
+  isRelativeToNode(node) {
+    return this.isRelativeToRecord(node.record) && this.nodePath === node.path
+  }
+
+  isRelativeToNodes({ parentEntity, nodeDefId }) {
+    return (
+      this.isRelativeToRecord(parentEntity.record) &&
+      this.parentEntityPath === parentEntity.path &&
+      Number(this.definitionId) === nodeDefId
+    )
   }
 }
 
 export class AttributeEvent extends RecordEvent {}
 
-export class AttributeUpdatedEvent extends AttributeEvent {}
+export class AttributeDeletedEvent extends RecordEvent {}
 
-export class BooleanAttributeUpdatedEvent extends AttributeUpdatedEvent {
+export class AttributeValueUpdatedEvent extends AttributeEvent {
   value
 }
 
-export class CodeAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  code
-  qualifier
-}
+export class BooleanAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
-export class CoordinateAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  x
-  y
-  srsId
-}
+export class CodeAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
-export class DateAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  date
-}
+export class CoordinateAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
-export class DoubleAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  value
-}
+export class DateAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
-export class DoubleRangeAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  from
-  to
-}
+export class DoubleAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
-export class IntegerAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  value
-}
+export class DoubleRangeAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
-export class IntegerRangeAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  from
-  to
-}
+export class IntegerAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
-export class TaxonAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  code
-  scientificName
-  vernacularName
-  languageCode
-  languageVariety
-}
+export class IntegerRangeAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
-export class TextAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  text
-}
+export class TaxonAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
-export class TimeAttributeUpdatedEvent extends AttributeUpdatedEvent {
-  time
-}
+export class TextAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
+
+export class TimeAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
 export class NodeRelevanceUpdatedEvent extends RecordEvent {
   childDefinitionId
@@ -113,14 +105,18 @@ export class EntityCreatedEvent extends RecordEvent {}
 
 export class EntityCollectionCreatedEvent extends RecordEvent {}
 
+export class EntityDeletedEvent extends RecordEvent {}
+
 const EVENT_CLASS_BY_TYPE = {
   EntityCreatedEvent,
   EntityCollectionCreatedEvent,
+  EntityDeletedEvent,
   NodeMaxCountUpdatedEvent,
   NodeMaxCountValidationUpdatedEvent,
   NodeMinCountUpdatedEvent,
   NodeMinCountValidationUpdatedEvent,
   NodeRelevanceUpdatedEvent,
+  AttributeDeletedEvent,
   BooleanAttributeUpdatedEvent,
   CodeAttributeUpdatedEvent,
   CoordinateAttributeUpdatedEvent,

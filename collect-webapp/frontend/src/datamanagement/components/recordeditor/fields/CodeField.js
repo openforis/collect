@@ -28,11 +28,6 @@ export default class CodeField extends AbstractField {
     }
   }
 
-  extractValueFromProps() {
-    const attr = this.getSingleAttribute()
-    return this.fromCodeToValue(attr.fields[0].value)
-  }
-
   fromCodeToValue(code) {
     let codeUpdated = null
     if (code === null) {
@@ -59,7 +54,7 @@ export default class CodeField extends AbstractField {
     if (attr) {
       ServiceFactory.codeListService
         .findAvailableItems(parentEntity, attr.definition)
-        .then((items) => this.setState({ items: items }))
+        .then((items) => this.setState({ items }))
     }
   }
 
@@ -67,13 +62,17 @@ export default class CodeField extends AbstractField {
     const { fieldDef } = this.props
     const { layout } = fieldDef
     const debounced = layout === 'TEXT'
-    this.onAttributeUpdate({ value: this.fromCodeToValue(event.target.value), debounced })
+    const code = event.target.value
+    const value = this.fromCodeToValue(code)
+    this.onAttributeUpdate({ value, debounced })
   }
 
   render() {
     const { fieldDef, parentEntity } = this.props
     const { items, value } = this.state
-    const { code } = value
+    const { code } = value || {}
+
+    const codeText = code || ''
 
     if (!parentEntity || !fieldDef) {
       return <div>Loading...</div>
@@ -90,7 +89,7 @@ export default class CodeField extends AbstractField {
           </option>
         )
         return (
-          <Input type="select" onChange={this.handleInputChange} value={code}>
+          <Input type="select" onChange={this.handleInputChange} value={codeText}>
             {[EMPTY_OPTION].concat(
               items.map((item) => (
                 <option key={item.code} value={item.code}>
@@ -120,7 +119,7 @@ export default class CodeField extends AbstractField {
           </div>
         )
       default:
-        return <Input value={code} onChange={this.handleInputChange} style={{ maxWidth: '100px' }} />
+        return <Input value={codeText} onChange={this.handleInputChange} style={{ maxWidth: '100px' }} />
     }
   }
 }

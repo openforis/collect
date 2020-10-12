@@ -102,7 +102,7 @@ public class RecordUpdater {
 		for (Node<?> child : oldAttributes) {
 			List<Integer> ancestorIds = child.getAncestorIds();
 			performNodeDeletion(child);
-			changeMap.addNodeDeleteChange(record.getId(), record.getStep(), ancestorIds, child);
+			changeMap.addNodeDeleteChange(record.getId(), record.getStep(), ancestorIds, parentEntity.getPath(), child);
 		}
 
 		//add new values
@@ -597,8 +597,9 @@ public class RecordUpdater {
 		
 		//perform node deletion
 		List<Integer> ancestorIds = node.getAncestorIds();
+		Entity parentEntity = node.getParent();
 		performNodeDeletion(node);
-		changeMap.addNodeDeleteChange(record.getId(), ((CollectRecord) record).getStep(), ancestorIds, node);
+		changeMap.addNodeDeleteChange(record.getId(), ((CollectRecord) record).getStep(), ancestorIds, parentEntity.getPath(), node);
 		// re-evaluate calculated attributes
 		List<Attribute<?, ?>> updatedCalculatedAttributes = recalculateValues(dependentCalculatedAttributes);
 		changeMap.addValueChanges(updatedCalculatedAttributes);
