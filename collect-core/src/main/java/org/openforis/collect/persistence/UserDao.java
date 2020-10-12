@@ -34,6 +34,11 @@ public class UserDao extends MappingJooqDaoSupport<Integer, User, UserDSLContext
 	public UserDao() {
 		super(UserDao.UserDSLContext.class);
 	}
+	
+	public int countAll() {
+		Record result = dsl().selectCount().from(OFC_USER).fetchOne();
+		return (Integer) result.getValue(0);
+	}
 
 	@Override
 	public User loadById(Integer id){

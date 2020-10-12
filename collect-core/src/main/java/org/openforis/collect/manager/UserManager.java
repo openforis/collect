@@ -8,7 +8,7 @@ import org.openforis.collect.model.UserRole;
 public interface UserManager extends ItemManager<User, Integer> {
 
 	static final String ADMIN_USER_NAME = "admin";
-	static final String ADMIN_DEFAULT_PASSWORD = "admin";
+	static final String ADMIN_DEFAULT_PASSWORD = "Collect123";
 	static final String PASSWORD_PATTERN = "^[a-zA-Z]\\w{3,14}$"; //First character must be a letter, at least 4 characters, no more than 15
 	
 	boolean verifyPassword(String username, String password);
