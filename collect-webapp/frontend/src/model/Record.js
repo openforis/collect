@@ -133,10 +133,23 @@ export class Entity extends Node {
   getDescendants(descendantDefIds) {
     let currentEntity = this
     let descendants
-    for (var descendantDefId in descendantDefIds) {
-      descendants = currentEntity.childrenByDefinitionId[descendantDefId]
-    }
+    const schema = this.record.survey.schema
+    descendantDefIds.forEach((descendantDefId) => {
+      descendants = currentEntity.getChildrenByDefinitionId(descendantDefId)
+      const descendantDef = schema.getDefinitionById(descendantDefId)
+      if (descendantDef instanceof EntityDefinition && descendantDef.single) {
+        currentEntity = descendants[0]
+      }
+    })
     return descendants
+  }
+
+  getDescendantEntityClosestToNode(nodeDef) {
+    const nodeDefAncestorIds = nodeDef.ancestorIds
+    const nodeDefAncestorIdsUpToThis = nodeDefAncestorIds.slice(0, nodeDefAncestorIds.indexOf(this.definition.id))
+    const descendantDefIds = [...nodeDefAncestorIdsUpToThis].reverse()
+    const entity = descendantDefIds.length ? this.getDescendants(descendantDefIds)[0] : this
+    return entity
   }
 
   getSingleChild(defId) {
@@ -227,7 +240,7 @@ export class Attribute extends Node {
         field = new Field()
         fields.push(field)
       }
-      field.value = value[fieldName]
+      field.value = value ? value[fieldName] : null
     })
   }
 

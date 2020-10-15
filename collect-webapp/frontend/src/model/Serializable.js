@@ -5,14 +5,14 @@ export default class Serializable {
     }
   }
 
-  fillFromJSON(jsonObj, params = { skipFields: [] }) {
+  fillFromJSON(json, params = { skipFields: [] }) {
     const { skipFields } = params
-    for (var propName in jsonObj) {
+    for (let propName in json) {
       if (skipFields && skipFields.includes(propName)) {
         continue
       }
-      let newVal = jsonObj[propName]
-      let oldVal = this[propName]
+      const newVal = json[propName]
+      const oldVal = this[propName]
       if ((oldVal === null || oldVal === undefined) && newVal !== null && newVal !== undefined) {
         this[propName] = newVal
       }
@@ -20,13 +20,13 @@ export default class Serializable {
   }
 
   static createArrayFromJSON(jsonArr, itemClassName) {
-    let result = []
-    for (var i = 0; i < jsonArr.length; i++) {
-      var itemJsonObj = jsonArr[i]
-      var item = new itemClassName()
-      item.fillFromJSON(itemJsonObj)
-      result.push(item)
-    }
-    return result
+    return jsonArr
+      ? jsonArr.reduce((acc, jsonItem) => {
+          const item = new itemClassName()
+          item.fillFromJSON(jsonItem)
+          acc.push(item)
+          return acc
+        })
+      : []
   }
 }

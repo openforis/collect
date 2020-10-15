@@ -1,0 +1,19 @@
+.grid {
+  display: grid;
+}
+
+.grid.header {
+  font-weight: 600;
+}
+
+.grid-row,
+.grid-cell {
+  /* display: grid; */
+}
+
+.grid-cell {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border: 1px solid black;
+}
