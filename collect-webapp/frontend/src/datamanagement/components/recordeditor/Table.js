@@ -28,7 +28,30 @@ const calculateWidth = (headingComponent) => {
   }
 }
 
-const HeadingRow = ({ headingRow, firstRow, totalHeadingRows, totalHeadingColumns, includeDeleteColumn }) => [
+const HeadingRow = ({
+  headingRow,
+  firstRow,
+  totalHeadingRows,
+  totalHeadingColumns,
+  includeRowNumberColumn,
+  includeDeleteColumn,
+}) => [
+  ...(firstRow && includeRowNumberColumn
+    ? [
+        <div
+          key="heading-cell-row-number"
+          className="grid-cell"
+          style={{
+            gridRowStart: 1,
+            gridRowEnd: totalHeadingRows + 1,
+            gridColumnStart: 1,
+            gridColumnEnd: 2,
+          }}
+        >
+          #
+        </div>,
+      ]
+    : []),
   ...headingRow.map((headingComponent) => {
     const { colSpan, col, label, row, rowSpan } = headingComponent
     return (
@@ -38,8 +61,8 @@ const HeadingRow = ({ headingRow, firstRow, totalHeadingRows, totalHeadingColumn
         style={{
           gridRowStart: row,
           gridRowEnd: row + rowSpan,
-          gridColumnStart: col,
-          gridColumnEnd: col + colSpan,
+          gridColumnStart: col + (includeRowNumberColumn ? 1 : 0),
+          gridColumnEnd: col + colSpan + (includeRowNumberColumn ? 1 : 0),
         }}
       >
         {label}
@@ -54,8 +77,8 @@ const HeadingRow = ({ headingRow, firstRow, totalHeadingRows, totalHeadingColumn
           style={{
             gridRowStart: 1,
             gridRowEnd: totalHeadingRows + 1,
-            gridColumnStart: totalHeadingColumns + 1,
-            gridColumnEnd: totalHeadingColumns + 1,
+            gridColumnStart: totalHeadingColumns + 1 + (includeRowNumberColumn ? 1 : 0),
+            gridColumnEnd: totalHeadingColumns + 1 + (includeRowNumberColumn ? 1 : 0),
           }}
         />,
       ]
@@ -68,6 +91,7 @@ export default class Table extends EntityCollectionComponent {
     this.handleDeleteButtonClick = this.handleDeleteButtonClick.bind(this)
     this.headerRowRenderer = this.headerRowRenderer.bind(this)
     this.cellRenderer = this.cellRenderer.bind(this)
+    this.rowNumberCellRenderer = this.rowNumberCellRenderer.bind(this)
     this.deleteCellRenderer = this.deleteCellRenderer.bind(this)
   }
 
@@ -81,7 +105,7 @@ export default class Table extends EntityCollectionComponent {
       acc.push(calculateWidth(headingColumn))
       return acc
     }, [])
-    const gridTemplateColumns = [...headingColumnWidths.map((width) => width + 'px'), '60px'].join(' ')
+    const gridTemplateColumns = ['60px', ...headingColumnWidths.map((width) => width + 'px'), '60px'].join(' ')
 
     this.setState({
       ...this.state,
@@ -107,6 +131,7 @@ export default class Table extends EntityCollectionComponent {
             totalHeadingRows={totalHeadingRows}
             totalHeadingColumns={totalHeadingColumns}
             firstRow={index === 0}
+            includeRowNumberColumn={true}
             includeDeleteColumn={true}
           />
         ))}
@@ -124,6 +149,11 @@ export default class Table extends EntityCollectionComponent {
         <FormItemFieldComponent itemDef={headingColumn} parentEntity={parentEntity} />
       </div>
     )
+  }
+
+  rowNumberCellRenderer({ rowData: entity }) {
+    const { entities } = this.state
+    return <div className="grid-cell row-number">{entities.indexOf(entity) + 1}</div>
   }
 
   deleteCellRenderer({ rowData: entity }) {
@@ -156,6 +186,8 @@ export default class Table extends EntityCollectionComponent {
           onDelete={(entity) => this.handleDeleteButtonClick(entity)}
         >
           {[
+            <Column key="row-num-col" width={56} dataKey="row-num-col" cellRenderer={this.rowNumberCellRenderer} />,
+            ,
             ...headingColumns.map((headingColumn) => (
               <Column
                 key={headingColumn.attributeDefinitionId}
