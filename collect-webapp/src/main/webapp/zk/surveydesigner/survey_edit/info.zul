@@ -142,7 +142,7 @@
 					href="http://www.bingmapsportal.com" target="_blank"
 					image="/assets/images/info-small.png" />
 			</hlayout>
-
+<!--
 			<hlayout style="padding: 10px">
 
 				<fieldErrorHandler
@@ -162,7 +162,7 @@
 					href="https://www.planet.com" target="_blank"
 					image="/assets/images/info-small.png" />
 			</hlayout>
-
+-->
 			<hlayout style="padding: 10px">
 
 				<fieldErrorHandler

@@ -158,7 +158,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("bing_maps_key", getBingMapsKey(survey));
 		p.put("open_bing_maps", isBingMapsEnabled(survey));
 		p.put("open_earth_map", isEarthMapEnabled(survey));
-		p.put("planet_maps_key", getPlanetMapsKey(survey));
+//		p.put("planet_maps_key", getPlanetMapsKey(survey));
 		p.put("open_planet_maps", isPlanetMapsEnabled(survey));
 		p.put("open_yandex_maps", isYandexMapsEnabled(survey));
 		p.put("open_earth_engine", isGEEExplorerEnabled(survey));
@@ -197,12 +197,12 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.getBingMapsKey();
 	}
-
+/*
 	private String getPlanetMapsKey(CollectSurvey survey){
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.getPlanetMapsKey();
 	}
-
+*/
 	private String getExtraMapUrl(CollectSurvey survey){
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.getExtraMapUrl();
