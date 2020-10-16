@@ -54,7 +54,7 @@ public class EventProducer {
 		this.context = context;
 		this.consumer = consumer;
 	}
-	
+
 	public void produceFor(Object obj) {
 		if (obj instanceof CollectRecord) {
 			produceFor((CollectRecord) obj);
@@ -64,7 +64,7 @@ public class EventProducer {
 			throw new IllegalArgumentException("Cannot produce events for object of type " + obj.getClass().getName());
 		}
 	}
-	
+
 	public void produceFor(CollectRecord record) {
 		final Integer recordId = record.getId();
 		final RecordStep recordStep = record.getStep().toRecordStep();
@@ -106,11 +106,8 @@ public class EventProducer {
 		Integer recordId = change.getRecordId();
 		RecordStep recordStep = change.getRecordStep().toRecordStep();
 
-		String parentEntityPath = change instanceof NodeDeleteChange 
-				? ((NodeDeleteChange) change).getParentEntityPath() 
-				: node.getParent() == null 
-					? null 
-					: node.getParent().getPath();
+		String parentEntityPath = change instanceof NodeDeleteChange ? ((NodeDeleteChange) change).getParentEntityPath()
+				: node.getParent() == null ? null : node.getParent().getPath();
 		EventFactory factory = new EventFactory(recordId, recordStep, ancestorIds, parentEntityPath, node);
 
 		if (change instanceof EntityChange) {
@@ -134,6 +131,10 @@ public class EventProducer {
 			factory.nodeDeleted();
 		}
 
+	}
+
+	private List<String> getAncestorIds(Node<?> node) {
+		return getAncestorIds(node.getDefinition(), node.getAncestorIds());
 	}
 
 	private List<String> getAncestorIds(NodeDefinition nodeDef, List<Integer> ancestorEntityIds) {
@@ -179,7 +180,7 @@ public class EventProducer {
 		EventFactory(Integer recordId, RecordStep recordStep, List<String> ancestorIds, Node<?> node) {
 			this(recordId, recordStep, ancestorIds, node.getParent().getPath(), node);
 		}
-		
+
 		EventFactory(Integer recordId, RecordStep recordStep, List<String> ancestorIds, String parentEntityPath,
 				Node<?> node) {
 			this.recordId = recordId;
@@ -204,6 +205,30 @@ public class EventProducer {
 			entityEvent.setChildrenMaxCountValidationByDefinitionId(maxCountValidationByChildDefinitionId);
 			consumer.onEvent(entityEvent);
 
+			entity.traverseDescendants(new NodeVisitor() {
+				public void visit(Node<? extends NodeDefinition> descendant, int idx) {
+					EventFactory descendantEventFactory = new EventFactory(recordId, recordStep,
+							getAncestorIds(descendant), descendant);
+					RecordEvent event;
+					if (descendant instanceof Entity) {
+						Entity entity = (Entity) descendant;
+						EntityCreatedEvent entityEvent = new EntityCreatedEvent();
+						entityEvent.setChildrenRelevanceByDefinitionId(entity.getRelevanceByDefinitionId());
+						entityEvent.setChildrenMinCountByDefinitionId(entity.getMinCountByDefinitionId());
+						entityEvent.setChildrenMaxCountByDefinitionId(entity.getMaxCountByDefinitionId());
+						entityEvent.setChildrenMinCountValidationByDefinitionId(
+								entity.getMinCountValidationResultByDefinitionId());
+						entityEvent.setChildrenMaxCountValidationByDefinitionId(
+								entity.getMaxCountValidationResultByDefinitionId());
+						event = entityEvent;
+						descendantEventFactory.fillRecordEvent(event);
+						consumer.onEvent(event);
+					} else {
+						descendantEventFactory.attributeCreated();
+					}
+				}
+			});
+
 			// add node collection created events
 			EntityDefinition entityDef = (EntityDefinition) node.getDefinition();
 			for (NodeDefinition childDef : entityDef.getChildDefinitions()) {
@@ -218,6 +243,9 @@ public class EventProducer {
 					consumer.onEvent(event);
 				}
 			}
+			EntityCreationCompletedEvent creationCompleteEvent = new EntityCreationCompletedEvent();
+			fillRecordEvent(creationCompleteEvent);
+			consumer.onEvent(creationCompleteEvent);
 		}
 
 		void entityUpdated(Map<Integer, Boolean> relevanceByChildDefinitionId,
@@ -242,10 +270,14 @@ public class EventProducer {
 		}
 
 		void attributeCreated() {
-			consumer.onEvent(fillRecordEvent(new AttributeCreatedEvent()));
+			AttributeCreatedEvent event = new AttributeCreatedEvent();
+			fillRecordEvent(event);
+			Attribute<?, ?> attribute = (Attribute<?, ?>) node;
 			if (node.hasData()) {
-				attributeValueUpdated();
+				event.setValue(attribute.getValue());
 			}
+			event.setValidationResults(new ValidationResultsView(attribute, context.messageSource, context.locale));
+			consumer.onEvent(event);
 		}
 
 		@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -297,8 +329,7 @@ public class EventProducer {
 			if (event != null) {
 				event.setValue(attribute.getValue());
 				fillRecordEvent(event);
-				event.setValidationResults(
-						new ValidationResultsView(attribute, context.messageSource, context.locale));
+				event.setValidationResults(new ValidationResultsView(attribute, context.messageSource, context.locale));
 				consumer.onEvent(event);
 			}
 		}

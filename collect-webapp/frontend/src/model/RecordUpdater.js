@@ -11,6 +11,7 @@ import {
   NodeMaxCountUpdatedEvent,
   NodeMaxCountValidationUpdatedEvent,
   RecordEvent,
+  AttributeCreatedEvent,
 } from './event/RecordEvent'
 
 import EventQueue from './event/EventQueue'
@@ -46,7 +47,7 @@ export class RecordUpdater {
         newEntity.childrenMinCountValidationByDefinitionId = event.childrenMinCountValidationByDefinitionId
         newEntity.childrenMaxCountValidationByDefinitionId = event.childrenMaxCountValidationByDefinitionId
         parentEntity.addChild(newEntity)
-      } else if (event instanceof AttributeValueUpdatedEvent) {
+      } else if (event instanceof AttributeCreatedEvent || event instanceof AttributeValueUpdatedEvent) {
         let attr = node
         if (attr == null) {
           attr = new Attribute(record, definition, parentEntity)

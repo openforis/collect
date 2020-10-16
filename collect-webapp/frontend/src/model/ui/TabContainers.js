@@ -23,30 +23,23 @@ const getFormItemClass = (itemType, attributeType) => {
 }
 
 export class TabContainers {
-  static createTabsFromJSON(jsonArrObj, parentUIModelObject) {
-    var tabs = []
-    for (var i = 0; i < jsonArrObj.length; i++) {
-      var itemJsonObj = jsonArrObj[i]
-      var item = new TabDefinition(itemJsonObj.id, parentUIModelObject)
-      item.fillFromJSON(itemJsonObj)
-      tabs.push(item)
-    }
-    return tabs
+  static createTabsFromJSON({ json = [], parent }) {
+    return json.reduce((tabsAcc, itemJsonObj) => {
+      var tab = new TabDefinition(itemJsonObj.id, parent)
+      tab.fillFromJSON(itemJsonObj)
+      tabsAcc.push(tab)
+      return tabsAcc
+    }, [])
   }
 
-  static createItemsFromJSON(jsonObj, parentUIModelObject) {
-    if (!jsonObj) {
-      return []
-    }
-    return jsonObj.reduce((itemsAcc, itemJsonObj) => {
+  static createItemsFromJSON({ json = [], parent }) {
+    return json.reduce((itemsAcc, itemJsonObj) => {
       const { type, attributeType, id } = itemJsonObj
       const formItemClass = getFormItemClass(type, attributeType)
       if (formItemClass) {
-        const item = new formItemClass(id, parentUIModelObject)
+        const item = new formItemClass(id, parent)
         item.fillFromJSON(itemJsonObj)
         itemsAcc.push(item)
-      } else {
-        console.log(`Unsopported attribute type: ${attributeType}`)
       }
       return itemsAcc
     }, [])

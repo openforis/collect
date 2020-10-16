@@ -112,7 +112,7 @@ export class SpatialReferenceSystem extends Serializable {
 export class Schema extends Serializable {
   survey
   rootEntities = []
-  definitions = [] //cache
+  definitions = {} //cache
 
   constructor(survey) {
     super()
@@ -168,6 +168,24 @@ export class NodeDefinition extends SurveyObject {
       currentParent = currentParent.parent
     }
     return currentParent
+  }
+
+  visitAncestors(visitor) {
+    let currentParent = this.parent
+    while (currentParent != null) {
+      visitor(currentParent)
+      currentParent = currentParent.parent
+    }
+  }
+
+  get ancestorIds() {
+    const ancestorIds = []
+    this.visitAncestors((ancestor) => ancestorIds.push(ancestor.id))
+    return ancestorIds
+  }
+
+  get single() {
+    return !this.multiple
   }
 }
 

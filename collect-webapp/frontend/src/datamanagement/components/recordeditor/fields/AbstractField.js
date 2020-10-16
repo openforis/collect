@@ -38,7 +38,7 @@ export default class AbstractField extends Component {
 
   extractValueFromProps() {
     const attr = this.getSingleAttribute()
-    return attr.value
+    return attr ? attr.value : null
   }
 
   extractValidationFromProps() {

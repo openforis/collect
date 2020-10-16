@@ -1,8 +1,7 @@
 import { Component } from 'react'
 import ServiceFactory from 'services/ServiceFactory'
 import EventQueue from 'model/event/EventQueue'
-import { EntityCreatedEvent } from 'model/event/RecordEvent'
-import { EntityDeletedEvent, RecordEvent } from '../../../model/event/RecordEvent'
+import { EntityCreationCompletedEvent, EntityDeletedEvent, RecordEvent } from 'model/event/RecordEvent'
 
 export default class EntityCollectionComponent extends Component {
   commandService = ServiceFactory.commandService
@@ -41,7 +40,7 @@ export default class EntityCollectionComponent extends Component {
       return
     }
     if (
-      (event instanceof EntityCreatedEvent || event instanceof EntityDeletedEvent) &&
+      (event instanceof EntityCreationCompletedEvent || event instanceof EntityDeletedEvent) &&
       event.isRelativeToNodes({ parentEntity, nodeDefId: itemDef.entityDefinitionId })
     ) {
       this.setState({ entities: this.determineEntities() }, () => this.onEntitiesUpdated())

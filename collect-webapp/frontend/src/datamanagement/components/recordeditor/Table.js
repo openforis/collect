@@ -1,162 +1,205 @@
+import './Table.css'
+
 import React from 'react'
 import { Column, Table as TableVirtualized } from 'react-virtualized'
-import { withStyles } from '@material-ui/core/styles'
-import clsx from 'clsx'
-import TableCell from '@material-ui/core/TableCell'
-import { Button, IconButton } from '@material-ui/core'
-import DeleteIcon from '@material-ui/icons/Delete'
+import { Button } from 'reactstrap'
+
+import { AttributeDefinition } from 'model/Survey'
+import { ColumnGroupDefinition } from 'model/ui/TableDefinition'
 
 import EntityCollectionComponent from './EntityCollectionComponent'
 import FormItemFieldComponent from './FormItemFieldComponent'
 
-const styles = (theme) => ({
-  flexContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    boxSizing: 'border-box',
-  },
-  table: {
-    // temporary right-to-left patch, waiting for
-    // https://github.com/bvaughn/react-virtualized/issues/454
-    '& .ReactVirtualized__Table__headerRow': {
-      flip: false,
-      paddingRight: theme.direction === 'rtl' ? '0 !important' : undefined,
-    },
-  },
-  tableRow: {
-    cursor: 'pointer',
-  },
-  tableRowHover: {
-    '&:hover': {
-      backgroundColor: theme.palette.grey[200],
-    },
-  },
-  tableCell: {
-    flex: 1,
-  },
-  noClick: {
-    cursor: 'initial',
-  },
-})
+const widthCalculatorByAttributeType = {
+  [AttributeDefinition.Types.BOOLEAN]: () => 100,
+  [AttributeDefinition.Types.CODE]: () => 100,
+  [AttributeDefinition.Types.COORDINATE]: () => 200,
+  [AttributeDefinition.Types.DATE]: () => 150,
+  [AttributeDefinition.Types.NUMBER]: () => 140,
+  [AttributeDefinition.Types.TEXT]: () => 200,
+}
 
-class MuiVirtualizedTable extends React.PureComponent {
-  getRowClassName = ({ index }) => {
-    const { classes, onRowClick } = this.props
-
-    return clsx(classes.tableRow, classes.flexContainer, {
-      [classes.tableRowHover]: index !== -1 && onRowClick != null,
-    })
-  }
-
-  cellRenderer = ({ rowData: entity, dataKey: headingColumn }) => {
-    const { classes, onRowClick } = this.props
-
-    return (
-      <TableCell
-        component="div"
-        className={clsx(classes.tableCell, classes.flexContainer, {
-          [classes.noClick]: onRowClick == null,
-        })}
-        variant="body"
-      >
-        <FormItemFieldComponent itemDef={headingColumn} parentEntity={entity} />
-      </TableCell>
-    )
-  }
-
-  deleteCellRenderer = ({ rowData }) => {
-    const { onDelete } = this.props
-    return (
-      <TableCell component="div" variant="body">
-        <IconButton color="secondary" onClick={() => onDelete(rowData)}>
-          <DeleteIcon />
-        </IconButton>
-      </TableCell>
-    )
-  }
-
-  headerRenderer = ({ label, columnIndex }) => {
-    const { classes } = this.props
-
-    return (
-      <TableCell
-        component="div"
-        variant="head"
-        className={clsx(classes.tableCell, classes.flexContainer, classes.noClick)}
-      >
-        <span>{label}</span>
-      </TableCell>
-    )
-  }
-
-  render() {
-    const { classes, rowCount, rowGetter, headingColumns } = this.props
-
-    return (
-      <TableVirtualized
-        className={classes.table}
-        rowClassName={this.getRowClassName}
-        height={300}
-        width={400}
-        headerHeight={48}
-        rowHeight={48}
-        rowCount={rowCount}
-        rowGetter={rowGetter}
-      >
-        {[
-          ...headingColumns.map((headingColumn, columnIndex) => {
-            const { attributeDefinitionId, label } = headingColumn
-            return (
-              <Column
-                key={attributeDefinitionId}
-                width={100}
-                headerRenderer={() => this.headerRenderer({ label, columnIndex })}
-                cellRenderer={this.cellRenderer}
-                dataKey={headingColumn}
-                headingColumn={headingColumn}
-              />
-            )
-          }),
-          <Column
-            key="delete-col"
-            width={100}
-            headerRenderer={() => this.headerRenderer({ label: 'Delete' })}
-            dataKey="delete-col"
-            cellRenderer={this.deleteCellRenderer}
-          />,
-        ]}
-      </TableVirtualized>
-    )
+const calculateWidth = (headingComponent) => {
+  if (headingComponent instanceof ColumnGroupDefinition) {
+    return headingComponent.descendantColumns.reduce((acc, headingColumn) => acc + calculateWidth(headingColumn), 0)
+  } else {
+    const widthCalculator = widthCalculatorByAttributeType[headingComponent.type]
+    return widthCalculator ? widthCalculator(headingComponent) : 100
   }
 }
 
-const VirtualizedTable = withStyles(styles)(MuiVirtualizedTable)
+const HeadingRow = ({
+  headingRow,
+  firstRow,
+  totalHeadingRows,
+  totalHeadingColumns,
+  includeRowNumberColumn,
+  includeDeleteColumn,
+}) => [
+  ...(firstRow && includeRowNumberColumn
+    ? [
+        <div
+          key="heading-cell-row-number"
+          className="grid-cell"
+          style={{
+            gridRowStart: 1,
+            gridRowEnd: totalHeadingRows + 1,
+            gridColumnStart: 1,
+            gridColumnEnd: 2,
+          }}
+        >
+          #
+        </div>,
+      ]
+    : []),
+  ...headingRow.map((headingComponent) => {
+    const { colSpan, col, label, row, rowSpan } = headingComponent
+    return (
+      <div
+        key={`heading-cell-${row}-${col}`}
+        className="grid-cell"
+        style={{
+          gridRowStart: row,
+          gridRowEnd: row + rowSpan,
+          gridColumnStart: col + (includeRowNumberColumn ? 1 : 0),
+          gridColumnEnd: col + colSpan + (includeRowNumberColumn ? 1 : 0),
+        }}
+      >
+        {label}
+      </div>
+    )
+  }),
+  ...(firstRow && includeDeleteColumn
+    ? [
+        <div
+          key="heading-cell-delete"
+          className="grid-cell"
+          style={{
+            gridRowStart: 1,
+            gridRowEnd: totalHeadingRows + 1,
+            gridColumnStart: totalHeadingColumns + 1 + (includeRowNumberColumn ? 1 : 0),
+            gridColumnEnd: totalHeadingColumns + 1 + (includeRowNumberColumn ? 1 : 0),
+          }}
+        />,
+      ]
+    : []),
+]
 
 export default class Table extends EntityCollectionComponent {
   constructor() {
     super()
     this.handleDeleteButtonClick = this.handleDeleteButtonClick.bind(this)
+    this.headerRowRenderer = this.headerRowRenderer.bind(this)
+    this.cellRenderer = this.cellRenderer.bind(this)
+    this.rowNumberCellRenderer = this.rowNumberCellRenderer.bind(this)
+    this.deleteCellRenderer = this.deleteCellRenderer.bind(this)
+  }
+
+  componentDidMount() {
+    super.componentDidMount()
+
+    const { itemDef } = this.props
+
+    const { headingColumns } = itemDef
+    const headingColumnWidths = headingColumns.reduce((acc, headingColumn) => {
+      acc.push(calculateWidth(headingColumn))
+      return acc
+    }, [])
+    const gridTemplateColumns = ['60px', ...headingColumnWidths.map((width) => width + 'px'), '60px'].join(' ')
+
+    this.setState({
+      ...this.state,
+      gridTemplateColumns,
+    })
   }
 
   handleDeleteButtonClick(entity) {
     this.commandService.deleteEntity(entity)
   }
 
+  headerRowRenderer() {
+    const { itemDef } = this.props
+    const { gridTemplateColumns } = this.state
+    const { headingRows, totalHeadingRows, totalHeadingColumns } = itemDef
+
+    return (
+      <div className="grid header" style={{ gridTemplateColumns }}>
+        {headingRows.map((headingRow, index) => (
+          <HeadingRow
+            key={`heading-row-${index + 1}`}
+            headingRow={headingRow}
+            totalHeadingRows={totalHeadingRows}
+            totalHeadingColumns={totalHeadingColumns}
+            firstRow={index === 0}
+            includeRowNumberColumn={true}
+            includeDeleteColumn={true}
+          />
+        ))}
+      </div>
+    )
+  }
+
+  cellRenderer({ rowData: rowEntity, dataKey: headingColumn }) {
+    const { attributeDefinition } = headingColumn
+
+    const parentEntity = rowEntity.getDescendantEntityClosestToNode(attributeDefinition)
+
+    return (
+      <div className="grid-cell">
+        <FormItemFieldComponent itemDef={headingColumn} parentEntity={parentEntity} />
+      </div>
+    )
+  }
+
+  rowNumberCellRenderer({ rowData: entity }) {
+    const { entities } = this.state
+    return <div className="grid-cell row-number">{entities.indexOf(entity) + 1}</div>
+  }
+
+  deleteCellRenderer({ rowData: entity }) {
+    return (
+      <div className="grid-cell">
+        <Button color="danger" onClick={() => this.handleDeleteButtonClick(entity)}>
+          <span className="fa fa-trash" />
+        </Button>
+      </div>
+    )
+  }
+
   render() {
     const { itemDef } = this.props
-    const { entities } = this.state
+    const { gridTemplateColumns, entities } = this.state
 
     const { headingColumns } = itemDef
 
     return (
       <fieldset>
         <legend>{itemDef.entityDefinition.label}</legend>
-        <VirtualizedTable
-          headingColumns={headingColumns}
+        <TableVirtualized
+          headerRowRenderer={this.headerRowRenderer}
+          rowStyle={{ display: 'grid', gridTemplateColumns }}
+          height={300}
+          width={600}
+          rowHeight={40}
           rowCount={entities.length}
           rowGetter={({ index }) => entities[index]}
           onDelete={(entity) => this.handleDeleteButtonClick(entity)}
-        />
+        >
+          {[
+            <Column key="row-num-col" width={56} dataKey="row-num-col" cellRenderer={this.rowNumberCellRenderer} />,
+            ,
+            ...headingColumns.map((headingColumn) => (
+              <Column
+                key={headingColumn.attributeDefinitionId}
+                width={100}
+                cellRenderer={this.cellRenderer}
+                dataKey={headingColumn}
+                headingColumn={headingColumn}
+              />
+            )),
+            <Column key="delete-col" width={56} dataKey="delete-col" cellRenderer={this.deleteCellRenderer} />,
+          ]}
+        </TableVirtualized>
         <Button variant="outlined" color="primary" onClick={this.handleNewButtonClick}>
           Add
         </Button>

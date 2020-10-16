@@ -48,7 +48,13 @@ export class RecordEvent extends Event {
   }
 }
 
-export class AttributeEvent extends RecordEvent {}
+export class AttributeEvent extends RecordEvent {
+  validationResults
+}
+
+export class AttributeCreatedEvent extends AttributeEvent {
+  value
+}
 
 export class AttributeDeletedEvent extends RecordEvent {}
 
@@ -103,12 +109,15 @@ export class NodeMinCountValidationUpdatedEvent extends NodeCountValidationUpdat
 
 export class EntityCreatedEvent extends RecordEvent {}
 
+export class EntityCreationCompletedEvent extends RecordEvent {}
+
 export class EntityCollectionCreatedEvent extends RecordEvent {}
 
 export class EntityDeletedEvent extends RecordEvent {}
 
 const EVENT_CLASS_BY_TYPE = {
   EntityCreatedEvent,
+  EntityCreationCompletedEvent,
   EntityCollectionCreatedEvent,
   EntityDeletedEvent,
   NodeMaxCountUpdatedEvent,
@@ -116,6 +125,7 @@ const EVENT_CLASS_BY_TYPE = {
   NodeMinCountUpdatedEvent,
   NodeMinCountValidationUpdatedEvent,
   NodeRelevanceUpdatedEvent,
+  AttributeCreatedEvent,
   AttributeDeletedEvent,
   BooleanAttributeUpdatedEvent,
   CodeAttributeUpdatedEvent,
