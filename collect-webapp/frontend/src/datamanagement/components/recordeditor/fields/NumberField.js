@@ -18,7 +18,7 @@ export default class NumberField extends AbstractField {
 
   extractValueFromProps() {
     const { fieldDef } = this.props
-    const attr = this.getSingleAttribute()
+    const attr = this.getAttribute()
 
     if (!attr) {
       return null

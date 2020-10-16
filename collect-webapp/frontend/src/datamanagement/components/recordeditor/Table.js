@@ -145,7 +145,7 @@ export default class Table extends EntityCollectionComponent {
     const parentEntity = rowEntity.getDescendantEntityClosestToNode(attributeDefinition)
 
     return (
-      <div className="grid-cell">
+      <div>
         <FormItemFieldComponent itemDef={headingColumn} parentEntity={parentEntity} />
       </div>
     )
@@ -153,12 +153,12 @@ export default class Table extends EntityCollectionComponent {
 
   rowNumberCellRenderer({ rowData: entity }) {
     const { entities } = this.state
-    return <div className="grid-cell row-number">{entities.indexOf(entity) + 1}</div>
+    return <div>{entities.indexOf(entity) + 1}</div>
   }
 
   deleteCellRenderer({ rowData: entity }) {
     return (
-      <div className="grid-cell">
+      <div>
         <Button color="danger" onClick={() => this.handleDeleteButtonClick(entity)}>
           <span className="fa fa-trash" />
         </Button>
@@ -186,8 +186,13 @@ export default class Table extends EntityCollectionComponent {
           onDelete={(entity) => this.handleDeleteButtonClick(entity)}
         >
           {[
-            <Column key="row-num-col" width={56} dataKey="row-num-col" cellRenderer={this.rowNumberCellRenderer} />,
-            ,
+            <Column
+              key="row-num-col"
+              width={56}
+              dataKey="row-num-col"
+              cellRenderer={this.rowNumberCellRenderer}
+              className="grid-cell row-number"
+            />,
             ...headingColumns.map((headingColumn) => (
               <Column
                 key={headingColumn.attributeDefinitionId}
@@ -195,9 +200,16 @@ export default class Table extends EntityCollectionComponent {
                 cellRenderer={this.cellRenderer}
                 dataKey={headingColumn}
                 headingColumn={headingColumn}
+                className="grid-cell"
               />
             )),
-            <Column key="delete-col" width={56} dataKey="delete-col" cellRenderer={this.deleteCellRenderer} />,
+            <Column
+              key="delete-col"
+              width={56}
+              dataKey="delete-col"
+              cellRenderer={this.deleteCellRenderer}
+              className="grid-cell"
+            />,
           ]}
         </TableVirtualized>
         <Button variant="outlined" color="primary" onClick={this.handleNewButtonClick}>

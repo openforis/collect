@@ -6,10 +6,12 @@ import Fieldset from './Fieldset'
 import MultipleFieldset from './MultipleFieldset'
 import Table from './Table'
 import FormItemFieldComponent from './FormItemFieldComponent'
+import FormItemMultipleFieldComponent from './FormItemMultipleFieldComponent'
 import FormItemTypes from '../../../model/ui/FormItemTypes'
 
 const internalComponentByFieldType = {
   [FormItemTypes.FIELD]: FormItemFieldComponent,
+  [FormItemTypes.MULTIPLE_FIELD]: FormItemMultipleFieldComponent,
   [FormItemTypes.MULTIPLE_FIELDSET]: MultipleFieldset,
   [FormItemTypes.FIELDSET]: Fieldset,
   [FormItemTypes.TABLE]: Table,

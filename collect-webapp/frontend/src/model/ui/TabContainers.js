@@ -3,6 +3,7 @@ import { CodeFieldDefinition } from './CodeFieldDefinition'
 import { FieldDefinition } from './FieldDefinition'
 import { FieldsetDefinition } from './FieldsetDefinition'
 import { MultipleFieldsetDefinition } from './MultipleFieldsetDefinition'
+import { MultipleFieldDefinition } from './MultipleFieldDefinition'
 import { TabDefinition } from './TabDefinition'
 import { TableDefinition } from './TableDefinition'
 import FormItemTypes from './FormItemTypes'
@@ -13,6 +14,8 @@ const getFormItemClass = (itemType, attributeType) => {
       return attributeType === AttributeDefinition.Types.CODE ? CodeFieldDefinition : FieldDefinition
     case FormItemTypes.FIELDSET:
       return FieldsetDefinition
+    case FormItemTypes.MULTIPLE_FIELD:
+      return MultipleFieldDefinition
     case FormItemTypes.MULTIPLE_FIELDSET:
       return MultipleFieldsetDefinition
     case FormItemTypes.TABLE:

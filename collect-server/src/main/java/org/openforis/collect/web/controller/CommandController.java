@@ -120,7 +120,7 @@ public class CommandController {
 		return submitCommand(command);
 	}
 
-	@RequestMapping(value = "record/attiribute/delete", method = POST, consumes = APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "record/attribute/delete", method = POST, consumes = APPLICATION_JSON_VALUE)
 	@Transactional
 	public @ResponseBody Object deleteAttribute(@RequestBody DeleteAttributeCommand command) {
 		return submitCommand(command);

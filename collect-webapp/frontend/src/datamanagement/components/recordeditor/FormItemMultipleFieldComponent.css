@@ -1,0 +1,4 @@
+.form-item-multiple-field-component .attributes-list {
+  display: grid;
+  grid-template-columns: 1fr 40px;
+}

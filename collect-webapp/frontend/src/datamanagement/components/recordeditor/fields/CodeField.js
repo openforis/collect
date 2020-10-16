@@ -50,7 +50,7 @@ export default class CodeField extends AbstractField {
   }
 
   loadCodeListItems(parentEntity) {
-    const attr = this.getSingleAttribute(parentEntity)
+    const attr = this.getAttribute(parentEntity)
     if (attr) {
       ServiceFactory.codeListService
         .findAvailableItems(parentEntity, attr.definition)

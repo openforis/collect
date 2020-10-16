@@ -139,6 +139,10 @@ header .breadcrumb {
   margin-right: 1em;
 }
 
+.btn-delete {
+  height: 40px;
+}
+
 fieldset {
   border: 1px solid #c0c0c0 !important;
   margin: 0 2px !important;

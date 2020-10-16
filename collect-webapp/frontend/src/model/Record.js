@@ -130,6 +130,15 @@ export class Entity extends Node {
     }
   }
 
+  getChildrenByChildName(childName) {
+    const childDef = this.definition.getChildDefinitionByName(childName)
+    return this.getChildrenByDefinitionId(childDef.id)
+  }
+
+  getChildrenByDefinitionId(childDefId) {
+    return this.childrenByDefinitionId[childDefId] || []
+  }
+
   getDescendants(descendantDefIds) {
     let currentEntity = this
     let descendants
@@ -153,7 +162,7 @@ export class Entity extends Node {
   }
 
   getSingleChild(defId) {
-    let children = this.getChildrenByDefinitionId(defId)
+    const children = this.getChildrenByDefinitionId(defId)
     return children.length === 0 ? null : children[0]
   }
 
@@ -177,18 +186,9 @@ export class Entity extends Node {
     children.slice(child.index).forEach((child) => child.updatePath())
   }
 
-  getChildrenByChildName(childName) {
-    const childDef = this.definition.getChildDefinitionByName(childName)
-    return this.getChildrenByDefinitionId(childDef.id)
-  }
-
-  getChildrenByDefinitionId(childDefId) {
-    return this.childrenByDefinitionId[childDefId] || []
-  }
-
   updatePath() {
     super.updatePath()
-    Object.entries(this.childrenByDefinitionId).forEach(([childDefId, children]) => {
+    Object.values(this.childrenByDefinitionId).forEach((children) => {
       children.forEach((child) => child.updatePath())
     })
   }

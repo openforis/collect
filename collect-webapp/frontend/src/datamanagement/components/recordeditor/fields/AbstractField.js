@@ -37,12 +37,12 @@ export default class AbstractField extends Component {
   }
 
   extractValueFromProps() {
-    const attr = this.getSingleAttribute()
+    const attr = this.getAttribute()
     return attr ? attr.value : null
   }
 
   extractValidationFromProps() {
-    const attr = this.getSingleAttribute()
+    const attr = this.getAttribute()
     let errors = null,
       warnings = null
     if (attr) {
@@ -53,23 +53,19 @@ export default class AbstractField extends Component {
     return { errors, warnings }
   }
 
-  getSingleAttribute(parentEntityParam) {
-    const { parentEntity: parentEntityProps, fieldDef } = this.props
+  getAttribute(parentEntityParam) {
+    const { parentEntity: parentEntityProps, fieldDef, attribute: attributeParam } = this.props
     const parentEntity = parentEntityParam || parentEntityProps
     if (parentEntity) {
       const attrDef = fieldDef.attributeDefinition
-      if (attrDef.multiple) {
-        throw new Error('Expected single attribute, found multiple: ' + attrDef.name)
-      } else {
-        return parentEntity.getSingleChild(attrDef.id)
-      }
+      return attrDef.multiple ? attributeParam : parentEntity.getSingleChild(attrDef.id)
     }
   }
 
   onAttributeUpdate({ value, debounced = true }) {
     this.setState({ value, dirty: true })
 
-    const attr = this.getSingleAttribute()
+    const attr = this.getAttribute()
     if (this.attributeUpdatedDebounced) {
       this.attributeUpdatedDebounced.cancel()
     }
