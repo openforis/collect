@@ -4,11 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.26.23] - NOT RELEASED
+
+## [3.26.24] - NOT RELEASED
 - Removed Planet API key field from CE surveys
 - Activated Planet imagery by default when creating new project
 ### Added
 - Data entry new UI: support multiple entities with table layout / coordinate attributes
+
+## [3.26.23] - 2020-10-14
+### Fixed
+- Error selecting survey from Data Management
 
 ## [3.26.22] - 2020-10-13
 ### Fixed

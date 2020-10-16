@@ -35,6 +35,9 @@ export class TabContainers {
   }
 
   static createItemsFromJSON(jsonObj, parentUIModelObject) {
+    if (!jsonObj) {
+      return []
+    }
     return jsonObj.reduce((itemsAcc, itemJsonObj) => {
       const { type, attributeType, id } = itemJsonObj
       const formItemClass = getFormItemClass(type, attributeType)
