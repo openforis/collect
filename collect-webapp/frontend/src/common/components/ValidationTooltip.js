@@ -1,8 +1,9 @@
 import React from 'react'
 import { UncontrolledTooltip } from 'reactstrap'
 import classnames from 'classnames'
+import PropTypes from 'prop-types'
 
-const FieldValidationTooltip = (props) => {
+const ValidationTooltip = (props) => {
   const { errors, warnings, target } = props
   const visible = Boolean(errors || warnings)
 
@@ -15,4 +16,14 @@ const FieldValidationTooltip = (props) => {
   ) : null
 }
 
-export default FieldValidationTooltip
+ValidationTooltip.propTypes = {
+  errors: PropTypes.string,
+  warnings: PropTypes.string,
+}
+
+ValidationTooltip.defaultProps = {
+  errors: null,
+  warnings: null,
+}
+
+export default ValidationTooltip

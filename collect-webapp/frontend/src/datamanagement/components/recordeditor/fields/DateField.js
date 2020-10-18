@@ -5,7 +5,7 @@ import DateFnsUtils from '@date-io/date-fns'
 import Dates from 'utils/Dates'
 import AbstractField from './AbstractField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
-import FieldValidationTooltip from './FieldValidationTooltip'
+import ValidationTooltip from 'common/components/ValidationTooltip'
 
 const fromValueToDate = (value) => (value ? new Date(value.year, value.month - 1, value.day) : null)
 const fromDateToValue = (date) => {
@@ -53,7 +53,7 @@ export default class DateField extends AbstractField {
           />
         </MuiPickersUtilsProvider>
         {dirty && <FieldLoadingSpinner />}
-        <FieldValidationTooltip target={this.fieldId} errors={errors} warnings={warnings} />
+        <ValidationTooltip target={this.fieldId} errors={errors} warnings={warnings} />
       </div>
     )
   }

@@ -1,9 +1,12 @@
 import './FormItemMultipleFieldComponent.css'
 import React from 'react'
 import { Button } from 'reactstrap'
+import classNames from 'classnames'
+
 import ServiceFactory from 'services/ServiceFactory'
 import EventQueue from 'model/event/EventQueue'
 import { AttributeCreatedEvent, AttributeDeletedEvent, RecordEvent } from 'model/event/RecordEvent'
+
 import FormItemFieldComponent from './FormItemFieldComponent'
 import DeleteNodeButton from './DeleteNodeButton'
 
@@ -71,12 +74,13 @@ export default class FormItemMultipleFieldComponent extends React.Component {
 
     const attrDefId = itemDef.attributeDefinition.id
     const maxCount = parentEntity.childrenMaxCountByDefinitionId[attrDefId]
-    console.log('===parentEntity', parentEntity)
+
+    const wrapperId = `form-item-multiple-field-component-${parentEntity.id}-attr-def-${attrDefId}`
 
     return (
-      <div className="form-item-multiple-field-component">
-        {attributes.map((attribute) => (
-          <div className="attributes-list">
+      <div id={wrapperId} className="form-item-multiple-field-component form-item-wrapper">
+        {attributes.map((attribute, index) => (
+          <div key={`attribute-list-item-${index}`} className="attributes-list-item">
             <FormItemFieldComponent itemDef={itemDef} parentEntity={parentEntity} attribute={attribute} />
             <DeleteNodeButton onClick={() => this.onDeleteButtonClick(attribute)} />
           </div>

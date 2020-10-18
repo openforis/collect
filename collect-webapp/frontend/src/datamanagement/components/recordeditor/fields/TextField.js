@@ -3,7 +3,7 @@ import { Input } from 'reactstrap'
 
 import AbstractField from './AbstractField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
-import FieldValidationTooltip from './FieldValidationTooltip'
+import ValidationTooltip from 'common/components/ValidationTooltip'
 
 export default class TextField extends AbstractField {
   constructor() {
@@ -32,7 +32,7 @@ export default class TextField extends AbstractField {
           value={text}
           onChange={this.onChange}
         />
-        <FieldValidationTooltip target={this.fieldId} errors={errors} warnings={warnings} />
+        <ValidationTooltip target={this.fieldId} errors={errors} warnings={warnings} />
         {dirty && <FieldLoadingSpinner />}
       </div>
     )

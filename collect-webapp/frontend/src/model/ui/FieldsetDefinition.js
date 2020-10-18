@@ -27,4 +27,12 @@ export class FieldsetDefinition extends UIModelObjectDefinition {
   get entityDefinition() {
     return this.parent.survey.schema.getDefinitionById(this.entityDefinitionId)
   }
+
+  get nodeDefinition() {
+    return this.entityDefinition
+  }
+
+  get nodeDefinitionId() {
+    return this.entityDefinitionId
+  }
 }

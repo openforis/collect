@@ -258,6 +258,13 @@
         "recordOwnedByAnotherUserAlert": {
             "title": "Record owned by another user",
             "message": "Record is owned by another user ({0}) and cannot be edited"
+        },
+        "dataEntry": {
+            "validation": {
+                "required": "Required field",
+                "minCount": "At least {0} items required",
+                "maxCount": "Only {0} item(s) allowed"
+            }
         }
     },
     "survey": {

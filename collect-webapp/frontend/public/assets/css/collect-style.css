@@ -411,3 +411,14 @@ input.is-invalid.warning:focus {
 .user-groups-data-table {
   height: calc(100vh - 175px);
 }
+
+/**
+* === VALIDATION FEEDBACK
+**/
+.form-item-wrapper.error {
+  border: 1px solid red;
+}
+
+.form-item-wrapper.warning {
+  border: 1px solid orangered;
+}

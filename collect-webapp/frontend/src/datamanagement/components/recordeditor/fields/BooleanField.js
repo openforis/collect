@@ -3,7 +3,7 @@ import { Checkbox } from '@material-ui/core'
 
 import AbstractField from './AbstractField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
-import FieldValidationTooltip from './FieldValidationTooltip'
+import ValidationTooltip from 'common/components/ValidationTooltip'
 
 export default class BooleanField extends AbstractField {
   constructor() {
@@ -30,7 +30,7 @@ export default class BooleanField extends AbstractField {
           onChange={this.onChange}
         />
         {dirty && <FieldLoadingSpinner />}
-        <FieldValidationTooltip target={this.fieldId} errors={errors} warnings={warnings} />
+        <ValidationTooltip target={this.fieldId} errors={errors} warnings={warnings} />
       </div>
     )
   }
