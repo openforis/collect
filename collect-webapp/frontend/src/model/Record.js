@@ -88,11 +88,11 @@ export class Node extends Serializable {
 
 export class Entity extends Node {
   childrenByDefinitionId = {}
-  childrenRelevanceByDefinitionId = {}
-  childrenMinCountByDefinitionId = {}
-  childrenMaxCountByDefinitionId = {}
-  childrenMinCountValidationByDefinitionId = {}
-  childrenMaxCountValidationByDefinitionId = {}
+  childrenRelevanceByDefinitionId
+  childrenMinCountByDefinitionId
+  childrenMaxCountByDefinitionId
+  childrenMinCountValidationByDefinitionId
+  childrenMaxCountValidationByDefinitionId
 
   get summaryLabel() {
     const { definition } = this

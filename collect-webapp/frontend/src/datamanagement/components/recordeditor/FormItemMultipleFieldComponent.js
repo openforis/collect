@@ -69,6 +69,10 @@ export default class FormItemMultipleFieldComponent extends React.Component {
       return null
     }
 
+    const attrDefId = itemDef.attributeDefinition.id
+    const maxCount = parentEntity.childrenMaxCountByDefinitionId[attrDefId]
+    console.log('===parentEntity', parentEntity)
+
     return (
       <div className="form-item-multiple-field-component">
         {attributes.map((attribute) => (
@@ -77,9 +81,11 @@ export default class FormItemMultipleFieldComponent extends React.Component {
             <DeleteNodeButton onClick={() => this.onDeleteButtonClick(attribute)} />
           </div>
         ))}
-        <Button color="success" onClick={this.onAddButtonClick}>
-          Add
-        </Button>
+        {attributes.length < maxCount && (
+          <Button color="success" onClick={this.onAddButtonClick}>
+            Add
+          </Button>
+        )}
       </div>
     )
   }
