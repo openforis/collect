@@ -1,5 +1,3 @@
-import { FieldsetDefinition } from './FieldsetDefinition';
+import { FieldsetDefinition } from './FieldsetDefinition'
 
-export class MultipleFieldsetDefinition extends FieldsetDefinition {
-    
-}
+export class MultipleFieldsetDefinition extends FieldsetDefinition {}

@@ -2,13 +2,14 @@ import AbstractService from './AbstractService'
 import { AttributeDefinition } from '../model/Survey'
 
 export default class CommandService extends AbstractService {
-  addAttribute(record, parentEntityId, attrDef) {
+  addAttribute({ parentEntity, attributeDef }) {
+    const { record } = parentEntity
     const command = {
       surveyId: record.survey.id,
       recordId: record.id,
       recordStep: record.step,
-      parentEntityId: parentEntityId,
-      nodeDefId: attrDef.id,
+      parentEntityPath: parentEntity.path,
+      nodeDefId: attributeDef.id,
     }
 
     return this.postJson('command/record/attribute/new', command)
@@ -55,6 +56,7 @@ export default class CommandService extends AbstractService {
       nodePath: node.path,
     }
   }
+
   deleteAttribute(node) {
     const command = this._createDeleteNodeCommand(node)
     return this.postJson('command/record/attribute/delete', command)

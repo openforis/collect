@@ -18,14 +18,16 @@ const FIELD_COMPONENTS_BY_TYPE = {
   [AttributeDefinition.Types.TEXT]: TextField,
 }
 
-export default (props) => {
-  const { itemDef, parentEntity } = props
+const FormItemFieldComponent = (props) => {
+  const { itemDef, parentEntity, attribute } = props
   const attrDef = itemDef.attributeDefinition
-  const component = FIELD_COMPONENTS_BY_TYPE[attrDef.attributeType]
+  const Component = FIELD_COMPONENTS_BY_TYPE[attrDef.attributeType]
 
-  return component ? (
-    React.createElement(component, { fieldDef: itemDef, parentEntity })
+  return Component ? (
+    <Component fieldDef={itemDef} parentEntity={parentEntity} attribute={attribute} />
   ) : (
     <div>Field type {attrDef.attributeType} not supported yet</div>
   )
 }
+
+export default FormItemFieldComponent

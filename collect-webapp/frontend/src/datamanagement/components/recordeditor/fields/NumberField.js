@@ -4,7 +4,7 @@ import { Input } from 'reactstrap'
 
 import AbstractField from './AbstractField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
-import FieldValidationTooltip from './FieldValidationTooltip'
+import ValidationTooltip from 'common/components/ValidationTooltip'
 
 export default class NumberField extends AbstractField {
   constructor(props) {
@@ -18,7 +18,7 @@ export default class NumberField extends AbstractField {
 
   extractValueFromProps() {
     const { fieldDef } = this.props
-    const attr = this.getSingleAttribute()
+    const attr = this.getAttribute()
 
     if (!attr) {
       return null
@@ -71,7 +71,7 @@ export default class NumberField extends AbstractField {
             value={text}
             onChange={this.onTextValueChange}
           />
-          <FieldValidationTooltip target={this.fieldId} errors={errors} warnings={warnings} />
+          <ValidationTooltip target={this.fieldId} errors={errors} warnings={warnings} />
 
           {hasPrecisions && (
             <FormControl>

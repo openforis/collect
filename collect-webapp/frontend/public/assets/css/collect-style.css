@@ -139,6 +139,10 @@ header .breadcrumb {
   margin-right: 1em;
 }
 
+.btn-delete {
+  height: 40px;
+}
+
 fieldset {
   border: 1px solid #c0c0c0 !important;
   margin: 0 2px !important;
@@ -406,4 +410,15 @@ input.is-invalid.warning:focus {
 .users-data-table,
 .user-groups-data-table {
   height: calc(100vh - 175px);
+}
+
+/**
+* === VALIDATION FEEDBACK
+**/
+.form-item-wrapper.error {
+  border: 1px solid red;
+}
+
+.form-item-wrapper.warning {
+  border: 1px solid orangered;
 }

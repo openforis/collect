@@ -4,7 +4,7 @@ import { CoordinateAttributeDefinition } from '../../../../model/Survey'
 
 import AbstractField from './AbstractField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
-import FieldValidationTooltip from './FieldValidationTooltip'
+import ValidationTooltip from 'common/components/ValidationTooltip'
 
 const numericField = ({ value, onChange, errors, warnings }) => (
   <Input
@@ -190,7 +190,7 @@ export default class CoordinateField extends AbstractField {
     return (
       <div id={this.wrapperId}>
         {getInternalContent()}
-        <FieldValidationTooltip target={this.wrapperId} errors={errors} warnings={warnings} />
+        <ValidationTooltip target={this.wrapperId} errors={errors} warnings={warnings} />
         {dirty && <FieldLoadingSpinner />}
       </div>
     )

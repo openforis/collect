@@ -84,13 +84,23 @@ export class TextAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
 export class TimeAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
-export class NodeRelevanceUpdatedEvent extends RecordEvent {
+export class NodeChildrenUpdatedEvent extends RecordEvent {
   childDefinitionId
+
+  isRelativeToNodes({ parentEntity, nodeDefId }) {
+    return (
+      this.isRelativeToRecord(parentEntity.record) &&
+      this.nodePath === parentEntity.path &&
+      Number(this.childDefinitionId) === nodeDefId
+    )
+  }
+}
+
+export class NodeRelevanceUpdatedEvent extends NodeChildrenUpdatedEvent {
   relevant
 }
 
-export class NodeCountUpdatedEvent extends RecordEvent {
-  childDefinitionId
+export class NodeCountUpdatedEvent extends NodeChildrenUpdatedEvent {
   count
 }
 
@@ -98,8 +108,7 @@ export class NodeMaxCountUpdatedEvent extends NodeCountUpdatedEvent {}
 
 export class NodeMinCountUpdatedEvent extends NodeCountUpdatedEvent {}
 
-export class NodeCountValidationUpdatedEvent extends RecordEvent {
-  childDefinitionId
+export class NodeCountValidationUpdatedEvent extends NodeChildrenUpdatedEvent {
   flag
 }
 

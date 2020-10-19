@@ -145,6 +145,14 @@ public class EntityProxy extends NodeProxy {
 		}
 		return result;
 	}
+	
+	public Map<Integer, Boolean> getChildrenErrorVisibleByDefinitionId() {
+		Map<Integer, Boolean> map = new HashMap<Integer, Boolean>(availableChildDefinitions.size());
+		for (NodeDefinition childDefinition : availableChildDefinitions) {
+			map.put(childDefinition.getId(), Boolean.FALSE);
+		}
+		return map;
+	}
 
 	private List<NodeDefinition> getAvailableChildDefinitions() {
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();

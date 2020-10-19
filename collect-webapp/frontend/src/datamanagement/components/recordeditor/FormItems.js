@@ -4,6 +4,8 @@ import classnames from 'classnames'
 
 import EventQueue from 'model/event/EventQueue'
 import { NodeRelevanceUpdatedEvent, RecordEvent } from 'model/event/RecordEvent'
+import { TableDefinition } from 'model/ui/TableDefinition'
+import { MultipleFieldsetDefinition } from 'model/ui/MultipleFieldsetDefinition'
 
 import FormItem from './FormItem'
 
@@ -53,9 +55,10 @@ export default class FormItems extends React.Component {
   render() {
     const { itemDefs, parentEntity } = this.props
 
-    return itemDefs.length === 1 ? (
+    return itemDefs.length === 1 &&
+      (itemDefs[0] instanceof TableDefinition || itemDefs[0] instanceof MultipleFieldsetDefinition) ? (
       <FormItemsItem itemDef={itemDefs[0]} parentEntity={parentEntity} fullSize />
-    ) : itemDefs.length > 1 ? (
+    ) : itemDefs.length > 0 ? (
       <Container className="formItems">
         {itemDefs.map((itemDef) => (
           <FormItemsItem key={itemDef.id} itemDef={itemDef} parentEntity={parentEntity} />
