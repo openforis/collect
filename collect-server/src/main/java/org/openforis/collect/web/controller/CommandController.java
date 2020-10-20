@@ -1,9 +1,11 @@
 package org.openforis.collect.web.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,15 +25,21 @@ import org.openforis.collect.command.UpdateBooleanAttributeCommand;
 import org.openforis.collect.command.UpdateCodeAttributeCommand;
 import org.openforis.collect.command.UpdateCoordinateAttributeCommand;
 import org.openforis.collect.command.UpdateDateAttributeCommand;
+import org.openforis.collect.command.UpdateFileAttributeCommand;
 import org.openforis.collect.command.UpdateIntegerAttributeCommand;
 import org.openforis.collect.command.UpdateRealAttributeCommand;
 import org.openforis.collect.command.UpdateTextAttributeCommand;
 import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.event.EventListener;
 import org.openforis.collect.event.RecordEvent;
+import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.utils.Files;
+import org.openforis.collect.web.manager.RecordProviderSession;
 import org.openforis.collect.web.ws.AppWS;
 import org.openforis.collect.web.ws.AppWS.RecordEventMessage;
 import org.openforis.commons.web.Response;
@@ -39,6 +47,7 @@ import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
+import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
@@ -47,6 +56,8 @@ import org.openforis.idm.model.BooleanValue;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
+import org.openforis.idm.model.File;
+import org.openforis.idm.model.FileAttribute;
 import org.openforis.idm.model.IntegerValue;
 import org.openforis.idm.model.RealValue;
 import org.openforis.idm.model.TextValue;
@@ -58,8 +69,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
 @Scope(WebApplicationContext.SCOPE_SESSION)
@@ -67,13 +82,17 @@ import org.springframework.web.context.WebApplicationContext;
 public class CommandController {
 
 	@Autowired
-	private SurveyManager surveyManager;
+	private transient SurveyManager surveyManager;
 	@Autowired
-	private CommandDispatcher commandDispatcher;
+	private transient RecordFileManager recordFileManager;
 	@Autowired
-	private SessionManager sessionManager;
+	private RecordProviderSession recordProviderSession;
 	@Autowired
-	private AppWS appWS;
+	private transient CommandDispatcher commandDispatcher;
+	@Autowired
+	private transient SessionManager sessionManager;
+	@Autowired
+	private transient AppWS appWS;
 
 	@RequestMapping(value = "record", method = POST, consumes = APPLICATION_JSON_VALUE)
 	@Transactional
@@ -118,6 +137,28 @@ public class CommandController {
 		CollectSurvey survey = getSurvey(commandWrapper);
 		UpdateAttributeCommand<?> command = commandWrapper.toCommand(survey);
 		return submitCommand(command);
+	}
+
+	@RequestMapping(value = "record/attribute/file", method = POST, consumes = MULTIPART_FORM_DATA_VALUE)
+	@Transactional
+	public @ResponseBody Response updateAttributeFile(
+			@RequestParam("command") String commandWrapperJsonString,
+			@RequestParam("file") MultipartFile multipartFile) throws IOException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		UpdateAttributeCommandWrapper commandWrapper = objectMapper.readValue(commandWrapperJsonString, UpdateAttributeCommandWrapper.class);
+		CollectSurvey survey = getSurvey(commandWrapper);
+		UpdateAttributeCommand<Value> command = commandWrapper.toCommand(survey);
+		FileAttributeDefinition attrDef = survey.getSchema().getDefinitionById(command.getNodeDefId());
+		if (multipartFile.getSize() <= attrDef.getMaxSize()) {
+			CollectRecord record = recordProviderSession.provide(survey, command.getRecordId(), Step.fromRecordStep(command.getRecordStep()));
+			FileAttribute fileAttr = record.findNodeByPath(command.getNodePath());
+			java.io.File tempFile = Files.writeToTempFile(multipartFile.getInputStream(), multipartFile.getOriginalFilename(), "ofc_data_entry_file");
+			File value = recordFileManager.moveFileIntoRepository(fileAttr, tempFile, multipartFile.getOriginalFilename(), false);
+			command.setValue(value);
+			return submitCommand(command);
+		} else {
+			throw new IllegalArgumentException(String.format("File size (%d) exceeds expected maximum size: %d", multipartFile.getSize(), attrDef.getMaxSize()));
+		}
 	}
 
 	@RequestMapping(value = "record/attribute/delete", method = POST, consumes = APPLICATION_JSON_VALUE)
@@ -232,6 +273,9 @@ public class CommandController {
 				return new Date((Integer) valueByField.get(DateAttributeDefinition.YEAR_FIELD_NAME),
 						(Integer) valueByField.get(DateAttributeDefinition.MONTH_FIELD_NAME),
 						(Integer) valueByField.get(DateAttributeDefinition.DAY_FIELD_NAME));
+			case FILE:
+				return new File((String) valueByField.get(FileAttributeDefinition.FILE_NAME_FIELD),
+						(Long) valueByField.get(FileAttributeDefinition.FILE_SIZE_FIELD));
 			case NUMBER:
 				Integer unitId = (Integer) valueByField.get(NumberAttributeDefinition.UNIT_FIELD);
 				Unit unit = unitId == null ? null : survey.getUnit(unitId);
@@ -269,6 +313,8 @@ public class CommandController {
 				return UpdateCoordinateAttributeCommand.class;
 			case DATE:
 				return UpdateDateAttributeCommand.class;
+			case FILE:
+				return UpdateFileAttributeCommand.class;
 			case NUMBER:
 				return numericType == Type.INTEGER ? UpdateIntegerAttributeCommand.class
 						: UpdateRealAttributeCommand.class;

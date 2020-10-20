@@ -74,6 +74,8 @@ export class DoubleAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
 export class DoubleRangeAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
+export class FileAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
+
 export class IntegerAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
 
 export class IntegerRangeAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}
@@ -142,6 +144,7 @@ const EVENT_CLASS_BY_TYPE = {
   DateAttributeUpdatedEvent,
   DoubleAttributeUpdatedEvent,
   DoubleRangeAttributeUpdatedEvent,
+  FileAttributeUpdatedEvent,
   IntegerAttributeUpdatedEvent,
   IntegerRangeAttributeUpdatedEvent,
   TaxonAttributeUpdatedEvent,

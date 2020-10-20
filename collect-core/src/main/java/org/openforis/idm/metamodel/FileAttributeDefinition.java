@@ -20,8 +20,8 @@ public class FileAttributeDefinition extends AttributeDefinition {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final String FILE_NAME_FIELD = "file_name";
-	private static final String FILE_SIZE_FIELD = "file_size";
+	public static final String FILE_NAME_FIELD = "file_name";
+	public static final String FILE_SIZE_FIELD = "file_size";
 
 	private final FieldDefinitionMap fieldDefinitionByName = new FieldDefinitionMap(
 		new FieldDefinition<String>(FILE_NAME_FIELD, "f", null, String.class, this),

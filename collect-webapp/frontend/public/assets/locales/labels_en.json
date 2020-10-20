@@ -260,6 +260,15 @@
             "message": "Record is owned by another user ({0}) and cannot be edited"
         },
         "dataEntry": {
+            "fileField": {
+                "fileType": {
+                    "audio": "Audio",
+                    "document": "document",
+                    "image": "Image",
+                    "video": "Video"
+                },
+                "acceptedFileDescription": "{0} file types ({1})"
+            },
             "validation": {
                 "required": "Required field",
                 "minCount": "At least {0} items required",

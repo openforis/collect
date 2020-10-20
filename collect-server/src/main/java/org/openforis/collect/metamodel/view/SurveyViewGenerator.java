@@ -22,6 +22,7 @@ import org.openforis.idm.metamodel.CodeListLabel;
 import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
@@ -143,6 +144,15 @@ public class SurveyViewGenerator {
 						attrDefView.setShowSrsField(annotations.isShowSrsField(attrDef));
 						attrDefView.setIncludeAccuracyField(annotations.isIncludeCoordinateAccuracy(attrDef));
 						attrDefView.setIncludeAltitudeField(annotations.isIncludeCoordinateAltitude(attrDef));
+						view = attrDefView;
+					}  else if (def instanceof FileAttributeDefinition) {
+						FileAttributeDefinition attrDef = (FileAttributeDefinition) def;
+						FileAttributeDefView attrDefView = new FileAttributeDefView(id, name, label,
+								AttributeType.valueOf(attrDef), attrDef.getFieldNames(), attrDef.isKey(),
+								attrDef.isMultiple(), showInSummary, qualifier);
+						attrDefView.setFileType(annotations.getFileType(attrDef));
+						attrDefView.setMaxSize(attrDef.getMaxSize());
+						attrDefView.setExtensions(attrDef.getExtensions());
 						view = attrDefView;
 					} else if (def instanceof NumberAttributeDefinition) {
 						NumberAttributeDefinition attrDef = (NumberAttributeDefinition) def;

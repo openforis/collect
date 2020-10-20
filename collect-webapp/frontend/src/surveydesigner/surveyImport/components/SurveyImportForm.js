@@ -38,7 +38,7 @@ const SurveyImportForm = props => {
                             acceptedFileTypesDescription={L.l('survey.import.acceptedFileTypesDescription')}
                             handleFileDrop={file => uploadSurveyFile(file)}
                             height="300px"
-                            fileToBeImportedPreview={surveyFileToBeImportedPreview} />
+                            selectedFilePreview={surveyFileToBeImportedPreview} />
                     }
                     {uploadingSurveyFile &&
                         <Progress animated value={100} />

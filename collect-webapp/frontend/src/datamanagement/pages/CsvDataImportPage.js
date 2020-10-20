@@ -242,7 +242,7 @@ class CsvDataImportPage extends Component {
                                     acceptedFileTypesDescription={acceptedFileTypesDescription}
                                     handleFileDrop={file => this.handleFileDrop(file)}
                                     height="300px"
-                                    fileToBeImportedPreview={this.state.fileToBeImportedPreview} />
+                                    selectedFilePreview={this.state.fileToBeImportedPreview} />
                             </Col>
                         </FormGroup>
                         <FormGroup row>

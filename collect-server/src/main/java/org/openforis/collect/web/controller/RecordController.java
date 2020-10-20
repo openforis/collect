@@ -74,6 +74,7 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
@@ -102,7 +103,6 @@ import org.openforis.commons.web.Response;
 import org.openforis.concurrency.proxy.JobProxy;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.metamodel.SurveyContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -135,7 +135,7 @@ public class RecordController extends BasicController implements Serializable {
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
-	private SurveyContext surveyContext;
+	private CollectSurveyContext surveyContext;
 	@Autowired
 	private MessageSource messageSource;
 	@Autowired

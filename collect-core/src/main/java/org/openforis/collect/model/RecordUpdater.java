@@ -646,8 +646,8 @@ public class RecordUpdater {
 		
 		// max count
 		Collection<NodePointer> pointersToCheckMaxCountFor = new HashSet<NodePointer>();
-		pointersToCheckMinCountFor.addAll(ancestorsAndSelfPointers);
-		pointersToCheckMinCountFor.addAll(updatedRelevancePointers);
+		pointersToCheckMaxCountFor.addAll(ancestorsAndSelfPointers);
+		pointersToCheckMaxCountFor.addAll(updatedRelevancePointers);
 		pointersToCheckMaxCountFor.addAll(maxCountDependenciesToSelf);
 		pointersToCheckMaxCountFor.addAll(updatedAttributePointers);
 		

@@ -93,7 +93,7 @@ class RestorePage extends Component {
                         acceptedFileTypesDescription={L.l('restore.acceptedFileTypesDescription')}
                         handleFileDrop={this.handleFileDrop}
                         height="300px"
-                        fileToBeImportedPreview={fileToBeImportedPreview} />
+                        selectedFilePreview={fileToBeImportedPreview} />
                 </Row>
                 <Form>
                     <FormGroup tag="fieldset" style={{width: '650px'}}>
