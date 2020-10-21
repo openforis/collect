@@ -173,7 +173,7 @@
 		<constructor-arg ref="recordManager" />
 	</bean>
 	
-	<bean id="recordProviderSession" class="org.openforis.collect.web.manager.RecordProviderSession" 
+	<bean id="sessionRecordProvider" class="org.openforis.collect.web.manager.SessionRecordProvider" 
 		scope="session">
 		<constructor-arg ref="cachedRecordProvider" />
 	</bean>

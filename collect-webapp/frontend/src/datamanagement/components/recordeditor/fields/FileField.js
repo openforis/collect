@@ -6,15 +6,44 @@ import { Button, Progress } from 'reactstrap'
 import L from 'utils/Labels'
 import ServiceFactory from 'services/ServiceFactory'
 
-import AbstractField from './AbstractField'
+import { FileAttributeDefinition } from 'model/Survey'
+
+import DeleteIconButton from 'common/components/DeleteIconButton'
 import Dropzone from 'common/components/Dropzone'
-import { FileAttributeDefinition } from '../../../../model/Survey'
+import Image from 'common/components/Image'
+
+import AbstractField from './AbstractField'
 
 const EXTENSIONS_BY_FILE_TYPE = {
   [FileAttributeDefinition.FileTypes.AUDIO]: '.mp3,.wav,.3gp',
   [FileAttributeDefinition.FileTypes.IMAGE]: '.jpg,.jpeg,.png,.btm',
   [FileAttributeDefinition.FileTypes.VIDEO]: '.avi,.mkv',
   [FileAttributeDefinition.FileTypes.DOCUMENT]: '.doc,.docx,.xls,.xlsx,.pdf,.odt,.xml',
+}
+
+const FileThumbnail = (props) => {
+  const { node, onClick } = props
+  if (!node) {
+    return null
+  }
+  const { filename = null } = node.value || {}
+  const { definition, record } = node
+  const { fileType } = definition
+  const { id: recordId = 0 } = record
+  const { survey } = record
+
+  const thumbnailUrl =
+    fileType === FileAttributeDefinition.FileTypes.IMAGE && filename
+      ? `${ServiceFactory.recordFileService.BASE_URL}survey/${survey.id}/data/records/${recordId}/${record.step}/node/${node.id}/file`
+      : null
+
+  return thumbnailUrl ? (
+    <Image src={thumbnailUrl} maxWidth={150} maxHeight={150} onClick={onClick} />
+  ) : (
+    <Button type="button" onClick={onClick}>
+      Download
+    </Button>
+  )
 }
 
 export default class FileField extends AbstractField {
@@ -29,35 +58,46 @@ export default class FileField extends AbstractField {
 
     this.onFileSelect = this.onFileSelect.bind(this)
     this.onDownloadClick = this.onDownloadClick.bind(this)
+    this.onDeleteClick = this.onDeleteClick.bind(this)
   }
 
   onFileSelect(file) {
     this.setState({ uploading: true, selectedFileName: file.name })
-    const attr = this.getAttribute()
-    ServiceFactory.commandService.updateAttributeFile(attr, file).then(() => {
+    const attribute = this.getAttribute()
+    ServiceFactory.commandService.updateAttributeFile({ attribute, file }).then(() => {
       this.setState({ uploading: false })
     })
   }
 
-  onDownloadClick() {}
+  onDownloadClick() {
+    const fileAttribute = this.getAttribute()
+    ServiceFactory.recordFileService.downloadRecordFile({ fileAttribute })
+  }
+
+  onDeleteClick() {
+    const fileAttribute = this.getAttribute()
+    ServiceFactory.commandService.deleteAttributeFile({ fileAttribute })
+  }
 
   render() {
     const { fieldDef } = this.props
-    const { dirty, value: valueState = {}, selectedFileName, uploading } = this.state
-    const { value = { fileName: null, fileSize: null } } = valueState || {}
-    const { fileName, fileSize } = value
-    const { attributeDefinition: attrDef } = fieldDef
-    const { fileType } = attrDef
+    const { value: valueState = {}, uploading } = this.state
+    const { filename = null } = valueState || {}
+    const { attributeDefinition } = fieldDef
+    const { fileType } = attributeDefinition
 
+    const node = this.getAttribute()
     const extensions = EXTENSIONS_BY_FILE_TYPE[fileType]
+
     return (
       <div>
-        {fileName && (
-          <Button type="button" onClick={this.onDownloadClick}>
-            Download
-          </Button>
+        {filename && (
+          <div>
+            <FileThumbnail node={node} onClick={this.onDownloadClick} />
+            <DeleteIconButton onClick={this.onDeleteClick} />
+          </div>
         )}
-        {!uploading && !fileName && (
+        {!uploading && !filename && (
           <Dropzone
             className="file-field-dropzone"
             compact
@@ -68,7 +108,6 @@ export default class FileField extends AbstractField {
             ])}
             handleFileDrop={(file) => this.onFileSelect(file)}
             height="60px"
-            selectedFilePreview={selectedFileName}
           />
         )}
         {uploading && <Progress animated value={100} />}

@@ -34,7 +34,7 @@ export default class CommandService extends AbstractService {
     return this.postJson('command/record/attribute', command)
   }
 
-  updateAttributeFile(attribute, file) {
+  updateAttributeFile({ attribute, file }) {
     const { record, definition, parent } = attribute
     const { attributeType } = definition
 
@@ -48,6 +48,11 @@ export default class CommandService extends AbstractService {
       attributeType,
     }
     return this.postFormData('command/record/attribute/file', { file, command: JSON.stringify(command) })
+  }
+
+  deleteAttributeFile({ fileAttribute }) {
+    const command = this._createDeleteNodeCommand(fileAttribute)
+    return this.postJson('command/record/attribute/file/delete', command)
   }
 
   addEntity(record, parentEntity, entityDef) {

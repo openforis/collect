@@ -95,7 +95,7 @@ import org.openforis.collect.utils.MediaTypes;
 import org.openforis.collect.utils.Proxies;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.controller.RecordStatsGenerator.RecordsStats;
-import org.openforis.collect.web.manager.RecordProviderSession;
+import org.openforis.collect.web.manager.SessionRecordProvider;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.collect.web.ws.AppWS;
 import org.openforis.commons.web.HttpResponses;
@@ -151,7 +151,7 @@ public class RecordController extends BasicController implements Serializable {
 	@Autowired
 	private CollectJobManager jobManager;
 	@Autowired
-	private RecordProviderSession recordProviderSession;
+	private SessionRecordProvider sessionRecordProvider;
 	@Autowired
 	private RecordStatsGenerator recordStatsGenerator;
 	@Autowired
@@ -328,7 +328,7 @@ public class RecordController extends BasicController implements Serializable {
 		params.setVersionName(ObjectUtils.defaultIfNull(params.getVersionName(), survey.getLatestVersion() != null ? survey.getLatestVersion().getName(): null));
 		params.setUserId(user.getId());
 		CollectRecord record = recordGenerator.generate(survey, params);
-		recordProviderSession.putRecord(record);
+		sessionRecordProvider.putRecord(record);
 		return toProxy(record);
 	}
 	

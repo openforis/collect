@@ -12,7 +12,7 @@ import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
-import org.openforis.collect.web.manager.RecordProviderSession;
+import org.openforis.collect.web.manager.SessionRecordProvider;
 import org.openforis.concurrency.JobManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -32,7 +32,7 @@ public class SpringCommandDispatcher extends RegistryCommandDispatcher {
 	@Autowired
 	private MessageSource messageSource;
 	@Autowired
-	private RecordProviderSession recordProviderSession;
+	private SessionRecordProvider sessionRecordProvider;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void init() {
@@ -65,7 +65,7 @@ public class SpringCommandDispatcher extends RegistryCommandDispatcher {
 			recordCommandHandler.setJobManager(jobManager);
 			recordCommandHandler.setSurveyManager(surveyManager);
 			recordCommandHandler.setRecordManager(recordManager);
-			recordCommandHandler.setRecordProvider(recordProviderSession);
+			recordCommandHandler.setRecordProvider(sessionRecordProvider);
 			recordCommandHandler.setUserManager(userManager);
 			recordCommandHandler.setMessageSource(messageSource);
 		}

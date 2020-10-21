@@ -5,11 +5,11 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.openforis.collect.command.AddAttributeCommand;
 import org.openforis.collect.command.AddEntityCommand;
 import org.openforis.collect.command.Command;
@@ -34,12 +34,13 @@ import org.openforis.collect.event.EventListener;
 import org.openforis.collect.event.RecordEvent;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.SessionRecordFileManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.utils.Files;
-import org.openforis.collect.web.manager.RecordProviderSession;
+import org.openforis.collect.web.manager.SessionRecordProvider;
 import org.openforis.collect.web.ws.AppWS;
 import org.openforis.collect.web.ws.AppWS.RecordEventMessage;
 import org.openforis.commons.web.Response;
@@ -86,7 +87,9 @@ public class CommandController {
 	@Autowired
 	private transient RecordFileManager recordFileManager;
 	@Autowired
-	private RecordProviderSession recordProviderSession;
+	private SessionRecordProvider sessionRecordProvider;
+	@Autowired
+	private SessionRecordFileManager sessionRecordFileManager;
 	@Autowired
 	private transient CommandDispatcher commandDispatcher;
 	@Autowired
@@ -143,22 +146,45 @@ public class CommandController {
 	@Transactional
 	public @ResponseBody Response updateAttributeFile(
 			@RequestParam("command") String commandWrapperJsonString,
-			@RequestParam("file") MultipartFile multipartFile) throws IOException {
+			@RequestParam("file") MultipartFile multipartFile) throws Exception {
 		ObjectMapper objectMapper = new ObjectMapper();
 		UpdateAttributeCommandWrapper commandWrapper = objectMapper.readValue(commandWrapperJsonString, UpdateAttributeCommandWrapper.class);
 		CollectSurvey survey = getSurvey(commandWrapper);
 		UpdateAttributeCommand<Value> command = commandWrapper.toCommand(survey);
 		FileAttributeDefinition attrDef = survey.getSchema().getDefinitionById(command.getNodeDefId());
 		if (multipartFile.getSize() <= attrDef.getMaxSize()) {
-			CollectRecord record = recordProviderSession.provide(survey, command.getRecordId(), Step.fromRecordStep(command.getRecordStep()));
+			CollectRecord record = sessionRecordProvider.provide(survey, command.getRecordId(), Step.fromRecordStep(command.getRecordStep()));
 			FileAttribute fileAttr = record.findNodeByPath(command.getNodePath());
-			java.io.File tempFile = Files.writeToTempFile(multipartFile.getInputStream(), multipartFile.getOriginalFilename(), "ofc_data_entry_file");
-			File value = recordFileManager.moveFileIntoRepository(fileAttr, tempFile, multipartFile.getOriginalFilename(), false);
+			File value;
+			if (record.isPreview()) {
+				java.io.File tempFile = sessionRecordFileManager.saveToTempFile(multipartFile.getInputStream(), multipartFile.getOriginalFilename(), record, fileAttr.getInternalId());
+				value = new File(tempFile.getName(), multipartFile.getSize());
+			} else {
+				java.io.File tempFile = Files.writeToTempFile(multipartFile.getInputStream(), multipartFile.getOriginalFilename(), "ofc_data_entry_file");
+				value = recordFileManager.moveFileIntoRepository(fileAttr, tempFile, multipartFile.getOriginalFilename(), false);
+			}
 			command.setValue(value);
 			return submitCommand(command);
 		} else {
 			throw new IllegalArgumentException(String.format("File size (%d) exceeds expected maximum size: %d", multipartFile.getSize(), attrDef.getMaxSize()));
 		}
+	}
+
+	@RequestMapping(value = "record/attribute/file/delete", method = POST, consumes = APPLICATION_JSON_VALUE)
+	@Transactional
+	public @ResponseBody Object deleteAttributeFile(@RequestBody DeleteAttributeCommand command) throws Exception {
+		CollectSurvey survey = getSurvey(command);
+		CollectRecord record = sessionRecordProvider.provide(survey, command.getRecordId(), Step.fromRecordStep(command.getRecordStep()));
+		FileAttribute fileAttr = record.findNodeByPath(command.getNodePath());
+		if (record.isPreview()) {
+			sessionRecordFileManager.prepareDeleteFile(record, fileAttr.getInternalId());
+		} else {
+			recordFileManager.deleteRepositoryFile(fileAttr);
+		}
+		UpdateFileAttributeCommand updateAttributeCommand = new UpdateFileAttributeCommand();
+		PropertyUtils.copyProperties(updateAttributeCommand, command);
+		updateAttributeCommand.setValue(null);
+		return submitCommand(updateAttributeCommand);
 	}
 
 	@RequestMapping(value = "record/attribute/delete", method = POST, consumes = APPLICATION_JSON_VALUE)
