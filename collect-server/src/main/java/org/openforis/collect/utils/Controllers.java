@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.activation.FileTypeMap;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
@@ -24,11 +23,10 @@ public abstract class Controllers {
 	}
 	
 	public static void writeFileToResponse(HttpServletResponse response, File file, String outputFileName) throws FileNotFoundException, IOException {
-		FileTypeMap defaultFileTypeMap = FileTypeMap.getDefaultFileTypeMap();
-		String contentType = defaultFileTypeMap.getContentType(outputFileName);
+		String contentType = Files.getContentType(outputFileName);
 		writeFileToResponse(response, file, outputFileName, contentType);
 	}
-	
+
 	public static void writeFileToResponse(HttpServletResponse response, File file, String outputFileName, 
 			String contentType) throws FileNotFoundException, IOException {
 		writeFileToResponse(response, new FileInputStream(file), outputFileName, contentType, file.length());

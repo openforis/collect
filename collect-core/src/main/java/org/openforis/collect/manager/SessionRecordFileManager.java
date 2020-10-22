@@ -44,6 +44,10 @@ public class SessionRecordFileManager implements Serializable {
 	public void init() {
 		resetTempInfo();
 	}
+	
+	public void destroy() {
+		deleteAllTempFiles();
+	}
 
 	public void resetTempInfo() {
 		nodeIdToTempFilePath.clear();

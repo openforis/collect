@@ -34,7 +34,7 @@ const FileThumbnail = (props) => {
 
   const thumbnailUrl =
     fileType === FileAttributeDefinition.FileTypes.IMAGE && filename
-      ? `${ServiceFactory.recordFileService.BASE_URL}survey/${survey.id}/data/records/${recordId}/${record.step}/node/${node.id}/file`
+      ? `${ServiceFactory.recordFileService.BASE_URL}survey/${survey.id}/data/records/${recordId}/${record.step}/node/${node.id}/thumbnail`
       : null
 
   return thumbnailUrl ? (
