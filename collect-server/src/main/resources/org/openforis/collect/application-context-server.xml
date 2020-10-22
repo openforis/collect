@@ -29,8 +29,8 @@
 	<bean id="recordSessionManager" class="org.openforis.collect.manager.RecordSessionManager"
 		scope="session" />
 	<bean id="sessionManager" class="org.openforis.collect.manager.SessionManager" />
-	<bean id="sessionRecordFileManager" class="org.openforis.collect.manager.SessionRecordFileManager" 
-		init-method="init" destroy-method="destroy" />
+	<bean id="sessionRecordFileManager" class="org.openforis.collect.manager.SessionRecordFileManager"
+		scope="session" init-method="init" destroy-method="destroy" />
 	<bean id="volatileRecordIndexManager"
 		class="org.openforis.collect.remoting.service.recordindex.VolatileRecordIndexManager"
 		init-method="init" scope="session" lazy-init="false" autowire="byName" />

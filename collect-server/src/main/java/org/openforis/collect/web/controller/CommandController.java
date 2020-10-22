@@ -177,7 +177,7 @@ public class CommandController {
 		CollectRecord record = sessionRecordProvider.provide(survey, command.getRecordId(), Step.fromRecordStep(command.getRecordStep()));
 		FileAttribute fileAttr = record.findNodeByPath(command.getNodePath());
 		if (record.isPreview()) {
-			sessionRecordFileManager.prepareDeleteFile(record, fileAttr.getInternalId());
+			sessionRecordFileManager.deleteTempFile(record, fileAttr.getInternalId());
 		} else {
 			recordFileManager.deleteRepositoryFile(fileAttr);
 		}

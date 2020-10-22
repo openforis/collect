@@ -41,6 +41,8 @@ public class SessionManager {
 	@Autowired
 	private transient RecordManager recordManager;
 	@Autowired
+	private transient SessionRecordFileManager sessionRecordFileManager;
+	@Autowired
 	private transient AppWS appWS;
 	
 	public void createSessionState(HttpSession session) {
@@ -61,6 +63,7 @@ public class SessionManager {
 				releaseRecord();
 			} catch (RecordUnlockedException e) {}
 		}
+		sessionRecordFileManager.destroy();
 	}
 
 	public SessionState getSessionState() {

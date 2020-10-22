@@ -98,9 +98,8 @@ public class RecordFileController extends BasicController implements Serializabl
 				Thumbnails.of(file).size(THUMBNAIL_SIZE, THUMBNAIL_SIZE).toOutputStream(response.getOutputStream());
 				return;
 			}
-		} catch (Exception e) {
-			// Try to write original file to response
-		}
+		} catch (Exception e) {}
+		// Try to write original file to response
 		writeFileToResponse(response, file, surveyId, recordId, nodeId);
 	}
 
