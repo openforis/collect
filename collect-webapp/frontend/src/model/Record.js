@@ -1,5 +1,5 @@
 import Serializable from './Serializable'
-import { CoordinateAttributeDefinition, EntityDefinition } from './Survey'
+import { CoordinateAttributeDefinition, FileAttributeDefinition, EntityDefinition } from './Survey'
 
 export class Record extends Serializable {
   id
@@ -120,6 +120,8 @@ export class Entity extends Node {
           childClass = Entity
         } else if (def instanceof CoordinateAttributeDefinition) {
           childClass = CoordinateAttribute
+        } else if (def instanceof FileAttributeDefinition) {
+          childClass = FileAttribute
         } else {
           childClass = Attribute
         }
@@ -268,6 +270,23 @@ export class CoordinateAttribute extends Attribute {
     // Workaround: Coordinate field "srsId" matches field "srs" in the attribute
     const { srsId: srs, ...other } = value
     super.value = { ...other, srs }
+  }
+}
+
+export class FileAttribute extends Attribute {
+  get value() {
+    const val = super.value
+    if (val === null) {
+      return null
+    }
+    const { file_name, file_size } = val
+    return { filename: file_name, size: file_size }
+  }
+
+  set value(value) {
+    // Workaround: File fields name are different from attribute field names
+    const { filename: file_name, size: file_size } = value
+    super.value = { file_name, file_size }
   }
 }
 

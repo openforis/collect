@@ -1,10 +1,11 @@
 import React from 'react'
 import { Button, Input } from 'reactstrap'
 
+import DeleteIconButton from 'common/components/DeleteIconButton'
+
 import FormItems from './FormItems'
 import EntityCollectionComponent from './EntityCollectionComponent'
 import TabSetContent from './TabSetContent'
-import DeleteNodeButton from './DeleteNodeButton'
 
 export default class MultipleFieldset extends EntityCollectionComponent {
   constructor() {
@@ -75,7 +76,7 @@ export default class MultipleFieldset extends EntityCollectionComponent {
         <Button color="success" onClick={this.handleNewButtonClick}>
           New
         </Button>
-        {selectedEntity && <DeleteNodeButton onClick={this.handleDeleteButtonClick} />}
+        {selectedEntity && <DeleteIconButton onClick={this.handleDeleteButtonClick} />}
         {selectedEntity && (
           <>
             <FormItems itemDefs={itemDef.items} parentEntity={selectedEntity} />

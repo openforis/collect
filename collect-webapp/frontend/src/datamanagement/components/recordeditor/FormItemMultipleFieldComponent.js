@@ -1,14 +1,13 @@
 import './FormItemMultipleFieldComponent.css'
 import React from 'react'
 import { Button } from 'reactstrap'
-import classNames from 'classnames'
 
 import ServiceFactory from 'services/ServiceFactory'
 import EventQueue from 'model/event/EventQueue'
 import { AttributeCreatedEvent, AttributeDeletedEvent, RecordEvent } from 'model/event/RecordEvent'
 
+import DeleteIconButton from 'common/components/DeleteIconButton'
 import FormItemFieldComponent from './FormItemFieldComponent'
-import DeleteNodeButton from './DeleteNodeButton'
 
 export default class FormItemMultipleFieldComponent extends React.Component {
   commandService = ServiceFactory.commandService
@@ -82,7 +81,7 @@ export default class FormItemMultipleFieldComponent extends React.Component {
         {attributes.map((attribute, index) => (
           <div key={`attribute-list-item-${index}`} className="attributes-list-item">
             <FormItemFieldComponent itemDef={itemDef} parentEntity={parentEntity} attribute={attribute} />
-            <DeleteNodeButton onClick={() => this.onDeleteButtonClick(attribute)} />
+            <DeleteIconButton onClick={() => this.onDeleteButtonClick(attribute)} />
           </div>
         ))}
         {attributes.length < maxCount && (

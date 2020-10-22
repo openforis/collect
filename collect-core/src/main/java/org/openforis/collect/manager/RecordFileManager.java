@@ -67,25 +67,40 @@ public class RecordFileManager extends BaseStorageManager {
 	 * Returns true if the record is modified (file name or size different from the old one).
 	 */
 	public boolean moveFileIntoRepository(CollectRecord record, int nodeId, java.io.File newFile, String originalFileName) throws IOException {
-		boolean recordUpdated = false;
 		FileAttribute fileAttribute = (FileAttribute) record.getNodeByInternalId(nodeId);
-		
+		return moveFileIntoRepository(fileAttribute, newFile, originalFileName);
+	}
+	
+	public boolean moveFileIntoRepository(FileAttribute fileAttribute, java.io.File newFile, String originalFileName) throws IOException {
+		org.openforis.idm.model.File value = moveFileIntoRepository(fileAttribute, newFile, originalFileName, true);
+		return value != null;
+	}
+	
+	public org.openforis.idm.model.File moveFileIntoRepository(FileAttribute fileAttribute, java.io.File newFile, String originalFileName, boolean updateRecord) throws IOException {
 		String repositoryFileName = isUniqueFileName(originalFileName) ? originalFileName
 				: generateUniqueRepositoryFileName(fileAttribute, newFile);
 		
 		FileAttributeDefinition defn = fileAttribute.getDefinition();
 		File repositoryFile = new java.io.File(getRepositoryDir(defn), repositoryFileName);
 		
+		org.openforis.idm.model.File value = null;
 		long repositoryFileSize = newFile.length();
 		if ( ! repositoryFileName.equals(fileAttribute.getFilename() ) || 
 				! Long.valueOf(repositoryFileSize).equals(fileAttribute.getSize()) ) {
-			recordUpdated = true;
-			fileAttribute.setFilename(repositoryFileName);
-			fileAttribute.setSize(repositoryFileSize);
+			value = new org.openforis.idm.model.File(repositoryFileName, repositoryFileSize);
+			if (updateRecord) {
+				fileAttribute.setValue(value);
+			}
 		}
+		
 		FileUtils.moveFile(newFile, repositoryFile);
 		
-		return recordUpdated;
+		return value;
+	}
+	
+	public org.openforis.idm.model.File generateFileAttributeValue(FileAttribute fileAttribute, java.io.File file) {
+		String repositoryFileName = generateUniqueRepositoryFileName(fileAttribute, file);
+		return new org.openforis.idm.model.File(repositoryFileName, file.length());
 	}
 	
 	private boolean isUniqueFileName(String fileName) {

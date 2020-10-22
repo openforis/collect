@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.activation.FileTypeMap;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -168,5 +170,10 @@ public class Files {
 		if (folder.exists()) {
 			FileUtils.deleteQuietly(folder);
 		}
+	}
+	
+	public static String getContentType(String fileName) {
+		FileTypeMap defaultFileTypeMap = FileTypeMap.getDefaultFileTypeMap();
+		return defaultFileTypeMap.getContentType(fileName);
 	}
 }

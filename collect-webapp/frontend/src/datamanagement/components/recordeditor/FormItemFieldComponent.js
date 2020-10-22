@@ -6,6 +6,7 @@ import BooleanField from './fields/BooleanField'
 import CodeField from './fields/CodeField'
 import CoordinateField from './fields/CoordinateField'
 import DateField from './fields/DateField'
+import FileField from './fields/FileField'
 import NumberField from './fields/NumberField'
 import TextField from './fields/TextField'
 
@@ -14,6 +15,7 @@ const FIELD_COMPONENTS_BY_TYPE = {
   [AttributeDefinition.Types.CODE]: CodeField,
   [AttributeDefinition.Types.COORDINATE]: CoordinateField,
   [AttributeDefinition.Types.DATE]: DateField,
+  [AttributeDefinition.Types.FILE]: FileField,
   [AttributeDefinition.Types.NUMBER]: NumberField,
   [AttributeDefinition.Types.TEXT]: TextField,
 }

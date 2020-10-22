@@ -19,7 +19,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.utils.MediaTypes;
-import org.openforis.collect.web.manager.RecordProviderSession;
+import org.openforis.collect.web.manager.SessionRecordProvider;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -44,7 +44,7 @@ public class CodeListController {
 	@Autowired
 	private CodeListManager codeListManager;
 	@Autowired
-	private RecordProviderSession recordProviderSession;
+	private SessionRecordProvider sessionRecordProvider;
 	
 	@RequestMapping(value = "survey/{surveyId}/codelist/{codeListId}.csv", method=GET)
 	public @ResponseBody String exportCodeListWork(HttpServletResponse response,
@@ -62,7 +62,7 @@ public class CodeListController {
 			@RequestParam String parentEntityPath,
 			@RequestParam Integer codeAttrDefId) {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
-		CollectRecord record = recordProviderSession.provide(survey, recordId, recordStep);
+		CollectRecord record = sessionRecordProvider.provide(survey, recordId, recordStep);
 		Entity parentEntity = (Entity) record.findNodeByPath(parentEntityPath);
 		CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) survey.getSchema().getDefinitionById(codeAttrDefId);
 		List<CodeListItem> items = codeListManager.loadValidItems(parentEntity, codeAttrDef);

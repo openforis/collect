@@ -34,6 +34,27 @@ export default class CommandService extends AbstractService {
     return this.postJson('command/record/attribute', command)
   }
 
+  updateAttributeFile({ attribute, file }) {
+    const { record, definition, parent } = attribute
+    const { attributeType } = definition
+
+    const command = {
+      surveyId: record.survey.id,
+      recordId: record.id,
+      recordStep: record.step,
+      parentEntityPath: parent.path,
+      nodeDefId: definition.id,
+      nodePath: attribute.path,
+      attributeType,
+    }
+    return this.postFormData('command/record/attribute/file', { file, command: JSON.stringify(command) })
+  }
+
+  deleteAttributeFile({ fileAttribute }) {
+    const command = this._createDeleteNodeCommand(fileAttribute)
+    return this.postJson('command/record/attribute/file/delete', command)
+  }
+
   addEntity(record, parentEntity, entityDef) {
     const command = {
       surveyId: record.survey.id,

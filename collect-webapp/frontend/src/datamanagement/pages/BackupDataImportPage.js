@@ -216,7 +216,7 @@ class BackupDataImportPage extends Component {
                                     acceptedFileTypesDescription={acceptedFileTypesDescription}
                                     handleFileDrop={this.onFileDrop}
                                     height="300px"
-                                    fileToBeImportedPreview={fileToBeImportedPreview} />
+                                    selectedFilePreview={fileToBeImportedPreview} />
                             </Col>
                         </FormGroup>
                         {fileSelected &&

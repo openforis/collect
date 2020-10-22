@@ -24,12 +24,12 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class SessionListener implements HttpSessionListener {
 
 	private static final Logger LOG = LogManager.getLogger(SessionListener.class);
-	
+
 	@Override
 	public void sessionCreated(HttpSessionEvent se) {
 		SessionManager sessionManager = getSessionManager(se);
 		sessionManager.createSessionState(se.getSession());
-		
+
 		logSessionStatusChange(se, sessionManager, true);
 	}
 
@@ -43,21 +43,18 @@ public class SessionListener implements HttpSessionListener {
 				sessionManager.sessionDestroyed();
 			}
 			logSessionStatusChange(se, sessionManager, false);
-		} catch(InvalidSessionException e) {
-			//ignore it, session was anonymous
+		} catch (InvalidSessionException e) {
+			// ignore it, session was anonymous
 		}
 	}
-	
+
 	private void logSessionStatusChange(HttpSessionEvent se, SessionManager sessionManager, boolean created) {
-		if ( LOG.isInfoEnabled() ) {
+		if (LOG.isInfoEnabled()) {
 			SessionState sessionState = sessionManager.getSessionState();
 			User user = sessionState == null ? null : sessionState.getUser();
-			
-			LOG.info("Session " + 
-					(created ? "created" : "destroyed") + 
-					": " + se.getSession().getId() + 
-					(user == null ? "" : " user: " + user.getUsername())
-			);
+
+			LOG.info("Session " + (created ? "created" : "destroyed") + ": " + se.getSession().getId()
+					+ (user == null ? "" : " user: " + user.getUsername()));
 		}
 	}
 
@@ -66,11 +63,10 @@ public class SessionListener implements HttpSessionListener {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T extends Object> T getBean(HttpSessionEvent se,
-			String name) {
+	private <T extends Object> T getBean(HttpSessionEvent se, String name) {
 		ServletContext sc = se.getSession().getServletContext();
 		WebApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(sc);
 		return (T) applicationContext.getBean(name);
 	}
-	
+
 }

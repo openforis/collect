@@ -44,6 +44,11 @@ public class SessionRecordFileManager implements Serializable {
 	public void init() {
 		resetTempInfo();
 	}
+	
+	public void destroy() {
+		deleteAllTempFiles();
+		resetTempInfo();
+	}
 
 	public void resetTempInfo() {
 		nodeIdToTempFilePath.clear();
@@ -116,7 +121,13 @@ public class SessionRecordFileManager implements Serializable {
 				filesToDelete.put(nodeId, fileName);
 			}
 		} else {
-			//remove temp file
+			deleteTempFile(record, nodeId);
+		}
+	}
+	
+	public void deleteTempFile(CollectRecord record, int nodeId) {
+		TempFileInfo tempFileInfo = nodeIdToTempFilePath.get(nodeId);
+		if (tempFileInfo != null ) {
 			java.io.File tempFile = new java.io.File(tempFileInfo.getTempFilePath());
 			tempFile.delete();
 			nodeIdToTempFilePath.remove(nodeId);

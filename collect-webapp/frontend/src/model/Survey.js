@@ -278,6 +278,7 @@ export class AttributeDefinition extends NodeDefinition {
     CODE: 'CODE',
     COORDINATE: 'COORDINATE',
     DATE: 'DATE',
+    FILE: 'FILE',
     NUMBER: 'NUMBER',
     TEXT: 'TEXT',
   }
@@ -308,6 +309,19 @@ export class CoordinateAttributeDefinition extends AttributeDefinition {
   }
 }
 
+export class FileAttributeDefinition extends AttributeDefinition {
+  fileType
+  extensions
+  maxSize
+
+  static FileTypes = {
+    AUDIO: 'AUDIO',
+    DOCUMENT: 'DOCUMENT',
+    IMAGE: 'IMAGE',
+    VIDEO: 'VIDEO',
+  }
+}
+
 export class NumericAttributeDefinition extends AttributeDefinition {
   numericType
   precisions
@@ -317,5 +331,6 @@ export class NumericAttributeDefinition extends AttributeDefinition {
 const attributeDefinitionClassByType = {
   [AttributeDefinition.Types.CODE]: CodeAttributeDefinition,
   [AttributeDefinition.Types.COORDINATE]: CoordinateAttributeDefinition,
+  [AttributeDefinition.Types.FILE]: FileAttributeDefinition,
   [AttributeDefinition.Types.NUMBER]: NumericAttributeDefinition,
 }

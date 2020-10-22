@@ -8,12 +8,12 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 
-public class RecordProviderSession extends CachedRecordProvider {
+public class SessionRecordProvider extends CachedRecordProvider {
 
 	private CachedRecordProvider delegate;
 	private Map<Integer, CollectRecord> recordsPreviewBySurvey = new HashMap<Integer, CollectRecord>();
 
-	public RecordProviderSession(CachedRecordProvider cachedRecordProvider) {
+	public SessionRecordProvider(CachedRecordProvider cachedRecordProvider) {
 		super(null);
 		this.delegate = cachedRecordProvider;
 	}

@@ -30,6 +30,7 @@ import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.DateAttribute;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.FileAttribute;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.NumberAttribute;
@@ -292,6 +293,8 @@ public class EventProducer {
 				event = new CoordinateAttributeUpdatedEvent();
 			} else if (attribute instanceof DateAttribute) {
 				event = new DateAttributeUpdatedEvent();
+			} else if (attribute instanceof FileAttribute) {
+				event = new FileAttributeUpdatedEvent();
 			} else if (attribute instanceof NumberAttribute<?, ?>) {
 				Type valueType = ((NumericAttributeDefinition) attribute.getDefinition()).getType();
 				switch (valueType) {
