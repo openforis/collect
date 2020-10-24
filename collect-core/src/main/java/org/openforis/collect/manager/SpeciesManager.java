@@ -115,13 +115,10 @@ public class SpeciesManager {
 	
 	public List<TaxonOccurrence> findByVernacularName(CollectTaxonomy taxonomy, TaxonAttribute attr, String searchString, int maxResults, TaxonSearchParameters parameters) {
 		List<TaxonVernacularName> list = null;
-		String[] qualifierValues = null;
-		if ( attr != null ) {
-			qualifierValues = extractQualifierValues(attr);
-		}
-		if (qualifierValues == null){
+		if (attr == null){
 			list = taxonVernacularNameDao.findByVernacularName(taxonomy.getId(), searchString, maxResults);
 		} else{
+			String[] qualifierValues = extractQualifierValues(attr);
 			list = taxonVernacularNameDao.findByVernacularName(taxonomy.getId(), searchString, qualifierValues, maxResults);
 		}
 		return fromVernacularNamesToTaxonOccurrences(taxonomy, list, parameters);

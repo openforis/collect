@@ -1,10 +1,11 @@
 import React from 'react'
-import { Col, Input, Label, Row } from 'reactstrap'
+import { Input, Label } from 'reactstrap'
 import { CoordinateAttributeDefinition } from '../../../../model/Survey'
 
 import AbstractField from './AbstractField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
 import ValidationTooltip from 'common/components/ValidationTooltip'
+import CompositeAttributeFormItem from './CompositeAttributeFormItem'
 
 const numericField = ({ value, onChange, errors, warnings }) => (
   <Input
@@ -14,15 +15,6 @@ const numericField = ({ value, onChange, errors, warnings }) => (
     type="number"
     onChange={onChange}
   />
-)
-
-const formItem = ({ field, fieldLabel, inputField }) => (
-  <Row key={field}>
-    <Col style={{ maxWidth: '50px' }}>
-      <Label>{fieldLabel}</Label>
-    </Col>
-    <Col>{inputField}</Col>
-  </Row>
 )
 
 export default class CoordinateField extends AbstractField {
@@ -144,6 +136,8 @@ export default class CoordinateField extends AbstractField {
           case CoordinateAttributeDefinition.FieldsOrder.Y_X_SRS:
             internalParts = [yField, xField, srsField]
             break
+          default:
+            throw new Error(`Fields order not supported: ${fieldsOrder}`)
         }
         if (includeAltitudeField) {
           internalParts.push(altitudeField)
@@ -156,11 +150,11 @@ export default class CoordinateField extends AbstractField {
         const yFieldLabel = attrDef.getFieldLabel('y') || 'Y'
         const srsFieldLabel = attrDef.getFieldLabel('srs') || 'SRS'
 
-        const xFormItem = formItem({ field: 'x', fieldLabel: xFieldLabel, inputField: xField })
-        const yFormItem = formItem({ field: 'y', fieldLabel: yFieldLabel, inputField: yField })
-        const srsFormItem = showSrsField
-          ? formItem({ field: 'srs', fieldLabel: srsFieldLabel, inputField: srsField })
-          : null
+        const xFormItem = <CompositeAttributeFormItem field="x" label={xFieldLabel} inputField={xField} />
+        const yFormItem = <CompositeAttributeFormItem field="y" label={yFieldLabel} inputField={yField} />
+        const srsFormItem = showSrsField ? (
+          <CompositeAttributeFormItem field="srs" label={srsFieldLabel} inputField={srsField} />
+        ) : null
 
         switch (attrDef.fieldsOrder) {
           case CoordinateAttributeDefinition.FieldsOrder.SRS_X_Y:
@@ -175,14 +169,20 @@ export default class CoordinateField extends AbstractField {
           case CoordinateAttributeDefinition.FieldsOrder.Y_X_SRS:
             internalParts = [yFormItem, xFormItem, srsFormItem]
             break
+          default:
+            throw new Error(`Fields order not supported: ${fieldsOrder}`)
         }
         if (includeAltitudeField) {
           const altitudeFieldLabel = attrDef.getFieldLabel('altitude') || 'Altitude'
-          internalParts.push(formItem({ field: 'altitude', fieldLabel: altitudeFieldLabel, inputField: altitudeField }))
+          internalParts.push(
+            <CompositeAttributeFormItem field="altitude" label={altitudeFieldLabel} inputField={altitudeField} />
+          )
         }
         if (includeAccuracyField) {
           const accuracyFieldLabel = attrDef.getFieldLabel('accuracy') || 'Accuracy'
-          internalParts.push(formItem({ field: 'accuracy', fieldLabel: accuracyFieldLabel, inputField: accuracyField }))
+          internalParts.push(
+            <CompositeAttributeFormItem field="accuracy" label={accuracyFieldLabel} inputField={accuracyField} />
+          )
         }
       }
       return internalParts

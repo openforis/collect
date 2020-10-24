@@ -7,6 +7,7 @@ import RecordService from './RecordService'
 import RecordFileService from './RecordFileService'
 import SaikuService from './SaikuService'
 import SessionService from './SessionService'
+import SpeciesService from './SpeciesService'
 import SurveyService from './SurveyService'
 import UserService from './UserService'
 import UserGroupService from './UserGroupService'
@@ -21,6 +22,7 @@ export default class ServiceFactory {
   static recordFileService = new RecordFileService()
   static saikuService = new SaikuService()
   static sessionService = new SessionService()
+  static speciesService = new SpeciesService()
   static surveyService = new SurveyService()
   static userService = new UserService()
   static userGroupService = new UserGroupService()

@@ -52,6 +52,7 @@ public class SpringCommandDispatcher extends RegistryCommandDispatcher {
 		register(UpdateFileAttributeCommand.class, updateAttributeCommandHandler);
 		register(UpdateIntegerAttributeCommand.class, updateAttributeCommandHandler);
 		register(UpdateRealAttributeCommand.class, updateAttributeCommandHandler);
+		register(UpdateTaxonAttributeCommand.class, updateAttributeCommandHandler);
 		register(UpdateTextAttributeCommand.class, updateAttributeCommandHandler);
 
 		DeleteNodeCommandHandler deleteNodeCommandHandler = new DeleteNodeCommandHandler();

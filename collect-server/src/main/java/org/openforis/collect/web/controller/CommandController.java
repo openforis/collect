@@ -28,6 +28,7 @@ import org.openforis.collect.command.UpdateDateAttributeCommand;
 import org.openforis.collect.command.UpdateFileAttributeCommand;
 import org.openforis.collect.command.UpdateIntegerAttributeCommand;
 import org.openforis.collect.command.UpdateRealAttributeCommand;
+import org.openforis.collect.command.UpdateTaxonAttributeCommand;
 import org.openforis.collect.command.UpdateTextAttributeCommand;
 import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.event.EventListener;
@@ -51,6 +52,7 @@ import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
+import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.model.BooleanValue;
@@ -61,6 +63,7 @@ import org.openforis.idm.model.File;
 import org.openforis.idm.model.FileAttribute;
 import org.openforis.idm.model.IntegerValue;
 import org.openforis.idm.model.RealValue;
+import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.TextValue;
 import org.openforis.idm.model.Value;
 import org.springframework.beans.BeanUtils;
@@ -308,6 +311,13 @@ public class CommandController {
 				Number number = (Number) valueByField.get(NumberAttributeDefinition.VALUE_FIELD);
 				return numericType == Type.INTEGER ? new IntegerValue(number == null ? null : number.intValue(), unit)
 						: new RealValue(number == null ? null : number.doubleValue(), unit);
+			case TAXON:
+				String code = (String) valueByField.get(TaxonAttributeDefinition.CODE_FIELD_NAME);
+				String scientificName = (String) valueByField.get(TaxonAttributeDefinition.SCIENTIFIC_NAME_FIELD_NAME);
+				String vernacularName = (String) valueByField.get(TaxonAttributeDefinition.VERNACULAR_NAME_FIELD_NAME);
+				String languageCode = (String) valueByField.get(TaxonAttributeDefinition.LANGUAGE_CODE_FIELD_NAME);
+				String languageVariety = (String) valueByField.get(TaxonAttributeDefinition.LANGUAGE_VARIETY_FIELD_NAME);
+				return new TaxonOccurrence(code, scientificName, vernacularName, languageCode, languageVariety);
 			case TEXT:
 				return new TextValue((String) valueByField.get(TextAttributeDefinition.VALUE_FIELD));
 			default:
@@ -344,6 +354,8 @@ public class CommandController {
 			case NUMBER:
 				return numericType == Type.INTEGER ? UpdateIntegerAttributeCommand.class
 						: UpdateRealAttributeCommand.class;
+			case TAXON:
+				return UpdateTaxonAttributeCommand.class;
 			case TEXT:
 				return UpdateTextAttributeCommand.class;
 			default:
