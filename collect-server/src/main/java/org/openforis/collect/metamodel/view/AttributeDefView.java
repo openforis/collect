@@ -1,6 +1,7 @@
 package org.openforis.collect.metamodel.view;
 
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.designer.metamodel.NodeType;
@@ -12,6 +13,7 @@ public class AttributeDefView extends NodeDefView {
 	private List<String> fieldLabels;
 	private boolean showInRecordSummaryList;
 	private boolean qualifier;
+	private Map<String, Boolean> visibilityByField;
 	
 	public AttributeDefView(int id, String name, String label, AttributeType type, 
 			List<String> fieldNames, boolean key, boolean multiple, boolean showInRecordSummaryList, boolean qualifier) {
@@ -46,4 +48,11 @@ public class AttributeDefView extends NodeDefView {
 		this.fieldLabels = fieldLabels;
 	}
 
+	public Map<String, Boolean> getVisibilityByField() {
+		return visibilityByField;
+	}
+	
+	public void setVisibilityByField(Map<String, Boolean> visibilityByField) {
+		this.visibilityByField = visibilityByField;
+	}
 }

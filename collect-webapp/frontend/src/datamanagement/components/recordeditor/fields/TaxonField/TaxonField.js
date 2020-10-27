@@ -1,231 +1,145 @@
-import React, { useEffect, useState } from 'react'
-import Autocomplete from '@material-ui/lab/Autocomplete'
-import { TextField } from '@material-ui/core'
+import './TaxonField.css'
 
-import ServiceFactory from 'services/ServiceFactory'
+import React from 'react'
+import { TextField } from '@material-ui/core'
+import Autocomplete from '@material-ui/lab/Autocomplete'
+
 import { TaxonAttributeDefinition } from 'model/Survey'
 
-import FieldLoadingSpinner from '../FieldLoadingSpinner'
+import Objects from 'utils/Objects'
+import L from 'utils/Labels'
+import Languages from 'utils/Languages'
+
 import AbstractField from '../AbstractField'
 import CompositeAttributeFormItem from '../CompositeAttributeFormItem'
-import Objects from '../../../../../utils/Objects'
+import TaxonAutoCompleteField from './TaxonAutoCompleteField'
 
-const AutoCompleteField = (props) => {
-  const { parentEntity, fieldDef, queryField, field, valueByFields, width, onChange } = props
+const LANG_CODE_STANDARD = Languages.STANDARDS.ISO_639_3
 
-  const valueField = TaxonAttributeDefinition.VALUE_FIELD_BY_FIELD[field]
-  const initialInputValue = valueByFields ? valueByFields[field] : ''
-  console.log('===field', field)
-  console.log('----initialInputValue', initialInputValue)
-  const selectedTaxonOccurrence = Objects.mapKeys({
-    obj: valueByFields,
-    keysMapping: TaxonAttributeDefinition.VALUE_FIELD_BY_FIELD,
-  })
-  const highestRank = 'FAMILY'
-  const includeUniqueVernacularName = false
-  const includeAncestorTaxons = false
-
-  const surveyId = parentEntity.survey.id
-  const taxonomyName = fieldDef.attributeDefinition.taxonomyName
-
-  const [open, setOpen] = useState(false)
-  const [taxonOccurrences, setTaxonOccurrences] = useState([])
-  const [noResultsFound, setNoResultsFound] = useState(false)
-  const [searchString, setSearchString] = useState(initialInputValue)
-
-  const loading = open && !noResultsFound && taxonOccurrences.length === 0
-
-  useEffect(() => {
-    let active = true
-
-    if (!loading) {
-      return undefined
-    }
-
-    ;(async () => {
-      const query = {
-        field: queryField,
-        searchString,
-        parameters: { highestRank, includeUniqueVernacularName, includeAncestorTaxons },
-      }
-      const taxa = await ServiceFactory.speciesService.findTaxa({ surveyId, taxonomyName, query })
-
-      if (active) {
-        setTaxonOccurrences(taxa)
-        setNoResultsFound(taxa.length === 0)
-      }
-    })()
-
-    return () => {
-      active = false
-    }
-  }, [loading, searchString])
-
-  useEffect(() => {
-    if (!open) {
-      setTaxonOccurrences([])
-      setNoResultsFound(false)
-    }
-  }, [open])
-
-  useEffect(() => {
-    if (open) {
-      setTaxonOccurrences([])
-      setNoResultsFound(false)
-    }
-  }, [searchString])
-
-  const gridTemplateColumns = '100px 200px 200px 50px 50px'
-
-  return (
-    <Autocomplete
-      style={{ width }}
-      open={open}
-      openOnFocus={false}
-      onOpen={() => {
-        setOpen(true)
-      }}
-      onClose={() => {
-        setOpen(false)
-      }}
-      value={selectedTaxonOccurrence}
-      inputValue={searchString}
-      onChange={(_, taxonOccurrence) => onChange(taxonOccurrence)}
-      onInputChange={(_, value) => setSearchString(value)}
-      getOptionLabel={Objects.getProp(valueField, '')}
-      getOptionSelected={(taxonOccurrence, value) => taxonOccurrence.code === value.code}
-      options={taxonOccurrences}
-      loading={loading}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          variant="outlined"
-          InputProps={{
-            ...params.InputProps,
-            endAdornment: (
-              <>
-                {loading && <FieldLoadingSpinner />}
-                {params.InputProps.endAdornment}
-              </>
-            ),
-          }}
-        />
-      )}
-      renderOption={(taxonOccurrence) => {
-        const { code, scientificName, vernacularName, languageCode, languageVariety } = taxonOccurrence
-        return (
-          <div style={{ display: 'grid', gridTemplateColumns }}>
-            <div>{code}</div>
-            <div>{scientificName}</div>
-            <div>{vernacularName}</div>
-            <div>{languageCode}</div>
-            <div>{languageVariety}</div>
-          </div>
-        )
-      }}
-    />
-  )
-}
+const ALL_AUTOCOMPLETE_FIELDS = [
+  TaxonAttributeDefinition.FIELDS.FAMILY_CODE,
+  TaxonAttributeDefinition.FIELDS.FAMILY_SCIENTIFIC_NAME,
+  TaxonAttributeDefinition.FIELDS.CODE,
+  TaxonAttributeDefinition.FIELDS.SCIENTIFIC_NAME,
+  TaxonAttributeDefinition.FIELDS.VERNACULAR_NAME,
+]
+const ALL_LANGUAGE_FIELDS = [
+  TaxonAttributeDefinition.FIELDS.LANGUAGE_CODE,
+  TaxonAttributeDefinition.FIELDS.LANGUAGE_VARIETY,
+]
+const ALL_FIELDS = [...ALL_AUTOCOMPLETE_FIELDS, ...ALL_LANGUAGE_FIELDS]
 
 export default class TaxonField extends AbstractField {
+  LANG_CODES = Languages.codes(LANG_CODE_STANDARD)
+
   constructor() {
     super()
 
     this.onChangeField = this.onChangeField.bind(this)
+    this.prepareValueUpdate = this.prepareValueUpdate.bind(this)
+    this.undoValueUpdate = this.undoValueUpdate.bind(this)
   }
 
   onChangeField(field) {
-    return (taxonOccurrence) => {
-      const value = Objects.mapKeys({
-        obj: taxonOccurrence,
-        keysMapping: TaxonAttributeDefinition.FIELD_BY_VALUE_FIELD,
-      })
-      this.onAttributeUpdate({ value })
+    if (ALL_LANGUAGE_FIELDS.includes(field)) {
+      return (langCode) => {
+        const { value } = this.state
+        const valueUpdated = { ...value, [field]: langCode }
+        this.onAttributeUpdate({ value: valueUpdated, debounced: false })
+      }
+    } else {
+      return (taxonOccurrence) => {
+        const value = Objects.mapKeys({
+          obj: taxonOccurrence,
+          keysMapping: TaxonAttributeDefinition.FIELD_BY_VALUE_FIELD,
+        })
+        this.setState({ previousValue: null }, () => this.onAttributeUpdate({ value, debounced: false }))
+      }
     }
+  }
+
+  prepareValueUpdate() {
+    const { value, previousValue } = this.state
+    if (!previousValue) {
+      this.setState({ previousValue: value, value: null, dirty: true })
+    }
+  }
+
+  undoValueUpdate() {
+    const { previousValue } = this.state
+    this.setState({ previousValue: null, value: previousValue, dirty: false })
   }
 
   render() {
     const { inTable, fieldDef, parentEntity } = this.props
-    const { dirty, value = {} } = this.state
-    const { code, scientificName, vernacularName, languageCode, languageVariety } = value || {}
+    const { attributeDefinition } = fieldDef
+    const { visibilityByField, showFamily } = attributeDefinition
+    const { value = {} } = this.state
+    const { code, vernacular_name: vernacularName } = value || {}
 
-    const codeField = (
-      <AutoCompleteField
-        key={TaxonAttributeDefinition.FIELDS.CODE}
-        field={TaxonAttributeDefinition.FIELDS.CODE}
-        queryField={TaxonAttributeDefinition.QUERY_FIELDS.CODE}
-        fieldDef={fieldDef}
-        parentEntity={parentEntity}
-        valueByFields={value}
-        onChange={this.onChangeField(TaxonAttributeDefinition.FIELDS.CODE)}
-      />
-    )
+    const getLangLabel = (langCode) => Languages.label(langCode, LANG_CODE_STANDARD)
+    const langOptions = Languages.items(LANG_CODE_STANDARD)
 
-    const scientificNameField = (
-      <AutoCompleteField
-        key={TaxonAttributeDefinition.FIELDS.SCIENTIFIC_NAME}
-        field={TaxonAttributeDefinition.FIELDS.SCIENTIFIC_NAME}
-        queryField={TaxonAttributeDefinition.QUERY_FIELDS.SCIENTIFIC_NAME}
-        fieldDef={fieldDef}
-        parentEntity={parentEntity}
-        valueByFields={value}
-        onChange={this.onChangeField(TaxonAttributeDefinition.FIELDS.SCIENTIFIC_NAME)}
-      />
-    )
+    const isFieldIncluded = (field) =>
+      visibilityByField[field] &&
+      (![TaxonAttributeDefinition.FIELDS.FAMILY_CODE, TaxonAttributeDefinition.FIELDS.FAMILY_SCIENTIFIC_NAME].includes(
+        field
+      ) ||
+        showFamily)
 
-    const vernacularNameField = (
-      <AutoCompleteField
-        key={TaxonAttributeDefinition.FIELDS.VERNACULAR_NAME}
-        field={TaxonAttributeDefinition.FIELDS.VERNACULAR_NAME}
-        queryField={TaxonAttributeDefinition.QUERY_FIELDS.VERNACULAR_NAME}
-        fieldDef={fieldDef}
-        parentEntity={parentEntity}
-        valueByFields={value}
-        onChange={this.onChangeField(TaxonAttributeDefinition.FIELDS.VERNACULAR_NAME)}
-      />
-    )
-
-    const getInternalContent = () => {
-      let internalParts = null
-      if (inTable) {
-        internalParts = [codeField, scientificNameField, vernacularNameField]
-      } else {
-        const labelWidth = 100
-        const codeFieldLabel = 'Code'
-        const codeFormItem = (
-          <CompositeAttributeFormItem
-            key={TaxonAttributeDefinition.FIELDS.CODE}
-            field={TaxonAttributeDefinition.FIELDS.CODE}
-            label={codeFieldLabel}
-            inputField={codeField}
-            labelWidth={labelWidth}
-          />
-        )
-        const scientificNameFieldLabel = 'Scientific name'
-        const scientificNameFormItem = (
-          <CompositeAttributeFormItem
-            key={TaxonAttributeDefinition.FIELDS.SCIENTIFIC_NAME}
-            field={TaxonAttributeDefinition.FIELDS.SCIENTIFIC_NAME}
-            label={scientificNameFieldLabel}
-            inputField={scientificNameField}
-            labelWidth={labelWidth}
-          />
-        )
-        const vernacularNameFieldLabel = 'Vernacular name'
-        const vernacularNameFormItem = (
-          <CompositeAttributeFormItem
-            key={TaxonAttributeDefinition.FIELDS.VERNACULAR_NAME}
-            field={TaxonAttributeDefinition.FIELDS.VERNACULAR_NAME}
-            label={vernacularNameFieldLabel}
-            inputField={vernacularNameField}
-            labelWidth={labelWidth}
-          />
-        )
-        internalParts = [codeFormItem, scientificNameFormItem, vernacularNameFormItem]
+    const fields = ALL_FIELDS.reduce((acc, field) => {
+      if (isFieldIncluded(field)) {
+        acc.push(field)
       }
-      return internalParts
-    }
+      return acc
+    }, [])
 
-    return getInternalContent()
+    const autocompleteFields = ALL_AUTOCOMPLETE_FIELDS.filter(isFieldIncluded)
+    const languageFields = ALL_LANGUAGE_FIELDS.filter(isFieldIncluded)
+
+    const inputFields = [
+      ...autocompleteFields.map((field) => (
+        <TaxonAutoCompleteField
+          key={field}
+          field={field}
+          fieldDef={fieldDef}
+          parentEntity={parentEntity}
+          valueByFields={value}
+          onInputChange={this.prepareValueUpdate}
+          onDismiss={this.undoValueUpdate}
+          onSelect={this.onChangeField(field)}
+        />
+      )),
+      ...languageFields.map((field) => {
+        const langCode = Objects.getProp(field)(value)
+        const selectedOption = langCode ? { code: langCode, label: getLangLabel(langCode) } : null
+        return (
+          <Autocomplete
+            key={field}
+            className="taxon-autocomplete-language"
+            style={{ width: 300 }}
+            value={selectedOption}
+            options={langOptions}
+            getOptionSelected={(option) => option.code === langCode}
+            getOptionLabel={(option) => `${option.label} (${option.code})`}
+            renderInput={(params) => <TextField {...params} variant="outlined" />}
+            onChange={(_, option) => this.onChangeField(field)(option.code)}
+            disabled={!code || code != 'UNL' || !vernacularName}
+          />
+        )
+      }),
+    ]
+
+    return inTable
+      ? inputFields
+      : fields.map((field, index) => (
+          <CompositeAttributeFormItem
+            key={field}
+            field={field}
+            label={L.l(`dataManagement.dataEntry.taxonField.${field}`)}
+            inputField={inputFields[index]}
+            labelWidth={160}
+          />
+        ))
   }
 }

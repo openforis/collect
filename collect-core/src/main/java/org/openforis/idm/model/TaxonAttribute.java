@@ -122,7 +122,10 @@ public class TaxonAttribute extends Attribute<TaxonAttributeDefinition, TaxonOcc
 		String vernacularName = getVernacularName();
 		String languageCode = getLanguageCode();
 		String languageVariety = getLanguageVariety();
-		return new TaxonOccurrence(code, scientificName, vernacularName, languageCode, languageVariety);
+		TaxonOccurrence taxonOccurrence = new TaxonOccurrence(code, scientificName, vernacularName, languageCode, languageVariety);
+		taxonOccurrence.setFamilyCode(getFamilyCode());
+		taxonOccurrence.setFamilyScientificName(getFamilyScientificName());
+		return taxonOccurrence;
 	}
 
 	@Override
@@ -138,6 +141,9 @@ public class TaxonAttribute extends Attribute<TaxonAttributeDefinition, TaxonOcc
 		if (familyAncestor != null) {
 			setFamilyCode(familyAncestor.getCode());
 			setFamilyScientificName(familyAncestor.getScientificName());
+		} else {
+			setFamilyCode(value.getFamilyCode());
+			setFamilyScientificName(value.getScientificName());
 		}
 	}
 	

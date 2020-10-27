@@ -172,16 +172,6 @@ public class SurveyViewGenerator {
 								attrDef.isMultiple(), showInSummary, qualifier);
 						attrDefView.setTaxonomyName(attrDef.getTaxonomy());
 						attrDefView.setHighestRank(attrDef.getHighestTaxonRank());
-						attrDefView.setCodeVisible(
-								uiOptions.isVisibleField(attrDef, TaxonAttributeDefinition.CODE_FIELD_NAME));
-						attrDefView.setScientificNameVisible(
-								uiOptions.isVisibleField(attrDef, TaxonAttributeDefinition.SCIENTIFIC_NAME_FIELD_NAME));
-						attrDefView.setVernacularNameVisible(
-								uiOptions.isVisibleField(attrDef, TaxonAttributeDefinition.VERNACULAR_NAME_FIELD_NAME));
-						attrDefView.setLanguageCodeVisible(
-								uiOptions.isVisibleField(attrDef, TaxonAttributeDefinition.LANGUAGE_CODE_FIELD_NAME));
-						attrDefView.setLanguageVarietyVisible(uiOptions.isVisibleField(attrDef,
-								TaxonAttributeDefinition.LANGUAGE_VARIETY_FIELD_NAME));
 						attrDefView.setShowFamily(annotations.isShowFamily(attrDef));
 						attrDefView.setIncludeUniqueVernacularName(annotations.isIncludeUniqueVernacularName(attrDef));
 						attrDefView.setAllowUnlisted(annotations.isAllowUnlisted(attrDef));
@@ -193,12 +183,16 @@ public class SurveyViewGenerator {
 								qualifier);
 					}
 					AttributeDefinition attrDef = ((AttributeDefinition) def);
+					AttributeDefView attrDefView = (AttributeDefView) view;
 					List<FieldLabel> fieldLabels = attrDef.getFieldLabels();
+					Map<String, Boolean> visibilityByField = new HashMap<String, Boolean>();
 					List<String> fieldLabelsView = new ArrayList<String>(fieldLabels.size());
 					for (String fieldName : ((AttributeDefinition) def).getFieldNames()) {
 						fieldLabelsView.add(attrDef.getFieldLabel(fieldName, languageCode));
+						visibilityByField.put(fieldName, uiOptions.isVisibleField(attrDef, fieldName));
 					}
-					((AttributeDefView) view).setFieldLabels(fieldLabelsView);
+					attrDefView.setFieldLabels(fieldLabelsView);
+					attrDefView.setVisibilityByField(visibilityByField);
 				}
 				UIModelObject uiModelObject = survey.getUIConfiguration().getModelObjectByNodeDefinitionId(def.getId());
 				view.setHideWhenNotRelevant(uiModelObject != null && uiModelObject.isHideWhenNotRelevant());

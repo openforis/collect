@@ -23,6 +23,8 @@ public final class TaxonOccurrence extends AbstractValue {
 	private String vernacularName;
 	private String languageCode;
 	private String languageVariety;
+	private String familyCode;
+	private String familyScientificName;
 	private TaxonRank taxonRank;
 	private List<String> infoAttributes = new ArrayList<String>();
 	private List<TaxonOccurrence> ancestorTaxons;
@@ -150,6 +152,22 @@ public final class TaxonOccurrence extends AbstractValue {
 	
 	public void setLanguageVariety(String languageVariety) {
 		this.languageVariety = languageVariety;
+	}
+	
+	public String getFamilyCode() {
+		return familyCode;
+	}
+	
+	public void setFamilyCode(String familyCode) {
+		this.familyCode = familyCode;
+	}
+	
+	public String getFamilyScientificName() {
+		return familyScientificName;
+	}
+	
+	public void setFamilyScientificName(String familyScientificName) {
+		this.familyScientificName = familyScientificName;
 	}
 	
 	public List<TaxonOccurrence> getAncestorTaxons() {

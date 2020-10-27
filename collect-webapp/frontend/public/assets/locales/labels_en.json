@@ -271,6 +271,15 @@
                 },
                 "acceptedFileDescription": "{0} file types ({1})"
             },
+            "taxonField": {
+                "code": "Code",
+                "scientific_name": "Scientific name",
+                "vernacular_name": "Vernacular name",
+                "language_code": "Language code",
+                "language_variety": "Language variety",
+                "family_code": "Family code",
+                "family_scientific_name": "Family name"
+            },
             "validation": {
                 "required": "Required field",
                 "minCount": "At least {0} items required",

@@ -9,11 +9,6 @@ public class TaxonAttributeDefView extends AttributeDefView {
 
 	private String taxonomyName;
 	private TaxonRank highestRank;
-	private boolean codeVisible;
-	private boolean scientificNameVisible;
-	private boolean vernacularNameVisible;
-	private boolean languageCodeVisible;
-	private boolean languageVarietyVisible;
 	private boolean showFamily;
 	private boolean includeUniqueVernacularName;
 	private boolean allowUnlisted;
@@ -37,46 +32,6 @@ public class TaxonAttributeDefView extends AttributeDefView {
 	
 	public void setHighestRank(TaxonRank highestRank) {
 		this.highestRank = highestRank;
-	}
-	
-	public boolean isCodeVisible() {
-		return codeVisible;
-	}
-	
-	public void setCodeVisible(boolean codeVisible) {
-		this.codeVisible = codeVisible;
-	}
-
-	public boolean isScientificNameVisible() {
-		return scientificNameVisible;
-	}
-	
-	public void setScientificNameVisible(boolean scientificNameVisible) {
-		this.scientificNameVisible = scientificNameVisible;
-	}
-
-	public boolean isVernacularNameVisible() {
-		return vernacularNameVisible;
-	}
-	
-	public void setVernacularNameVisible(boolean vernacularNameVisible) {
-		this.vernacularNameVisible = vernacularNameVisible;
-	}
-
-	public boolean isLanguageCodeVisible() {
-		return languageCodeVisible;
-	}
-	
-	public void setLanguageCodeVisible(boolean languageCodeVisible) {
-		this.languageCodeVisible = languageCodeVisible;
-	}
-
-	public boolean isLanguageVarietyVisible() {
-		return languageVarietyVisible;
-	}
-	
-	public void setLanguageVarietyVisible(boolean languageVarietyVisible) {
-		this.languageVarietyVisible = languageVarietyVisible;
 	}
 	
 	public boolean isShowFamily() {
