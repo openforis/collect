@@ -24,12 +24,12 @@ const fetchTaxa = async ({ surveyId, fieldDef, queryField, searchString, onCompl
     if (taxa.length === 0 && allowUnlisted) {
       taxa.push(
         {
-          [TaxonAttributeDefinition.VALUE_FIELDS.CODE]: 'UNK',
-          [TaxonAttributeDefinition.VALUE_FIELDS.SCIENTIFIC_NAME]: 'Unknown',
+          [TaxonAttributeDefinition.ValueFields.CODE]: 'UNK',
+          [TaxonAttributeDefinition.ValueFields.SCIENTIFIC_NAME]: 'Unknown',
         },
         {
-          [TaxonAttributeDefinition.VALUE_FIELDS.CODE]: 'UNL',
-          [TaxonAttributeDefinition.VALUE_FIELDS.SCIENTIFIC_NAME]: 'Unlisted',
+          [TaxonAttributeDefinition.ValueFields.CODE]: 'UNL',
+          [TaxonAttributeDefinition.ValueFields.SCIENTIFIC_NAME]: 'Unlisted',
         }
       )
     }
@@ -55,15 +55,15 @@ const TaxonAutoCompleteField = (props) => {
   const { attributeDefinition } = fieldDef
   const { showFamily } = attributeDefinition
 
-  const queryField = TaxonAttributeDefinition.QUERY_FIELDS_BY_FIELD[field]
+  const queryField = TaxonAttributeDefinition.QueryFieldByField[field]
 
   const surveyId = parentEntity.survey.id
 
-  const valueField = TaxonAttributeDefinition.VALUE_FIELD_BY_FIELD[field]
+  const valueField = TaxonAttributeDefinition.ValueFieldByField[field]
   const initialInputValue = Objects.getProp(field, '')(valueByFields)
   const selectedTaxonOccurrence = Objects.mapKeys({
     obj: valueByFields,
-    keysMapping: TaxonAttributeDefinition.VALUE_FIELD_BY_FIELD,
+    keysMapping: TaxonAttributeDefinition.ValueFieldByField,
   })
 
   const [state, setStateInternal] = useState({
@@ -154,9 +154,9 @@ const TaxonAutoCompleteField = (props) => {
     if (
       taxonOccurrence &&
       [
-        TaxonAttributeDefinition.FIELDS.SCIENTIFIC_NAME,
-        TaxonAttributeDefinition.FIELDS.VERNACULAR_NAME,
-        TaxonAttributeDefinition.FIELDS.FAMILY_SCIENTIFIC_NAME,
+        TaxonAttributeDefinition.Fields.SCIENTIFIC_NAME,
+        TaxonAttributeDefinition.Fields.VERNACULAR_NAME,
+        TaxonAttributeDefinition.Fields.FAMILY_SCIENTIFIC_NAME,
       ].includes(field) &&
       ['UNK', 'UNL'].includes(taxonOccurrence.code)
     ) {

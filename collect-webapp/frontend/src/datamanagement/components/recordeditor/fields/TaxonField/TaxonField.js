@@ -17,15 +17,15 @@ import TaxonAutoCompleteField from './TaxonAutoCompleteField'
 const LANG_CODE_STANDARD = Languages.STANDARDS.ISO_639_3
 
 const ALL_AUTOCOMPLETE_FIELDS = [
-  TaxonAttributeDefinition.FIELDS.FAMILY_CODE,
-  TaxonAttributeDefinition.FIELDS.FAMILY_SCIENTIFIC_NAME,
-  TaxonAttributeDefinition.FIELDS.CODE,
-  TaxonAttributeDefinition.FIELDS.SCIENTIFIC_NAME,
-  TaxonAttributeDefinition.FIELDS.VERNACULAR_NAME,
+  TaxonAttributeDefinition.Fields.FAMILY_CODE,
+  TaxonAttributeDefinition.Fields.FAMILY_SCIENTIFIC_NAME,
+  TaxonAttributeDefinition.Fields.CODE,
+  TaxonAttributeDefinition.Fields.SCIENTIFIC_NAME,
+  TaxonAttributeDefinition.Fields.VERNACULAR_NAME,
 ]
 const ALL_LANGUAGE_FIELDS = [
-  TaxonAttributeDefinition.FIELDS.LANGUAGE_CODE,
-  TaxonAttributeDefinition.FIELDS.LANGUAGE_VARIETY,
+  TaxonAttributeDefinition.Fields.LANGUAGE_CODE,
+  TaxonAttributeDefinition.Fields.LANGUAGE_VARIETY,
 ]
 const ALL_FIELDS = [...ALL_AUTOCOMPLETE_FIELDS, ...ALL_LANGUAGE_FIELDS]
 
@@ -51,7 +51,7 @@ export default class TaxonField extends AbstractField {
       return (taxonOccurrence) => {
         const value = Objects.mapKeys({
           obj: taxonOccurrence,
-          keysMapping: TaxonAttributeDefinition.FIELD_BY_VALUE_FIELD,
+          keysMapping: TaxonAttributeDefinition.FieldByValueField,
         })
         this.setState({ previousValue: null }, () => this.onAttributeUpdate({ value, debounced: false }))
       }
@@ -82,7 +82,7 @@ export default class TaxonField extends AbstractField {
 
     const isFieldIncluded = (field) =>
       visibilityByField[field] &&
-      (![TaxonAttributeDefinition.FIELDS.FAMILY_CODE, TaxonAttributeDefinition.FIELDS.FAMILY_SCIENTIFIC_NAME].includes(
+      (![TaxonAttributeDefinition.Fields.FAMILY_CODE, TaxonAttributeDefinition.Fields.FAMILY_SCIENTIFIC_NAME].includes(
         field
       ) ||
         showFamily)

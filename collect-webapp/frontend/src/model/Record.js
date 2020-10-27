@@ -323,7 +323,7 @@ export class TaxonAttribute extends Attribute {
   }
 
   set value(value) {
-    const valueByFields = Objects.mapKeys({ obj: value, keysMapping: TaxonAttributeDefinition.FIELD_BY_VALUE_FIELD })
+    const valueByFields = Objects.mapKeys({ obj: value, keysMapping: TaxonAttributeDefinition.FieldByValueField })
     super.value = valueByFields
   }
 }
