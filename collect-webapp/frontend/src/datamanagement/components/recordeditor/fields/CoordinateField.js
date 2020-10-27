@@ -150,10 +150,10 @@ export default class CoordinateField extends AbstractField {
         const yFieldLabel = attrDef.getFieldLabel('y') || 'Y'
         const srsFieldLabel = attrDef.getFieldLabel('srs') || 'SRS'
 
-        const xFormItem = <CompositeAttributeFormItem field="x" label={xFieldLabel} inputField={xField} />
-        const yFormItem = <CompositeAttributeFormItem field="y" label={yFieldLabel} inputField={yField} />
+        const xFormItem = <CompositeAttributeFormItem key="x" field="x" label={xFieldLabel} inputField={xField} />
+        const yFormItem = <CompositeAttributeFormItem key="y" field="y" label={yFieldLabel} inputField={yField} />
         const srsFormItem = showSrsField ? (
-          <CompositeAttributeFormItem field="srs" label={srsFieldLabel} inputField={srsField} />
+          <CompositeAttributeFormItem key="srs" field="srs" label={srsFieldLabel} inputField={srsField} />
         ) : null
 
         switch (attrDef.fieldsOrder) {
@@ -175,13 +175,23 @@ export default class CoordinateField extends AbstractField {
         if (includeAltitudeField) {
           const altitudeFieldLabel = attrDef.getFieldLabel('altitude') || 'Altitude'
           internalParts.push(
-            <CompositeAttributeFormItem field="altitude" label={altitudeFieldLabel} inputField={altitudeField} />
+            <CompositeAttributeFormItem
+              key="altitude"
+              field="altitude"
+              label={altitudeFieldLabel}
+              inputField={altitudeField}
+            />
           )
         }
         if (includeAccuracyField) {
           const accuracyFieldLabel = attrDef.getFieldLabel('accuracy') || 'Accuracy'
           internalParts.push(
-            <CompositeAttributeFormItem field="accuracy" label={accuracyFieldLabel} inputField={accuracyField} />
+            <CompositeAttributeFormItem
+              key="accuracy"
+              field="accuracy"
+              label={accuracyFieldLabel}
+              inputField={accuracyField}
+            />
           )
         }
       }

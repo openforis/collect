@@ -19,9 +19,12 @@ export default class TextField extends AbstractField {
   }
 
   render() {
+    const { fieldDef } = this.props
     const { dirty, value: valueState, errors, warnings } = this.state
     const { value } = valueState || {}
     const text = value || ''
+    const { attributeDefinition } = fieldDef
+    const { textType } = attributeDefinition
 
     return (
       <div>
@@ -30,6 +33,7 @@ export default class TextField extends AbstractField {
           invalid={Boolean(errors || warnings)}
           className={warnings ? 'warning' : ''}
           value={text}
+          type={textType === 'MEMO' ? 'textarea' : 'text'}
           onChange={this.onChange}
         />
         <ValidationTooltip target={this.fieldId} errors={errors} warnings={warnings} />

@@ -422,3 +422,12 @@ input.is-invalid.warning:focus {
 .form-item-wrapper.warning {
   border: 1px solid orangered;
 }
+
+/**
+* === Material UI components
+**/
+.MuiOutlinedInput-input,
+.MuiInputBase-input.MuiOutlinedInput-input,
+.MuiSelect-outlined.MuiSelect-outlined {
+  padding: 10px;
+}
