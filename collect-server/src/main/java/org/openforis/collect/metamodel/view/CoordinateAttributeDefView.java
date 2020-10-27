@@ -13,8 +13,8 @@ public class CoordinateAttributeDefView extends AttributeDefView {
 	private boolean includeAccuracyField;
 
 	public CoordinateAttributeDefView(int id, String name, String label, AttributeType type, List<String> fieldNames,
-			boolean key, boolean multiple, boolean showInRecordSummaryList, boolean qualifier) {
-		super(id, name, label, type, fieldNames, key, multiple, showInRecordSummaryList, qualifier);
+			boolean key, boolean multiple) {
+		super(id, name, label, type, fieldNames, key, multiple);
 	}
 
 	public CoordinateAttributeFieldsOrder getFieldsOrder() {

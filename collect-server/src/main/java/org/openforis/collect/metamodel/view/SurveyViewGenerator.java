@@ -31,6 +31,7 @@ import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.Precision;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.Unit;
 
 /**
@@ -63,9 +64,9 @@ public class SurveyViewGenerator {
 	public SurveyView generateView(final CollectSurvey survey, UserGroup userGroup,
 			UserInGroup.UserGroupRole userInSurveyGroupRole) {
 		String defaultLanguage = survey.getDefaultLanguage();
-		CollectAnnotations annotations = survey.getAnnotations();
+		final CollectAnnotations annotations = survey.getAnnotations();
 		// TODO use UIConfiguration instead
-		UIOptions uiOptions = survey.getUIOptions();
+		final UIOptions uiOptions = survey.getUIOptions();
 
 		final SurveyView surveyView = new SurveyView(survey, new ViewContext(languageCode));
 
@@ -123,71 +124,76 @@ public class SurveyViewGenerator {
 				int id = def.getId();
 				String name = def.getName();
 				String label = getLabel(def);
+				boolean multiple = def.isMultiple();
 				NodeDefView view;
 				if (def instanceof EntityDefinition) {
-					view = new EntityDefView(((EntityDefinition) def).isRoot(), id, name, label, def.isMultiple());
+					view = new EntityDefView(((EntityDefinition) def).isRoot(), id, name, label, multiple);
 				} else {
-					boolean qualifier = annotations.isQualifier((AttributeDefinition) def);
-					boolean showInSummary = annotations.isShowInSummary((AttributeDefinition) def);
+					AttributeDefinition attrDef = (AttributeDefinition) def;
+					boolean qualifier = annotations.isQualifier(attrDef);
+					boolean showInSummary = annotations.isShowInSummary(attrDef);
+					AttributeType attributeType = AttributeType.valueOf(attrDef);
+					List<String> fieldNames = attrDef.getFieldNames();
+					boolean key = attrDef.isKey();
 
 					if (def instanceof CodeAttributeDefinition) {
-						CodeAttributeDefinition attrDef = (CodeAttributeDefinition) def;
-						int codeListId = attrDef.getList() == null ? -1 : attrDef.getList().getId();
-						view = new CodeAttributeDefView(id, name, label, AttributeType.valueOf(attrDef),
-								attrDef.getFieldNames(), attrDef.isKey(), attrDef.isMultiple(), showInSummary,
-								qualifier, codeListId);
+						CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) def;
+						int codeListId = codeAttrDef.getList() == null ? -1 : codeAttrDef.getList().getId();
+						CodeAttributeDefView attrDefView = new CodeAttributeDefView(id, name, label, attributeType, fieldNames, key, multiple);
+						attrDefView.setCodeListId(codeListId);
+						view = attrDefView;
 					} else if (def instanceof CoordinateAttributeDefinition) {
-						CoordinateAttributeDefinition attrDef = (CoordinateAttributeDefinition) def;
+						CoordinateAttributeDefinition coordDef = (CoordinateAttributeDefinition) def;
 						CoordinateAttributeDefView attrDefView = new CoordinateAttributeDefView(id, name, label,
-								AttributeType.valueOf(attrDef), attrDef.getFieldNames(), attrDef.isKey(),
-								attrDef.isMultiple(), showInSummary, qualifier);
-						attrDefView.setFieldsOrder(uiOptions.getFieldsOrder(attrDef));
-						attrDefView.setShowSrsField(annotations.isShowSrsField(attrDef));
-						attrDefView.setIncludeAccuracyField(annotations.isIncludeCoordinateAccuracy(attrDef));
-						attrDefView.setIncludeAltitudeField(annotations.isIncludeCoordinateAltitude(attrDef));
+								attributeType, fieldNames, key, multiple);
+						attrDefView.setFieldsOrder(uiOptions.getFieldsOrder(coordDef));
+						attrDefView.setShowSrsField(annotations.isShowSrsField(coordDef));
+						attrDefView.setIncludeAccuracyField(annotations.isIncludeCoordinateAccuracy(coordDef));
+						attrDefView.setIncludeAltitudeField(annotations.isIncludeCoordinateAltitude(coordDef));
 						view = attrDefView;
 					} else if (def instanceof FileAttributeDefinition) {
-						FileAttributeDefinition attrDef = (FileAttributeDefinition) def;
-						FileAttributeDefView attrDefView = new FileAttributeDefView(id, name, label,
-								AttributeType.valueOf(attrDef), attrDef.getFieldNames(), attrDef.isKey(),
-								attrDef.isMultiple(), showInSummary, qualifier);
-						attrDefView.setFileType(annotations.getFileType(attrDef));
-						attrDefView.setMaxSize(attrDef.getMaxSize());
-						attrDefView.setExtensions(attrDef.getExtensions());
+						FileAttributeDefinition fileDef = (FileAttributeDefinition) def;
+						FileAttributeDefView attrDefView = new FileAttributeDefView(id, name, label, attributeType,
+								fieldNames, key, multiple);
+						attrDefView.setFileType(annotations.getFileType(fileDef));
+						attrDefView.setMaxSize(fileDef.getMaxSize());
+						attrDefView.setExtensions(fileDef.getExtensions());
 						view = attrDefView;
 					} else if (def instanceof NumberAttributeDefinition) {
-						NumberAttributeDefinition attrDef = (NumberAttributeDefinition) def;
-						List<Precision> precisions = attrDef.getPrecisionDefinitions();
+						NumberAttributeDefinition numberDef = (NumberAttributeDefinition) def;
+						List<Precision> precisions = numberDef.getPrecisionDefinitions();
 						List<PrecisionView> precisionViews = Views.fromObjects(precisions, PrecisionView.class);
-						NumericAttributeDefView attrDefView = new NumberAttributeDefView(id, name, label,
-								AttributeType.valueOf(attrDef), attrDef.getFieldNames(), attrDef.isKey(),
-								attrDef.isMultiple(), showInSummary, qualifier);
-						attrDefView.setNumericType(attrDef.getType());
+						NumericAttributeDefView attrDefView = new NumberAttributeDefView(id, name, label, attributeType,
+								fieldNames, key, multiple);
+						attrDefView.setNumericType(numberDef.getType());
 						attrDefView.setPrecisions(precisionViews);
 						view = attrDefView;
 					} else if (def instanceof TaxonAttributeDefinition) {
-						TaxonAttributeDefinition attrDef = (TaxonAttributeDefinition) def;
-						TaxonAttributeDefView attrDefView = new TaxonAttributeDefView(id, name, label,
-								AttributeType.valueOf(attrDef), attrDef.getFieldNames(), attrDef.isKey(),
-								attrDef.isMultiple(), showInSummary, qualifier);
-						attrDefView.setTaxonomyName(attrDef.getTaxonomy());
-						attrDefView.setHighestRank(attrDef.getHighestTaxonRank());
-						attrDefView.setShowFamily(annotations.isShowFamily(attrDef));
-						attrDefView.setIncludeUniqueVernacularName(annotations.isIncludeUniqueVernacularName(attrDef));
-						attrDefView.setAllowUnlisted(annotations.isAllowUnlisted(attrDef));
+						TaxonAttributeDefinition taxonDef = (TaxonAttributeDefinition) def;
+						TaxonAttributeDefView attrDefView = new TaxonAttributeDefView(id, name, label, attributeType,
+								fieldNames, key, multiple);
+						attrDefView.setTaxonomyName(taxonDef.getTaxonomy());
+						attrDefView.setHighestRank(taxonDef.getHighestTaxonRank());
+						attrDefView.setShowFamily(annotations.isShowFamily(taxonDef));
+						attrDefView.setIncludeUniqueVernacularName(annotations.isIncludeUniqueVernacularName(taxonDef));
+						attrDefView.setAllowUnlisted(annotations.isAllowUnlisted(taxonDef));
+						view = attrDefView;
+					} else if (def instanceof TextAttributeDefinition) {
+						TextAttributeDefinition textDef = (TextAttributeDefinition) def;
+						TextAttributeDefView attrDefView = new TextAttributeDefView(id, name, label, attributeType,
+								fieldNames, key, multiple);
+						attrDefView.setTextType(textDef.getType());
 						view = attrDefView;
 					} else {
-						AttributeDefinition attrDef = (AttributeDefinition) def;
-						view = new AttributeDefView(id, name, label, AttributeType.valueOf(attrDef),
-								attrDef.getFieldNames(), attrDef.isKey(), attrDef.isMultiple(), showInSummary,
-								qualifier);
+						view = new AttributeDefView(id, name, label, attributeType, fieldNames, key, multiple);
 					}
-					AttributeDefinition attrDef = ((AttributeDefinition) def);
 					AttributeDefView attrDefView = (AttributeDefView) view;
+					attrDefView.setShowInRecordSummaryList(showInSummary);
+					attrDefView.setQualifier(qualifier);
 					List<FieldLabel> fieldLabels = attrDef.getFieldLabels();
 					Map<String, Boolean> visibilityByField = new HashMap<String, Boolean>();
 					List<String> fieldLabelsView = new ArrayList<String>(fieldLabels.size());
-					for (String fieldName : ((AttributeDefinition) def).getFieldNames()) {
+					for (String fieldName : attrDef.getFieldNames()) {
 						fieldLabelsView.add(attrDef.getFieldLabel(fieldName, languageCode));
 						visibilityByField.put(fieldName, uiOptions.isVisibleField(attrDef, fieldName));
 					}

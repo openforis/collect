@@ -16,12 +16,10 @@ public class AttributeDefView extends NodeDefView {
 	private Map<String, Boolean> visibilityByField;
 	
 	public AttributeDefView(int id, String name, String label, AttributeType type, 
-			List<String> fieldNames, boolean key, boolean multiple, boolean showInRecordSummaryList, boolean qualifier) {
+			List<String> fieldNames, boolean key, boolean multiple) {
 		super(id, name, label, NodeType.ATTRIBUTE, key, multiple);
 		this.attributeType = type;
 		this.fieldNames = fieldNames;
-		this.showInRecordSummaryList = showInRecordSummaryList;
-		this.qualifier = qualifier;
 	}
 	
 	public AttributeType getAttributeType() {
@@ -36,8 +34,16 @@ public class AttributeDefView extends NodeDefView {
 		return showInRecordSummaryList;
 	}
 	
+	public void setShowInRecordSummaryList(boolean showInRecordSummaryList) {
+		this.showInRecordSummaryList = showInRecordSummaryList;
+	}
+	
 	public boolean isQualifier() {
 		return qualifier;
+	}
+	
+	public void setQualifier(boolean qualifier) {
+		this.qualifier = qualifier;
 	}
 	
 	public List<String> getFieldLabels() {

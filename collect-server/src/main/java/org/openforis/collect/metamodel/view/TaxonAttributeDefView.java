@@ -14,14 +14,14 @@ public class TaxonAttributeDefView extends AttributeDefView {
 	private boolean allowUnlisted;
 
 	public TaxonAttributeDefView(int id, String name, String label, AttributeType type, List<String> fieldNames,
-			boolean key, boolean multiple, boolean showInRecordSummaryList, boolean qualifier) {
-		super(id, name, label, type, fieldNames, key, multiple, showInRecordSummaryList, qualifier);
+			boolean key, boolean multiple) {
+		super(id, name, label, type, fieldNames, key, multiple);
 	}
 
 	public String getTaxonomyName() {
 		return taxonomyName;
 	}
-	
+
 	public void setTaxonomyName(String taxonomyName) {
 		this.taxonomyName = taxonomyName;
 	}
@@ -29,15 +29,15 @@ public class TaxonAttributeDefView extends AttributeDefView {
 	public TaxonRank getHighestRank() {
 		return highestRank;
 	}
-	
+
 	public void setHighestRank(TaxonRank highestRank) {
 		this.highestRank = highestRank;
 	}
-	
+
 	public boolean isShowFamily() {
 		return showFamily;
 	}
-	
+
 	public void setShowFamily(boolean showFamily) {
 		this.showFamily = showFamily;
 	}
@@ -45,15 +45,15 @@ public class TaxonAttributeDefView extends AttributeDefView {
 	public boolean isIncludeUniqueVernacularName() {
 		return includeUniqueVernacularName;
 	}
-	
+
 	public void setIncludeUniqueVernacularName(boolean includeUniqueVernacularName) {
 		this.includeUniqueVernacularName = includeUniqueVernacularName;
 	}
-	
+
 	public boolean isAllowUnlisted() {
 		return allowUnlisted;
 	}
-	
+
 	public void setAllowUnlisted(boolean allowUnlisted) {
 		this.allowUnlisted = allowUnlisted;
 	}

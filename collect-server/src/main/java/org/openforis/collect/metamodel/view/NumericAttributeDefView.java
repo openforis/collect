@@ -11,8 +11,8 @@ public abstract class NumericAttributeDefView extends AttributeDefView {
 	private List<PrecisionView> precisions;
 
 	public NumericAttributeDefView(int id, String name, String label, AttributeType type, List<String> fieldNames,
-			boolean key, boolean multiple, boolean showInRecordSummaryList, boolean qualifier) {
-		super(id, name, label, type, fieldNames, key, multiple, showInRecordSummaryList, qualifier);
+			boolean key, boolean multiple) {
+		super(id, name, label, type, fieldNames, key, multiple);
 	}
 
 	public Type getNumericType() {

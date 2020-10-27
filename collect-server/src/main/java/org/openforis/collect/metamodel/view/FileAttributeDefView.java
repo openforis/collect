@@ -12,14 +12,14 @@ public class FileAttributeDefView extends AttributeDefView {
 	private List<String> extensions;
 
 	public FileAttributeDefView(int id, String name, String label, AttributeType type, List<String> fieldNames,
-			boolean key, boolean multiple, boolean showInRecordSummaryList, boolean qualifier) {
-		super(id, name, label, type, fieldNames, key, multiple, showInRecordSummaryList, qualifier);
+			boolean key, boolean multiple) {
+		super(id, name, label, type, fieldNames, key, multiple);
 	}
-	
+
 	public FileType getFileType() {
 		return fileType;
 	}
-	
+
 	public void setFileType(FileType fileType) {
 		this.fileType = fileType;
 	}
