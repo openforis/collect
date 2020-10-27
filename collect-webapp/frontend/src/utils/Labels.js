@@ -38,7 +38,9 @@ export default class Labels {
         })
     }
 
-    const filePrefixes = ['labels_', ...Object.values(LanguagesKeys.LABELS_PREFIX_BY_LANGUAGE_CODE_STANDARD)]
+    const filePrefixes = ['labels', ...Object.values(LanguagesKeys.LABELS_PREFIX_BY_LANGUAGE_CODE_STANDARD)].map(
+      (key) => `${key}_`
+    )
     const nextFilePrefix = filePrefixes.pop()
     fetchLabelFile(nextFilePrefix, langCode, labelsFileLoaded)
   }

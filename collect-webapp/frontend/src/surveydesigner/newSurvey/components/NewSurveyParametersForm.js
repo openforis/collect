@@ -10,6 +10,7 @@ import { TextFormItem, SelectFormItem, SubmitButton, normalizeInternalName, asyn
 import { createNewSurvey } from 'surveydesigner/newSurvey/actions'
 import ServiceFactory from 'services/ServiceFactory'
 import L from 'utils/Labels'
+import Languages from 'utils/Languages'
 import Strings from 'utils/Strings'
 
 const templateTypes = ['BLANK', 'BIOPHYSICAL', 'COLLECT_EARTH', 'COLLECT_EARTH_IPCC']
@@ -28,9 +29,7 @@ const NewSurveyParametersForm = props => {
     const userGroupOptions = [<option key="-1" value="">{L.l('forms.selectOne')}</option>].concat(
         userGroups.map(g => <option key={g.id} value={g.id}>{g.label}</option>))
 
-    const langCodes = L.keys('languages')
-    const langItems = langCodes.map(code => ({ code, label: L.l('languages.' + code) }))
-    const languageOptions = langItems.sort((a, b) => Strings.compare(a.label, b.label)).map(item =>
+    const languageOptions = Languages.items().sort((a, b) => Strings.compare(a.label, b.label)).map(item =>
         <option key={item.code} value={item.code}>{item.label + ' (' + item.code + ')'}</option>)
 
     const fieldProps = { labelColSpan: 4, fieldColSpan: 8 }

@@ -124,7 +124,7 @@ export default class TaxonField extends AbstractField {
             getOptionLabel={(option) => `${option.label} (${option.code})`}
             renderInput={(params) => <TextField {...params} variant="outlined" />}
             onChange={(_, option) => this.onChangeField(field)(option.code)}
-            disabled={!code || code != 'UNL' || !vernacularName}
+            disabled={!code || code !== 'UNL' || !vernacularName}
           />
         )
       }),

@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import ServiceFactory from 'services/ServiceFactory';
 import * as JobActions from 'actions/job';
 import L from 'utils/Labels'
+import Languages from 'utils/Languages'
 
 const surveyTypes = {
     temporary: 'TEMPORARY',
@@ -190,7 +191,7 @@ class SurveyExportPage extends Component {
                 </Label>
             </FormGroup>
         )
-        const languageOptions = availableLanguages.map(l => <option key={l} value={l}>{L.l('languages.' + l)}</option>)
+        const languageOptions = availableLanguages.map(langCode => <option key={langCode} value={langCode}>{Languages.label(langCode)}</option>)
 
         return (
             <Container>

@@ -4,6 +4,6 @@ export const STANDARDS = {
 }
 
 export const LABELS_PREFIX_BY_LANGUAGE_CODE_STANDARD = {
-  [STANDARDS.ISO_639_1]: 'languages_',
-  [STANDARDS.ISO_639_3]: 'languages_iso_639_3_',
+  [STANDARDS.ISO_639_1]: 'languages',
+  [STANDARDS.ISO_639_3]: 'languages_iso_639_3',
 }
