@@ -280,6 +280,7 @@ export class AttributeDefinition extends NodeDefinition {
     DATE: 'DATE',
     FILE: 'FILE',
     NUMBER: 'NUMBER',
+    TAXON: 'TAXON',
     TEXT: 'TEXT',
   }
 
@@ -309,6 +310,78 @@ export class CoordinateAttributeDefinition extends AttributeDefinition {
   }
 }
 
+export class TaxonAttributeDefinition extends AttributeDefinition {
+  static QUERY_FIELDS = {
+    CODE: 'CODE',
+    SCIENTIFIC_NAME: 'SCIENTIFIC_NAME',
+    VERNACULAR_NAME: 'VERNACULAR_NAME',
+    FAMILY_CODE: 'FAMILY_CODE',
+    FAMILY_SCIENTIFIC_NAME: 'FAMILY_SCIENTIFIC_NAME',
+  }
+
+  static FIELDS = {
+    CODE: 'code',
+    SCIENTIFIC_NAME: 'scientific_name',
+    VERNACULAR_NAME: 'vernacular_name',
+    LANGUAGE_CODE: 'language_code',
+    LANGUAGE_VARIETY: 'language_variety',
+    FAMILY_CODE: 'family_code',
+    FAMILY_SCIENTIFIC_NAME: 'family_scientific_name',
+  }
+
+  static QUERY_FIELDS_BY_FIELD = {
+    [TaxonAttributeDefinition.FIELDS.CODE]: TaxonAttributeDefinition.QUERY_FIELDS.CODE,
+    [TaxonAttributeDefinition.FIELDS.SCIENTIFIC_NAME]: TaxonAttributeDefinition.QUERY_FIELDS.SCIENTIFIC_NAME,
+    [TaxonAttributeDefinition.FIELDS.VERNACULAR_NAME]: TaxonAttributeDefinition.QUERY_FIELDS.VERNACULAR_NAME,
+    [TaxonAttributeDefinition.FIELDS.FAMILY_CODE]: TaxonAttributeDefinition.QUERY_FIELDS.FAMILY_CODE,
+    [TaxonAttributeDefinition.FIELDS.FAMILY_SCIENTIFIC_NAME]:
+      TaxonAttributeDefinition.QUERY_FIELDS.FAMILY_SCIENTIFIC_NAME,
+  }
+
+  static VALUE_FIELDS = {
+    CODE: 'code',
+    SCIENTIFIC_NAME: 'scientificName',
+    VERNACULAR_NAME: 'vernacularName',
+    LANGUAGE_CODE: 'languageCode',
+    LANGUAGE_VARIETY: 'languageVariety',
+    FAMILY_CODE: 'familyCode',
+    FAMILY_SCIENTIFIC_NAME: 'familyScientificName',
+  }
+
+  static VALUE_FIELD_BY_FIELD = {
+    [TaxonAttributeDefinition.FIELDS.CODE]: TaxonAttributeDefinition.VALUE_FIELDS.CODE,
+    [TaxonAttributeDefinition.FIELDS.SCIENTIFIC_NAME]: TaxonAttributeDefinition.VALUE_FIELDS.SCIENTIFIC_NAME,
+    [TaxonAttributeDefinition.FIELDS.VERNACULAR_NAME]: TaxonAttributeDefinition.VALUE_FIELDS.VERNACULAR_NAME,
+    [TaxonAttributeDefinition.FIELDS.LANGUAGE_CODE]: TaxonAttributeDefinition.VALUE_FIELDS.LANGUAGE_CODE,
+    [TaxonAttributeDefinition.FIELDS.LANGUAGE_VARIETY]: TaxonAttributeDefinition.VALUE_FIELDS.LANGUAGE_VARIETY,
+    [TaxonAttributeDefinition.FIELDS.FAMILY_CODE]: TaxonAttributeDefinition.VALUE_FIELDS.FAMILY_CODE,
+    [TaxonAttributeDefinition.FIELDS.FAMILY_SCIENTIFIC_NAME]:
+      TaxonAttributeDefinition.VALUE_FIELDS.FAMILY_SCIENTIFIC_NAME,
+  }
+
+  static FIELD_BY_VALUE_FIELD = {
+    [TaxonAttributeDefinition.VALUE_FIELDS.CODE]: TaxonAttributeDefinition.FIELDS.CODE,
+    [TaxonAttributeDefinition.VALUE_FIELDS.SCIENTIFIC_NAME]: TaxonAttributeDefinition.FIELDS.SCIENTIFIC_NAME,
+    [TaxonAttributeDefinition.VALUE_FIELDS.VERNACULAR_NAME]: TaxonAttributeDefinition.FIELDS.VERNACULAR_NAME,
+    [TaxonAttributeDefinition.VALUE_FIELDS.LANGUAGE_CODE]: TaxonAttributeDefinition.FIELDS.LANGUAGE_CODE,
+    [TaxonAttributeDefinition.VALUE_FIELDS.LANGUAGE_VARIETY]: TaxonAttributeDefinition.FIELDS.LANGUAGE_VARIETY,
+    [TaxonAttributeDefinition.VALUE_FIELDS.FAMILY_CODE]: TaxonAttributeDefinition.FIELDS.FAMILY_CODE,
+    [TaxonAttributeDefinition.VALUE_FIELDS.FAMILY_SCIENTIFIC_NAME]:
+      TaxonAttributeDefinition.FIELDS.FAMILY_SCIENTIFIC_NAME,
+  }
+
+  taxonomyName
+  highestRank
+  codeVisible
+  scientificNameVisible
+  vernacularNameVisible
+  languageCodeVisible
+  languageVarietyVisible
+  showFamily
+  includeUniqueVernacularName
+  allowUnlisted
+}
+
 export class FileAttributeDefinition extends AttributeDefinition {
   fileType
   extensions
@@ -333,4 +406,5 @@ const attributeDefinitionClassByType = {
   [AttributeDefinition.Types.COORDINATE]: CoordinateAttributeDefinition,
   [AttributeDefinition.Types.FILE]: FileAttributeDefinition,
   [AttributeDefinition.Types.NUMBER]: NumericAttributeDefinition,
+  [AttributeDefinition.Types.TAXON]: TaxonAttributeDefinition,
 }

@@ -8,6 +8,7 @@ import CoordinateField from './fields/CoordinateField'
 import DateField from './fields/DateField'
 import FileField from './fields/FileField'
 import NumberField from './fields/NumberField'
+import TaxonField from './fields/TaxonField'
 import TextField from './fields/TextField'
 
 const FIELD_COMPONENTS_BY_TYPE = {
@@ -17,6 +18,7 @@ const FIELD_COMPONENTS_BY_TYPE = {
   [AttributeDefinition.Types.DATE]: DateField,
   [AttributeDefinition.Types.FILE]: FileField,
   [AttributeDefinition.Types.NUMBER]: NumberField,
+  [AttributeDefinition.Types.TAXON]: TaxonField,
   [AttributeDefinition.Types.TEXT]: TextField,
 }
 

@@ -1,0 +1,12 @@
+.taxon-autocomplete-language .MuiAutocomplete-input.Mui-disabled {
+  color: black;
+  font-style: italic;
+}
+
+.taxon-autocomplete-dialog-item {
+  display: grid;
+}
+
+.taxon-autocomplete-dialog-item div {
+  word-wrap: break-word;
+}

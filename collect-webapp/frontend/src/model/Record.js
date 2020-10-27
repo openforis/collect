@@ -1,5 +1,11 @@
+import Objects from '../utils/Objects'
 import Serializable from './Serializable'
-import { CoordinateAttributeDefinition, FileAttributeDefinition, EntityDefinition } from './Survey'
+import {
+  CoordinateAttributeDefinition,
+  FileAttributeDefinition,
+  EntityDefinition,
+  TaxonAttributeDefinition,
+} from './Survey'
 
 export class Record extends Serializable {
   id
@@ -59,6 +65,10 @@ export class Node extends Serializable {
     this.record = record
     this.definition = definition
     this.parent = parent
+  }
+
+  get survey() {
+    return this.record.survey
   }
 
   fillFromJSON(jsonObj) {
@@ -122,6 +132,8 @@ export class Entity extends Node {
           childClass = CoordinateAttribute
         } else if (def instanceof FileAttributeDefinition) {
           childClass = FileAttribute
+        } else if (def instanceof TaxonAttributeDefinition) {
+          childClass = TaxonAttribute
         } else {
           childClass = Attribute
         }
@@ -287,6 +299,32 @@ export class FileAttribute extends Attribute {
     // Workaround: File fields name are different from attribute field names
     const { filename: file_name, size: file_size } = value
     super.value = { file_name, file_size }
+  }
+}
+
+export class TaxonAttribute extends Attribute {
+  // get value() {
+  //   const val = super.value
+  //   if (val === null) {
+  //     return null
+  //   }
+  //   const { code, scientific_name, vernacular_name, language_code, language_variety } = val
+  //   return {
+  //     code,
+  //     scientificName: scientific_name,
+  //     vernacularName: vernacular_name,
+  //     languageCode: language_code,
+  //     languageVariety: language_variety,
+  //   }
+  // }
+
+  get value() {
+    return super.value
+  }
+
+  set value(value) {
+    const valueByFields = Objects.mapKeys({ obj: value, keysMapping: TaxonAttributeDefinition.FIELD_BY_VALUE_FIELD })
+    super.value = valueByFields
   }
 }
 

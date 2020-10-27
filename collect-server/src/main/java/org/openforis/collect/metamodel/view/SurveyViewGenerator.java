@@ -30,6 +30,7 @@ import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.Precision;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
+import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.Unit;
 
 /**
@@ -145,7 +146,7 @@ public class SurveyViewGenerator {
 						attrDefView.setIncludeAccuracyField(annotations.isIncludeCoordinateAccuracy(attrDef));
 						attrDefView.setIncludeAltitudeField(annotations.isIncludeCoordinateAltitude(attrDef));
 						view = attrDefView;
-					}  else if (def instanceof FileAttributeDefinition) {
+					} else if (def instanceof FileAttributeDefinition) {
 						FileAttributeDefinition attrDef = (FileAttributeDefinition) def;
 						FileAttributeDefView attrDefView = new FileAttributeDefView(id, name, label,
 								AttributeType.valueOf(attrDef), attrDef.getFieldNames(), attrDef.isKey(),
@@ -164,6 +165,17 @@ public class SurveyViewGenerator {
 						attrDefView.setNumericType(attrDef.getType());
 						attrDefView.setPrecisions(precisionViews);
 						view = attrDefView;
+					} else if (def instanceof TaxonAttributeDefinition) {
+						TaxonAttributeDefinition attrDef = (TaxonAttributeDefinition) def;
+						TaxonAttributeDefView attrDefView = new TaxonAttributeDefView(id, name, label,
+								AttributeType.valueOf(attrDef), attrDef.getFieldNames(), attrDef.isKey(),
+								attrDef.isMultiple(), showInSummary, qualifier);
+						attrDefView.setTaxonomyName(attrDef.getTaxonomy());
+						attrDefView.setHighestRank(attrDef.getHighestTaxonRank());
+						attrDefView.setShowFamily(annotations.isShowFamily(attrDef));
+						attrDefView.setIncludeUniqueVernacularName(annotations.isIncludeUniqueVernacularName(attrDef));
+						attrDefView.setAllowUnlisted(annotations.isAllowUnlisted(attrDef));
+						view = attrDefView;
 					} else {
 						AttributeDefinition attrDef = (AttributeDefinition) def;
 						view = new AttributeDefView(id, name, label, AttributeType.valueOf(attrDef),
@@ -171,12 +183,16 @@ public class SurveyViewGenerator {
 								qualifier);
 					}
 					AttributeDefinition attrDef = ((AttributeDefinition) def);
+					AttributeDefView attrDefView = (AttributeDefView) view;
 					List<FieldLabel> fieldLabels = attrDef.getFieldLabels();
+					Map<String, Boolean> visibilityByField = new HashMap<String, Boolean>();
 					List<String> fieldLabelsView = new ArrayList<String>(fieldLabels.size());
-					for (String fieldName: ((AttributeDefinition) def).getFieldNames()) {
+					for (String fieldName : ((AttributeDefinition) def).getFieldNames()) {
 						fieldLabelsView.add(attrDef.getFieldLabel(fieldName, languageCode));
+						visibilityByField.put(fieldName, uiOptions.isVisibleField(attrDef, fieldName));
 					}
-					((AttributeDefView) view).setFieldLabels(fieldLabelsView);
+					attrDefView.setFieldLabels(fieldLabelsView);
+					attrDefView.setVisibilityByField(visibilityByField);
 				}
 				UIModelObject uiModelObject = survey.getUIConfiguration().getModelObjectByNodeDefinitionId(def.getId());
 				view.setHideWhenNotRelevant(uiModelObject != null && uiModelObject.isHideWhenNotRelevant());
