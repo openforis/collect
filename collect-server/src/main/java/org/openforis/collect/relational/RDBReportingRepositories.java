@@ -491,8 +491,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 				FieldDefinition<Integer> unitIdFieldDef = numberAttrDef.getUnitIdFieldDefinition();
 				DataColumn unitColumn = dataTable.getDataColumn(unitIdFieldDef);
 				if (unitColumn != null) {
-					Integer unitId = value.getUnit() == null ? null : value.getUnit().getId();
-					columnValuePairs.add(new ColumnValuePair<DataColumn, Integer>(unitColumn, unitId));
+					columnValuePairs.add(new ColumnValuePair<DataColumn, Integer>(unitColumn, value.getUnitId()));
 				}
 				DataColumn valueColumn = dataTable.getDataColumn(numberAttrDef.getValueFieldDefinition());
 				Number numberValue = value == null ? null : value.getValue();

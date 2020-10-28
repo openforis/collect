@@ -20,6 +20,6 @@ public class RealAttribute extends NumberAttribute<Double, RealValue> {
 
 	@Override
 	protected RealValue createValue(Double value, Unit unit) {
-		return new RealValue(value, unit);
+		return new RealValue(value, unit == null ? null : unit.getId());
 	}
 }

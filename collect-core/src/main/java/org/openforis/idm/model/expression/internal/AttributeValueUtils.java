@@ -92,7 +92,8 @@ public class AttributeValueUtils {
 			Unit unit = attr.getUnit();
 			Unit defaultUnit = defn.getDefaultUnit();
 			if ( unit != null && defaultUnit != null ) {
-				double normalizedValue = getNormalizedValue(attr.getValue(), defaultUnit).doubleValue();
+				NumberValue<?> numberValue = attr.getValue();
+				double normalizedValue = getNormalizedValue(numberValue.getValue(), attr.getUnit(), defaultUnit).doubleValue();
 				return normalizedValue;
 			}
 		}
@@ -150,7 +151,4 @@ public class AttributeValueUtils {
 		}
 	}
 	
-	private static Number getNormalizedValue(NumberValue<?> value, Unit defaultUnit) {
-		return getNormalizedValue(value.getValue(), value.getUnit(), defaultUnit);
-	}
 }

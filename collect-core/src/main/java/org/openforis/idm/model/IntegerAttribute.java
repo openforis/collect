@@ -20,6 +20,6 @@ public class IntegerAttribute extends NumberAttribute<Integer, IntegerValue> {
 	
 	@Override
 	protected IntegerValue createValue(Integer value, Unit unit) {
-		return new IntegerValue(value, unit);
+		return new IntegerValue(value, unit == null ? null : unit.getId());
 	}
 }

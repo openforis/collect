@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Removed Planet API key field from CE surveys
 - Activated Planet imagery by default when creating new project
-- Data entry: support column groupings in table (single entities inside multiple entities with table layout), Coordinate and Taxon attributes
+- Data entry: support column groupings in table (single entities inside multiple entities with table layout), Coordinate, Taxon, "memo" (large) Text, Time attributes
 
 ## [3.26.23] - 2020-10-14
 ### Fixed

@@ -78,8 +78,7 @@ public abstract class NumberAttribute<N extends Number, T extends NumberValue<N>
 	@Override
 	protected void setValueInFields(T value) {
 		N number = value.getValue();
-		Unit unit = value.getUnit();
-		Integer unitId = unit == null ? null : unit.getId();
+		Integer unitId = value.getUnitId();
 		getNumberField().setValue(number);
 		getUnitField().setValue(unitId);
 	}

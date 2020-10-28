@@ -24,6 +24,7 @@ import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
+import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.RealValue;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +108,9 @@ public class DataReportGeneratorIntegrationTest extends DataCleansingIntegration
 		DataReportItem item = items.get(0);
 		CollectRecord record = recordManager.load(survey, item.getRecordId());
 		assertEquals(Arrays.asList("10_117"), record.getRootEntityKeyValues());
-		assertEquals(new RealValue(30.0d, dbhDef.getDefaultUnit()), item.extractAttributeValue());
+		Unit defaultUnit = dbhDef.getDefaultUnit();
+		Integer unitId = defaultUnit == null ? null : defaultUnit.getId();
+		assertEquals(new RealValue(30.0d, unitId), item.extractAttributeValue());
 	}
 
 	private void initRecords() {

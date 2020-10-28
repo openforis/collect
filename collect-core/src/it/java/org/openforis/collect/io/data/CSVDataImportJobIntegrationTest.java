@@ -34,7 +34,6 @@ import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.concurrency.Worker.Status;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
@@ -73,10 +72,10 @@ public class CSVDataImportJobIntegrationTest extends CollectIntegrationTest {
 	
 	private CollectSurvey survey;
 
-	private Unit meterUnit;
+	private Integer meterUnitId;
 	@SuppressWarnings("unused")
-	private Unit centimeterUnit;
-	private Unit kilometerUnit;
+	private Integer centimeterUnitId;
+	private Integer kilometerUnitId;
 	
 	@Autowired
 	private CollectJobManager jobManager;
@@ -87,9 +86,9 @@ public class CSVDataImportJobIntegrationTest extends CollectIntegrationTest {
 		survey = loadSurvey();
 		survey.setTemporary(false);
 		surveyManager.importModel(survey);
-		meterUnit = survey.getUnit("m");
-		centimeterUnit = survey.getUnit("cm");
-		kilometerUnit = survey.getUnit("km");
+		meterUnitId = survey.getUnit("m").getId();
+		centimeterUnitId = survey.getUnit("cm").getId();
+		kilometerUnitId = survey.getUnit("km").getId();
 	}
 	
 	public CSVDataImportJob importCSVFile(String fileName, int parentEntityDefinitionId) throws Exception {
@@ -149,7 +148,7 @@ public class CSVDataImportJobIntegrationTest extends CollectIntegrationTest {
 			RealAttribute plotDistance = (RealAttribute) cluster.getChild("plot_distance");
 			RealValue plotDistanceVal = plotDistance.getValue();
 			assertEquals(Double.valueOf(200d), plotDistanceVal.getValue());
-			assertEquals(meterUnit, plotDistanceVal.getUnit());
+			assertEquals(meterUnitId, plotDistanceVal.getUnitId());
 			TextAttribute gpsModel = (TextAttribute) cluster.getChild("gps_model");
 			assertEquals("GPS MAP 62S", gpsModel.getValue().getValue());
 			
@@ -172,7 +171,7 @@ public class CSVDataImportJobIntegrationTest extends CollectIntegrationTest {
 			RealAttribute plotDistance = (RealAttribute) cluster.getChild("plot_distance");
 			RealValue plotDistanceVal = plotDistance.getValue();
 			assertEquals(Double.valueOf(0.3d), plotDistanceVal.getValue());
-			assertEquals(kilometerUnit, plotDistanceVal.getUnit());
+			assertEquals(kilometerUnitId, plotDistanceVal.getUnitId());
 			TextAttribute gpsModel = (TextAttribute) cluster.getChild("gps_model");
 			assertEquals("GPS MAP 62S", gpsModel.getValue().getValue());
 		}
@@ -331,7 +330,7 @@ public class CSVDataImportJobIntegrationTest extends CollectIntegrationTest {
 			RealAttribute plotDistance = (RealAttribute) cluster.getChild("plot_distance");
 			RealValue plotDistanceVal = plotDistance.getValue();
 			assertEquals(Double.valueOf(100d), plotDistanceVal.getValue());
-			assertEquals(meterUnit, plotDistanceVal.getUnit());
+			assertEquals(meterUnitId, plotDistanceVal.getUnitId());
 		}
 		{
 			CollectRecord reloadedRecord = loadRecord("10_114");
@@ -339,7 +338,7 @@ public class CSVDataImportJobIntegrationTest extends CollectIntegrationTest {
 			RealAttribute plotDistance = (RealAttribute) cluster.getChild("plot_distance");
 			RealValue plotDistanceVal = plotDistance.getValue();
 			assertEquals(Double.valueOf(100d), plotDistanceVal.getValue());
-			assertEquals(meterUnit, plotDistanceVal.getUnit());
+			assertEquals(meterUnitId, plotDistanceVal.getUnitId());
 		}
 	}
 	
@@ -356,7 +355,7 @@ public class CSVDataImportJobIntegrationTest extends CollectIntegrationTest {
 			RealAttribute plotDistance = (RealAttribute) cluster.getChild("plot_distance");
 			RealValue plotDistanceVal = plotDistance.getValue();
 			assertEquals(Double.valueOf(200d), plotDistanceVal.getValue());
-			assertEquals(meterUnit, plotDistanceVal.getUnit());
+			assertEquals(meterUnitId, plotDistanceVal.getUnitId());
 		}
 		{
 			CollectRecord reloadedRecord = loadRecord("10_114");
@@ -364,7 +363,7 @@ public class CSVDataImportJobIntegrationTest extends CollectIntegrationTest {
 			RealAttribute plotDistance = (RealAttribute) cluster.getChild("plot_distance");
 			RealValue plotDistanceVal = plotDistance.getValue();
 			assertEquals(Double.valueOf(0.3d), plotDistanceVal.getValue());
-			assertEquals(kilometerUnit, plotDistanceVal.getUnit());
+			assertEquals(kilometerUnitId, plotDistanceVal.getUnitId());
 		}
 	}
 	
@@ -498,7 +497,7 @@ public class CSVDataImportJobIntegrationTest extends CollectIntegrationTest {
 		EntityBuilder.addValue(cluster, "id", new Code(id));
 		EntityBuilder.addValue(cluster, "region", new Code("001"));
 		EntityBuilder.addValue(cluster, "district", new Code("002"));
-		EntityBuilder.addValue(cluster, "plot_distance", 100d, meterUnit);
+		EntityBuilder.addValue(cluster, "plot_distance", 100d, survey.getUnit(meterUnitId));
 		EntityBuilder.addValue(cluster, "map_sheet", "map sheet 1");
 		EntityBuilder.addValue(cluster, "map_sheet", "map sheet 2");
 		EntityBuilder.addValue(cluster, "map_sheet", "map sheet 3");

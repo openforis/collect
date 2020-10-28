@@ -4,7 +4,8 @@ const dateFnsUtils = new DateFnsUtils()
 
 export default class Dates {
   static DATE_FORMAT = 'dd/MM/yyyy'
-  static DATETIME_FORMAT = 'dd/MM/yyyy HH:mm'
+  static TIME_FORMAT = 'HH:mm'
+  static DATETIME_FORMAT = `${Dates.DATE_FORMAT} ${Dates.TIME_FORMAT}`
   static MILLIS = 'millis'
   static DAYS = 'days'
   static MONTHS = 'months'

@@ -61,11 +61,12 @@ public class NumberAttributeDefinition extends NumericAttributeDefinition {
 
 	private NumberValue<? extends Number> createValue(double val) {
 		Unit defaultUnit = getDefaultUnit();
+		Integer defaultUnitId = defaultUnit == null ? null : defaultUnit.getId();
 		switch(getType()) {
 		case INTEGER:
-			return new IntegerValue(Double.valueOf(Math.round(val)).intValue(), defaultUnit);
+			return new IntegerValue(Double.valueOf(Math.round(val)).intValue(), defaultUnitId);
 		case REAL:
-			return new RealValue(val, defaultUnit);
+			return new RealValue(val, defaultUnitId);
 		default:
 			throw new RuntimeException("Invalid type " + getType());
 		}

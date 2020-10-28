@@ -282,6 +282,7 @@ export class AttributeDefinition extends NodeDefinition {
     NUMBER: 'NUMBER',
     TAXON: 'TAXON',
     TEXT: 'TEXT',
+    TIME: 'TIME',
   }
 
   getFieldLabel(fieldName) {

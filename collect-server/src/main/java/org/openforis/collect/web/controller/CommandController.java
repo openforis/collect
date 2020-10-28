@@ -30,6 +30,7 @@ import org.openforis.collect.command.UpdateIntegerAttributeCommand;
 import org.openforis.collect.command.UpdateRealAttributeCommand;
 import org.openforis.collect.command.UpdateTaxonAttributeCommand;
 import org.openforis.collect.command.UpdateTextAttributeCommand;
+import org.openforis.collect.command.UpdateTimeAttributeCommand;
 import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.event.EventListener;
 import org.openforis.collect.event.RecordEvent;
@@ -54,7 +55,7 @@ import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
-import org.openforis.idm.metamodel.Unit;
+import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.model.BooleanValue;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
@@ -65,6 +66,7 @@ import org.openforis.idm.model.IntegerValue;
 import org.openforis.idm.model.RealValue;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.TextValue;
+import org.openforis.idm.model.Time;
 import org.openforis.idm.model.Value;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -313,10 +315,9 @@ public class CommandController {
 						(Long) valueByField.get(FileAttributeDefinition.FILE_SIZE_FIELD));
 			case NUMBER:
 				Integer unitId = (Integer) valueByField.get(NumberAttributeDefinition.UNIT_FIELD);
-				Unit unit = unitId == null ? null : survey.getUnit(unitId);
 				Number number = (Number) valueByField.get(NumberAttributeDefinition.VALUE_FIELD);
-				return numericType == Type.INTEGER ? new IntegerValue(number == null ? null : number.intValue(), unit)
-						: new RealValue(number == null ? null : number.doubleValue(), unit);
+				return numericType == Type.INTEGER ? new IntegerValue(number == null ? null : number.intValue(), unitId)
+						: new RealValue(number == null ? null : number.doubleValue(), unitId);
 			case TAXON:
 				String code = (String) valueByField.get(TaxonAttributeDefinition.CODE_FIELD_NAME);
 				String scientificName = (String) valueByField.get(TaxonAttributeDefinition.SCIENTIFIC_NAME_FIELD_NAME);
@@ -334,6 +335,10 @@ public class CommandController {
 				return taxonOccurrence;
 			case TEXT:
 				return new TextValue((String) valueByField.get(TextAttributeDefinition.VALUE_FIELD));
+			case TIME:
+				Integer hour = (Integer) valueByField.get(TimeAttributeDefinition.HOUR_FIELD);
+				Integer minute = (Integer) valueByField.get(TimeAttributeDefinition.MINUTE_FIELD);
+				return new Time(hour, minute);
 			default:
 				throw new IllegalStateException("Unsupported command type: " + attributeType);
 			}
@@ -372,6 +377,8 @@ public class CommandController {
 				return UpdateTaxonAttributeCommand.class;
 			case TEXT:
 				return UpdateTextAttributeCommand.class;
+			case TIME:
+				return UpdateTimeAttributeCommand.class;
 			default:
 				throw new IllegalStateException("Unsupported command type: " + attributeType);
 			}

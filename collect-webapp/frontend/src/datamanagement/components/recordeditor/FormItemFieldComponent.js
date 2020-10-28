@@ -10,6 +10,7 @@ import FileField from './fields/FileField'
 import NumberField from './fields/NumberField'
 import TaxonField from './fields/TaxonField'
 import TextField from './fields/TextField'
+import TimeField from './fields/TimeField'
 
 const FIELD_COMPONENTS_BY_TYPE = {
   [AttributeDefinition.Types.BOOLEAN]: BooleanField,
@@ -20,6 +21,7 @@ const FIELD_COMPONENTS_BY_TYPE = {
   [AttributeDefinition.Types.NUMBER]: NumberField,
   [AttributeDefinition.Types.TAXON]: TaxonField,
   [AttributeDefinition.Types.TEXT]: TextField,
+  [AttributeDefinition.Types.TIME]: TimeField,
 }
 
 const FormItemFieldComponent = (props) => {

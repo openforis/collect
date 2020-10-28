@@ -1,5 +1,5 @@
 import React from 'react'
-import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers'
+import { MuiPickersUtilsProvider, KeyboardTimePicker } from '@material-ui/pickers'
 import DateFnsUtils from '@date-io/date-fns'
 
 import Dates from 'utils/Dates'
@@ -7,17 +7,16 @@ import AbstractField from './AbstractField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
 import ValidationTooltip from 'common/components/ValidationTooltip'
 
-const fromValueToDate = (value) => (value ? new Date(value.year, value.month - 1, value.day) : null)
+const fromValueToDate = (value) => (value ? new Date(1970, 1, 1, value.hour, value.minute) : null)
 const fromDateToValue = (date) => {
   const dateUtils = new DateFnsUtils()
   return {
-    year: dateUtils.getYear(date),
-    month: dateUtils.getMonth(date) + 1,
-    day: Number(dateUtils.getDayText(date)),
+    hour: dateUtils.getHours(date),
+    minute: dateUtils.getMinutes(date),
   }
 }
 
-export default class DateField extends AbstractField {
+export default class TimeField extends AbstractField {
   constructor() {
     super()
 
@@ -36,21 +35,23 @@ export default class DateField extends AbstractField {
 
   render() {
     const { dirty, value: valueState, errors, warnings } = this.state
-    const selectedDate = fromValueToDate(valueState)
+    const selectedTime = fromValueToDate(valueState)
 
     return (
       <div>
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
-          <KeyboardDatePicker
+          <KeyboardTimePicker
             id={this.fieldId}
             variant="dialog"
             inputVariant="outlined"
-            format={Dates.DATE_FORMAT}
+            format={Dates.TIME_FORMAT}
+            ampm={false}
             margin="none"
-            value={selectedDate}
+            value={selectedTime}
             onChange={this.onChange}
+            keyboardIcon={<span className="far fa-clock" />}
             className={warnings ? 'warning' : ''}
-            style={{ width: '180px' }}
+            style={{ width: '130px' }}
           />
         </MuiPickersUtilsProvider>
         {dirty && <FieldLoadingSpinner />}

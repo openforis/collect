@@ -3,8 +3,6 @@ package org.openforis.idm.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openforis.idm.metamodel.Unit;
-
 /**
  * 
  * @author G. Miceli
@@ -17,23 +15,23 @@ public abstract class NumberValue<T extends Number> extends AbstractValue {
 	public static final String UNIT_ID_FIELD = "unit_id";
 	
 	private T value;
-	private Unit unit;
+	private Integer unitId;
 	
 	public NumberValue(T value) {
 		this(value, null);
 	}
 	
-	public NumberValue(T value, Unit unit) {
+	public NumberValue(T value, Integer unitId) {
 		this.value = value;
-		this.unit = unit;
+		this.unitId = unitId;
 	}
 
 	public T getValue() {
 		return value;
 	}
 	
-	public Unit getUnit() {
-		return unit;
+	public Integer getUnitId() {
+		return unitId;
 	}
 
 	@Override
@@ -51,7 +49,7 @@ public abstract class NumberValue<T extends Number> extends AbstractValue {
 	public Map<String, Object> toMap() {
 		return new HashMap<String, Object>() {{
 			put(VALUE_FIELD, value);
-			put(UNIT_ID_FIELD, unit == null ? null: unit.getId());
+			put(UNIT_ID_FIELD, unitId);
 		}};
 	}
 	
@@ -64,7 +62,7 @@ public abstract class NumberValue<T extends Number> extends AbstractValue {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((unit == null) ? 0 : unit.hashCode());
+		result = prime * result + ((unitId == null) ? 0 : unitId.hashCode());
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
@@ -79,10 +77,10 @@ public abstract class NumberValue<T extends Number> extends AbstractValue {
 		if (getClass() != obj.getClass())
 			return false;
 		NumberValue<?> other = (NumberValue<?>) obj;
-		if (unit == null) {
-			if (other.unit != null)
+		if (unitId == null) {
+			if (other.unitId != null)
 				return false;
-		} else if (!unit.equals(other.unit))
+		} else if (!unitId.equals(other.unitId))
 			return false;
 		if (value == null) {
 			if (other.value != null)

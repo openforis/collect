@@ -133,7 +133,8 @@ public class JSONValueParser implements ValueParser {
 		}
 		Integer unitId = getInteger(map, NumberValue.UNIT_ID_FIELD);
 		Unit unit = attrDef.getActualUnit(unitId);
-		return new IntegerValue(getInteger(map, NumberValue.VALUE_FIELD), unit);
+		Integer unitIdActual = unit == null ? null : unit.getId();
+		return new IntegerValue(getInteger(map, NumberValue.VALUE_FIELD), unitIdActual);
 	}
 	
 	public IntegerRange parseIntegerRange(RangeAttributeDefinition attrDef, String value) {
@@ -158,7 +159,8 @@ public class JSONValueParser implements ValueParser {
 		}
 		Integer unitId = getInteger(map, RealValue.UNIT_ID_FIELD);
 		Unit unit = attrDef.getActualUnit(unitId);
-		return new RealValue(getDouble(map, RealValue.VALUE_FIELD), unit);
+		Integer unitIdActual = unit == null ? null : unit.getId();
+		return new RealValue(getDouble(map, RealValue.VALUE_FIELD), unitIdActual);
 	}
 	
 	public RealRange parseRealRange(RangeAttributeDefinition attrDef, String value) {

@@ -10,6 +10,7 @@ import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
+import org.openforis.idm.metamodel.IdentifiableSurveyObject;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
@@ -72,19 +73,19 @@ public class EntityBuilder {
 	}
 
 	public static RealAttribute addValue(Entity parentEntity, String name, Double value, Unit unit, int idx) {
-		return addValueInternal(parentEntity, name, new RealValue(value, unit), idx, RealAttribute.class, NumberAttributeDefinition.class);
+		return addValueInternal(parentEntity, name, new RealValue(value, getId(unit)), idx, RealAttribute.class, NumberAttributeDefinition.class);
 	}
 
 	public static RealAttribute addValue(Entity parentEntity, String name, Double value, Unit unit) {
-		return addValueInternal(parentEntity, name, new RealValue(value, unit), null, RealAttribute.class, NumberAttributeDefinition.class);
+		return addValueInternal(parentEntity, name, new RealValue(value, getId(unit)), null, RealAttribute.class, NumberAttributeDefinition.class);
 	}
 
 	public static IntegerAttribute addValue(Entity parentEntity, String name, Integer value, Unit unit, int idx) {
-		return addValueInternal(parentEntity, name, new IntegerValue(value, unit), idx, IntegerAttribute.class, NumberAttributeDefinition.class);
+		return addValueInternal(parentEntity, name, new IntegerValue(value, getId(unit)), idx, IntegerAttribute.class, NumberAttributeDefinition.class);
 	}
 
 	public static IntegerAttribute addValue(Entity parentEntity, String name, Integer value, Unit unit) {
-		return addValueInternal(parentEntity, name, new IntegerValue(value, unit), null, IntegerAttribute.class, NumberAttributeDefinition.class);
+		return addValueInternal(parentEntity, name, new IntegerValue(value, getId(unit)), null, IntegerAttribute.class, NumberAttributeDefinition.class);
 	}
 
 	public static RealAttribute addValue(Entity parentEntity, String name, Double value, int idx) {
@@ -197,4 +198,7 @@ public class EntityBuilder {
 		return entity;
 	}
 
+	private static Integer getId(IdentifiableSurveyObject<?> obj) {
+		return obj == null ? null : obj.getId();
+	}
 }
