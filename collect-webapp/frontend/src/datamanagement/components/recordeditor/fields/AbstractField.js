@@ -33,24 +33,12 @@ export default class AbstractField extends Component {
 
   updateStateFromProps() {
     const value = this.extractValueFromProps()
-    this.setState({ dirty: false, value, ...this.extractValidationFromProps() })
+    this.setState({ dirty: false, value })
   }
 
   extractValueFromProps() {
     const attr = this.getAttribute()
     return attr ? attr.value : null
-  }
-
-  extractValidationFromProps() {
-    const attr = this.getAttribute()
-    let errors = null,
-      warnings = null
-    if (attr) {
-      const { errors: errorsArray, warnings: warningsArray } = attr.validationResults
-      errors = errorsArray ? errorsArray.join('; ') : null
-      warnings = warningsArray ? warningsArray.join('; ') : null
-    }
-    return { errors, warnings }
   }
 
   getAttribute(parentEntityParam) {

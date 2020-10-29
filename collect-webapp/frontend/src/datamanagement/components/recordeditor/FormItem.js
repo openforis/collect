@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Label, Row, Col } from 'reactstrap'
 import classNames from 'classnames'
 
 import { FieldDefinition } from 'model/ui/FieldDefinition'
 import FormItemTypes from 'model/ui/FormItemTypes'
 import { ValidationResultFlag } from 'model/ValidationResultFlag'
-import EventQueue from 'model/event/EventQueue'
-import { NodeCountUpdatedEvent, NodeCountValidationUpdatedEvent, RecordEvent } from 'model/event/RecordEvent'
+import { NodeCountUpdatedEvent, NodeCountValidationUpdatedEvent } from 'model/event/RecordEvent'
 import L from 'utils/Labels'
 
 import ValidationTooltip from 'common/components/ValidationTooltip'
@@ -15,6 +14,7 @@ import MultipleFieldset from './MultipleFieldset'
 import Table from './Table'
 import FormItemFieldComponent from './FormItemFieldComponent'
 import FormItemMultipleFieldComponent from './FormItemMultipleFieldComponent'
+import { useRecordEvent } from '../../../common/hooks'
 
 const internalComponentByFieldType = {
   [FormItemTypes.FIELD]: FormItemFieldComponent,
@@ -47,22 +47,17 @@ const FormItem = (props) => {
 
   const [cardinalityErrors, setCardinalityErrors] = useState(_getCardinalityErrors({ itemDef, parentEntity }))
 
-  const handleRecordEventReceived = (event) => {
-    if (!parentEntity) {
-      return
-    }
-    if (
-      (event instanceof NodeCountValidationUpdatedEvent || event instanceof NodeCountUpdatedEvent) &&
-      event.isRelativeToNodes({ parentEntity, nodeDefId: itemDef.attributeDefinitionId })
-    ) {
-      setCardinalityErrors(_getCardinalityErrors({ itemDef, parentEntity }))
-    }
-  }
-
-  useEffect(() => {
-    EventQueue.subscribe(RecordEvent.TYPE, handleRecordEventReceived)
-    return () => EventQueue.unsubscribe(RecordEvent.TYPE, handleRecordEventReceived)
-  }, [])
+  useRecordEvent({
+    parentEntity,
+    onEvent: (event) => {
+      if (
+        (event instanceof NodeCountValidationUpdatedEvent || event instanceof NodeCountUpdatedEvent) &&
+        event.isRelativeToNodes({ parentEntity, nodeDefId: itemDef.attributeDefinitionId })
+      ) {
+        setCardinalityErrors(_getCardinalityErrors({ itemDef, parentEntity }))
+      }
+    },
+  })
 
   const wrapperId = `form-item-${parentEntity.id}-node-def-${
     itemDef.attributeDefinitionId || itemDef.entityDefinitionId

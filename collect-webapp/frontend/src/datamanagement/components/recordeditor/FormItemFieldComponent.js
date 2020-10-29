@@ -1,6 +1,12 @@
-import React from 'react'
+import React, { useRef, useState } from 'react'
+import classNames from 'classnames'
 
 import { AttributeDefinition } from 'model/Survey'
+
+import { useRecordEvent } from 'common/hooks'
+import ValidationTooltip from 'common/components/ValidationTooltip'
+
+import { AttributeValueUpdatedEvent } from 'model/event/RecordEvent'
 
 import BooleanField from './fields/BooleanField'
 import CodeField from './fields/CodeField'
@@ -24,15 +30,64 @@ const FIELD_COMPONENTS_BY_TYPE = {
   [AttributeDefinition.Types.TIME]: TimeField,
 }
 
+const extractValidation = (props) => {
+  const { parentEntity, itemDef, attribute: attributeParam } = props
+  let errors = null,
+    warnings = null
+  if (parentEntity) {
+    const attrDef = itemDef.attributeDefinition
+    const attr = attrDef.multiple ? attributeParam : parentEntity.getSingleChild(attrDef.id)
+    const { errors: errorsArray, warnings: warningsArray } = attr.validationResults
+    errors = errorsArray ? errorsArray.join('; ') : null
+    warnings = warningsArray ? warningsArray.join('; ') : null
+    return { errors, warnings }
+  }
+  return { errors, warnings }
+}
+
 const FormItemFieldComponent = (props) => {
   const { itemDef, parentEntity, attribute } = props
-  const attrDef = itemDef.attributeDefinition
-  const Component = FIELD_COMPONENTS_BY_TYPE[attrDef.attributeType]
+
+  const wrapperIdRef = useRef(`form-item-field-${new Date().getTime()}`)
+  const wrapperId = wrapperIdRef.current
+
+  const [validation, setValidation] = useState({ errors: null, warnings: null })
+
+  useRecordEvent({
+    parentEntity,
+    onEvent: (event) => {
+      if (
+        event instanceof AttributeValueUpdatedEvent &&
+        event.isRelativeToNodes({ parentEntity, nodeDefId: itemDef.attributeDefinitionId })
+      ) {
+        setValidation(extractValidation(props))
+      }
+    },
+  })
+
+  const { attributeDefinition } = itemDef
+  const { attributeType } = attributeDefinition
+  const { errors, warnings } = validation
+  const Component = FIELD_COMPONENTS_BY_TYPE[attributeType]
 
   return Component ? (
-    <Component fieldDef={itemDef} parentEntity={parentEntity} attribute={attribute} />
+    <>
+      <div
+        id={wrapperId}
+        className={classNames('form-item-field-wrapper', { error: Boolean(errors), warning: Boolean(warnings) })}
+      >
+        <Component
+          fieldDef={itemDef}
+          parentEntity={parentEntity}
+          attribute={attribute}
+          error={Boolean(errors)}
+          warning={Boolean(warnings)}
+        />
+      </div>
+      <ValidationTooltip target={wrapperId} errors={errors} warnings={warnings} />
+    </>
   ) : (
-    <div>Field type {attrDef.attributeType} not supported yet</div>
+    <div>Field type {attributeType} not supported yet</div>
   )
 }
 

@@ -4,13 +4,10 @@ import { Input } from 'reactstrap'
 
 import AbstractField from './AbstractField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
-import ValidationTooltip from 'common/components/ValidationTooltip'
 
 export default class NumberField extends AbstractField {
   constructor(props) {
     super(props)
-
-    this.fieldId = `number-field-${new Date().getTime()}`
 
     this.onTextValueChange = this.onTextValueChange.bind(this)
     this.onUnitChange = this.onUnitChange.bind(this)
@@ -53,7 +50,7 @@ export default class NumberField extends AbstractField {
 
   render() {
     const { fieldDef } = this.props
-    const { dirty, value: valueState, errors, warnings } = this.state
+    const { dirty, value: valueState } = this.state
     const { value, unit: unitId } = valueState || {}
     const text = value || ''
     const attrDef = fieldDef.attributeDefinition
@@ -63,15 +60,7 @@ export default class NumberField extends AbstractField {
     return (
       <div>
         <div style={hasPrecisions ? { display: 'grid', gridTemplateColumns: '1fr 150px' } : null}>
-          <Input
-            id={this.fieldId}
-            type="number"
-            invalid={Boolean(errors || warnings)}
-            className={warnings ? 'warning' : ''}
-            value={text}
-            onChange={this.onTextValueChange}
-          />
-          <ValidationTooltip target={this.fieldId} errors={errors} warnings={warnings} />
+          <Input type="number" value={text} onChange={this.onTextValueChange} />
 
           {hasPrecisions && (
             <FormControl>

@@ -4,28 +4,19 @@ import { CoordinateAttributeDefinition } from '../../../../model/Survey'
 
 import AbstractField from './AbstractField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
-import ValidationTooltip from 'common/components/ValidationTooltip'
 import CompositeAttributeFormItem from './CompositeAttributeFormItem'
 
-const numericField = ({ value, onChange, errors, warnings }) => (
-  <Input
-    invalid={Boolean(errors || warnings)}
-    className={warnings ? 'warning' : ''}
-    value={value}
-    type="number"
-    onChange={onChange}
-  />
-)
+const numericField = ({ value, onChange }) => <Input value={value} type="number" onChange={onChange} />
 
 export default class CoordinateField extends AbstractField {
   constructor() {
     super()
 
-    this.wrapperId = `coordinate-field-${new Date().getTime()}`
-
     this.onChangeX = this.onChangeX.bind(this)
     this.onChangeY = this.onChangeY.bind(this)
     this.onChangeSrs = this.onChangeSrs.bind(this)
+    this.onChangeAltitude = this.onChangeAltitude.bind(this)
+    this.onChangeAccuracy = this.onChangeAccuracy.bind(this)
   }
 
   onChangeField({ fieldName, fieldValue }) {
@@ -61,6 +52,10 @@ export default class CoordinateField extends AbstractField {
     this.onChangeNumericField({ fieldName: 'y', event })
   }
 
+  onChangeSrs(event) {
+    this.onChangeField({ fieldName: 'srs', fieldValue: event.target.value })
+  }
+
   onChangeAltitude(event) {
     this.onChangeNumericField({ fieldName: 'altitude', event })
   }
@@ -69,17 +64,13 @@ export default class CoordinateField extends AbstractField {
     this.onChangeNumericField({ fieldName: 'accuracy', event })
   }
 
-  onChangeSrs(event) {
-    this.onChangeField({ fieldName: 'srs', fieldValue: event.target.value })
-  }
-
   getSpatialReferenceSystems() {
     return this.props.parentEntity.definition.survey.spatialReferenceSystems
   }
 
   render() {
     const { inTable, fieldDef } = this.props
-    const { dirty, value, errors, warnings } = this.state
+    const { dirty, value } = this.state
     const { x, y, srs, altitude, accuracy } = value || {}
     const xText = x || ''
     const yText = y || ''
@@ -92,13 +83,7 @@ export default class CoordinateField extends AbstractField {
     const srsField = !showSrsField ? null : srss.length === 1 ? (
       <Label>{srss[0].label}</Label>
     ) : (
-      <Input
-        invalid={Boolean(errors || warnings)}
-        className={warnings ? 'warning' : ''}
-        value={srs}
-        type="select"
-        onChange={this.onChangeSrs}
-      >
+      <Input value={srs} type="select" onChange={this.onChangeSrs}>
         {[
           <option key="empty" value="">
             Select...
@@ -111,13 +96,13 @@ export default class CoordinateField extends AbstractField {
         ]}
       </Input>
     )
-    const xField = numericField({ value: xText, onChange: this.onChangeX, errors, warnings })
-    const yField = numericField({ value: yText, onChange: this.onChangeY, errors, warnings })
+    const xField = numericField({ value: xText, onChange: this.onChangeX })
+    const yField = numericField({ value: yText, onChange: this.onChangeY })
     const altitudeField = includeAltitudeField
-      ? numericField({ value: altitudeText, onChange: this.onChangeAltitude, errors, warnings })
+      ? numericField({ value: altitudeText, onChange: this.onChangeAltitude })
       : null
     const accuracyField = includeAccuracyField
-      ? numericField({ value: accuracyText, onChange: this.onChangeAccuracy, errors, warnings })
+      ? numericField({ value: accuracyText, onChange: this.onChangeAccuracy })
       : null
 
     const getInternalContent = () => {
@@ -198,9 +183,8 @@ export default class CoordinateField extends AbstractField {
       return internalParts
     }
     return (
-      <div id={this.wrapperId}>
+      <div>
         {getInternalContent()}
-        <ValidationTooltip target={this.wrapperId} errors={errors} warnings={warnings} />
         {dirty && <FieldLoadingSpinner />}
       </div>
     )

@@ -5,7 +5,6 @@ import DateFnsUtils from '@date-io/date-fns'
 import Dates from 'utils/Dates'
 import AbstractField from './AbstractField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
-import ValidationTooltip from 'common/components/ValidationTooltip'
 
 const fromValueToDate = (value) => (value ? new Date(value.year, value.month - 1, value.day) : null)
 const fromDateToValue = (date) => {
@@ -20,9 +19,6 @@ const fromDateToValue = (date) => {
 export default class DateField extends AbstractField {
   constructor() {
     super()
-
-    this.fieldId = `date-field-${new Date().getTime()}`
-
     this.onChange = this.onChange.bind(this)
   }
 
@@ -35,26 +31,23 @@ export default class DateField extends AbstractField {
   }
 
   render() {
-    const { dirty, value: valueState, errors, warnings } = this.state
+    const { dirty, value: valueState } = this.state
     const selectedDate = fromValueToDate(valueState)
 
     return (
       <div>
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
           <KeyboardDatePicker
-            id={this.fieldId}
             variant="dialog"
             inputVariant="outlined"
             format={Dates.DATE_FORMAT}
             margin="none"
             value={selectedDate}
             onChange={this.onChange}
-            className={warnings ? 'warning' : ''}
             style={{ width: '180px' }}
           />
         </MuiPickersUtilsProvider>
         {dirty && <FieldLoadingSpinner />}
-        <ValidationTooltip target={this.fieldId} errors={errors} warnings={warnings} />
       </div>
     )
   }
