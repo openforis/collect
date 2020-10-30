@@ -22,16 +22,16 @@ export class RecordUpdater {
   constructor(record) {
     this.record = record
 
-    this.handleRecordEventReceived = this.handleRecordEventReceived.bind(this)
+    this.onRecordEvent = this.onRecordEvent.bind(this)
 
-    EventQueue.subscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
+    EventQueue.subscribe(RecordEvent.TYPE, this.onRecordEvent)
   }
 
   destroy() {
-    EventQueue.unsubscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
+    EventQueue.unsubscribe(RecordEvent.TYPE, this.onRecordEvent)
   }
 
-  handleRecordEventReceived(event) {
+  onRecordEvent(event) {
     const record = this.record
     if (record && event.isRelativeToRecord(record)) {
       const survey = record.survey

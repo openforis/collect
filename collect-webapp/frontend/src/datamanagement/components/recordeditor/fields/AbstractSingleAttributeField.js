@@ -1,11 +1,11 @@
-import { Component } from 'react'
 import { debounce } from 'throttle-debounce'
 
-import { AttributeValueUpdatedEvent, RecordEvent } from 'model/event/RecordEvent'
-import EventQueue from 'model/event/EventQueue'
+import { AttributeValueUpdatedEvent } from 'model/event/RecordEvent'
 import ServiceFactory from 'services/ServiceFactory'
 
-export default class AbstractField extends Component {
+import AbstractFormComponent from '../AbstractFormComponent'
+
+export default class AbstractSingleAttributeField extends AbstractFormComponent {
   constructor() {
     super()
 
@@ -17,18 +17,12 @@ export default class AbstractField extends Component {
     }
 
     this.attributeUpdatedDebounced = null
-    this.handleRecordEventReceived = this.handleRecordEventReceived.bind(this)
     this.onAttributeUpdate = this.onAttributeUpdate.bind(this)
-
-    EventQueue.subscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
   }
 
   componentDidMount() {
+    super.componentDidMount()
     this.updateStateFromProps()
-  }
-
-  componentWillUnmount() {
-    EventQueue.unsubscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
   }
 
   updateStateFromProps() {
@@ -63,11 +57,10 @@ export default class AbstractField extends Component {
     this.attributeUpdatedDebounced()
   }
 
-  handleRecordEventReceived(event) {
+  onRecordEvent(event) {
+    super.onRecordEvent(event)
+
     const { fieldDef, parentEntity } = this.props
-    if (!parentEntity) {
-      return
-    }
     if (
       event instanceof AttributeValueUpdatedEvent &&
       event.isRelativeToNodes({ parentEntity, nodeDefId: fieldDef.attributeDefinitionId })

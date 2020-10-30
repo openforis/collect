@@ -3,13 +3,13 @@ import React from 'react'
 import { Button } from 'reactstrap'
 
 import ServiceFactory from 'services/ServiceFactory'
-import EventQueue from 'model/event/EventQueue'
-import { AttributeCreatedEvent, AttributeDeletedEvent, RecordEvent } from 'model/event/RecordEvent'
+import { AttributeCreatedEvent, AttributeDeletedEvent } from 'model/event/RecordEvent'
 
 import DeleteIconButton from 'common/components/DeleteIconButton'
 import FormItemFieldComponent from './FormItemFieldComponent'
+import AbstractFormComponent from './AbstractFormComponent'
 
-export default class FormItemMultipleFieldComponent extends React.Component {
+export default class FormItemMultipleFieldComponent extends AbstractFormComponent {
   commandService = ServiceFactory.commandService
 
   constructor() {
@@ -19,20 +19,14 @@ export default class FormItemMultipleFieldComponent extends React.Component {
       attributes: [],
     }
 
-    this.handleRecordEventReceived = this.handleRecordEventReceived.bind(this)
     this.extractAttributesFromProps = this.extractAttributesFromProps.bind(this)
     this.onAddButtonClick = this.onAddButtonClick.bind(this)
     this.onDeleteButtonClick = this.onDeleteButtonClick.bind(this)
   }
 
   componentDidMount() {
-    EventQueue.subscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
-
+    super.componentDidMount()
     this.setState({ attributes: this.extractAttributesFromProps() })
-  }
-
-  componentWillUnmount() {
-    EventQueue.unsubscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
   }
 
   extractAttributesFromProps() {
@@ -40,11 +34,10 @@ export default class FormItemMultipleFieldComponent extends React.Component {
     return parentEntity ? parentEntity.getChildrenByDefinitionId(itemDef.attributeDefinitionId) : []
   }
 
-  handleRecordEventReceived(event) {
+  onRecordEvent(event) {
+    super.onRecordEvent(event)
+
     const { parentEntity, itemDef } = this.props
-    if (!parentEntity) {
-      return
-    }
     if (
       (event instanceof AttributeCreatedEvent || event instanceof AttributeDeletedEvent) &&
       event.isRelativeToNodes({ parentEntity, nodeDefId: itemDef.attributeDefinitionId })

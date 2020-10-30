@@ -2,10 +2,10 @@ import { FormControl, InputLabel, Select } from '@material-ui/core'
 import React from 'react'
 import { Input } from 'reactstrap'
 
-import AbstractField from './AbstractField'
+import AbstractSingleAttributeField from './AbstractSingleAttributeField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
 
-export default class NumberField extends AbstractField {
+export default class NumberField extends AbstractSingleAttributeField {
   constructor(props) {
     super(props)
 

@@ -2,12 +2,12 @@ import React from 'react'
 import { Container, Fade } from 'reactstrap'
 import classnames from 'classnames'
 
-import EventQueue from 'model/event/EventQueue'
-import { NodeRelevanceUpdatedEvent, RecordEvent } from 'model/event/RecordEvent'
+import { NodeRelevanceUpdatedEvent } from 'model/event/RecordEvent'
 import { TableDefinition } from 'model/ui/TableDefinition'
 import { MultipleFieldsetDefinition } from 'model/ui/MultipleFieldsetDefinition'
 
 import FormItem from './FormItem'
+import AbstractFormComponent from './AbstractFormComponent'
 
 const FormItemsItem = (props) => {
   const { itemDef, parentEntity, fullSize } = props
@@ -29,22 +29,10 @@ FormItemsItem.defaultProps = {
   fullSize: false,
 }
 
-export default class FormItems extends React.Component {
-  constructor() {
-    super()
+export default class FormItems extends AbstractFormComponent {
+  onRecordEvent(event) {
+    super.onRecordEvent(event)
 
-    this.handleRecordEventReceived = this.handleRecordEventReceived.bind(this)
-  }
-
-  componentDidMount() {
-    EventQueue.subscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
-  }
-
-  componentWillUnmount() {
-    EventQueue.unsubscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
-  }
-
-  handleRecordEventReceived(event) {
     const { parentEntity } = this.props
 
     if (event instanceof NodeRelevanceUpdatedEvent && event.isRelativeToNode(parentEntity)) {

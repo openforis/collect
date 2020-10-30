@@ -10,7 +10,7 @@ import Objects from 'utils/Objects'
 import L from 'utils/Labels'
 import Languages from 'utils/Languages'
 
-import AbstractField from '../AbstractField'
+import AbstractSingleAttributeField from '../AbstractSingleAttributeField'
 import CompositeAttributeFormItem from '../CompositeAttributeFormItem'
 import TaxonAutoCompleteField from './TaxonAutoCompleteField'
 
@@ -29,7 +29,7 @@ const ALL_LANGUAGE_FIELDS = [
 ]
 const ALL_FIELDS = [...ALL_AUTOCOMPLETE_FIELDS, ...ALL_LANGUAGE_FIELDS]
 
-export default class TaxonField extends AbstractField {
+export default class TaxonField extends AbstractSingleAttributeField {
   LANG_CODES = Languages.codes(LANG_CODE_STANDARD)
 
   constructor() {

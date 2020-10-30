@@ -3,7 +3,7 @@ import { MuiPickersUtilsProvider, KeyboardTimePicker } from '@material-ui/picker
 import DateFnsUtils from '@date-io/date-fns'
 
 import Dates from 'utils/Dates'
-import AbstractField from './AbstractField'
+import AbstractSingleAttributeField from './AbstractSingleAttributeField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
 
 const fromValueToDate = (value) => (value ? new Date(1970, 1, 1, value.hour, value.minute) : null)
@@ -15,7 +15,7 @@ const fromDateToValue = (date) => {
   }
 }
 
-export default class TimeField extends AbstractField {
+export default class TimeField extends AbstractSingleAttributeField {
   constructor() {
     super()
     this.onChange = this.onChange.bind(this)

@@ -1,9 +1,9 @@
 import React from 'react'
 import { Label, Input, FormGroup } from 'reactstrap'
 import ServiceFactory from 'services/ServiceFactory'
-import AbstractField from './AbstractField'
+import AbstractSingleAttributeField from './AbstractSingleAttributeField'
 
-export default class CodeField extends AbstractField {
+export default class CodeField extends AbstractSingleAttributeField {
   constructor(props) {
     super(props)
 

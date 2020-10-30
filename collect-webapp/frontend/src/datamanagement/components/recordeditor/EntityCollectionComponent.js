@@ -1,9 +1,8 @@
-import { Component } from 'react'
 import ServiceFactory from 'services/ServiceFactory'
-import EventQueue from 'model/event/EventQueue'
-import { EntityCreationCompletedEvent, EntityDeletedEvent, RecordEvent } from 'model/event/RecordEvent'
+import { EntityCreationCompletedEvent, EntityDeletedEvent } from 'model/event/RecordEvent'
+import AbstractFormComponent from './AbstractFormComponent'
 
-export default class EntityCollectionComponent extends Component {
+export default class EntityCollectionComponent extends AbstractFormComponent {
   commandService = ServiceFactory.commandService
 
   constructor() {
@@ -13,20 +12,14 @@ export default class EntityCollectionComponent extends Component {
       entities: [],
     }
 
-    this.handleRecordEventReceived = this.handleRecordEventReceived.bind(this)
     this.determineEntities = this.determineEntities.bind(this)
     this.onEntitiesUpdated = this.onEntitiesUpdated.bind(this)
     this.handleNewButtonClick = this.handleNewButtonClick.bind(this)
   }
 
   componentDidMount() {
-    EventQueue.subscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
-
+    super.componentDidMount()
     this.setState({ entities: this.determineEntities() })
-  }
-
-  componentWillUnmount() {
-    EventQueue.unsubscribe(RecordEvent.TYPE, this.handleRecordEventReceived)
   }
 
   determineEntities() {
@@ -34,11 +27,10 @@ export default class EntityCollectionComponent extends Component {
     return parentEntity ? parentEntity.getChildrenByDefinitionId(itemDef.entityDefinitionId) : []
   }
 
-  handleRecordEventReceived(event) {
+  onRecordEvent(event) {
+    super.onRecordEvent(event)
+
     const { parentEntity, itemDef } = this.props
-    if (!parentEntity) {
-      return
-    }
     if (
       (event instanceof EntityCreationCompletedEvent || event instanceof EntityDeletedEvent) &&
       event.isRelativeToNodes({ parentEntity, nodeDefId: itemDef.entityDefinitionId })

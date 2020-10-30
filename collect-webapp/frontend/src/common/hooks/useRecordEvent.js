@@ -4,7 +4,7 @@ import EventQueue from 'model/event/EventQueue'
 import { RecordEvent } from 'model/event/RecordEvent'
 
 export const useRecordEvent = ({ parentEntity, onEvent }) => {
-  const handleRecordEventReceived = (event) => {
+  const onRecordEvent = (event) => {
     if (!parentEntity) {
       return
     }
@@ -12,7 +12,7 @@ export const useRecordEvent = ({ parentEntity, onEvent }) => {
   }
 
   useEffect(() => {
-    EventQueue.subscribe(RecordEvent.TYPE, handleRecordEventReceived)
-    return () => EventQueue.unsubscribe(RecordEvent.TYPE, handleRecordEventReceived)
+    EventQueue.subscribe(RecordEvent.TYPE, onRecordEvent)
+    return () => EventQueue.unsubscribe(RecordEvent.TYPE, onRecordEvent)
   }, [parentEntity])
 }

@@ -2,13 +2,13 @@ import React from 'react'
 import { Input, Label } from 'reactstrap'
 import { CoordinateAttributeDefinition } from '../../../../model/Survey'
 
-import AbstractField from './AbstractField'
+import AbstractSingleAttributeField from './AbstractSingleAttributeField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
 import CompositeAttributeFormItem from './CompositeAttributeFormItem'
 
 const numericField = ({ value, onChange }) => <Input value={value} type="number" onChange={onChange} />
 
-export default class CoordinateField extends AbstractField {
+export default class CoordinateField extends AbstractSingleAttributeField {
   constructor() {
     super()
 

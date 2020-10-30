@@ -1,10 +1,10 @@
 import React from 'react'
 import { Input } from 'reactstrap'
 
-import AbstractField from './AbstractField'
+import AbstractSingleAttributeField from './AbstractSingleAttributeField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
 
-export default class TextField extends AbstractField {
+export default class TextField extends AbstractSingleAttributeField {
   constructor() {
     super()
     this.onChange = this.onChange.bind(this)
