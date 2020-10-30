@@ -8,6 +8,7 @@ import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.ui.UIOptions.CoordinateAttributeFieldsOrder;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITable.Direction;
+import org.openforis.collect.metamodel.ui.UITextField.TextTransform;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -191,15 +192,20 @@ public class UIOptionsMigrator {
 			codeField.setShowCode(uiOptions.getShowCode(codeAttrDefn));
 			codeField.setItemsOrientation(uiOptions.getLayoutDirection(codeAttrDefn));
 			field = codeField;
+		} else if (nodeDefn instanceof TextAttributeDefinition) {
+			UITextField textField = parent.createTextField();
+			textField.setAutoCompleteGroup(annotations.getAutoCompleteGroup((TextAttributeDefinition) nodeDefn));
+			TextTransform textTranform = uiOptions.isAutoUppercase((TextAttributeDefinition) nodeDefn)
+					? TextTransform.UPPERCASE
+					: TextTransform.NONE;
+			textField.setTextTranform(textTranform);
+			field = textField;
 		} else {
 			field = parent.createField();
 		}
 		field.setAttributeDefinitionId(nodeDefn.getId());
 		
-		if ( nodeDefn instanceof TextAttributeDefinition ) {
-			String autoCompleteGroup = annotations.getAutoCompleteGroup((TextAttributeDefinition) nodeDefn);
-			field.setAutoCompleteGroup(autoCompleteGroup);
-		} else if ( nodeDefn instanceof CoordinateAttributeDefinition ) {
+		if ( nodeDefn instanceof CoordinateAttributeDefinition ) {
 			CoordinateAttributeFieldsOrder fieldsOrder = uiOptions.getFieldsOrder((CoordinateAttributeDefinition) nodeDefn);
 			field.setFieldsOrder(fieldsOrder);
 		}

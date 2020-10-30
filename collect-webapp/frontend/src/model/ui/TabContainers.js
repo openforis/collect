@@ -1,5 +1,6 @@
 import { AttributeDefinition } from 'model/Survey'
 import { CodeFieldDefinition } from './CodeFieldDefinition'
+import { TextFieldDefinition } from './TextFieldDefinition'
 import { FieldDefinition } from './FieldDefinition'
 import { FieldsetDefinition } from './FieldsetDefinition'
 import { MultipleFieldsetDefinition } from './MultipleFieldsetDefinition'
@@ -11,7 +12,14 @@ import FormItemTypes from './FormItemTypes'
 const getFormItemClass = (itemType, attributeType) => {
   switch (itemType) {
     case FormItemTypes.FIELD:
-      return attributeType === AttributeDefinition.Types.CODE ? CodeFieldDefinition : FieldDefinition
+      switch (attributeType) {
+        case AttributeDefinition.Types.CODE:
+          return CodeFieldDefinition
+        case AttributeDefinition.Types.TEXT:
+          return TextFieldDefinition
+        default:
+          return FieldDefinition
+      }
     case FormItemTypes.FIELDSET:
       return FieldsetDefinition
     case FormItemTypes.MULTIPLE_FIELD:

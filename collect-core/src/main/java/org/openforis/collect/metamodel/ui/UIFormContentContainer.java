@@ -54,12 +54,19 @@ public abstract class UIFormContentContainer extends UIModelObject {
 	}
 
 	public UICodeField createCodeField() {
-		UIConfiguration uiOptions = getUIConfiguration();
-		return createCodeField(uiOptions.nextId());
+		return createCodeField(getUIConfiguration().nextId());
 	}
 	
 	public UICodeField createCodeField(int id) {
 		return new UICodeField(this, id);
+	}
+	
+	public UITextField createTextField() {
+		return createTextField(getUIConfiguration().nextId());
+	}
+	
+	public UITextField createTextField(int id) {
+		return new UITextField(this, id);
 	}
 
 	public UITable createTable() {

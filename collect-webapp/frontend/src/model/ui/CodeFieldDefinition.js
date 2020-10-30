@@ -1,9 +1,7 @@
-import { FieldDefinition } from './FieldDefinition';
+import { FieldDefinition } from './FieldDefinition'
 
 export class CodeFieldDefinition extends FieldDefinition {
-    
-    layout;
-    itemsOrientation;
-    showCode;
-    
+  layout
+  itemsOrientation
+  showCode
 }
