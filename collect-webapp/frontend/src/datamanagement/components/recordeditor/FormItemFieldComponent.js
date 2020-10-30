@@ -46,7 +46,7 @@ const extractValidation = (props) => {
 }
 
 const FormItemFieldComponent = (props) => {
-  const { itemDef, parentEntity, attribute } = props
+  const { itemDef, parentEntity, attribute, inTable } = props
 
   const wrapperIdRef = useRef(`form-item-field-${new Date().getTime()}`)
   const wrapperId = wrapperIdRef.current
@@ -80,6 +80,7 @@ const FormItemFieldComponent = (props) => {
           fieldDef={itemDef}
           parentEntity={parentEntity}
           attribute={attribute}
+          inTable={inTable}
           error={Boolean(errors)}
           warning={Boolean(warnings)}
         />

@@ -309,6 +309,14 @@ export class CoordinateAttributeDefinition extends AttributeDefinition {
     X_Y_SRS: 'X_Y_SRS',
     Y_X_SRS: 'Y_X_SRS',
   }
+
+  static Fields = {
+    X: 'x',
+    Y: 'y',
+    SRS: 'srs',
+    ALTITUDE: 'altitude',
+    ACCURACY: 'accuracy',
+  }
 }
 
 export class TaxonAttributeDefinition extends AttributeDefinition {

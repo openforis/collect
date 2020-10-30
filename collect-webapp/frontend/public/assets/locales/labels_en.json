@@ -262,6 +262,13 @@
             "message": "Record is owned by another user ({0}) and cannot be edited"
         },
         "dataEntry": {
+            "coordinateField": {
+                "x": "X",
+                "y": "Y",
+                "srs": "SRS",
+                "altitude": "Altitude",
+                "accuracy": "Accuracy"
+            },
             "fileField": {
                 "fileType": {
                     "audio": "Audio",

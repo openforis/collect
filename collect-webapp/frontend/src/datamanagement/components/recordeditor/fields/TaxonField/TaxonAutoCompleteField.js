@@ -9,6 +9,7 @@ import Objects from 'utils/Objects'
 
 import FieldLoadingSpinner from '../FieldLoadingSpinner'
 import TaxonAutoCompleteDialogItem from './TaxonAutoCompleteDialogItem'
+import * as FieldsSizes from '../FieldsSizes'
 
 const fetchTaxa = async ({ surveyId, fieldDef, queryField, searchString, onComplete }) => {
   const { attributeDefinition } = fieldDef
@@ -41,16 +42,7 @@ const fetchTaxa = async ({ surveyId, fieldDef, queryField, searchString, onCompl
 }
 
 const TaxonAutoCompleteField = (props) => {
-  const {
-    parentEntity,
-    fieldDef,
-    field,
-    valueByFields,
-    width,
-    onInputChange: onInputChangeProps,
-    onSelect,
-    onDismiss,
-  } = props
+  const { parentEntity, fieldDef, field, valueByFields, onInputChange: onInputChangeProps, onSelect, onDismiss } = props
 
   const { attributeDefinition } = fieldDef
   const { showFamily } = attributeDefinition
@@ -167,7 +159,6 @@ const TaxonAutoCompleteField = (props) => {
 
   return (
     <Autocomplete
-      style={{ width }}
       open={open}
       openOnFocus={false}
       onOpen={onOpen}
@@ -184,6 +175,8 @@ const TaxonAutoCompleteField = (props) => {
       renderInput={(params) => (
         <TextField
           {...params}
+          fullWidth={false}
+          style={{ width: `${FieldsSizes.TaxonFieldWidths[field]}px` }}
           variant="outlined"
           InputProps={{
             ...params.InputProps,

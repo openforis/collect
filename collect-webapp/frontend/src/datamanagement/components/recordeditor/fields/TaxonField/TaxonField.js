@@ -13,6 +13,7 @@ import Languages from 'utils/Languages'
 import AbstractSingleAttributeField from '../AbstractSingleAttributeField'
 import CompositeAttributeFormItem from '../CompositeAttributeFormItem'
 import TaxonAutoCompleteField from './TaxonAutoCompleteField'
+import * as FieldsSizes from '../FieldsSizes'
 
 const LANG_CODE_STANDARD = Languages.STANDARDS.ISO_639_3
 
@@ -113,15 +114,16 @@ export default class TaxonField extends AbstractSingleAttributeField {
       ...languageFields.map((field) => {
         const langCode = Objects.getProp(field)(value)
         const selectedOption = langCode ? { code: langCode, label: getLangLabel(langCode) } : null
+        const width = FieldsSizes.TaxonFieldWidths[field]
         return (
           <Autocomplete
             key={field}
             className="taxon-autocomplete-language"
-            style={{ width: 300 }}
+            style={{ width: `${width}px` }}
             value={selectedOption}
             options={langOptions}
             getOptionSelected={(option) => option.code === langCode}
-            getOptionLabel={(option) => `${option.label} (${option.code})`}
+            getOptionLabel={(option) => `${option.code} - ${option.label}`}
             renderInput={(params) => <TextField {...params} variant="outlined" />}
             onChange={(_, option) => this.onChangeField(field)(option.code)}
             disabled={!code || code !== 'UNL' || !vernacularName}
@@ -130,16 +132,18 @@ export default class TaxonField extends AbstractSingleAttributeField {
       }),
     ]
 
-    return inTable
-      ? inputFields
-      : fields.map((field, index) => (
-          <CompositeAttributeFormItem
-            key={field}
-            field={field}
-            label={L.l(`dataManagement.dataEntry.taxonField.${field}`)}
-            inputField={inputFields[index]}
-            labelWidth={160}
-          />
-        ))
+    return inTable ? (
+      <div style={{ display: 'flex' }}>{inputFields}</div>
+    ) : (
+      fields.map((field, index) => (
+        <CompositeAttributeFormItem
+          key={field}
+          field={field}
+          label={L.l(`dataManagement.dataEntry.taxonField.${field}`)}
+          inputField={inputFields[index]}
+          labelWidth={160}
+        />
+      ))
+    )
   }
 }

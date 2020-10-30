@@ -425,6 +425,10 @@ input.is-invalid.warning:focus {
   border: 1px solid red;
 }
 
+.form-item-field-wrapper.error input {
+  background-color: #ffdbdb;
+}
+
 .form-item-wrapper.warning,
 .form-item-field-wrapper.warnings {
   border: 1px solid orangered;

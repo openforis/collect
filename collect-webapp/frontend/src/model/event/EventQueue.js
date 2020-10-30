@@ -26,6 +26,8 @@ class EventQueueInternal {
   }
 
   startProcessing() {
+    this.processing = true
+
     const $this = this
     Object.entries(this.queuesByEvent).forEach(([event, queue]) => {
       const data = queue.dequeue()

@@ -5,25 +5,22 @@ import { CoordinateAttributeDefinition } from '../../../../model/Survey'
 import AbstractSingleAttributeField from './AbstractSingleAttributeField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
 import CompositeAttributeFormItem from './CompositeAttributeFormItem'
-
-const numericField = ({ value, onChange }) => <Input value={value} type="number" onChange={onChange} />
+import { COORDINATE_FIELD_WIDTH_PX } from './FieldsSizes'
+import Objects from 'utils/Objects'
+import L from 'utils/Labels'
 
 export default class CoordinateField extends AbstractSingleAttributeField {
   constructor() {
     super()
-
-    this.onChangeX = this.onChangeX.bind(this)
-    this.onChangeY = this.onChangeY.bind(this)
     this.onChangeSrs = this.onChangeSrs.bind(this)
-    this.onChangeAltitude = this.onChangeAltitude.bind(this)
-    this.onChangeAccuracy = this.onChangeAccuracy.bind(this)
+    this.onChangeNumericField = this.onChangeNumericField.bind(this)
   }
 
-  onChangeField({ fieldName, fieldValue }) {
+  onChangeField({ field, fieldValue }) {
     const { value: valueState } = this.state
     const { fieldDef } = this.props
     const { showSrsField } = fieldDef.attributeDefinition
-    const value = { ...valueState, [fieldName]: fieldValue }
+    const value = { ...valueState, [field]: fieldValue }
     const { x = null, y = null, srs = null } = value
 
     const srss = this.getSpatialReferenceSystems()
@@ -39,29 +36,13 @@ export default class CoordinateField extends AbstractSingleAttributeField {
     this.onAttributeUpdate({ value })
   }
 
-  onChangeNumericField({ fieldName, event }) {
+  onChangeNumericField({ field, event }) {
     const value = event.target.value
-    this.onChangeField({ fieldName, fieldValue: value === '' ? null : Number(value) })
-  }
-
-  onChangeX(event) {
-    this.onChangeNumericField({ fieldName: 'x', event })
-  }
-
-  onChangeY(event) {
-    this.onChangeNumericField({ fieldName: 'y', event })
+    this.onChangeField({ field, fieldValue: value === '' ? null : Number(value) })
   }
 
   onChangeSrs(event) {
-    this.onChangeField({ fieldName: 'srs', fieldValue: event.target.value })
-  }
-
-  onChangeAltitude(event) {
-    this.onChangeNumericField({ fieldName: 'altitude', event })
-  }
-
-  onChangeAccuracy(event) {
-    this.onChangeNumericField({ fieldName: 'accuracy', event })
+    this.onChangeField({ field: 'srs', fieldValue: event.target.value })
   }
 
   getSpatialReferenceSystems() {
@@ -71,19 +52,22 @@ export default class CoordinateField extends AbstractSingleAttributeField {
   render() {
     const { inTable, fieldDef } = this.props
     const { dirty, value } = this.state
-    const { x, y, srs, altitude, accuracy } = value || {}
-    const xText = x || ''
-    const yText = y || ''
-    const altitudeText = altitude || ''
-    const accuracyText = accuracy || ''
+    const { srs } = value || {}
     const attrDef = fieldDef.attributeDefinition
+
     const { fieldsOrder, showSrsField, includeAltitudeField, includeAccuracyField } = attrDef
 
     const srss = this.getSpatialReferenceSystems()
     const srsField = !showSrsField ? null : srss.length === 1 ? (
-      <Label>{srss[0].label}</Label>
+      <Input key="srs" value={srss[0].label} readOnly style={{ width: COORDINATE_FIELD_WIDTH_PX }} />
     ) : (
-      <Input value={srs} type="select" onChange={this.onChangeSrs}>
+      <Input
+        key="srs"
+        value={srs}
+        type="select"
+        onChange={this.onChangeSrs}
+        style={{ width: COORDINATE_FIELD_WIDTH_PX }}
+      >
         {[
           <option key="empty" value="">
             Select...
@@ -96,14 +80,20 @@ export default class CoordinateField extends AbstractSingleAttributeField {
         ]}
       </Input>
     )
-    const xField = numericField({ value: xText, onChange: this.onChangeX })
-    const yField = numericField({ value: yText, onChange: this.onChangeY })
-    const altitudeField = includeAltitudeField
-      ? numericField({ value: altitudeText, onChange: this.onChangeAltitude })
-      : null
-    const accuracyField = includeAccuracyField
-      ? numericField({ value: accuracyText, onChange: this.onChangeAccuracy })
-      : null
+
+    const numericField = ({ field }) => (
+      <Input
+        key={field}
+        value={Objects.getProp(field, '')(value)}
+        type="number"
+        onChange={(event) => this.onChangeNumericField({ field, event })}
+        style={{ width: COORDINATE_FIELD_WIDTH_PX }}
+      />
+    )
+    const xField = numericField({ field: 'x' })
+    const yField = numericField({ field: 'y' })
+    const altitudeField = includeAltitudeField ? numericField({ field: 'altitude' }) : null
+    const accuracyField = includeAccuracyField ? numericField({ field: 'accuracy' }) : null
 
     const getInternalContent = () => {
       let internalParts = null
@@ -131,15 +121,18 @@ export default class CoordinateField extends AbstractSingleAttributeField {
           internalParts.push(accuracyField)
         }
       } else {
-        const xFieldLabel = attrDef.getFieldLabel('x') || 'X'
-        const yFieldLabel = attrDef.getFieldLabel('y') || 'Y'
-        const srsFieldLabel = attrDef.getFieldLabel('srs') || 'SRS'
-
-        const xFormItem = <CompositeAttributeFormItem key="x" field="x" label={xFieldLabel} inputField={xField} />
-        const yFormItem = <CompositeAttributeFormItem key="y" field="y" label={yFieldLabel} inputField={yField} />
-        const srsFormItem = showSrsField ? (
-          <CompositeAttributeFormItem key="srs" field="srs" label={srsFieldLabel} inputField={srsField} />
-        ) : null
+        const getFormItem = ({ field, inputField }) => (
+          <CompositeAttributeFormItem
+            key={field}
+            field={field}
+            label={attrDef.getFieldLabel(field) || L.l(`dataManagement.dataEntry.coordinateField.${field}`)}
+            labelWidth={100}
+            inputField={inputField}
+          />
+        )
+        const xFormItem = getFormItem({ field: 'x', inputField: xField })
+        const yFormItem = getFormItem({ field: 'y', inputField: yField })
+        const srsFormItem = showSrsField ? getFormItem({ field: 'srs', inputField: srsField }) : null
 
         switch (attrDef.fieldsOrder) {
           case CoordinateAttributeDefinition.FieldsOrder.SRS_X_Y:
@@ -158,32 +151,16 @@ export default class CoordinateField extends AbstractSingleAttributeField {
             throw new Error(`Fields order not supported: ${fieldsOrder}`)
         }
         if (includeAltitudeField) {
-          const altitudeFieldLabel = attrDef.getFieldLabel('altitude') || 'Altitude'
-          internalParts.push(
-            <CompositeAttributeFormItem
-              key="altitude"
-              field="altitude"
-              label={altitudeFieldLabel}
-              inputField={altitudeField}
-            />
-          )
+          internalParts.push(getFormItem({ field: 'altitude', inputField: altitudeField }))
         }
         if (includeAccuracyField) {
-          const accuracyFieldLabel = attrDef.getFieldLabel('accuracy') || 'Accuracy'
-          internalParts.push(
-            <CompositeAttributeFormItem
-              key="accuracy"
-              field="accuracy"
-              label={accuracyFieldLabel}
-              inputField={accuracyField}
-            />
-          )
+          internalParts.push(getFormItem({ field: 'accuracy', inputField: accuracyField }))
         }
       }
       return internalParts
     }
     return (
-      <div>
+      <div style={{ display: inTable ? 'flex' : 'block' }}>
         {getInternalContent()}
         {dirty && <FieldLoadingSpinner />}
       </div>

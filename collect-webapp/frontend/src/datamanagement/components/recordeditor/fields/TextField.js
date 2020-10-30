@@ -5,6 +5,8 @@ import { TextFieldDefinition } from 'model/ui/TextFieldDefinition'
 
 import AbstractSingleAttributeField from './AbstractSingleAttributeField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
+import { TextAttributeDefinition } from '../../../../model/Survey'
+import * as FieldsSizes from './FieldsSizes'
 
 const tranformFunctions = {
   [TextFieldDefinition.TextTranform.NONE]: (value) => value,
@@ -28,18 +30,25 @@ export default class TextField extends AbstractSingleAttributeField {
   }
 
   render() {
-    const { fieldDef } = this.props
+    const { fieldDef, inTable } = this.props
     const { dirty, value: valueState } = this.state
     const { value } = valueState || {}
     const text = value || ''
     const { attributeDefinition } = fieldDef
     const { textType } = attributeDefinition
 
+    const inputFieldType = textType === TextAttributeDefinition.TextTypes.MEMO ? 'textarea' : 'text'
+
     return (
-      <div>
-        <Input value={text} type={textType === 'MEMO' ? 'textarea' : 'text'} onChange={this.onChange} />
+      <>
+        <Input
+          value={text}
+          type={inputFieldType}
+          onChange={this.onChange}
+          style={{ width: FieldsSizes.getWidth({ fieldDef, inTable }) }}
+        />
         {dirty && <FieldLoadingSpinner />}
-      </div>
+      </>
     )
   }
 }
