@@ -6,13 +6,15 @@ export const COORDINATE_FIELD_WIDTH_PX = `${COORDINATE_FIELD_WIDTH}px`
 
 export const TaxonFieldWidths = {
   [TaxonAttributeDefinition.Fields.FAMILY_CODE]: 200,
-  [TaxonAttributeDefinition.Fields.FAMILY_SCIENTIFIC_NAME]: 400,
+  [TaxonAttributeDefinition.Fields.FAMILY_SCIENTIFIC_NAME]: 380,
   [TaxonAttributeDefinition.Fields.CODE]: 200,
-  [TaxonAttributeDefinition.Fields.SCIENTIFIC_NAME]: 400,
-  [TaxonAttributeDefinition.Fields.VERNACULAR_NAME]: 400,
+  [TaxonAttributeDefinition.Fields.SCIENTIFIC_NAME]: 380,
+  [TaxonAttributeDefinition.Fields.VERNACULAR_NAME]: 380,
   [TaxonAttributeDefinition.Fields.LANGUAGE_CODE]: 100,
   [TaxonAttributeDefinition.Fields.LANGUAGE_VARIETY]: 100,
 }
+
+export const TaxonFormFieldLabelWidth = 160
 
 const WIDTH_CALCULATORS_BY_ATTRIBUTE_TYPE = {
   [AttributeDefinition.Types.BOOLEAN]: () => 50,
@@ -61,7 +63,7 @@ const WIDTH_CALCULATORS_BY_ATTRIBUTE_TYPE = {
           const width = visible ? TaxonFieldWidths[field] : 0
           return widthAcc + width
         }, 0)
-      : TaxonFieldWidths[TaxonAttributeDefinition.Fields.SCIENTIFIC_NAME]
+      : TaxonFieldWidths[TaxonAttributeDefinition.Fields.SCIENTIFIC_NAME] + TaxonFormFieldLabelWidth
   },
   [AttributeDefinition.Types.TEXT]: ({ fieldDef }) => {
     const { attributeDefinition: attrDef } = fieldDef

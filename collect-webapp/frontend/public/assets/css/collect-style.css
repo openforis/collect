@@ -442,3 +442,16 @@ input.is-invalid.warning:focus {
 .MuiSelect-outlined.MuiSelect-outlined {
   padding: 10px;
 }
+
+.MuiAutocomplete-root {
+  padding: 0;
+  height: 40px;
+}
+
+.MuiInputBase-root.MuiOutlinedInput-root.MuiAutocomplete-inputRoot {
+  padding: 1px;
+}
+
+.MuiInputBase-input.MuiOutlinedInput-input.MuiAutocomplete-input {
+  padding: 0;
+}

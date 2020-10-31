@@ -125,23 +125,27 @@ export class Entity extends Node {
       const def = this.record.survey.schema.getDefinitionById(defId)
       const childrenJsonObj = jsonObj.childrenByDefinitionId[defId]
       childrenJsonObj.forEach((childJsonObj) => {
-        let childClass
-        if (def instanceof EntityDefinition) {
-          childClass = Entity
-        } else if (def instanceof CoordinateAttributeDefinition) {
-          childClass = CoordinateAttribute
-        } else if (def instanceof FileAttributeDefinition) {
-          childClass = FileAttribute
-        } else if (def instanceof TaxonAttributeDefinition) {
-          childClass = TaxonAttribute
-        } else {
-          childClass = Attribute
-        }
-        const child = new childClass(this.record, def, this)
+        const child = this._createChildInstance(def)
         child.fillFromJSON(childJsonObj)
         this.addChild(child)
       })
     }
+  }
+
+  _createChildInstance(def) {
+    let childClass
+    if (def instanceof EntityDefinition) {
+      childClass = Entity
+    } else if (def instanceof CoordinateAttributeDefinition) {
+      childClass = CoordinateAttribute
+    } else if (def instanceof FileAttributeDefinition) {
+      childClass = FileAttribute
+    } else if (def instanceof TaxonAttributeDefinition) {
+      childClass = TaxonAttribute
+    } else {
+      childClass = Attribute
+    }
+    return new childClass(this.record, def, this)
   }
 
   getChildrenByChildName(childName) {
@@ -178,6 +182,12 @@ export class Entity extends Node {
   getSingleChild(defId) {
     const children = this.getChildrenByDefinitionId(defId)
     return children.length === 0 ? null : children[0]
+  }
+
+  addNewAttribute(attrDef) {
+    const attr = this._createChildInstance(attrDef)
+    this.addChild(attr)
+    return attr
   }
 
   addChild(child) {
@@ -243,6 +253,20 @@ export class Attribute extends Node {
     )
   }
 
+  get value() {
+    const $this = this
+    return $this.isAllFieldsEmpty()
+      ? null
+      : $this.definition.fieldNames.reduce((valueAcc, fieldName, index) => {
+          valueAcc[fieldName] = $this.fields[index].value
+          return valueAcc
+        }, {})
+  }
+
+  get humanReadableValue() {
+    return this.fields && this.fields.length ? this.fields[0].value || '' : ''
+  }
+
   set value(value) {
     if (this.fields == null) {
       this.fields = []
@@ -257,20 +281,6 @@ export class Attribute extends Node {
       field.value = value ? value[fieldName] : null
     })
   }
-
-  get value() {
-    const $this = this
-    return $this.isAllFieldsEmpty()
-      ? null
-      : $this.definition.fieldNames.reduce((valueAcc, fieldName, index) => {
-          valueAcc[fieldName] = $this.fields[index].value
-          return valueAcc
-        }, {})
-  }
-
-  get humanReadableValue() {
-    return this.fields && this.fields.length ? this.fields[0].value || '' : ''
-  }
 }
 
 export class CoordinateAttribute extends Attribute {
@@ -279,9 +289,13 @@ export class CoordinateAttribute extends Attribute {
   }
 
   set value(value) {
-    // Workaround: Coordinate field "srsId" matches field "srs" in the attribute
-    const { srsId: srs, ...other } = value
-    super.value = { ...other, srs }
+    if (value) {
+      // Workaround: Coordinate field "srsId" matches field "srs" in the attribute
+      const { srsId: srs, ...other } = value
+      super.value = { ...other, srs }
+    } else {
+      super.value = null
+    }
   }
 }
 
@@ -296,9 +310,13 @@ export class FileAttribute extends Attribute {
   }
 
   set value(value) {
-    // Workaround: File fields name are different from attribute field names
-    const { filename: file_name, size: file_size } = value
-    super.value = { file_name, file_size }
+    if (value) {
+      // Workaround: File fields name are different from attribute field names
+      const { filename: file_name, size: file_size } = value
+      super.value = { file_name, file_size }
+    } else {
+      super.value = null
+    }
   }
 }
 
@@ -323,8 +341,12 @@ export class TaxonAttribute extends Attribute {
   }
 
   set value(value) {
-    const valueByFields = Objects.mapKeys({ obj: value, keysMapping: TaxonAttributeDefinition.FieldByValueField })
-    super.value = valueByFields
+    if (value) {
+      const valueByFields = Objects.mapKeys({ obj: value, keysMapping: TaxonAttributeDefinition.FieldByValueField })
+      super.value = valueByFields
+    } else {
+      super.value = null
+    }
   }
 }
 

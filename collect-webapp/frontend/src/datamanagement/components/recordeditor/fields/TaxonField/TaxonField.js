@@ -141,7 +141,7 @@ export default class TaxonField extends AbstractSingleAttributeField {
           field={field}
           label={L.l(`dataManagement.dataEntry.taxonField.${field}`)}
           inputField={inputFields[index]}
-          labelWidth={160}
+          labelWidth={FieldsSizes.TaxonFormFieldLabelWidth}
         />
       ))
     )
