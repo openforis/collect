@@ -4,14 +4,19 @@ import React from 'react'
 import { Column, Table as TableVirtualized } from 'react-virtualized'
 import { Button } from 'reactstrap'
 
+import { CoordinateAttributeDefinition, TaxonAttributeDefinition } from 'model/Survey'
 import { ColumnGroupDefinition } from 'model/ui/TableDefinition'
 
 import EntityCollectionComponent from './EntityCollectionComponent'
 import FormItemFieldComponent from './FormItemFieldComponent'
 import * as FieldsSizes from './fields/FieldsSizes'
+import L from 'utils/Labels'
 
 const ROW_NUMBER_COLUMN_WIDTH = 60
 const DELETE_COLUMN_WIDTH = 60
+
+const isCompositeAttribute = (attrDef) =>
+  attrDef instanceof CoordinateAttributeDefinition || attrDef instanceof TaxonAttributeDefinition
 
 const calculateWidth = (headingComponent) => {
   if (headingComponent instanceof ColumnGroupDefinition) {
@@ -47,6 +52,9 @@ const HeadingRow = ({
     : []),
   ...headingRow.map((headingComponent) => {
     const { colSpan, col, label, row, rowSpan } = headingComponent
+    const { attributeDefinition } = headingComponent
+    const compositeAttribute = isCompositeAttribute(attributeDefinition)
+
     return (
       <div
         key={`heading-cell-${row}-${col}`}
@@ -58,7 +66,24 @@ const HeadingRow = ({
           gridColumnEnd: col + colSpan + (includeRowNumberColumn ? 1 : 0),
         }}
       >
-        {label}
+        <div style={{ width: '100%' }}>
+          <div style={{ textAlign: 'center' }}>{label}</div>
+          {compositeAttribute && (
+            <div style={{ display: 'flex' }}>
+              {attributeDefinition.availableFieldNames.map((fieldName) => (
+                <div
+                  key={fieldName}
+                  style={{ width: FieldsSizes.getFieldWidthPx({ fieldDef: headingComponent, fieldName }) }}
+                >
+                  {attributeDefinition.getFieldLabel(fieldName) ||
+                    L.l(
+                      `dataManagement.dataEntry.attribute.${attributeDefinition.attributeType.toLocaleLowerCase()}.${fieldName.toLocaleLowerCase()}`
+                    )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     )
   }),
@@ -130,7 +155,7 @@ export default class Table extends EntityCollectionComponent {
   headerRowRenderer() {
     const { itemDef } = this.props
     const { gridTemplateColumns } = this.state
-    const { headingRows, totalHeadingRows, totalHeadingColumns, showRowNumbers } = itemDef
+    const { headingRows, totalHeadingColumns, showRowNumbers } = itemDef
     const readOnly = false
 
     return (
@@ -139,7 +164,7 @@ export default class Table extends EntityCollectionComponent {
           <HeadingRow
             key={`heading-row-${index + 1}`}
             headingRow={headingRow}
-            totalHeadingRows={totalHeadingRows}
+            totalHeadingRows={headingRows.length}
             totalHeadingColumns={totalHeadingColumns}
             firstRow={index === 0}
             includeRowNumberColumn={showRowNumbers}

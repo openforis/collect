@@ -75,6 +75,13 @@ export default class Arrays {
         return Arrays.addOrRemoveItems(array, items, true, keyProp)
     }
 
+    static deleteItem = (item, keyProp = null) => array => {
+        const idx = Arrays.indexOf(array, item, keyProp)
+        if (idx >= 0) {
+            delete array[idx]
+        }
+    }
+
     /**
      * Adds or removes an element without side effect on the specified array
      * @param {Array} array 

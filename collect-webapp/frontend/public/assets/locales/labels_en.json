@@ -262,30 +262,32 @@
             "message": "Record is owned by another user ({0}) and cannot be edited"
         },
         "dataEntry": {
-            "coordinateField": {
-                "x": "X",
-                "y": "Y",
-                "srs": "SRS",
-                "altitude": "Altitude",
-                "accuracy": "Accuracy"
-            },
-            "fileField": {
-                "fileType": {
-                    "audio": "Audio",
-                    "document": "document",
-                    "image": "Image",
-                    "video": "Video"
+            "attribute": {
+                "coordinate": {
+                    "x": "X",
+                    "y": "Y",
+                    "srs": "SRS",
+                    "altitude": "Altitude",
+                    "accuracy": "Accuracy"
                 },
-                "acceptedFileDescription": "{0} file types ({1})"
-            },
-            "taxonField": {
-                "code": "Code",
-                "scientific_name": "Scientific name",
-                "vernacular_name": "Vernacular name",
-                "language_code": "Language code",
-                "language_variety": "Language variety",
-                "family_code": "Family code",
-                "family_scientific_name": "Family name"
+                "file": {
+                    "fileType": {
+                        "audio": "Audio",
+                        "document": "document",
+                        "image": "Image",
+                        "video": "Video"
+                    },
+                    "acceptedFileDescription": "{0} file types ({1})"
+                },
+                "taxon": {
+                    "code": "Code",
+                    "scientific_name": "Scientific name",
+                    "vernacular_name": "Vernacular name",
+                    "language_code": "Lang.",
+                    "language_variety": "Lang. variety",
+                    "family_code": "Family code",
+                    "family_scientific_name": "Family name"
+                }
             },
             "validation": {
                 "required": "Required field",
