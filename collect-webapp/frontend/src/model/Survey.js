@@ -1,5 +1,6 @@
 import Serializable from './Serializable'
 import { UIConfiguration } from './ui/UIConfiguration'
+import Arrays from 'utils/Arrays'
 
 export class SurveyObject extends Serializable {
   id
@@ -289,6 +290,13 @@ export class AttributeDefinition extends NodeDefinition {
     const index = this.fieldNames.indexOf(fieldName)
     return this.fieldLabels[index]
   }
+
+  /**
+   * Visible field names in order
+   */
+  get availableFieldNames() {
+    return this.fieldnames
+  }
 }
 
 export class CodeAttributeDefinition extends AttributeDefinition {
@@ -308,6 +316,60 @@ export class CoordinateAttributeDefinition extends AttributeDefinition {
     SRS_Y_X: 'SRS_Y_X',
     X_Y_SRS: 'X_Y_SRS',
     Y_X_SRS: 'Y_X_SRS',
+  }
+
+  static Fields = {
+    X: 'x',
+    Y: 'y',
+    SRS: 'srs',
+    ALTITUDE: 'altitude',
+    ACCURACY: 'accuracy',
+  }
+
+  get availableFieldNames() {
+    const fields = []
+    switch (this.fieldsOrder) {
+      case CoordinateAttributeDefinition.FieldsOrder.SRS_X_Y:
+        fields.push(
+          CoordinateAttributeDefinition.Fields.SRS,
+          CoordinateAttributeDefinition.Fields.X,
+          CoordinateAttributeDefinition.Fields.Y
+        )
+        break
+      case CoordinateAttributeDefinition.FieldsOrder.SRS_Y_X:
+        fields.push(
+          CoordinateAttributeDefinition.Fields.SRS,
+          CoordinateAttributeDefinition.Fields.Y,
+          CoordinateAttributeDefinition.Fields.X
+        )
+        break
+      case CoordinateAttributeDefinition.FieldsOrder.X_Y_SRS:
+        fields.push(
+          CoordinateAttributeDefinition.Fields.X,
+          CoordinateAttributeDefinition.Fields.Y,
+          CoordinateAttributeDefinition.Fields.SRS
+        )
+        break
+      case CoordinateAttributeDefinition.FieldsOrder.Y_X_SRS:
+        fields.push(
+          CoordinateAttributeDefinition.Fields.Y,
+          CoordinateAttributeDefinition.Fields.X,
+          CoordinateAttributeDefinition.Fields.SRS
+        )
+        break
+      default:
+        throw new Error(`Fields order not supported: ${this.fieldsOrder}`)
+    }
+    if (!this.showSrsField) {
+      Arrays.deleteItem(CoordinateAttributeDefinition.Fields.SRS)(fields)
+    }
+    if (this.includeAltitudeField) {
+      fields.push(CoordinateAttributeDefinition.Fields.ALTITUDE)
+    }
+    if (this.includeAccuracyField) {
+      fields.push(CoordinateAttributeDefinition.Fields.ACCURACY)
+    }
+    return fields
   }
 }
 
@@ -371,6 +433,32 @@ export class TaxonAttributeDefinition extends AttributeDefinition {
       TaxonAttributeDefinition.Fields.FAMILY_SCIENTIFIC_NAME,
   }
 
+  static AUTOCOMPLETE_FIELDS = [
+    TaxonAttributeDefinition.Fields.FAMILY_CODE,
+    TaxonAttributeDefinition.Fields.FAMILY_SCIENTIFIC_NAME,
+    TaxonAttributeDefinition.Fields.CODE,
+    TaxonAttributeDefinition.Fields.SCIENTIFIC_NAME,
+    TaxonAttributeDefinition.Fields.VERNACULAR_NAME,
+  ]
+
+  static LANGUAGE_FIELDS = [
+    TaxonAttributeDefinition.Fields.LANGUAGE_CODE,
+    //TaxonAttributeDefinition.Fields.LANGUAGE_VARIETY,
+  ]
+
+  static ALL_FIELDS_IN_ORDER = [
+    ...TaxonAttributeDefinition.AUTOCOMPLETE_FIELDS,
+    ...TaxonAttributeDefinition.LANGUAGE_FIELDS,
+  ]
+
+  static isAutocompleteField(field) {
+    return TaxonAttributeDefinition.AUTOCOMPLETE_FIELDS.includes(field)
+  }
+
+  static isLanguageField(field) {
+    return TaxonAttributeDefinition.LANGUAGE_FIELDS.includes(field)
+  }
+
   taxonomyName
   highestRank
   codeVisible
@@ -381,6 +469,22 @@ export class TaxonAttributeDefinition extends AttributeDefinition {
   showFamily
   includeUniqueVernacularName
   allowUnlisted
+
+  _isFieldAvailable = (field) =>
+    this.visibilityByField[field] &&
+    (![TaxonAttributeDefinition.Fields.FAMILY_CODE, TaxonAttributeDefinition.Fields.FAMILY_SCIENTIFIC_NAME].includes(
+      field
+    ) ||
+      this.showFamily)
+
+  get availableFieldNames() {
+    return TaxonAttributeDefinition.ALL_FIELDS_IN_ORDER.reduce((acc, field) => {
+      if (this._isFieldAvailable(field)) {
+        acc.push(field)
+      }
+      return acc
+    }, [])
+  }
 }
 
 export class FileAttributeDefinition extends AttributeDefinition {

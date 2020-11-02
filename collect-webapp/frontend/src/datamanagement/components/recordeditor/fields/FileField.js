@@ -102,7 +102,7 @@ export default class FileField extends AbstractSingleAttributeField {
             className="file-field-dropzone"
             compact
             acceptedFileTypes={extensions}
-            acceptedFileTypesDescription={L.l('dataManagement.dataEntry.fileField.acceptedFileDescription', [
+            acceptedFileTypesDescription={L.l('dataManagement.dataEntry.attribute.file.acceptedFileDescription', [
               fileType,
               extensions,
             ])}

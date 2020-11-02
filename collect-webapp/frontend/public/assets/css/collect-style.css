@@ -425,6 +425,10 @@ input.is-invalid.warning:focus {
   border: 1px solid red;
 }
 
+.form-item-field-wrapper.error input {
+  background-color: #ffdbdb;
+}
+
 .form-item-wrapper.warning,
 .form-item-field-wrapper.warnings {
   border: 1px solid orangered;
@@ -437,4 +441,17 @@ input.is-invalid.warning:focus {
 .MuiInputBase-input.MuiOutlinedInput-input,
 .MuiSelect-outlined.MuiSelect-outlined {
   padding: 10px;
+}
+
+.MuiAutocomplete-root {
+  padding: 0;
+  height: 40px;
+}
+
+.MuiInputBase-root.MuiOutlinedInput-root.MuiAutocomplete-inputRoot {
+  padding: 1px;
+}
+
+.MuiInputBase-input.MuiOutlinedInput-input.MuiAutocomplete-input {
+  padding: 0;
 }

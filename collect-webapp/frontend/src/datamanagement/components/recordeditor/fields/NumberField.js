@@ -4,6 +4,7 @@ import { Input } from 'reactstrap'
 
 import AbstractSingleAttributeField from './AbstractSingleAttributeField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
+import * as FieldsSizes from './FieldsSizes'
 
 export default class NumberField extends AbstractSingleAttributeField {
   constructor(props) {
@@ -49,7 +50,7 @@ export default class NumberField extends AbstractSingleAttributeField {
   }
 
   render() {
-    const { fieldDef } = this.props
+    const { fieldDef, inTable } = this.props
     const { dirty, value: valueState } = this.state
     const { value, unit: unitId } = valueState || {}
     const text = value || ''
@@ -58,9 +59,13 @@ export default class NumberField extends AbstractSingleAttributeField {
     const hasPrecisions = precisions.length > 0
 
     return (
-      <div>
+      <>
         <div style={hasPrecisions ? { display: 'grid', gridTemplateColumns: '1fr 150px' } : null}>
-          <Input type="number" value={text} onChange={this.onTextValueChange} />
+          <Input
+            type="number"
+            value={text}
+            onChange={this.onTextValueChange}
+          />
 
           {hasPrecisions && (
             <FormControl>
@@ -79,7 +84,7 @@ export default class NumberField extends AbstractSingleAttributeField {
           )}
         </div>
         {dirty && <FieldLoadingSpinner />}
-      </div>
+      </>
     )
   }
 }

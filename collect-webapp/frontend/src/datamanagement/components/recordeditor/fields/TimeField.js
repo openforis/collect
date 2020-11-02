@@ -5,6 +5,7 @@ import DateFnsUtils from '@date-io/date-fns'
 import Dates from 'utils/Dates'
 import AbstractSingleAttributeField from './AbstractSingleAttributeField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
+import * as FieldSizes from './FieldsSizes'
 
 const fromValueToDate = (value) => (value ? new Date(1970, 1, 1, value.hour, value.minute) : null)
 const fromDateToValue = (date) => {
@@ -30,8 +31,10 @@ export default class TimeField extends AbstractSingleAttributeField {
   }
 
   render() {
+    const { fieldDef, inTable } = this.props
     const { dirty, value: valueState } = this.state
     const selectedTime = fromValueToDate(valueState)
+    const width = FieldSizes.getWidth({ fieldDef, inTable })
 
     return (
       <div>
@@ -45,7 +48,7 @@ export default class TimeField extends AbstractSingleAttributeField {
             value={selectedTime}
             onChange={this.onChange}
             keyboardIcon={<span className="far fa-clock" />}
-            style={{ width: '130px' }}
+            style={{ width: `${width}px` }}
           />
         </MuiPickersUtilsProvider>
         {dirty && <FieldLoadingSpinner />}

@@ -5,6 +5,7 @@ import DateFnsUtils from '@date-io/date-fns'
 import Dates from 'utils/Dates'
 import AbstractSingleAttributeField from './AbstractSingleAttributeField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
+import * as FieldSizes from './FieldsSizes'
 
 const fromValueToDate = (value) => (value ? new Date(value.year, value.month - 1, value.day) : null)
 const fromDateToValue = (date) => {
@@ -31,11 +32,12 @@ export default class DateField extends AbstractSingleAttributeField {
   }
 
   render() {
+    const { fieldDef, inTable } = this.props
     const { dirty, value: valueState } = this.state
     const selectedDate = fromValueToDate(valueState)
 
     return (
-      <div>
+      <>
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
           <KeyboardDatePicker
             variant="dialog"
@@ -44,11 +46,11 @@ export default class DateField extends AbstractSingleAttributeField {
             margin="none"
             value={selectedDate}
             onChange={this.onChange}
-            style={{ width: '180px' }}
+            style={{ width: `${FieldSizes.getWidth({ fieldDef, inTable })}px` }}
           />
         </MuiPickersUtilsProvider>
         {dirty && <FieldLoadingSpinner />}
-      </div>
+      </>
     )
   }
 }

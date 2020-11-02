@@ -1,6 +1,7 @@
 import React from 'react'
 import { Label, Input, FormGroup } from 'reactstrap'
 import ServiceFactory from 'services/ServiceFactory'
+import { CodeFieldDefinition } from 'model/ui/CodeFieldDefinition'
 import AbstractSingleAttributeField from './AbstractSingleAttributeField'
 
 export default class CodeField extends AbstractSingleAttributeField {
@@ -82,7 +83,7 @@ export default class CodeField extends AbstractSingleAttributeField {
     const layout = fieldDef.layout
 
     switch (layout) {
-      case 'DROPDOWN':
+      case CodeFieldDefinition.Layouts.DROPDOWN:
         const EMPTY_OPTION = (
           <option key="-1" value="-1">
             --- Select one ---
@@ -99,7 +100,7 @@ export default class CodeField extends AbstractSingleAttributeField {
             )}
           </Input>
         )
-      case 'RADIO':
+      case CodeFieldDefinition.Layouts.RADIO:
         return (
           <div>
             {items.map((item) => (

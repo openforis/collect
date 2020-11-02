@@ -138,12 +138,12 @@ public class TaxonAttribute extends Attribute<TaxonAttributeDefinition, TaxonOcc
 		setLanguageCode(value.getLanguageCode());
 		setLanguageVariety(value.getLanguageVariety());
 		TaxonOccurrence familyAncestor = value.getAncestorTaxon(TaxonRank.FAMILY);
-		if (familyAncestor != null) {
+		if (familyAncestor == null) {
+			setFamilyCode(value.getFamilyCode());
+			setFamilyScientificName(value.getFamilyScientificName());
+		} else {
 			setFamilyCode(familyAncestor.getCode());
 			setFamilyScientificName(familyAncestor.getScientificName());
-		} else {
-			setFamilyCode(value.getFamilyCode());
-			setFamilyScientificName(value.getScientificName());
 		}
 	}
 	

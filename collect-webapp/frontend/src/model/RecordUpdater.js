@@ -50,8 +50,7 @@ export class RecordUpdater {
       } else if (event instanceof AttributeCreatedEvent || event instanceof AttributeValueUpdatedEvent) {
         let attr = node
         if (attr == null) {
-          attr = new Attribute(record, definition, parentEntity)
-          parentEntity.addChild(attr)
+          attr = parentEntity.addNewAttribute(definition)
         }
         attr.value = event.value
         attr.validationResults = event.validationResults

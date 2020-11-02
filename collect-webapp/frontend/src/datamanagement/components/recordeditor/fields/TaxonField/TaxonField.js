@@ -13,21 +13,9 @@ import Languages from 'utils/Languages'
 import AbstractSingleAttributeField from '../AbstractSingleAttributeField'
 import CompositeAttributeFormItem from '../CompositeAttributeFormItem'
 import TaxonAutoCompleteField from './TaxonAutoCompleteField'
+import * as FieldsSizes from '../FieldsSizes'
 
 const LANG_CODE_STANDARD = Languages.STANDARDS.ISO_639_3
-
-const ALL_AUTOCOMPLETE_FIELDS = [
-  TaxonAttributeDefinition.Fields.FAMILY_CODE,
-  TaxonAttributeDefinition.Fields.FAMILY_SCIENTIFIC_NAME,
-  TaxonAttributeDefinition.Fields.CODE,
-  TaxonAttributeDefinition.Fields.SCIENTIFIC_NAME,
-  TaxonAttributeDefinition.Fields.VERNACULAR_NAME,
-]
-const ALL_LANGUAGE_FIELDS = [
-  TaxonAttributeDefinition.Fields.LANGUAGE_CODE,
-  TaxonAttributeDefinition.Fields.LANGUAGE_VARIETY,
-]
-const ALL_FIELDS = [...ALL_AUTOCOMPLETE_FIELDS, ...ALL_LANGUAGE_FIELDS]
 
 export default class TaxonField extends AbstractSingleAttributeField {
   LANG_CODES = Languages.codes(LANG_CODE_STANDARD)
@@ -41,7 +29,7 @@ export default class TaxonField extends AbstractSingleAttributeField {
   }
 
   onChangeField(field) {
-    if (ALL_LANGUAGE_FIELDS.includes(field)) {
+    if (TaxonAttributeDefinition.isLanguageField(field)) {
       return (langCode) => {
         const { value } = this.state
         const valueUpdated = { ...value, [field]: langCode }
@@ -73,73 +61,60 @@ export default class TaxonField extends AbstractSingleAttributeField {
   render() {
     const { inTable, fieldDef, parentEntity } = this.props
     const { attributeDefinition } = fieldDef
-    const { visibilityByField, showFamily } = attributeDefinition
+    const { availableFieldNames } = attributeDefinition
     const { value = {} } = this.state
     const { code, vernacular_name: vernacularName } = value || {}
 
     const getLangLabel = (langCode) => Languages.label(langCode, LANG_CODE_STANDARD)
     const langOptions = Languages.items(LANG_CODE_STANDARD)
 
-    const isFieldIncluded = (field) =>
-      visibilityByField[field] &&
-      (![TaxonAttributeDefinition.Fields.FAMILY_CODE, TaxonAttributeDefinition.Fields.FAMILY_SCIENTIFIC_NAME].includes(
-        field
-      ) ||
-        showFamily)
-
-    const fields = ALL_FIELDS.reduce((acc, field) => {
-      if (isFieldIncluded(field)) {
-        acc.push(field)
-      }
-      return acc
-    }, [])
-
-    const autocompleteFields = ALL_AUTOCOMPLETE_FIELDS.filter(isFieldIncluded)
-    const languageFields = ALL_LANGUAGE_FIELDS.filter(isFieldIncluded)
-
-    const inputFields = [
-      ...autocompleteFields.map((field) => (
-        <TaxonAutoCompleteField
-          key={field}
-          field={field}
-          fieldDef={fieldDef}
-          parentEntity={parentEntity}
-          valueByFields={value}
-          onInputChange={this.prepareValueUpdate}
-          onDismiss={this.undoValueUpdate}
-          onSelect={this.onChangeField(field)}
-        />
-      )),
-      ...languageFields.map((field) => {
+    const inputFields = availableFieldNames.map((field) => {
+      if (TaxonAttributeDefinition.isAutocompleteField(field)) {
+        return (
+          <TaxonAutoCompleteField
+            key={field}
+            field={field}
+            fieldDef={fieldDef}
+            parentEntity={parentEntity}
+            valueByFields={value}
+            onInputChange={this.prepareValueUpdate}
+            onDismiss={this.undoValueUpdate}
+            onSelect={this.onChangeField(field)}
+          />
+        )
+      } else {
         const langCode = Objects.getProp(field)(value)
         const selectedOption = langCode ? { code: langCode, label: getLangLabel(langCode) } : null
+        const width = FieldsSizes.TaxonFieldWidths[field]
         return (
           <Autocomplete
             key={field}
             className="taxon-autocomplete-language"
-            style={{ width: 300 }}
+            style={{ width: `${width}px` }}
             value={selectedOption}
             options={langOptions}
             getOptionSelected={(option) => option.code === langCode}
-            getOptionLabel={(option) => `${option.label} (${option.code})`}
+            getOptionLabel={(option) => `${option.code} - ${option.label}`}
             renderInput={(params) => <TextField {...params} variant="outlined" />}
             onChange={(_, option) => this.onChangeField(field)(option.code)}
             disabled={!code || code !== 'UNL' || !vernacularName}
           />
         )
-      }),
-    ]
+      }
+    })
 
-    return inTable
-      ? inputFields
-      : fields.map((field, index) => (
-          <CompositeAttributeFormItem
-            key={field}
-            field={field}
-            label={L.l(`dataManagement.dataEntry.taxonField.${field}`)}
-            inputField={inputFields[index]}
-            labelWidth={160}
-          />
-        ))
+    return inTable ? (
+      <div style={{ display: 'flex' }}>{inputFields}</div>
+    ) : (
+      availableFieldNames.map((field, index) => (
+        <CompositeAttributeFormItem
+          key={field}
+          field={field}
+          label={L.l(`dataManagement.dataEntry.attribute.taxon.${field}`)}
+          inputField={inputFields[index]}
+          labelWidth={FieldsSizes.TaxonFormFieldLabelWidth}
+        />
+      ))
+    )
   }
 }
