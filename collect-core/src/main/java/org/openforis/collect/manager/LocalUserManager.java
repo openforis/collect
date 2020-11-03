@@ -178,13 +178,9 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 	}
 	
 	public Boolean isDefaultAdminPasswordSet() {
-		if (userDao.countAll() == 1) {
-			User adminUser = loadAdminUser();
-			String encodedDefaultPassword = encodePassword(ADMIN_DEFAULT_PASSWORD);
-			return encodedDefaultPassword.equals(adminUser.getPassword());
-		} else {
-			return false;
-		}
+		User adminUser = loadAdminUser();
+		String encodedDefaultPassword = encodePassword(ADMIN_DEFAULT_PASSWORD);
+		return encodedDefaultPassword.equals(adminUser.getPassword());
 	}
 
 	@Override
