@@ -3,6 +3,7 @@ import { debounce } from 'throttle-debounce'
 
 import ServiceFactory from 'services/ServiceFactory'
 import AutocompleteAsync from 'common/components/AutocompleteAsync'
+import * as FieldsSizes from '../FieldsSizes'
 
 const fetchCodeItems = ({ surveyId, codeListId, versionId, language, ancestorCodes }) => ({
   searchString,
@@ -24,7 +25,7 @@ const fetchCodeItems = ({ surveyId, codeListId, versionId, language, ancestorCod
 }
 
 const CodeFieldAutocomplete = (props) => {
-  const { parentEntity, fieldDef, selectedItem, onSelect } = props
+  const { parentEntity, fieldDef, inTable, selectedItem, onSelect } = props
   const { survey, record } = parentEntity
   const { attributeDefinition } = fieldDef
 
@@ -36,7 +37,7 @@ const CodeFieldAutocomplete = (props) => {
 
   return (
     <AutocompleteAsync
-      inputFieldWidth={300}
+      inputFieldWidth={FieldsSizes.getWidth({ fieldDef, inTable })}
       selectedItem={selectedItem}
       fetchFunction={fetchCodeItems({ surveyId, codeListId, versionId, language, ancestorCodes })}
       optionLabelFunction={(item) => `${item.code}${item.label ? ` - ${item.label}` : ''}`}
