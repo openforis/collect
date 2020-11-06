@@ -1,4 +1,4 @@
-import { Attribute, Entity } from './Record'
+import { Entity } from './Record'
 
 import {
   AttributeDeletedEvent,

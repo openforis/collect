@@ -2,12 +2,13 @@ import React from 'react'
 import { Input } from 'reactstrap'
 import { CoordinateAttributeDefinition } from 'model/Survey'
 
-import AbstractSingleAttributeField from './AbstractSingleAttributeField'
-import FieldLoadingSpinner from './FieldLoadingSpinner'
-import CompositeAttributeFormItem from './CompositeAttributeFormItem'
-import { COORDINATE_FIELD_WIDTH_PX } from './FieldsSizes'
+import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 import Objects from 'utils/Objects'
 import L from 'utils/Labels'
+
+import AbstractSingleAttributeField from './AbstractSingleAttributeField'
+import CompositeAttributeFormItem from './CompositeAttributeFormItem'
+import { COORDINATE_FIELD_WIDTH_PX } from './FieldsSizes'
 
 export default class CoordinateField extends AbstractSingleAttributeField {
   constructor() {
@@ -100,7 +101,9 @@ export default class CoordinateField extends AbstractSingleAttributeField {
       <CompositeAttributeFormItem
         key={field}
         field={field}
-        label={attributeDefinition.getFieldLabel(field) || L.l(`dataManagement.dataEntry.attribute.coordinate.${field}`)}
+        label={
+          attributeDefinition.getFieldLabel(field) || L.l(`dataManagement.dataEntry.attribute.coordinate.${field}`)
+        }
         labelWidth={100}
         inputField={inputField}
       />
@@ -111,7 +114,7 @@ export default class CoordinateField extends AbstractSingleAttributeField {
         {inTable
           ? inputFields
           : availableFieldNames.map((field, index) => getFormItem({ field, inputField: inputFields[index] }))}
-        {dirty && <FieldLoadingSpinner />}
+        {dirty && <LoadingSpinnerSmall />}
       </div>
     )
   }

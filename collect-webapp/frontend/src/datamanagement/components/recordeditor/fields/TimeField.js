@@ -2,9 +2,9 @@ import React from 'react'
 import { MuiPickersUtilsProvider, KeyboardTimePicker } from '@material-ui/pickers'
 import DateFnsUtils from '@date-io/date-fns'
 
+import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 import Dates from 'utils/Dates'
 import AbstractSingleAttributeField from './AbstractSingleAttributeField'
-import FieldLoadingSpinner from './FieldLoadingSpinner'
 import * as FieldSizes from './FieldsSizes'
 
 const fromValueToDate = (value) => (value ? new Date(1970, 1, 1, value.hour, value.minute) : null)
@@ -51,7 +51,7 @@ export default class TimeField extends AbstractSingleAttributeField {
             style={{ width: `${width}px` }}
           />
         </MuiPickersUtilsProvider>
-        {dirty && <FieldLoadingSpinner />}
+        {dirty && <LoadingSpinnerSmall />}
       </div>
     )
   }

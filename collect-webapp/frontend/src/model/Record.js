@@ -15,6 +15,7 @@ export class Record extends Serializable {
   rootEntity
   rootEntityKeys = []
   owner
+  version
 
   constructor(survey, jsonData) {
     super()
@@ -51,6 +52,10 @@ export class Record extends Serializable {
 
   get ownerId() {
     return this.owner ? this.owner.id : null
+  }
+
+  get versionId() {
+    return this.version ? this.version.id : null
   }
 }
 

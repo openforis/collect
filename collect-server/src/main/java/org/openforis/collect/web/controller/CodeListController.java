@@ -23,6 +23,7 @@ import org.openforis.collect.web.manager.SessionRecordProvider;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.model.Entity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -66,6 +67,47 @@ public class CodeListController {
 		Entity parentEntity = (Entity) record.findNodeByPath(parentEntityPath);
 		CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) survey.getSchema().getDefinitionById(codeAttrDefId);
 		List<CodeListItem> items = codeListManager.loadValidItems(parentEntity, codeAttrDef);
+		return toViews(items);
+	}
+	
+	@RequestMapping(value = "survey/{surveyId}/codelist/{codeListId}/validitems/count", method=GET)
+	public @ResponseBody Integer countAvailableItemsByAncestorCodes(
+			@PathVariable int surveyId,
+			@PathVariable int codeListId,
+			@RequestParam(required=false) Integer versionId,
+			@RequestParam(required=false) List<String> ancestorCodes) {
+		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
+		CodeList list = survey.getCodeListById(codeListId);
+		ModelVersion version = versionId == null ? null : survey.getVersionById(versionId);
+		List<CodeListItem> items = codeListManager.loadValidItems(list, version, ancestorCodes);
+		return items.size();
+	}
+	
+	@RequestMapping(value = "survey/{surveyId}/codelist/{codeListId}/validitems", method=GET)
+	public @ResponseBody List<CodeListItemView> loadAvailableItemsByAncestorCodes(
+			@PathVariable int surveyId,
+			@PathVariable int codeListId,
+			@RequestParam(required=false) Integer versionId,
+			@RequestParam(required=false) List<String> ancestorCodes) {
+		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
+		CodeList list = survey.getCodeListById(codeListId);
+		ModelVersion version = versionId == null ? null : survey.getVersionById(versionId);
+		List<CodeListItem> items = codeListManager.loadValidItems(list, version, ancestorCodes);
+		return toViews(items);
+	}
+	
+	@RequestMapping(value = "survey/{surveyId}/codelist/{codeListId}/finditems", method=GET)
+	public @ResponseBody List<CodeListItemView> findAvailableItems(
+			@PathVariable int surveyId,
+			@PathVariable int codeListId,
+			@RequestParam(required=false) Integer versionId,
+			@RequestParam(required=false) String language,
+			@RequestParam(required=false) List<String> ancestorCodes,
+			@RequestParam(required=false) String searchString) {
+		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
+		CodeList list = survey.getCodeListById(codeListId);
+		ModelVersion version = versionId == null ? null : survey.getVersionById(versionId);
+		List<CodeListItem> items = codeListManager.findValidItems(list, version, language, ancestorCodes, searchString);
 		return toViews(items);
 	}
 

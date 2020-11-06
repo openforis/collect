@@ -7,7 +7,7 @@ import ServiceFactory from 'services/ServiceFactory'
 import { TaxonAttributeDefinition } from 'model/Survey'
 import Objects from 'utils/Objects'
 
-import FieldLoadingSpinner from '../FieldLoadingSpinner'
+import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 import TaxonAutoCompleteDialogItem from './TaxonAutoCompleteDialogItem'
 import * as FieldsSizes from '../FieldsSizes'
 
@@ -182,7 +182,7 @@ const TaxonAutoCompleteField = (props) => {
             ...params.InputProps,
             endAdornment: (
               <>
-                {loading && <FieldLoadingSpinner />}
+                {loading && <LoadingSpinnerSmall />}
                 {params.InputProps.endAdornment}
               </>
             ),

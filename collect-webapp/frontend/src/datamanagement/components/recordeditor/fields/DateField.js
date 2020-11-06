@@ -2,9 +2,9 @@ import React from 'react'
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers'
 import DateFnsUtils from '@date-io/date-fns'
 
+import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 import Dates from 'utils/Dates'
 import AbstractSingleAttributeField from './AbstractSingleAttributeField'
-import FieldLoadingSpinner from './FieldLoadingSpinner'
 import * as FieldSizes from './FieldsSizes'
 
 const fromValueToDate = (value) => (value ? new Date(value.year, value.month - 1, value.day) : null)
@@ -49,7 +49,7 @@ export default class DateField extends AbstractSingleAttributeField {
             style={{ width: `${FieldSizes.getWidth({ fieldDef, inTable })}px` }}
           />
         </MuiPickersUtilsProvider>
-        {dirty && <FieldLoadingSpinner />}
+        {dirty && <LoadingSpinnerSmall />}
       </>
     )
   }
