@@ -94,7 +94,7 @@
 		        					<fieldErrorHandler
 		        						message="@load(vmsgs['name'])">
 		        						<textbox id="nameTextbox"
-		        							width="150px"
+		        							width="150px" maxlength="255"
 		        							value="@bind(fx.name)"
 		        							onChange="@command('applyChanges')" />
 		        					</fieldErrorHandler>
@@ -111,6 +111,7 @@
 		        						message="@load(vmsgs['itemLabel'])">
 		        						<textbox width="300px"
 		        							value="@bind(fx.itemLabel)"
+		        							maxlength="255"
 		        							placeholder="@load(fx.defaultItemLabel)"
 		        							onChange="@command('applyChanges')" />
 		        					</fieldErrorHandler>
@@ -126,7 +127,8 @@
 		        					<fieldErrorHandler
 		        						message="@load(vmsgs['description'])">
 		        						<textbox width="300px"
-		        							value="@bind(fx.description)" multiline="true" rows="4"
+		        							value="@bind(fx.description)" 
+		        							multiline="true" rows="4" maxlength="1023"
 											placeholder="@load(fx.defaultDescription)"
 		        							onChange="@command('applyChanges')" />
 		        					</fieldErrorHandler>

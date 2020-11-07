@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import Autocomplete from '@material-ui/lab/Autocomplete'
+import MuiAutocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete'
 import { TextField } from '@material-ui/core'
 
 import LoadingSpinnerSmall from './LoadingSpinnerSmall'
 
-const AutocompleteAsync = (props) => {
+const Autocomplete = (props) => {
   const {
+    asynchronous,
+    items: itemsProps,
     inputValue: initialInputValue,
     inputFieldWidth,
     selectedItem,
@@ -21,7 +23,7 @@ const AutocompleteAsync = (props) => {
   const [state, setStateInternal] = useState({
     open: false,
     loading: false,
-    items: [],
+    items: itemsProps,
     inputValue: initialInputValue,
     fetchDebounced: null,
   })
@@ -64,18 +66,20 @@ const AutocompleteAsync = (props) => {
     }
   }, [initialInputValue])
 
-  // on dialog open, trigger loading
+  // on dialog open, trigger loading (if asyncrhonous)
   useEffect(() => {
-    const stateUpdated = { loading: open }
-    if (!open) {
-      stateUpdated.items = []
+    if (asynchronous) {
+      const stateUpdated = { loading: open }
+      if (!open) {
+        stateUpdated.items = []
+      }
+      setState(stateUpdated)
     }
-    setState(stateUpdated)
   }, [open])
 
   // on input value change re-fetch items
   useEffect(() => {
-    if (open) {
+    if (asynchronous && open) {
       setState({ items: [], loading: true })
     }
   }, [inputValue])
@@ -97,8 +101,10 @@ const AutocompleteAsync = (props) => {
     }
   }
 
+  const filterOptions = asynchronous ? () => items : createFilterOptions()
+
   return (
-    <Autocomplete
+    <MuiAutocomplete
       open={open}
       openOnFocus={false}
       onOpen={onOpen}
@@ -110,7 +116,7 @@ const AutocompleteAsync = (props) => {
       getOptionLabel={optionLabelFunction}
       getOptionSelected={optionSelectedFunction}
       options={items}
-      filterOptions={() => items}
+      filterOptions={filterOptions}
       loading={loading}
       renderInput={(params) => (
         <TextField
@@ -134,7 +140,7 @@ const AutocompleteAsync = (props) => {
   )
 }
 
-AutocompleteAsync.defaultProps = {
+Autocomplete.defaultProps = {
   inputValue: '',
   selectedItem: null,
   onInputChange: () => {},
@@ -142,4 +148,4 @@ AutocompleteAsync.defaultProps = {
   optionRenderFunction: null,
 }
 
-export default AutocompleteAsync
+export default Autocomplete

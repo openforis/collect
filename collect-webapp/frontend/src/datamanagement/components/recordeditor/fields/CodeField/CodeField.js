@@ -1,5 +1,4 @@
 import React from 'react'
-import { Input } from 'reactstrap'
 
 import ServiceFactory from 'services/ServiceFactory'
 import { CodeFieldDefinition } from 'model/ui/CodeFieldDefinition'
@@ -79,15 +78,14 @@ export default class CodeField extends AbstractSingleAttributeField {
       })
 
       const asynchronous = count > MAX_ITEMS
-      let items = null
-      if (!asynchronous) {
-        items = await ServiceFactory.codeListService.loadAllAvailableItems({
-          surveyId: survey.id,
-          codeListId,
-          versionId,
-          ancestorCodes,
-        })
-      }
+      const items = asynchronous
+        ? null
+        : await ServiceFactory.codeListService.loadAllAvailableItems({
+            surveyId: survey.id,
+            codeListId,
+            versionId,
+            ancestorCodes,
+          })
       this.setState({ loading: false, value, asynchronous, items })
     }
   }
@@ -119,25 +117,23 @@ export default class CodeField extends AbstractSingleAttributeField {
 
     const { attributeDefinition, layout } = fieldDef
 
-    if (!asynchronous && layout === CodeFieldDefinition.Layouts.RADIO) {
-      return (
-        <CodeFieldRadio
-          parentEntity={parentEntity}
-          attributeDefinition={attributeDefinition}
-          selectedCode={code}
-          items={items}
-          onChange={this.onInputChange}
-        />
-      )
-    } else {
-      return (
-        <CodeFieldAutocomplete
-          parentEntity={parentEntity}
-          fieldDef={fieldDef}
-          selectedItem={selectedItem}
-          onSelect={this.onCodeListItemSelect}
-        />
-      )
-    }
+    return !asynchronous && layout === CodeFieldDefinition.Layouts.RADIO ? (
+      <CodeFieldRadio
+        parentEntity={parentEntity}
+        attributeDefinition={attributeDefinition}
+        selectedCode={code}
+        items={items}
+        onChange={this.onInputChange}
+      />
+    ) : (
+      <CodeFieldAutocomplete
+        parentEntity={parentEntity}
+        fieldDef={fieldDef}
+        asynchronous={asynchronous}
+        items={items}
+        selectedItem={selectedItem}
+        onSelect={this.onCodeListItemSelect}
+      />
+    )
   }
 }

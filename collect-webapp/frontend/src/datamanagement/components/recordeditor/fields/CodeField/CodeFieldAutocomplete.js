@@ -2,7 +2,7 @@ import React from 'react'
 import { debounce } from 'throttle-debounce'
 
 import ServiceFactory from 'services/ServiceFactory'
-import AutocompleteAsync from 'common/components/AutocompleteAsync'
+import Autocomplete from 'common/components/Autocomplete'
 import * as FieldsSizes from '../FieldsSizes'
 
 const fetchCodeItems = ({ surveyId, codeListId, versionId, language, ancestorCodes }) => ({
@@ -25,7 +25,7 @@ const fetchCodeItems = ({ surveyId, codeListId, versionId, language, ancestorCod
 }
 
 const CodeFieldAutocomplete = (props) => {
-  const { parentEntity, fieldDef, inTable, selectedItem, onSelect } = props
+  const { parentEntity, fieldDef, inTable, selectedItem, asynchronous, items, onSelect } = props
   const { survey, record } = parentEntity
   const { attributeDefinition } = fieldDef
 
@@ -36,7 +36,9 @@ const CodeFieldAutocomplete = (props) => {
   const ancestorCodes = []
 
   return (
-    <AutocompleteAsync
+    <Autocomplete
+      asynchronous={asynchronous}
+      items={items}
       inputFieldWidth={FieldsSizes.getWidth({ fieldDef, inTable })}
       selectedItem={selectedItem}
       fetchFunction={fetchCodeItems({ surveyId, codeListId, versionId, language, ancestorCodes })}
