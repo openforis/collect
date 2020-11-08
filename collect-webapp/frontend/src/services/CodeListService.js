@@ -2,21 +2,21 @@ import AbstractService from './AbstractService'
 
 export default class CodeListService extends AbstractService {
   countAvailableItems({ surveyId, codeListId, versionId, ancestorCodes }) {
-    return this.get(`survey/${surveyId}/codelist/${codeListId}/validitems/count`, {
+    return this.postJson(`survey/${surveyId}/codelist/${codeListId}/validitems/count`, {
       versionId,
       ancestorCodes,
     })
   }
 
   loadAllAvailableItems({ surveyId, codeListId, versionId, ancestorCodes }) {
-    return this.get(`survey/${surveyId}/codelist/${codeListId}/validitems`, {
+    return this.postJson(`survey/${surveyId}/codelist/${codeListId}/validitems`, {
       versionId,
       ancestorCodes,
     })
   }
 
   findAvailableItems({ surveyId, codeListId, versionId, language, ancestorCodes, searchString }) {
-    return this.get(`survey/${surveyId}/codelist/${codeListId}/finditems`, {
+    return this.postJson(`survey/${surveyId}/codelist/${codeListId}/finditems`, {
       versionId,
       ancestorCodes,
       language,

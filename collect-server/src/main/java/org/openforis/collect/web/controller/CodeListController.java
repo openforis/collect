@@ -1,6 +1,7 @@
 package org.openforis.collect.web.controller;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
 
 import java.io.IOException;
@@ -29,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -39,80 +41,66 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class CodeListController {
 
 	private static final String CSV_EXTENSION = ".csv";
-	
+
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
 	private CodeListManager codeListManager;
 	@Autowired
 	private SessionRecordProvider sessionRecordProvider;
-	
-	@RequestMapping(value = "survey/{surveyId}/codelist/{codeListId}.csv", method=GET)
+
+	@RequestMapping(value = "survey/{surveyId}/codelist/{codeListId}.csv", method = GET)
 	public @ResponseBody String exportCodeListWork(HttpServletResponse response,
-			@PathVariable("surveyId") Integer surveyId,
-			@PathVariable("codeListId") Integer codeListId) throws IOException {
+			@PathVariable("surveyId") Integer surveyId, @PathVariable("codeListId") Integer codeListId)
+			throws IOException {
 		return exportCodeList(response, surveyId, codeListId);
 	}
-	
-	@RequestMapping(value = "survey/{surveyId}/codelist/{codeListId}", method=GET)
-	public @ResponseBody List<CodeListItemView> loadAvailableItems(
-			@PathVariable Integer surveyId,
-			@PathVariable Integer codeListId,
-			@RequestParam(required=false) Integer recordId,
-			@RequestParam Step recordStep,
-			@RequestParam String parentEntityPath,
-			@RequestParam Integer codeAttrDefId) {
+
+	@RequestMapping(value = "survey/{surveyId}/codelist/{codeListId}", method = GET)
+	public @ResponseBody List<CodeListItemView> loadAvailableItems(@PathVariable Integer surveyId,
+			@PathVariable Integer codeListId, @RequestParam(required = false) Integer recordId,
+			@RequestParam Step recordStep, @RequestParam String parentEntityPath, @RequestParam Integer codeAttrDefId) {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
 		CollectRecord record = sessionRecordProvider.provide(survey, recordId, recordStep);
 		Entity parentEntity = (Entity) record.findNodeByPath(parentEntityPath);
-		CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) survey.getSchema().getDefinitionById(codeAttrDefId);
+		CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) survey.getSchema()
+				.getDefinitionById(codeAttrDefId);
 		List<CodeListItem> items = codeListManager.loadValidItems(parentEntity, codeAttrDef);
 		return toViews(items);
 	}
-	
-	@RequestMapping(value = "survey/{surveyId}/codelist/{codeListId}/validitems/count", method=GET)
-	public @ResponseBody Integer countAvailableItemsByAncestorCodes(
-			@PathVariable int surveyId,
-			@PathVariable int codeListId,
-			@RequestParam(required=false) Integer versionId,
-			@RequestParam(required=false) List<String> ancestorCodes) {
+
+	@RequestMapping(value = "survey/{surveyId}/codelist/{codeListId}/validitems/count", method = POST)
+	public @ResponseBody Integer countAvailableItemsByAncestorCodes(@PathVariable int surveyId,
+			@PathVariable int codeListId, @RequestBody CodeListSearchParameters params) {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
 		CodeList list = survey.getCodeListById(codeListId);
-		ModelVersion version = versionId == null ? null : survey.getVersionById(versionId);
-		List<CodeListItem> items = codeListManager.loadValidItems(list, version, ancestorCodes);
+		ModelVersion version = params.versionId == null ? null : survey.getVersionById(params.versionId);
+		List<CodeListItem> items = codeListManager.loadValidItems(list, version, params.ancestorCodes);
 		return items.size();
 	}
-	
-	@RequestMapping(value = "survey/{surveyId}/codelist/{codeListId}/validitems", method=GET)
-	public @ResponseBody List<CodeListItemView> loadAvailableItemsByAncestorCodes(
-			@PathVariable int surveyId,
-			@PathVariable int codeListId,
-			@RequestParam(required=false) Integer versionId,
-			@RequestParam(required=false) List<String> ancestorCodes) {
+
+	@RequestMapping(value = "survey/{surveyId}/codelist/{codeListId}/validitems", method = POST)
+	public @ResponseBody List<CodeListItemView> loadAvailableItemsByAncestorCodes(@PathVariable int surveyId,
+			@PathVariable int codeListId, @RequestBody CodeListSearchParameters params) {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
 		CodeList list = survey.getCodeListById(codeListId);
-		ModelVersion version = versionId == null ? null : survey.getVersionById(versionId);
-		List<CodeListItem> items = codeListManager.loadValidItems(list, version, ancestorCodes);
-		return toViews(items);
-	}
-	
-	@RequestMapping(value = "survey/{surveyId}/codelist/{codeListId}/finditems", method=GET)
-	public @ResponseBody List<CodeListItemView> findAvailableItems(
-			@PathVariable int surveyId,
-			@PathVariable int codeListId,
-			@RequestParam(required=false) Integer versionId,
-			@RequestParam(required=false) String language,
-			@RequestParam(required=false) List<String> ancestorCodes,
-			@RequestParam(required=false) String searchString) {
-		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
-		CodeList list = survey.getCodeListById(codeListId);
-		ModelVersion version = versionId == null ? null : survey.getVersionById(versionId);
-		List<CodeListItem> items = codeListManager.findValidItems(list, version, language, ancestorCodes, searchString);
+		ModelVersion version = params.versionId == null ? null : survey.getVersionById(params.versionId);
+		List<CodeListItem> items = codeListManager.loadValidItems(list, version, params.ancestorCodes);
 		return toViews(items);
 	}
 
-	protected String exportCodeList(HttpServletResponse response,
-			int surveyId, int codeListId) throws IOException {
+	@RequestMapping(value = "survey/{surveyId}/codelist/{codeListId}/finditems", method = POST)
+	public @ResponseBody List<CodeListItemView> findAvailableItems(@PathVariable int surveyId,
+			@PathVariable int codeListId, @RequestBody CodeListSearchParameters params) {
+		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
+		CodeList list = survey.getCodeListById(codeListId);
+		ModelVersion version = params.versionId == null ? null : survey.getVersionById(params.versionId);
+		List<CodeListItem> items = codeListManager.findValidItems(list, version, params.language, params.ancestorCodes,
+				params.searchString);
+		return toViews(items);
+	}
+
+	protected String exportCodeList(HttpServletResponse response, int surveyId, int codeListId) throws IOException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
 		CodeList list = survey.getCodeListById(codeListId);
 		String fileName = list.getName() + CSV_EXTENSION;
@@ -122,7 +110,7 @@ public class CodeListController {
 		process.exportToCSV(out, survey, codeListId);
 		return "ok";
 	}
-	
+
 	private List<CodeListItemView> toViews(List<CodeListItem> items) {
 		List<CodeListItemView> views = new ArrayList<CodeListItemView>(items.size());
 		for (CodeListItem item : items) {
@@ -132,5 +120,45 @@ public class CodeListController {
 			views.add(view);
 		}
 		return views;
+	}
+
+	public static class CodeListSearchParameters {
+		private Integer versionId;
+		private List<String> ancestorCodes;
+		private String searchString;
+		private String language;
+
+		public Integer getVersionId() {
+			return versionId;
+		}
+
+		public void setVersionId(Integer versionId) {
+			this.versionId = versionId;
+		}
+
+		public List<String> getAncestorCodes() {
+			return ancestorCodes;
+		}
+
+		public void setAncestorCodes(List<String> ancestorCodes) {
+			this.ancestorCodes = ancestorCodes;
+		}
+
+		public String getSearchString() {
+			return searchString;
+		}
+
+		public void setSearchString(String searchString) {
+			this.searchString = searchString;
+		}
+
+		public String getLanguage() {
+			return language;
+		}
+
+		public void setLanguage(String language) {
+			this.language = language;
+		}
+
 	}
 }

@@ -2,7 +2,7 @@ import React from 'react'
 import { Label, Input, FormGroup } from 'reactstrap'
 
 const CodeFieldRadio = (props) => {
-  const { parentEntity, attrDef: attributeDefinition, selectedCode, items, onChange } = props
+  const { parentEntity, attributeDefinition, selectedItem, items, onChange } = props
 
   return (
     <div>
@@ -13,9 +13,9 @@ const CodeFieldRadio = (props) => {
               type="radio"
               name={`code_group_${parentEntity.id}_${attributeDefinition.id}`}
               value={item.code}
-              checked={item.code === selectedCode}
+              checked={selectedItem && selectedItem.code === item.code}
               onChange={onChange}
-            />{' '}
+            />
             {item.label}
           </Label>
         </FormGroup>

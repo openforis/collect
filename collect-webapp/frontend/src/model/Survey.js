@@ -302,7 +302,23 @@ export class AttributeDefinition extends NodeDefinition {
 export class CodeAttributeDefinition extends AttributeDefinition {
   codeListId
   parentCodeAttributeDefinitionId
+  levelIndex
   mandatoryFieldNames = ['code']
+
+  get levelIndex() {
+    let idx = 0
+    let currentParentCodeDef = this.parentCodeAttributeDefinition
+    while (currentParentCodeDef) {
+      idx += 1
+      currentParentCodeDef = currentParentCodeDef.parentCodeAttributeDefinition
+    }
+    return idx
+  }
+
+  get parentCodeAttributeDefinition() {
+    const id = this.parentCodeAttributeDefinitionId
+    return id ? this.survey.schema.getDefinitionById(id) : null
+  }
 }
 
 export class CoordinateAttributeDefinition extends AttributeDefinition {

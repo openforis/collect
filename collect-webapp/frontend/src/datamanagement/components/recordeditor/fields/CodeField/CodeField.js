@@ -66,27 +66,33 @@ export default class CodeField extends AbstractSingleAttributeField {
     if (attr) {
       const { definition, survey, record } = attr
       const { versionId } = record
-      const { codeListId } = definition
-      const ancestorCodes = []
-      const value = this.extractValueFromProps()
+      const { codeListId, levelIndex } = definition
+      const ancestorCodes = record.getAncestorCodeValues({ parentEntity, attributeDefinition: definition })
 
-      const count = await ServiceFactory.codeListService.countAvailableItems({
-        surveyId: survey.id,
-        codeListId,
-        versionId,
-        ancestorCodes,
-      })
+      console.log('===definition', definition)
+      console.log('===levelIndex', levelIndex)
+      console.log('===ancestorCodes', ancestorCodes)
+      if (levelIndex === 0 || (ancestorCodes && ancestorCodes.length >= levelIndex)) {
+        const value = this.extractValueFromProps()
 
-      const asynchronous = count > MAX_ITEMS
-      const items = asynchronous
-        ? null
-        : await ServiceFactory.codeListService.loadAllAvailableItems({
-            surveyId: survey.id,
-            codeListId,
-            versionId,
-            ancestorCodes,
-          })
-      this.setState({ loading: false, value, asynchronous, items })
+        const count = await ServiceFactory.codeListService.countAvailableItems({
+          surveyId: survey.id,
+          codeListId,
+          versionId,
+          ancestorCodes,
+        })
+
+        const asynchronous = count > MAX_ITEMS
+        const items = asynchronous
+          ? null
+          : await ServiceFactory.codeListService.loadAllAvailableItems({
+              surveyId: survey.id,
+              codeListId,
+              versionId,
+              ancestorCodes,
+            })
+        this.setState({ loading: false, value, asynchronous, items })
+      }
     }
   }
 
@@ -121,7 +127,7 @@ export default class CodeField extends AbstractSingleAttributeField {
       <CodeFieldRadio
         parentEntity={parentEntity}
         attributeDefinition={attributeDefinition}
-        selectedCode={code}
+        selectedItem={items.find((itm) => itm.code === code)}
         items={items}
         onChange={this.onInputChange}
       />
