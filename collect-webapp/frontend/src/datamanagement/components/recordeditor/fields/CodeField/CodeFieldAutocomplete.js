@@ -8,8 +8,8 @@ import * as FieldsSizes from '../FieldsSizes'
 const fetchCodeItems = ({ surveyId, codeListId, versionId, language, ancestorCodes }) => ({
   searchString,
   onComplete,
-}) => {
-  const fetchCodeItemsDebounced = debounce(1000, false, async () => {
+}) =>
+  debounce(1000, false, async () => {
     const items = await ServiceFactory.codeListService.findAvailableItems({
       surveyId,
       codeListId,
@@ -20,9 +20,6 @@ const fetchCodeItems = ({ surveyId, codeListId, versionId, language, ancestorCod
     })
     onComplete(items)
   })
-
-  return fetchCodeItemsDebounced
-}
 
 const CodeFieldAutocomplete = (props) => {
   const { parentEntity, fieldDef, inTable, selectedItem, asynchronous, items, onSelect } = props
@@ -42,8 +39,8 @@ const CodeFieldAutocomplete = (props) => {
       inputFieldWidth={FieldsSizes.getWidth({ fieldDef, inTable })}
       selectedItem={selectedItem}
       fetchFunction={fetchCodeItems({ surveyId, codeListId, versionId, language, ancestorCodes })}
-      optionLabelFunction={(item) => `${item.code}${item.label ? ` - ${item.label}` : ''}`}
-      optionSelectedFunction={(item, value) => item.code === value.code}
+      itemLabelFunction={(item) => `${item.code}${item.label ? ` - ${item.label}` : ''}`}
+      itemSelectedFunction={(item, value) => item.code === value.code}
       onSelect={onSelect}
     />
   )

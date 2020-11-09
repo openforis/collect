@@ -8,14 +8,16 @@ import LoadingSpinnerSmall from './LoadingSpinnerSmall'
 const Autocomplete = (props) => {
   const {
     asynchronous,
+    className,
+    disabled,
     items: itemsProps,
     inputValue: initialInputValue,
     inputFieldWidth,
     selectedItem,
     fetchFunction,
-    optionRenderFunction,
-    optionLabelFunction,
-    optionSelectedFunction,
+    itemRenderFunction,
+    itemLabelFunction,
+    itemSelectedFunction,
     onInputChange: onInputChangeProps,
     onSelect,
     onDismiss,
@@ -112,10 +114,10 @@ const Autocomplete = (props) => {
       onClose={onClose}
       value={selectedItem}
       inputValue={inputValue}
-      onChange={(_, item) => onSelect(item)}
+      onChange={(_, item) => onSelect(item, inputValue)}
       onInputChange={onInputChange}
-      getOptionLabel={optionLabelFunction}
-      getOptionSelected={optionSelectedFunction}
+      getOptionLabel={itemLabelFunction}
+      getOptionSelected={itemSelectedFunction}
       options={items}
       filterOptions={filterOptions}
       loading={loading}
@@ -136,38 +138,44 @@ const Autocomplete = (props) => {
           }}
         />
       )}
-      renderOption={optionRenderFunction}
+      renderOption={itemRenderFunction}
+      className={className}
+      disabled={disabled}
     />
   )
 }
 
 Autocomplete.propTypes = {
   asynchronous: PropTypes.bool,
-  items: PropTypes.array,
+  fetchFunction: PropTypes.func,
+  disabled: PropTypes.bool,
+  className: PropTypes.string,
   inputValue: PropTypes.string,
   inputFieldWidth: PropTypes.number,
+  items: PropTypes.array,
+  itemRenderFunction: PropTypes.func,
+  itemLabelFunction: PropTypes.func,
+  itemSelectedFunction: PropTypes.func,
   selectedItem: PropTypes.object,
-  fetchFunction: PropTypes.func,
-  optionRenderFunction: PropTypes.func,
-  optionLabelFunction: PropTypes.func,
-  optionSelectedFunction: PropTypes.func,
-  onInputChange: PropTypes.func,
   onSelect: PropTypes.func.isRequired,
+  onInputChange: PropTypes.func,
   onDismiss: PropTypes.func,
 }
 
 Autocomplete.defaultProps = {
   asynchronous: false,
-  items: [],
+  fetchFunction: null,
+  disabled: false,
+  className: null,
   inputValue: '',
   inputFieldWidth: 300,
+  items: [],
+  itemRenderFunction: null,
+  itemLabelFunction: null,
+  itemSelectedFunction: null,
   selectedItem: null,
   onInputChange: () => {},
   onDismiss: () => {},
-  fetchFunction: null,
-  optionRenderFunction: null,
-  optionLabelFunction: null,
-  optionSelectedFunction: null,
 }
 
 export default Autocomplete
