@@ -1,6 +1,7 @@
 import React from 'react'
 
 import ServiceFactory from 'services/ServiceFactory'
+import { CodeAttributeUpdatedEvent } from 'model/event/RecordEvent'
 import { CodeFieldDefinition } from 'model/ui/CodeFieldDefinition'
 import AbstractSingleAttributeField from '../AbstractSingleAttributeField'
 import CodeFieldRadio from './CodeFieldRadio'
@@ -24,6 +25,7 @@ export default class CodeField extends AbstractSingleAttributeField {
       items: [],
       loading: true,
       asynchronous: false,
+      ancestorCodes: null,
     }
 
     this.onInputChange = this.onInputChange.bind(this)
@@ -31,14 +33,16 @@ export default class CodeField extends AbstractSingleAttributeField {
   }
 
   componentDidMount() {
-    this.handleParentEntityChanged()
+    super.componentDidMount()
+    this.onParentEntityChange()
   }
 
   componentDidUpdate(prevProps) {
     const { parentEntity } = this.props
     const { parentEntity: prevParentEntity } = prevProps
+
     if (prevParentEntity !== parentEntity) {
-      this.handleParentEntityChanged()
+      this.onParentEntityChange()
     }
   }
 
@@ -52,26 +56,46 @@ export default class CodeField extends AbstractSingleAttributeField {
     return { code: codeUpdated }
   }
 
-  handleParentEntityChanged() {
-    const { parentEntity } = this.props
+  onParentEntityChange() {
+    const { parentEntity, fieldDef } = this.props
+    const { attributeDefinition } = fieldDef
 
     if (parentEntity) {
-      this.setState({ loading: true })
-      this.loadCodeListItems(parentEntity)
+      const { record } = parentEntity
+
+      const ancestorCodes = record.getAncestorCodeValues({
+        contextEntity: parentEntity,
+        attributeDefinition,
+      })
+
+      this.setState({ loading: true, ancestorCodes }, () => this.loadCodeListItems())
     }
   }
 
-  async loadCodeListItems(parentEntity) {
-    const attr = this.getAttribute(parentEntity)
+  onRecordEvent(event) {
+    super.onRecordEvent(event)
+
+    const { fieldDef } = this.props
+    const { attributeDefinition } = fieldDef
+    const { ancestorCodeAttributeDefinitionIds } = attributeDefinition
+
+    if (
+      ancestorCodeAttributeDefinitionIds.length > 0 &&
+      event instanceof CodeAttributeUpdatedEvent &&
+      ancestorCodeAttributeDefinitionIds.includes(Number(event.definitionId))
+    ) {
+      this.onParentEntityChange()
+    }
+  }
+
+  async loadCodeListItems() {
+    const { ancestorCodes } = this.state
+    const attr = this.getAttribute()
     if (attr) {
       const { definition, survey, record } = attr
       const { versionId } = record
       const { codeListId, levelIndex } = definition
-      const ancestorCodes = record.getAncestorCodeValues({ parentEntity, attributeDefinition: definition })
 
-      console.log('===definition', definition)
-      console.log('===levelIndex', levelIndex)
-      console.log('===ancestorCodes', ancestorCodes)
       if (levelIndex === 0 || (ancestorCodes && ancestorCodes.length >= levelIndex)) {
         const value = this.extractValueFromProps()
 

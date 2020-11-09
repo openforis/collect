@@ -65,11 +65,11 @@ export default class AbstractSingleAttributeField extends AbstractFormComponent 
       event instanceof AttributeValueUpdatedEvent &&
       event.isRelativeToNodes({ parentEntity, nodeDefId: fieldDef.attributeDefinitionId })
     ) {
-      this.handleAttributeUpdatedEvent(event)
+      this.onAttributeUpdatedEvent(event)
     }
   }
 
-  handleAttributeUpdatedEvent(_) {
+  onAttributeUpdatedEvent(_) {
     this.updateStateFromProps()
   }
 }

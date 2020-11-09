@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
 import MuiAutocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete'
 import { TextField } from '@material-ui/core'
 
@@ -23,7 +24,7 @@ const Autocomplete = (props) => {
   const [state, setStateInternal] = useState({
     open: false,
     loading: false,
-    items: itemsProps,
+    items: itemsProps || [],
     inputValue: initialInputValue,
     fetchDebounced: null,
   })
@@ -140,12 +141,33 @@ const Autocomplete = (props) => {
   )
 }
 
+Autocomplete.propTypes = {
+  asynchronous: PropTypes.bool,
+  items: PropTypes.array,
+  inputValue: PropTypes.string,
+  inputFieldWidth: PropTypes.number,
+  selectedItem: PropTypes.object,
+  fetchFunction: PropTypes.func,
+  optionRenderFunction: PropTypes.func,
+  optionLabelFunction: PropTypes.func,
+  optionSelectedFunction: PropTypes.func,
+  onInputChange: PropTypes.func,
+  onSelect: PropTypes.func.isRequired,
+  onDismiss: PropTypes.func,
+}
+
 Autocomplete.defaultProps = {
+  asynchronous: false,
+  items: [],
   inputValue: '',
+  inputFieldWidth: 300,
   selectedItem: null,
   onInputChange: () => {},
   onDismiss: () => {},
+  fetchFunction: null,
   optionRenderFunction: null,
+  optionLabelFunction: null,
+  optionSelectedFunction: null,
 }
 
 export default Autocomplete

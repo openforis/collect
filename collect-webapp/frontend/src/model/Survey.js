@@ -185,6 +185,10 @@ export class NodeDefinition extends SurveyObject {
     return ancestorIds
   }
 
+  get ancestorAndSelfIds() {
+    return [...this.ancestorIds, this.id]
+  }
+
   get single() {
     return !this.multiple
   }
@@ -302,22 +306,25 @@ export class AttributeDefinition extends NodeDefinition {
 export class CodeAttributeDefinition extends AttributeDefinition {
   codeListId
   parentCodeAttributeDefinitionId
-  levelIndex
   mandatoryFieldNames = ['code']
-
-  get levelIndex() {
-    let idx = 0
-    let currentParentCodeDef = this.parentCodeAttributeDefinition
-    while (currentParentCodeDef) {
-      idx += 1
-      currentParentCodeDef = currentParentCodeDef.parentCodeAttributeDefinition
-    }
-    return idx
-  }
 
   get parentCodeAttributeDefinition() {
     const id = this.parentCodeAttributeDefinitionId
     return id ? this.survey.schema.getDefinitionById(id) : null
+  }
+
+  get ancestorCodeAttributeDefinitionIds() {
+    const ancestorIds = []
+    let currentParentAttrDef = this.parentCodeAttributeDefinition
+    while (currentParentAttrDef) {
+      ancestorIds.push(currentParentAttrDef.id)
+      currentParentAttrDef = currentParentAttrDef.parentCodeAttributeDefinition
+    }
+    return ancestorIds
+  }
+
+  get levelIndex() {
+    return this.ancestorCodeAttributeDefinitionIds.length
   }
 }
 

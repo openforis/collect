@@ -90,8 +90,8 @@ export class Entity extends Node {
     const nodeDefAncestorIds = nodeDef.ancestorIds
     const nodeDefAncestorIdsUpToThis = nodeDefAncestorIds.slice(0, nodeDefAncestorIds.indexOf(this.definition.id))
     const descendantDefIds = [...nodeDefAncestorIdsUpToThis].reverse()
-    const entity = descendantDefIds.length ? this.getDescendants(descendantDefIds)[0] : this
-    return entity
+    const descendantEntities = descendantDefIds.length ? this.getDescendants(descendantDefIds) : null
+    return descendantEntities && descendantEntities.length ? descendantEntities[0] : this
   }
 
   getSingleChild(defId) {

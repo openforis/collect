@@ -1,3 +1,5 @@
+import Arrays from 'utils/Arrays'
+
 import Serializable from '../Serializable'
 import { Entity } from './Entity'
 
@@ -69,26 +71,44 @@ export class Record extends Serializable {
     return null
   }
 
-  getAncestorCodeValues({ parentEntity, attributeDefinition }) {
-    const ancestorCodeAttributes = []
+  getCommonParentEntity({ contextEntity, attributeDefinition }) {
+    const { definition: contextEntityDef } = contextEntity
+    const contextAncestorIds = contextEntityDef.ancestorAndSelfIds
+    const { ancestorIds: attrDefAncestorIds } = attributeDefinition
+    const commonHierarchyDefIds = Arrays.intersect(contextAncestorIds, attrDefAncestorIds)
+    const commonEntityDefId = Arrays.head(commonHierarchyDefIds)
+    return commonEntityDefId === contextEntityDef.id
+      ? contextEntity
+      : contextEntity.getAncestorByDefinitionId(commonEntityDefId)
+  }
 
-    let currentCodeAttrDef = attributeDefinition
-    let currentParentEntity = parentEntity
-    let currentParentCodeAttr = null
-    do {
-      currentParentCodeAttr = this.getParentCodeAttribute({
-        parentEntity: currentParentEntity,
-        attributeDefinition: currentCodeAttrDef,
+  getAncestorCodeAttributesPath({ contextEntity, attributeDefinition }) {
+    let currentContextEntity = contextEntity
+    let currentAttrDef = attributeDefinition.parentCodeAttributeDefinition
+    const ancestorCodePaths = []
+
+    while (currentAttrDef && currentContextEntity) {
+      const commonParent = this.getCommonParentEntity({
+        contextEntity: currentContextEntity,
+        attributeDefinition: currentAttrDef,
       })
-      if (currentParentCodeAttr && !currentParentCodeAttr.isEmpty()) {
-        ancestorCodeAttributes.unshift(currentParentCodeAttr)
-        currentParentEntity = currentParentCodeAttr.parent
-        currentCodeAttrDef = currentParentCodeAttr.definition
+      const ancestorCodeParentEntity = commonParent && commonParent.getDescendantEntityClosestToNode(currentAttrDef)
+      if (ancestorCodeParentEntity) {
+        ancestorCodePaths.push(`${ancestorCodeParentEntity.path}/${currentAttrDef.name}`)
       }
-    } while (currentParentCodeAttr && currentCodeAttrDef.levelIndex > 0)
+      currentAttrDef = currentAttrDef.parentCodeAttributeDefinition
+      currentContextEntity = ancestorCodeParentEntity
+    }
+    return ancestorCodePaths.length === attributeDefinition.levelIndex ? ancestorCodePaths : null
+  }
 
-    return ancestorCodeAttributes.length === attributeDefinition.levelIndex
-      ? ancestorCodeAttributes.map((attr) => attr.value.code)
+  getAncestorCodeValues({ contextEntity, attributeDefinition }) {
+    const codeAttributePaths = this.getAncestorCodeAttributesPath({ contextEntity, attributeDefinition })
+    return codeAttributePaths
+      ? codeAttributePaths.map((path) => {
+          const attr = this.getNodeByPath(path)
+          return attr && !attr.isEmpty() ? attr.value.code : null
+        })
       : null
   }
 }

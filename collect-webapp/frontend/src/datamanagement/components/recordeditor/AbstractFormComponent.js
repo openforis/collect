@@ -6,7 +6,6 @@ import EventQueue from 'model/event/EventQueue'
 export default class AbstractFormComponent extends React.Component {
   constructor() {
     super()
-    this.onRecordEvent = this.onRecordEvent.bind(this)
     this._onRecordEvent = this._onRecordEvent.bind(this)
   }
 
