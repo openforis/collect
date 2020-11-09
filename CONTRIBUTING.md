@@ -70,3 +70,42 @@ Just run the following commands:
 mvn release:prepare -Pinstaller
 mvn release:perform
 ```
+
+## Setup Collect in Eclipse IDE
+
+Configuring Collect in Eclipse can be a bit tricky, because some Maven plugins used by Collect are not working in this IDE.
+
+If you want to configure Collect in Tomcat under Eclipse and publish automatically the changes to the resources, these are the main steps to follow:
+
+- import all the projects as `Existing Maven Projects`. Install the plugins required during this process. Once done, if everything went well you shouldn't have any errors in every module.
+- add Tomcat (version 9 or greater) to the Server Runtime Environments (if not done already)
+- add some required libraries to the Tomcat lib folder: commons-pool-1.6.jar, commons-dbcp-1.4.jar, h2-1.4.193.jar, sqlite-jdbc-3.7.2.jar, postgresql-9.1-901.jdbc4.jar
+- add the DB connection parameters as a Resource among the GlobalNamingResources in the Tomcat server.xml file. E.g. 
+
+```
+<Resource auth="Container" driverClassName="org.sqlite.JDBC" factory="org.apache.commons.dbcp.BasicDataSourceFactory" name="jdbc/collectDs" type="javax.sql.DataSource" url="jdbc:sqlite:${user.home}/OpenForis/CollectDev/data/collect.db"/>
+```
+(note that if you are using SQLite DB, the path to the .db file must exist).
+- add the devMode=true parameter to the context.xml file:
+
+```
+   	<?xml version="1.0" encoding="UTF-8"?>
+   	<Context>
+   		...
+   		<Parameter name="devMode" value="true" />
+   	</Context>
+```
+- add the project collect-webapp to the Tomcat server
+- startup Tomcat and check that you don't have any errors starting up Collect.
+- start the NPM development server from command line: 
+
+```
+cd collect-webapp/frontend
+npm start
+```
+Once started, Collect user interface will be available from the web browser at the address `http://localhost:3000` (please CHANGE IT INTO `http://127.0.0.1:3000` to avoid problems if running Collect with Google Chrome).
+When running in dev mode, the web application will try to access the Collect RESTful API at the address `http://127.0.0.1:8080/collect/`; the CORS filter will prevent calls to the API from a different location, this is why you will have to use a plugin like Access Control Allow Origin (`https://mybrowseraddon.com/access-control-allow-origin.html`) to enable the connection to the server side.
+
+The collect-client module won't compile in Tomcat under Eclipse, because the plugin responsible to compile the Flex code does not work there.
+The migration to the new UI will be completed by the end of 2020, meanwhile please be patient.
+If you want to build the collect-client module, you have to do it from command line, with "mvn clean build".
