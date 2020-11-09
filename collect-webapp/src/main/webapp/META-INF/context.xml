@@ -5,6 +5,7 @@
 		type="javax.sql.DataSource"
 		global="jdbc/collectDs" />
 
-	<Parameter name="devMode" value="false" />
+<!-- 	Pass devMode parameter from outside -->
+<!-- 	<Parameter name="devMode" value="true" /> -->
 
 </Context>

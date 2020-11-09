@@ -6,7 +6,7 @@ import {
   TextAttributeDefinition,
 } from 'model/Survey'
 
-export const COORDINATE_FIELD_WIDTH = 100
+export const COORDINATE_FIELD_WIDTH = 150
 export const COORDINATE_FIELD_WIDTH_PX = `${COORDINATE_FIELD_WIDTH}px`
 
 export const TaxonFieldWidths = {
@@ -26,12 +26,12 @@ const WIDTH_CALCULATORS_BY_ATTRIBUTE_TYPE = {
   [AttributeDefinition.Types.CODE]: ({ fieldDef }) => {
     const { layout } = fieldDef
     switch (layout) {
-      case CodeFieldDefinition.Layouts.DROPDOWN:
-        return 200
       case CodeFieldDefinition.Layouts.RADIO:
         return 200
+      case CodeFieldDefinition.Layouts.DROPDOWN:
+      case CodeFieldDefinition.Layouts.TEXT:
       default:
-        return 100
+        return 200
     }
   },
   [AttributeDefinition.Types.COORDINATE]: ({ fieldDef, inTable }) => {

@@ -25,6 +25,8 @@ import org.openforis.collect.model.FileWrapper;
 import org.openforis.collect.persistence.CodeListItemDao;
 import org.openforis.collect.persistence.DatabaseExternalCodeListProvider;
 import org.openforis.collect.service.CollectCodeListService;
+import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -333,6 +335,33 @@ public class CodeListManager {
 		}
 		Record record = parent.getRecord();
 		ModelVersion version = record.getVersion();
+		return filterApplicableItems(items, version);
+	}
+	
+	public <T extends CodeListItem> List<T> loadValidItems(CodeList list, ModelVersion version, List<String> ancestorCodes) {
+		List<T> items = null;
+		if ( CollectionUtils.isNotEmpty(ancestorCodes) ) {
+			CodeListItem parentItem = getParentCodeListItem(list, version, ancestorCodes);
+			if (parentItem == null) {
+				return Collections.emptyList();
+			}
+			items = loadChildItems(parentItem);
+		} else {
+			items = loadRootItems(list);
+		}
+		return filterApplicableItems(items, version);
+	}
+
+	public <T extends CodeListItem> List<T> findValidItems(CodeList list, ModelVersion version, final String language,
+			List<String> ancestorCodes, final String searchString) {
+		List<T> items = loadValidItems(list, version, ancestorCodes);
+		CollectionUtils.filter(items, new Predicate<T>() {
+			public boolean evaluate(T item) {
+				String code = item.getCode();
+				return StringUtils.isBlank(searchString) || StringUtils.startsWithIgnoreCase(code, searchString)
+						|| StringUtils.startsWithIgnoreCase(item.getLabel(language, true), searchString);
+			}
+		});
 		return filterApplicableItems(items, version);
 	}
 
@@ -722,6 +751,28 @@ public class CodeListManager {
 
 	public void setCodeListItemDao(CodeListItemDao codeListItemDao) {
 		this.codeListItemDao = codeListItemDao;
+	}
+	
+	private CodeListItem getParentCodeListItem(CodeList list, ModelVersion version, List<String> ancestorCodes) {
+		String rootCode = ancestorCodes.get(0);
+		if (StringUtils.isBlank(rootCode)) {
+			return null;
+		}
+		CodeListItem parentItem = loadRootItem(list, rootCode, version);
+		if (parentItem == null) {
+			return null;
+		}
+		for (int i = 1; i < ancestorCodes.size(); i++) {
+			String ancestorCode = ancestorCodes.get(i);
+			if (StringUtils.isBlank(ancestorCode)) {
+				return null;
+			}
+			parentItem = loadChildItem(parentItem, ancestorCode, version);
+			if (parentItem == null) {
+				return null;
+			}
+		}
+		return parentItem;
 	}
 
 }

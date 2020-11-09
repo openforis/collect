@@ -1,15 +1,26 @@
 import AbstractService from './AbstractService'
 
 export default class CodeListService extends AbstractService {
-  findAvailableItems(parentEntity, codeAttrDef) {
-    let record = parentEntity.record
-    let survey = record.survey
+  countAvailableItems({ surveyId, codeListId, versionId, ancestorCodes }) {
+    return this.postJson(`survey/${surveyId}/codelist/${codeListId}/validitems/count`, {
+      versionId,
+      ancestorCodes,
+    })
+  }
 
-    return this.get('survey/' + survey.id + '/codelist/' + codeAttrDef.codeListId, {
-      recordId: record.preview ? null : record.id,
-      recordStep: record.dataStep,
-      parentEntityPath: parentEntity.path,
-      codeAttrDefId: codeAttrDef.id,
+  loadAllAvailableItems({ surveyId, codeListId, versionId, ancestorCodes }) {
+    return this.postJson(`survey/${surveyId}/codelist/${codeListId}/validitems`, {
+      versionId,
+      ancestorCodes,
+    })
+  }
+
+  findAvailableItems({ surveyId, codeListId, versionId, language, ancestorCodes, searchString }) {
+    return this.postJson(`survey/${surveyId}/codelist/${codeListId}/finditems`, {
+      versionId,
+      ancestorCodes,
+      language,
+      searchString,
     })
   }
 }

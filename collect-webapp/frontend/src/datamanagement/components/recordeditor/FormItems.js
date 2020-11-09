@@ -18,7 +18,7 @@ const FormItemsItem = (props) => {
 
   return (
     visible && (
-      <Fade in={visible} className={classnames({ 'full-height': fullSize })}>
+      <Fade in={visible} className={classnames('form-item-external-wrapper', { 'full-height': fullSize })}>
         <FormItem parentEntity={parentEntity} itemDef={itemDef} fullSize={fullSize} />
       </Fade>
     )
@@ -43,8 +43,11 @@ export default class FormItems extends AbstractFormComponent {
   render() {
     const { itemDefs, parentEntity } = this.props
 
-    return itemDefs.length === 1 &&
-      (itemDefs[0] instanceof TableDefinition || itemDefs[0] instanceof MultipleFieldsetDefinition) ? (
+    const onlyOneMultipleEntity =
+      itemDefs.length === 1 &&
+      (itemDefs[0] instanceof TableDefinition || itemDefs[0] instanceof MultipleFieldsetDefinition)
+
+    return onlyOneMultipleEntity ? (
       <FormItemsItem itemDef={itemDefs[0]} parentEntity={parentEntity} fullSize />
     ) : itemDefs.length > 0 ? (
       <Container className="formItems">

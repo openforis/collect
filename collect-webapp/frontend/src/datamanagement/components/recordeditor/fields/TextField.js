@@ -1,11 +1,11 @@
 import React from 'react'
 import { Input } from 'reactstrap'
 
+import { TextAttributeDefinition } from 'model/Survey'
 import { TextFieldDefinition } from 'model/ui/TextFieldDefinition'
 
+import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 import AbstractSingleAttributeField from './AbstractSingleAttributeField'
-import FieldLoadingSpinner from './FieldLoadingSpinner'
-import { TextAttributeDefinition } from '../../../../model/Survey'
 import * as FieldsSizes from './FieldsSizes'
 
 const tranformFunctions = {
@@ -47,7 +47,7 @@ export default class TextField extends AbstractSingleAttributeField {
           onChange={this.onChange}
           style={{ width: FieldsSizes.getWidth({ fieldDef, inTable }) }}
         />
-        {dirty && <FieldLoadingSpinner />}
+        {dirty && <LoadingSpinnerSmall />}
       </>
     )
   }

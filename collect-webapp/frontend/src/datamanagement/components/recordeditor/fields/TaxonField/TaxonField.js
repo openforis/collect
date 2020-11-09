@@ -1,8 +1,6 @@
 import './TaxonField.css'
 
 import React from 'react'
-import { TextField } from '@material-ui/core'
-import Autocomplete from '@material-ui/lab/Autocomplete'
 
 import { TaxonAttributeDefinition } from 'model/Survey'
 
@@ -10,6 +8,7 @@ import Objects from 'utils/Objects'
 import L from 'utils/Labels'
 import Languages from 'utils/Languages'
 
+import Autocomplete from 'common/components/Autocomplete'
 import AbstractSingleAttributeField from '../AbstractSingleAttributeField'
 import CompositeAttributeFormItem from '../CompositeAttributeFormItem'
 import TaxonAutoCompleteField from './TaxonAutoCompleteField'
@@ -85,19 +84,18 @@ export default class TaxonField extends AbstractSingleAttributeField {
       } else {
         const langCode = Objects.getProp(field)(value)
         const selectedOption = langCode ? { code: langCode, label: getLangLabel(langCode) } : null
-        const width = FieldsSizes.TaxonFieldWidths[field]
         return (
           <Autocomplete
             key={field}
             className="taxon-autocomplete-language"
-            style={{ width: `${width}px` }}
-            value={selectedOption}
-            options={langOptions}
-            getOptionSelected={(option) => option.code === langCode}
-            getOptionLabel={(option) => `${option.code} - ${option.label}`}
-            renderInput={(params) => <TextField {...params} variant="outlined" />}
-            onChange={(_, option) => this.onChangeField(field)(option.code)}
+            asynchronous={false}
             disabled={!code || code !== 'UNL' || !vernacularName}
+            items={langOptions}
+            inputFieldWidth={FieldsSizes.TaxonFieldWidths[field]}
+            selectedItem={selectedOption}
+            itemLabelFunction={(option) => `${option.code} - ${option.label}`}
+            itemSelectedFunction={(item) => item.code === langCode}
+            onSelect={(option) => this.onChangeField(field)(option.code)}
           />
         )
       }

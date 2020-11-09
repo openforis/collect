@@ -1,26 +1,24 @@
-import React, { useEffect, useState } from 'react'
-import Autocomplete from '@material-ui/lab/Autocomplete'
-import { TextField } from '@material-ui/core'
+import React from 'react'
+import Autocomplete from 'common/components/Autocomplete'
 import { debounce } from 'throttle-debounce'
 
 import ServiceFactory from 'services/ServiceFactory'
 import { TaxonAttributeDefinition } from 'model/Survey'
 import Objects from 'utils/Objects'
 
-import FieldLoadingSpinner from '../FieldLoadingSpinner'
 import TaxonAutoCompleteDialogItem from './TaxonAutoCompleteDialogItem'
 import * as FieldsSizes from '../FieldsSizes'
 
-const fetchTaxa = async ({ surveyId, fieldDef, queryField, searchString, onComplete }) => {
-  const { attributeDefinition } = fieldDef
-  const { allowUnlisted, highestRank, includeUniqueVernacularName, showFamily, taxonomyName } = attributeDefinition
+const fetchTaxa = ({ surveyId, fieldDef, queryField }) => ({ searchString, onComplete }) => {
+  return debounce(1000, false, async () => {
+    const { attributeDefinition } = fieldDef
+    const { allowUnlisted, highestRank, includeUniqueVernacularName, showFamily, taxonomyName } = attributeDefinition
 
-  const query = {
-    field: queryField,
-    searchString,
-    parameters: { highestRank, includeUniqueVernacularName, includeAncestorTaxons: showFamily },
-  }
-  const fetchTaxaDebounced = debounce(1000, false, async () => {
+    const query = {
+      field: queryField,
+      searchString,
+      parameters: { highestRank, includeUniqueVernacularName, includeAncestorTaxons: showFamily },
+    }
     const taxa = await ServiceFactory.speciesService.findTaxa({ surveyId, taxonomyName, query })
     if (taxa.length === 0 && allowUnlisted) {
       taxa.push(
@@ -36,9 +34,6 @@ const fetchTaxa = async ({ surveyId, fieldDef, queryField, searchString, onCompl
     }
     onComplete(taxa)
   })
-  fetchTaxaDebounced()
-
-  return fetchTaxaDebounced
 }
 
 const TaxonAutoCompleteField = (props) => {
@@ -58,90 +53,7 @@ const TaxonAutoCompleteField = (props) => {
     keysMapping: TaxonAttributeDefinition.ValueFieldByField,
   })
 
-  const [state, setStateInternal] = useState({
-    open: false,
-    loading: false,
-    taxonOccurrences: [],
-    inputValue: initialInputValue,
-    fetchTaxaDebounced: null,
-  })
-  const setState = (stateUpdated) => setStateInternal({ ...state, ...stateUpdated })
-
-  const { open, loading, taxonOccurrences, inputValue, fetchTaxaDebounced } = state
-
-  // fetch taxa on "open" and "inputValue" change
-  useEffect(() => {
-    if (!loading) {
-      return undefined
-    }
-
-    let active = true // prevents rendering of an unmounted component
-
-    ;(async () => {
-      if (fetchTaxaDebounced) {
-        fetchTaxaDebounced.cancel()
-      }
-      const fetchDataDebouncedNew = await fetchTaxa({
-        surveyId,
-        fieldDef,
-        queryField,
-        searchString: inputValue,
-        onComplete: (taxa) => {
-          if (active) {
-            setState({ taxonOccurrences: taxa, loading: false })
-          }
-        },
-      })
-      setState({ fetchTaxaDebounced: fetchDataDebouncedNew })
-    })()
-
-    return () => {
-      active = false
-    }
-  }, [loading, inputValue])
-
-  // set input initial value on "initialInputValue" change (if dialog not open)
-  useEffect(() => {
-    if (!open) {
-      setState({ inputValue: initialInputValue })
-    }
-  }, [initialInputValue])
-
-  // on dialog open, trigger loading
-  useEffect(() => {
-    const stateUpdated = { loading: open }
-    if (!open) {
-      stateUpdated.taxonOccurrences = []
-    }
-    setState(stateUpdated)
-  }, [open])
-
-  // on input value change re-fetch taxa
-  useEffect(() => {
-    if (open) {
-      setState({ taxonOccurrences: [], loading: true })
-    }
-  }, [inputValue])
-
-  const onInputChange = (_event, value, reason) => {
-    if (reason === 'input') {
-      onInputChangeProps(value)
-    }
-    setState({ inputValue: value })
-  }
-
-  const onOpen = () => {
-    setState({ open: true })
-  }
-
-  const onClose = (_, reason) => {
-    setState({ open: false })
-    if (['escape', 'blur'].includes(reason)) {
-      onDismiss()
-    }
-  }
-
-  const onTaxonSelected = (taxonOccurrence) => {
+  const onTaxonSelected = (taxonOccurrence, inputValue) => {
     const taxonOccurrenceUpdated = taxonOccurrence
     if (
       taxonOccurrence &&
@@ -159,39 +71,18 @@ const TaxonAutoCompleteField = (props) => {
 
   return (
     <Autocomplete
-      open={open}
-      openOnFocus={false}
-      onOpen={onOpen}
-      onClose={onClose}
-      value={selectedTaxonOccurrence}
-      inputValue={inputValue}
-      onChange={(_, taxonOccurrence) => onTaxonSelected(taxonOccurrence)}
-      onInputChange={onInputChange}
-      getOptionLabel={Objects.getProp(valueField, '')}
-      getOptionSelected={(taxonOccurrence, value) => taxonOccurrence.code === value.code}
-      options={taxonOccurrences}
-      filterOptions={() => taxonOccurrences}
-      loading={loading}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          fullWidth={false}
-          style={{ width: `${FieldsSizes.TaxonFieldWidths[field]}px` }}
-          variant="outlined"
-          InputProps={{
-            ...params.InputProps,
-            endAdornment: (
-              <>
-                {loading && <FieldLoadingSpinner />}
-                {params.InputProps.endAdornment}
-              </>
-            ),
-          }}
-        />
-      )}
-      renderOption={(taxonOccurrence) => (
+      asynchronous
+      inputFieldValue={initialInputValue}
+      inputFieldWidth={FieldsSizes.TaxonFieldWidths[field]}
+      selectedItem={selectedTaxonOccurrence}
+      fetchFunction={fetchTaxa({ surveyId, fieldDef, queryField })}
+      itemLabelFunction={Objects.getProp(valueField, '')}
+      itemSelectedFunction={(item, value) => item.code === value.code}
+      itemRenderFunction={(taxonOccurrence) => (
         <TaxonAutoCompleteDialogItem taxonOccurrence={taxonOccurrence} showFamily={showFamily} />
       )}
+      onSelect={onTaxonSelected}
+      onDismiss={onDismiss}
     />
   )
 }

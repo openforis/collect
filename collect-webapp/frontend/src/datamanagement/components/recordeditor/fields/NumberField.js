@@ -2,9 +2,8 @@ import { FormControl, InputLabel, Select } from '@material-ui/core'
 import React from 'react'
 import { Input } from 'reactstrap'
 
+import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 import AbstractSingleAttributeField from './AbstractSingleAttributeField'
-import FieldLoadingSpinner from './FieldLoadingSpinner'
-import * as FieldsSizes from './FieldsSizes'
 
 export default class NumberField extends AbstractSingleAttributeField {
   constructor(props) {
@@ -50,7 +49,7 @@ export default class NumberField extends AbstractSingleAttributeField {
   }
 
   render() {
-    const { fieldDef, inTable } = this.props
+    const { fieldDef } = this.props
     const { dirty, value: valueState } = this.state
     const { value, unit: unitId } = valueState || {}
     const text = value || ''
@@ -61,11 +60,7 @@ export default class NumberField extends AbstractSingleAttributeField {
     return (
       <>
         <div style={hasPrecisions ? { display: 'grid', gridTemplateColumns: '1fr 150px' } : null}>
-          <Input
-            type="number"
-            value={text}
-            onChange={this.onTextValueChange}
-          />
+          <Input type="number" value={text} onChange={this.onTextValueChange} />
 
           {hasPrecisions && (
             <FormControl>
@@ -83,7 +78,7 @@ export default class NumberField extends AbstractSingleAttributeField {
             </FormControl>
           )}
         </div>
-        {dirty && <FieldLoadingSpinner />}
+        {dirty && <LoadingSpinnerSmall />}
       </>
     )
   }

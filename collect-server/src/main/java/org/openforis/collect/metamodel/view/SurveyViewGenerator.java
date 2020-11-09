@@ -141,6 +141,9 @@ public class SurveyViewGenerator {
 						int codeListId = codeAttrDef.getList() == null ? -1 : codeAttrDef.getList().getId();
 						CodeAttributeDefView attrDefView = new CodeAttributeDefView(id, name, label, attributeType, fieldNames, key, multiple);
 						attrDefView.setCodeListId(codeListId);
+						Integer codeAttributeDefId = codeAttrDef.getParentCodeAttributeDefinition() == null ? null
+								: codeAttrDef.getParentCodeAttributeDefinition().getId();
+						attrDefView.setParentCodeAttributeDefinitionId(codeAttributeDefId);
 						view = attrDefView;
 					} else if (def instanceof CoordinateAttributeDefinition) {
 						CoordinateAttributeDefinition coordDef = (CoordinateAttributeDefinition) def;

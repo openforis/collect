@@ -18,6 +18,7 @@ package org.openforis.collect.io.metadata.parsing {
         public static const EMPTY:ParsingError$ErrorType = new ParsingError$ErrorType("EMPTY", _);
         public static const INVALID_VALUE:ParsingError$ErrorType = new ParsingError$ErrorType("INVALID_VALUE", _);
         public static const DUPLICATE_VALUE:ParsingError$ErrorType = new ParsingError$ErrorType("DUPLICATE_VALUE", _);
+        public static const MAX_LENGTH_EXCEEDED:ParsingError$ErrorType = new ParsingError$ErrorType("MAX_LENGTH_EXCEEDED", _);
         public static const EXCEEDING_MAXIMUM_EXTRA_COLUMNS:ParsingError$ErrorType = new ParsingError$ErrorType("EXCEEDING_MAXIMUM_EXTRA_COLUMNS", _);
         public static const IOERROR:ParsingError$ErrorType = new ParsingError$ErrorType("IOERROR", _);
 
@@ -30,7 +31,7 @@ package org.openforis.collect.io.metadata.parsing {
         }
 
         public static function get constants():Array {
-            return [MISSING_REQUIRED_COLUMNS, WRONG_COLUMN_NAME, EMPTY, INVALID_VALUE, DUPLICATE_VALUE, EXCEEDING_MAXIMUM_EXTRA_COLUMNS, IOERROR];
+            return [MISSING_REQUIRED_COLUMNS, WRONG_COLUMN_NAME, EMPTY, INVALID_VALUE, DUPLICATE_VALUE, MAX_LENGTH_EXCEEDED, EXCEEDING_MAXIMUM_EXTRA_COLUMNS, IOERROR];
         }
 
         public static function valueOf(name:String):ParsingError$ErrorType {

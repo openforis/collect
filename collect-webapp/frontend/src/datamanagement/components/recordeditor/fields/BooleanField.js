@@ -2,7 +2,7 @@ import React from 'react'
 import { Checkbox } from '@material-ui/core'
 
 import AbstractSingleAttributeField from './AbstractSingleAttributeField'
-import FieldLoadingSpinner from './FieldLoadingSpinner'
+import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 
 export default class BooleanField extends AbstractSingleAttributeField {
   constructor() {
@@ -21,7 +21,7 @@ export default class BooleanField extends AbstractSingleAttributeField {
     return (
       <div>
         <Checkbox checked={checked} onChange={this.onChange} />
-        {dirty && <FieldLoadingSpinner />}
+        {dirty && <LoadingSpinnerSmall />}
       </div>
     )
   }

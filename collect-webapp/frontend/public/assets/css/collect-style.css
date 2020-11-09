@@ -412,6 +412,10 @@ input.is-invalid.warning:focus {
   height: calc(100vh - 175px);
 }
 
+.form-item-external-wrapper {
+  margin-top: 4px;
+}
+
 /**
 * === VALIDATION FEEDBACK
 **/

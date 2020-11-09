@@ -83,6 +83,10 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 
 	public static class CodeListCSVLineParser extends CSVLineParser<CodeListLine> {
 		
+		private static final int MAX_LENGTH_CODE = 255;
+		private static final int MAX_LENGTH_LABEL = 255;
+		private static final int MAX_LENGTH_DESCRIPTION = 1023;
+
 		CodeListCSVLineParser(CodeListCSVReader reader, CsvLine line) {
 			super(reader, line);
 		}
@@ -98,19 +102,19 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 			for (int levelIdx = 0; levelIdx < levels.size(); levelIdx++) {
 				String level = levels.get(levelIdx);
 				String codeColumnName = columnsInfo.getCodeColumnInfo(level).getColumnName();
-				String code = getColumnValue(codeColumnName, false, String.class);
+				String code = getColumnValue(codeColumnName, String.class, false, MAX_LENGTH_CODE);
 				if ( code != null ) {
 					line.addLevelCode(code);
 					// Labels
 					for (ColumnInfo columnInfo : columnsInfo.getLabelColumnInfos(levelIdx)) {
-						String colValue = getColumnValue(columnInfo.getColumnName(), false, String.class);
+						String colValue = getColumnValue(columnInfo.getColumnName(), String.class, false, MAX_LENGTH_LABEL);
 						if ( colValue != null ) {
 							line.addLabel(levelIdx, columnInfo.getLangCode(), colValue);
 						}
 					}
 					// Descriptions
 					for (ColumnInfo columnInfo : columnsInfo.getDescriptionColumnInfos(levelIdx)) {
-						String colValue = getColumnValue(columnInfo.getColumnName(), false, String.class);
+						String colValue = getColumnValue(columnInfo.getColumnName(), String.class, false, MAX_LENGTH_DESCRIPTION);
 						if ( colValue != null ) {
 							line.addDescription(levelIdx, columnInfo.getLangCode(), colValue);
 						}
