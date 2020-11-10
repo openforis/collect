@@ -3,7 +3,8 @@ import React from 'react'
 import ServiceFactory from 'services/ServiceFactory'
 import { CodeAttributeUpdatedEvent } from 'model/event/RecordEvent'
 import { CodeFieldDefinition } from 'model/ui/CodeFieldDefinition'
-import AbstractSingleAttributeField from '../AbstractSingleAttributeField'
+import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
+import AbstractField from '../AbstractField'
 import CodeFieldRadio from './CodeFieldRadio'
 import CodeFieldAutocomplete from './CodeFieldAutocomplete'
 
@@ -15,7 +16,7 @@ const EMPTY_OPTION = (
   </option>
 )
 
-export default class CodeField extends AbstractSingleAttributeField {
+export default class CodeField extends AbstractField {
   constructor(props) {
     super(props)
 
@@ -57,18 +58,10 @@ export default class CodeField extends AbstractSingleAttributeField {
   }
 
   onParentEntityChange() {
-    const { parentEntity, fieldDef } = this.props
-    const { attributeDefinition } = fieldDef
+    const { parentEntity } = this.props
 
     if (parentEntity) {
-      const { record } = parentEntity
-
-      const ancestorCodes = record.getAncestorCodeValues({
-        contextEntity: parentEntity,
-        attributeDefinition,
-      })
-
-      this.setState({ loading: true, ancestorCodes }, () => this.loadCodeListItems())
+      this.setState({ loading: true, items: [] }, () => this.loadCodeListItems())
     }
   }
 
@@ -89,35 +82,75 @@ export default class CodeField extends AbstractSingleAttributeField {
   }
 
   async loadCodeListItems() {
-    const { ancestorCodes } = this.state
-    const attr = this.getAttribute()
-    if (attr) {
-      const { definition, survey, record } = attr
-      const { versionId } = record
-      const { codeListId, levelIndex } = definition
+    const { parentEntity, fieldDef } = this.props
+    const { survey, record } = parentEntity
+    const { id: surveyId } = survey
+    const { versionId } = record
+    const { attributeDefinition } = fieldDef
+    const { codeListId, levelIndex } = attributeDefinition
 
-      if (levelIndex === 0 || (ancestorCodes && ancestorCodes.length >= levelIndex)) {
-        const value = this.extractValueFromProps()
+    const ancestorCodes = record.getAncestorCodeValues({
+      contextEntity: parentEntity,
+      attributeDefinition,
+    })
 
-        const count = await ServiceFactory.codeListService.countAvailableItems({
-          surveyId: survey.id,
-          codeListId,
-          versionId,
-          ancestorCodes,
-        })
+    if (levelIndex === 0 || (ancestorCodes && ancestorCodes.length == levelIndex)) {
+      const count = await ServiceFactory.codeListService.countAvailableItems({
+        surveyId,
+        codeListId,
+        versionId,
+        ancestorCodes,
+      })
 
-        const asynchronous = count > MAX_ITEMS
-        const items = asynchronous
-          ? null
-          : await ServiceFactory.codeListService.loadAllAvailableItems({
-              surveyId: survey.id,
-              codeListId,
-              versionId,
-              ancestorCodes,
-            })
-        this.setState({ loading: false, value, asynchronous, items })
-      }
+      const asynchronous = count > MAX_ITEMS
+      const items = asynchronous
+        ? null
+        : await ServiceFactory.codeListService.loadAllAvailableItems({
+            surveyId,
+            codeListId,
+            versionId,
+            ancestorCodes,
+          })
+
+      this.setState({ asynchronous, items, ancestorCodes }, () => this.updateStateFromProps())
+    } else {
+      this.setState({ loading: false, asynchronous: false, items: [] })
     }
+  }
+
+  async updateStateFromProps() {
+    const { ancestorCodes, asynchronous, items } = this.state
+    const { parentEntity, fieldDef } = this.props
+
+    const values = this.extractValuesFromProps()
+
+    let selectedItems = null
+    if (asynchronous) {
+      const { survey, record } = parentEntity
+      const { id: surveyId } = survey
+      const { versionId } = record
+      const { attributeDefinition } = fieldDef
+      const { codeListId } = attributeDefinition
+
+      const selectedItemsFetched = await Promise.all(
+        values.map((value) =>
+          ServiceFactory.codeListService.loadItem({
+            surveyId,
+            codeListId,
+            versionId,
+            ancestorCodes,
+            code: value.code,
+          })
+        )
+      )
+      selectedItems = selectedItemsFetched.map((item, index) => (item ? item : values[index]))
+    } else {
+      selectedItems = values.map((value) => {
+        const item = items.find((item) => item.code === value.code)
+        return item ? item : value
+      })
+    }
+    this.setState({ loading: false, selectedItems })
   }
 
   onInputChange(event) {
@@ -136,13 +169,10 @@ export default class CodeField extends AbstractSingleAttributeField {
 
   render() {
     const { fieldDef, parentEntity } = this.props
-    const { items, value, asynchronous, loading } = this.state
-    const { code } = value || {}
-
-    const selectedItem = code ? { code } : null
+    const { items, selectedItems, asynchronous, loading } = this.state
 
     if (loading) {
-      return <div>Loading...</div>
+      return <LoadingSpinnerSmall />
     }
 
     const { attributeDefinition, layout } = fieldDef
@@ -151,7 +181,7 @@ export default class CodeField extends AbstractSingleAttributeField {
       <CodeFieldRadio
         parentEntity={parentEntity}
         attributeDefinition={attributeDefinition}
-        selectedItem={items.find((itm) => itm.code === code)}
+        selectedItems={selectedItems}
         items={items}
         onChange={this.onInputChange}
       />
@@ -161,7 +191,7 @@ export default class CodeField extends AbstractSingleAttributeField {
         fieldDef={fieldDef}
         asynchronous={asynchronous}
         items={items}
-        selectedItem={selectedItem}
+        selectedItems={selectedItems}
         onSelect={this.onCodeListItemSelect}
       />
     )

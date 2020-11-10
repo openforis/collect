@@ -3,9 +3,9 @@ import React from 'react'
 import { Input } from 'reactstrap'
 
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
-import AbstractSingleAttributeField from './AbstractSingleAttributeField'
+import AbstractField from './AbstractField'
 
-export default class NumberField extends AbstractSingleAttributeField {
+export default class NumberField extends AbstractField {
   constructor(props) {
     super(props)
 

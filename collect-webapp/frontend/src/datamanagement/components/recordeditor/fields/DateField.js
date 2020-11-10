@@ -4,7 +4,7 @@ import DateFnsUtils from '@date-io/date-fns'
 
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 import Dates from 'utils/Dates'
-import AbstractSingleAttributeField from './AbstractSingleAttributeField'
+import AbstractField from './AbstractField'
 import * as FieldSizes from './FieldsSizes'
 
 const fromValueToDate = (value) => (value ? new Date(value.year, value.month - 1, value.day) : null)
@@ -17,7 +17,7 @@ const fromDateToValue = (date) => {
   }
 }
 
-export default class DateField extends AbstractSingleAttributeField {
+export default class DateField extends AbstractField {
   constructor() {
     super()
     this.onChange = this.onChange.bind(this)

@@ -5,7 +5,7 @@ import ServiceFactory from 'services/ServiceFactory'
 
 import AbstractFormComponent from '../AbstractFormComponent'
 
-export default class AbstractSingleAttributeField extends AbstractFormComponent {
+export default class AbstractField extends AbstractFormComponent {
   constructor() {
     super()
 
@@ -35,13 +35,21 @@ export default class AbstractSingleAttributeField extends AbstractFormComponent 
     return attr ? attr.value : null
   }
 
-  getAttribute(parentEntityParam) {
-    const { parentEntity: parentEntityProps, fieldDef, attribute: attributeParam } = this.props
-    const parentEntity = parentEntityParam || parentEntityProps
-    if (parentEntity) {
-      const attrDef = fieldDef.attributeDefinition
-      return attrDef.multiple ? attributeParam : parentEntity.getSingleChild(attrDef.id)
-    }
+  extractValuesFromProps() {
+    const attrs = this.getAttributes()
+    return attrs ? attrs.map((attr) => attr.value).filter((value) => !!value) : []
+  }
+
+  getAttribute() {
+    const { fieldDef, attribute: attributeParam } = this.props
+    const attributes = this.getAttributes()
+    return fieldDef.attributeDefinition.multiple ? attributeParam : attributes[0]
+  }
+
+  getAttributes() {
+    const { parentEntity, fieldDef, attribute: attributeParam } = this.props
+    const { attributeDefinitionId } = fieldDef
+    return parentEntity ? parentEntity.getChildrenByDefinitionId(attributeDefinitionId) : []
   }
 
   onAttributeUpdate({ value, debounced = true }) {

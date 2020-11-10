@@ -9,14 +9,14 @@ import L from 'utils/Labels'
 import Languages from 'utils/Languages'
 
 import Autocomplete from 'common/components/Autocomplete'
-import AbstractSingleAttributeField from '../AbstractSingleAttributeField'
+import AbstractField from '../AbstractField'
 import CompositeAttributeFormItem from '../CompositeAttributeFormItem'
 import TaxonAutoCompleteField from './TaxonAutoCompleteField'
 import * as FieldsSizes from '../FieldsSizes'
 
 const LANG_CODE_STANDARD = Languages.STANDARDS.ISO_639_3
 
-export default class TaxonField extends AbstractSingleAttributeField {
+export default class TaxonField extends AbstractField {
   LANG_CODES = Languages.codes(LANG_CODE_STANDARD)
 
   constructor() {

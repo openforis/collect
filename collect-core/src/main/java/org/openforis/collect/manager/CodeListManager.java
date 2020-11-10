@@ -56,14 +56,14 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  *
  */
-@Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
+@Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
 public class CodeListManager {
-	
-	@Autowired(required=false)
+
+	@Autowired(required = false)
 	private DatabaseExternalCodeListProvider provider;
-	@Autowired(required=false)
+	@Autowired(required = false)
 	private CodeListItemDao codeListItemDao;
-	
+
 	@Transactional
 	public void importCodeLists(CollectSurvey survey, InputStream is) throws CodeListImportException {
 		long nextSystemId = codeListItemDao.nextSystemId();
@@ -76,7 +76,7 @@ public class CodeListManager {
 			throw new CodeListImportException(e);
 		}
 	}
-	
+
 	@Transactional
 	public void importCodeLists(CollectSurvey survey, File file) throws CodeListImportException {
 		FileInputStream is = null;
@@ -89,33 +89,33 @@ public class CodeListManager {
 			IOUtils.closeQuietly(is);
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <T extends CodeListItem> T loadItem(CodeList list, int itemId) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
-		if ( list.isExternal() ) {
+		if (list.isExternal()) {
 			throw new UnsupportedOperationException();
-		} else if ( persistedSurvey && list.isEmpty() ) {
+		} else if (persistedSurvey && list.isEmpty()) {
 			return (T) codeListItemDao.loadItem(list, itemId);
 		} else {
 			return (T) list.getItem(itemId);
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <T extends CodeListItem> T loadItemByAttribute(CodeAttribute attribute) {
 		CodeAttributeDefinition defn = attribute.getDefinition();
 		CodeList list = defn.getList();
 		boolean persistedSurvey = list.getSurvey().getId() != null;
-		if ( persistedSurvey && list.isExternal() ) {
+		if (persistedSurvey && list.isExternal()) {
 			return (T) provider.getItem(attribute);
-		} else if ( persistedSurvey && list.isEmpty() ) {
+		} else if (persistedSurvey && list.isEmpty()) {
 			return (T) loadPersistedItem(attribute);
 		} else {
 			return (T) getInternalCodeListItem(attribute);
 		}
 	}
-	
+
 	protected CodeListItem getInternalCodeListItem(CodeAttribute attribute) {
 		Code code = attribute.getValue();
 		if (code != null) {
@@ -142,7 +142,7 @@ public class CodeListManager {
 
 	protected PersistedCodeListItem loadPersistedItem(CodeAttribute attribute) {
 		Code code = attribute.getValue();
-		if ( code == null || StringUtils.isBlank(code.getCode()) ) {
+		if (code == null || StringUtils.isBlank(code.getCode())) {
 			return null;
 		} else {
 			String codeVal = code.getCode();
@@ -150,12 +150,12 @@ public class CodeListManager {
 			CodeList list = defn.getList();
 			Record record = attribute.getRecord();
 			ModelVersion version = record.getVersion();
-			if ( StringUtils.isBlank(defn.getParentExpression()) ) {
+			if (StringUtils.isBlank(defn.getParentExpression())) {
 				CodeListItem item = codeListItemDao.loadRootItem(list, codeVal, version);
 				return (PersistedCodeListItem) item;
 			} else {
 				PersistedCodeListItem parentItem = (PersistedCodeListItem) loadParentItem(attribute);
-				if ( parentItem == null ) {
+				if (parentItem == null) {
 					return null;
 				} else {
 					CodeListItem item = codeListItemDao.loadItem(list, parentItem.getSystemId(), codeVal, version);
@@ -164,111 +164,110 @@ public class CodeListManager {
 			}
 		}
 	}
-	
+
 	protected CodeListItem loadParentItem(CodeAttribute attribute) {
 		CodeList list = attribute.getDefinition().getList();
 		boolean persistedSurvey = list.getSurvey().getId() != null;
 		Record record = attribute.getRecord();
 		ModelVersion version = record.getVersion();
-		if ( persistedSurvey && list.isExternal() ) {
+		if (persistedSurvey && list.isExternal()) {
 			ExternalCodeListItem item = (ExternalCodeListItem) loadItemByAttribute(attribute);
 			return provider.getParentItem(item);
-		} else if ( persistedSurvey && list.isEmpty() ) {
+		} else if (persistedSurvey && list.isEmpty()) {
 			PersistedCodeListItem lastParentItem = null;
 			List<CodeAttribute> codeAncestors = attribute.getCodeAncestors();
 			for (int i = 0; i < codeAncestors.size(); i++) {
 				CodeAttribute ancestor = codeAncestors.get(i);
-				Long lastParentItemId = lastParentItem == null ? null: lastParentItem.getSystemId();
+				Long lastParentItemId = lastParentItem == null ? null : lastParentItem.getSystemId();
 				Code code = ancestor.getValue();
 				lastParentItem = codeListItemDao.loadItem(list, lastParentItemId, code.getCode(), version);
-				if ( lastParentItem == null ) {
+				if (lastParentItem == null) {
 					break;
 				}
 			}
 			return lastParentItem;
 		} else {
 			CodeAttribute codeParent = attribute.getCodeParent();
-			if ( codeParent == null ) {
+			if (codeParent == null) {
 				return null;
 			} else {
 				return loadItemByAttribute(codeParent);
 			}
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <T extends CodeListItem> List<T> loadItems(CodeList list, int level) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
-		if ( list.isExternal() ) {
+		if (list.isExternal()) {
 			throw new UnsupportedOperationException();
-		} else if ( persistedSurvey && list.isEmpty() ) {
+		} else if (persistedSurvey && list.isEmpty()) {
 			return (List<T>) codeListItemDao.loadItemsByLevel(list, level);
 		} else {
 			return (List<T>) list.getItems(level - 1);
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <T extends CodeListItem> List<T> loadRootItems(CodeList list) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
-		if ( persistedSurvey && list.isExternal() ) {
+		if (persistedSurvey && list.isExternal()) {
 			return (List<T>) provider.getRootItems(list);
-		} else if ( persistedSurvey && list.isEmpty() ) {
+		} else if (persistedSurvey && list.isEmpty()) {
 			return (List<T>) codeListItemDao.loadRootItems(list);
 		} else {
 			return list.getItems();
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <T extends CodeListItem> T loadRootItem(CodeList list, String code, ModelVersion version) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
-		if ( persistedSurvey && list.isExternal() ) {
+		if (persistedSurvey && list.isExternal()) {
 			return (T) provider.getRootItem(list, code);
-		} else if ( persistedSurvey && list.isEmpty() ) {
+		} else if (persistedSurvey && list.isEmpty()) {
 			return (T) codeListItemDao.loadRootItem(list, code, version);
 		} else {
 			return (T) list.getItem(code, 0, version);
 		}
 	}
-	
+
 	public boolean hasChildItemsInLevel(CodeList list, int level) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
-		if ( list.isExternal() ) {
+		if (list.isExternal()) {
 			throw new UnsupportedOperationException();
-		} else if ( persistedSurvey && list.isEmpty() ) {
+		} else if (persistedSurvey && list.isEmpty()) {
 			return codeListItemDao.hasItemsInLevel(list, level);
 		} else {
 			return list.hasItemsInLevel(level - 1);
 		}
 	}
-	
+
 	public int countMaxChildren(CodeList list, int level) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
-		if ( list.isExternal() ) {
+		if (list.isExternal()) {
 			return provider.countMaxChildren(list, level);
-		} else if ( persistedSurvey && list.isEmpty()) {
+		} else if (persistedSurvey && list.isEmpty()) {
 			return codeListItemDao.countMaxChildren(list, level);
 		} else {
 			return list.countItemsInLevel(level);
 		}
 	}
 
-	
 	@Transactional
 	public void removeLevel(CodeList list, int level) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
-		if ( list.isExternal() ) {
+		if (list.isExternal()) {
 			throw new UnsupportedOperationException();
-		} else if ( persistedSurvey && list.isEmpty() ) {
+		} else if (persistedSurvey && list.isEmpty()) {
 			codeListItemDao.removeItemsInLevel(list, level);
 			list.removeLevel(level - 1);
 		} else {
 			list.removeLevel(level - 1);
 		}
-		
+
 	}
-	
+
 	private CodeListItem getCodeListItem(List<CodeListItem> siblings, String code, ModelVersion version) {
 		for (CodeListItem item : siblings) {
 			if (code.equals(item.getCode()) && (version == null || version.isApplicable(item))) {
@@ -277,41 +276,40 @@ public class CodeListManager {
 		}
 		return null;
 	}
-	
+
 	private CodeListItem findCodeListItem(List<CodeListItem> siblings, String code, ModelVersion version) {
 		String adaptedCode = code.trim();
-		//remove initial zeros
+		// remove initial zeros
 		adaptedCode = adaptedCode.replaceFirst("^0+", "");
 		adaptedCode = Pattern.quote(adaptedCode);
 		Pattern pattern = Pattern.compile("^[0]*" + adaptedCode + "$", Pattern.CASE_INSENSITIVE);
 
 		for (CodeListItem item : siblings) {
-			if ( version == null || version.isApplicable(item) ) {
+			if (version == null || version.isApplicable(item)) {
 				String itemCode = item.getCode();
 				Matcher matcher = pattern.matcher(itemCode);
-				if(matcher.find()) {
+				if (matcher.find()) {
 					return item;
 				}
 			}
 		}
 		return null;
 	}
-	
-	public CodeListItem findValidItem(Entity parent,
-			CodeAttributeDefinition defn, String code) {
+
+	public CodeListItem findValidItem(Entity parent, CodeAttributeDefinition defn, String code) {
 		List<CodeListItem> items = findValidItems(parent, defn, code);
-		return items.size() == 1 ? items.get(0): null;
+		return items.size() == 1 ? items.get(0) : null;
 	}
 
 	public List<CodeListItem> findValidItems(Entity parent, CodeAttributeDefinition defn, String... codes) {
 		List<CodeListItem> result = new ArrayList<CodeListItem>();
 		List<CodeListItem> assignableItems = loadValidItems(parent, defn);
-		if ( ! assignableItems.isEmpty() ) {
+		if (!assignableItems.isEmpty()) {
 			Record record = parent.getRecord();
 			ModelVersion version = record.getVersion();
-			for (String code: codes) {
+			for (String code : codes) {
 				CodeListItem item = findCodeListItem(assignableItems, code, version);
-				if ( item != null ) {
+				if (item != null) {
 					result.add(item);
 				}
 			}
@@ -322,13 +320,13 @@ public class CodeListManager {
 	public <T extends CodeListItem> List<T> loadValidItems(Entity parent, CodeAttributeDefinition def) {
 		List<T> items = null;
 		CodeList list = def.getList();
-		if ( StringUtils.isEmpty(def.getParentExpression()) ) {
+		if (StringUtils.isEmpty(def.getParentExpression())) {
 			items = loadRootItems(list);
 		} else {
 			CodeAttribute parentCodeAttribute = getCodeParent(parent, def);
-			if ( parentCodeAttribute != null ) {
+			if (parentCodeAttribute != null) {
 				CodeListItem parentCodeListItem = loadItemByAttribute(parentCodeAttribute);
-				if ( parentCodeListItem != null ) {
+				if (parentCodeListItem != null) {
 					items = loadChildItems(parentCodeListItem);
 				}
 			}
@@ -337,10 +335,11 @@ public class CodeListManager {
 		ModelVersion version = record.getVersion();
 		return filterApplicableItems(items, version);
 	}
-	
-	public <T extends CodeListItem> List<T> loadValidItems(CodeList list, ModelVersion version, List<String> ancestorCodes) {
+
+	public <T extends CodeListItem> List<T> loadValidItems(CodeList list, ModelVersion version,
+			List<String> ancestorCodes) {
 		List<T> items = null;
-		if ( CollectionUtils.isNotEmpty(ancestorCodes) ) {
+		if (CollectionUtils.isNotEmpty(ancestorCodes)) {
 			CodeListItem parentItem = getParentCodeListItem(list, version, ancestorCodes);
 			if (parentItem == null) {
 				return Collections.emptyList();
@@ -354,24 +353,38 @@ public class CodeListManager {
 
 	public <T extends CodeListItem> List<T> findValidItems(CodeList list, ModelVersion version, final String language,
 			List<String> ancestorCodes, final String searchString) {
-		List<T> items = loadValidItems(list, version, ancestorCodes);
-		CollectionUtils.filter(items, new Predicate<T>() {
+		return findValidItems(list, version, ancestorCodes, new Predicate<T>() {
 			public boolean evaluate(T item) {
 				String code = item.getCode();
 				return StringUtils.isBlank(searchString) || StringUtils.startsWithIgnoreCase(code, searchString)
 						|| StringUtils.startsWithIgnoreCase(item.getLabel(language, true), searchString);
 			}
 		});
+	}
+
+	public <T extends CodeListItem> List<T> findValidItems(CodeList list, ModelVersion version,
+			List<String> ancestorCodes, Predicate<T> filterPredicate) {
+		List<T> items = loadValidItems(list, version, ancestorCodes);
+		CollectionUtils.filter(items, filterPredicate);
 		return filterApplicableItems(items, version);
 	}
 
-	protected <T extends CodeListItem> List<T> filterApplicableItems(
-			List<T> items, ModelVersion version) {
-		if ( items == null ) {
+	public <T extends CodeListItem> T loadItem(CodeList list, ModelVersion version, List<String> ancestorCodes,
+			final String code) {
+		List<T> items = findValidItems(list, version, ancestorCodes, new Predicate<T>() {
+			public boolean evaluate(T item) {
+				return item.getCode().equals(code);
+			}
+		});
+		return items.isEmpty() ? null : items.get(0);
+	}
+
+	protected <T extends CodeListItem> List<T> filterApplicableItems(List<T> items, ModelVersion version) {
+		if (items == null) {
 			return Collections.emptyList();
 		} else {
 			List<T> result;
-			if ( version == null ) {
+			if (version == null) {
 				result = items;
 			} else {
 				result = version.filterApplicableItems(items);
@@ -379,7 +392,7 @@ public class CodeListManager {
 			return result;
 		}
 	}
-	
+
 	protected CodeAttribute getCodeParent(Entity context, CodeAttributeDefinition def) {
 		try {
 			ExpressionEvaluator expressionEvaluator = context.getSurvey().getContext().getExpressionEvaluator();
@@ -394,33 +407,32 @@ public class CodeListManager {
 			return null;
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <T extends CodeListItem> List<T> loadChildItems(CodeListItem parent) {
 		CodeList list = parent.getCodeList();
-		if ( list.isExternal() ) {
+		if (list.isExternal()) {
 			return (List<T>) provider.getChildItems((ExternalCodeListItem) parent);
-		} else if ( list.isEmpty() ) {
+		} else if (list.isEmpty()) {
 			return (List<T>) codeListItemDao.loadChildItems((PersistedCodeListItem) parent);
 		} else {
 			return parent.getChildItems();
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public <T extends CodeListItem> T loadChildItem(CodeList list,
-			String code, ModelVersion version) {
-		if ( list.isExternal() ) {
-			//TODO
+	public <T extends CodeListItem> T loadChildItem(CodeList list, String code, ModelVersion version) {
+		if (list.isExternal()) {
+			// TODO
 			return null;
-		} else if ( list.isEmpty() ) {
+		} else if (list.isEmpty()) {
 			return (T) codeListItemDao.loadItem(list, code, version);
 		} else {
 			Deque<CodeListItem> stack = new LinkedList<CodeListItem>();
 			stack.addAll(list.getItems());
-			while ( ! stack.isEmpty() ) {
+			while (!stack.isEmpty()) {
 				CodeListItem item = stack.pop();
-				if ( item.matchCode(code) ) {
+				if (item.matchCode(code)) {
 					return (T) item;
 				} else {
 					stack.addAll(item.getChildItems());
@@ -429,49 +441,49 @@ public class CodeListManager {
 			return null;
 		}
 	}
-	
+
 	public boolean isEmpty(CodeList list) {
-		if ( list.isExternal() ) {
-			//TODO 
+		if (list.isExternal()) {
+			// TODO
 			return false;
-		} else if ( list.isEmpty() ) {
+		} else if (list.isEmpty()) {
 			return codeListItemDao.isEmpty(list);
 		} else {
 			return false;
 		}
 	}
-	
+
 	public boolean hasChildItems(CodeListItem parent) {
 		CodeList list = parent.getCodeList();
-		if ( list.isExternal() ) {
+		if (list.isExternal()) {
 			return provider.hasChildItems((ExternalCodeListItem) parent);
-		} else if ( list.isEmpty() ) {
+		} else if (list.isEmpty()) {
 			return codeListItemDao.hasChildItems(list, ((PersistedCodeListItem) parent).getSystemId());
 		} else {
 			List<CodeListItem> childItems = parent.getChildItems();
-			return ! childItems.isEmpty();
+			return !childItems.isEmpty();
 		}
 	}
-	
+
 	public boolean hasQualifiableItems(CodeList list) {
-		if ( list.isExternal() ) {
+		if (list.isExternal()) {
 			return false;
-		} else if ( list.isEmpty() ) {
+		} else if (list.isEmpty()) {
 			return codeListItemDao.hasQualifiableItems(list);
 		} else {
 			return list.isQualifiable();
 		}
 	}
-	
+
 	public Map<Integer, Boolean> hasQualifiableItemsByLevel(CodeList list) {
 		List<CodeListLevel> hierarchy = list.getHierarchy();
 		int levelsSize = hierarchy.isEmpty() ? 1 : hierarchy.size();
 		Map<Integer, Boolean> result = new HashMap<Integer, Boolean>(levelsSize);
 		for (int levelIdx = 0; levelIdx < levelsSize; levelIdx++) {
 			boolean qualifiable;
-			if ( list.isExternal() ) {
+			if (list.isExternal()) {
 				qualifiable = false;
-			} else if ( list.isEmpty() ) {
+			} else if (list.isEmpty()) {
 				qualifiable = codeListItemDao.hasQualifiableItems(list, levelIdx);
 			} else {
 				qualifiable = list.isQualifiableLevel(levelIdx);
@@ -484,23 +496,23 @@ public class CodeListManager {
 	@SuppressWarnings("unchecked")
 	public <T extends CodeListItem> T loadChildItem(T parent, String code, ModelVersion version) {
 		CodeList list = parent.getCodeList();
-		if ( list.isExternal() ) {
+		if (list.isExternal()) {
 			return (T) provider.getChildItem((ExternalCodeListItem) parent, code);
-		} else if ( list.isEmpty() ) {
+		} else if (list.isEmpty()) {
 			return (T) codeListItemDao.loadItem(list, ((PersistedCodeListItem) parent).getSystemId(), code, version);
 		} else {
 			return (T) parent.getChildItem(code);
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <T extends CodeListItem> T loadParentItem(T item) {
 		CodeList list = item.getCodeList();
-		if ( list.isExternal() ) {
+		if (list.isExternal()) {
 			return (T) provider.getParentItem((ExternalCodeListItem) item);
-		} else if ( list.isEmpty() ) {
+		} else if (list.isEmpty()) {
 			Long parentId = ((PersistedCodeListItem) item).getParentId();
-			if ( parentId != null ) {
+			if (parentId != null) {
 				return (T) codeListItemDao.loadById(list, parentId);
 			} else {
 				return null;
@@ -509,33 +521,34 @@ public class CodeListManager {
 			return (T) item.getParentItem();
 		}
 	}
-	
+
 	public void visitItems(CodeList list, Visitor<CodeListItem> visitor) {
 		visitItems(list, visitor, (ModelVersion) null);
 	}
-	
+
 	public void visitItems(CodeList list, Visitor<CodeListItem> visitor, ModelVersion version) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
-		if ( persistedSurvey && list.isExternal() ) {
+		if (persistedSurvey && list.isExternal()) {
 			provider.visitItems(list, visitor);
-		} else if ( persistedSurvey && list.isEmpty() ) {
+		} else if (persistedSurvey && list.isEmpty()) {
 			codeListItemDao.visitItems(list, visitor, version);
 		} else {
 			list.visitItems(visitor, version);
 		}
 	}
-	
+
 	@Transactional
 	public void moveCodeLists(int temporarySurveyId, int publishedSurveyId) {
 		codeListItemDao.deleteBySurvey(publishedSurveyId);
 		codeListItemDao.moveItems(temporarySurveyId, publishedSurveyId);
 	}
-	
+
 	@Transactional
 	public void copyCodeLists(CollectSurvey fromSurvey, CollectSurvey toSurvey) {
-		codeListItemDao.copyItems(fromSurvey.getId(), fromSurvey.getLanguages(), toSurvey.getId(), toSurvey.getLanguages());
+		codeListItemDao.copyItems(fromSurvey.getId(), fromSurvey.getLanguages(), toSurvey.getId(),
+				toSurvey.getLanguages());
 	}
-	
+
 	@Transactional
 	public CodeList copyCodeList(CodeList list, CollectSurvey toSurvey) {
 		CodeList destCodeList = toSurvey.cloneCodeList(list);
@@ -543,29 +556,28 @@ public class CodeListManager {
 		codeListItemDao.copyItems(list, destCodeList);
 		return destCodeList;
 	}
-	
+
 	@Transactional
 	public void save(PersistedCodeListItem item) {
-		if ( item.getSystemId() == null ) {
+		if (item.getSystemId() == null) {
 			codeListItemDao.insert(item);
 		} else {
 			codeListItemDao.update(item);
 		}
 	}
-	
+
 	@Transactional
 	public void save(List<PersistedCodeListItem> items) {
 		codeListItemDao.insert(items);
 	}
-	
+
 	@Transactional
 	public void saveItemsAndDescendants(List<CodeListItem> items) {
 		List<PersistedCodeListItem> persistedItems = createPersistedItems(items, codeListItemDao.nextSystemId(), null);
 		save(persistedItems);
 	}
-	
-	protected List<PersistedCodeListItem> createPersistedItems(Collection<CodeListItem> items,
-			long nextId,
+
+	protected List<PersistedCodeListItem> createPersistedItems(Collection<CodeListItem> items, long nextId,
 			Long parentItemId) {
 		List<PersistedCodeListItem> result = new ArrayList<PersistedCodeListItem>();
 		int sortOrder = 1;
@@ -577,12 +589,12 @@ public class CodeListManager {
 			persistedChildItem.setSortOrder(sortOrder++);
 			result.add(persistedChildItem);
 			List<PersistedCodeListItem> temp = createPersistedItems(item.getChildItems(), nextId, id);
-			nextId+=temp.size();
+			nextId += temp.size();
 			result.addAll(temp);
 		}
 		return result;
 	}
-	
+
 	@Transactional
 	public void delete(CodeList codeList) {
 		Survey survey = codeList.getSurvey();
@@ -593,14 +605,14 @@ public class CodeListManager {
 	@Transactional
 	public void delete(CodeListItem item) {
 		CodeList list = item.getCodeList();
-		if ( list.isExternal() ) {
+		if (list.isExternal()) {
 			throw new UnsupportedOperationException();
-		} else if ( list.isEmpty() ) {
+		} else if (list.isEmpty()) {
 			codeListItemDao.delete((PersistedCodeListItem) item);
 		} else {
 			CodeListItem parentItem = item.getParentItem();
 			int id = item.getId();
-			if ( parentItem == null ) {
+			if (parentItem == null) {
 				CodeList codeList = item.getCodeList();
 				codeList.removeItem(id);
 			} else {
@@ -608,12 +620,12 @@ public class CodeListManager {
 			}
 		}
 	}
-	
+
 	@Transactional
 	public void deleteAllItems(CodeList list) {
-		if ( list.isExternal()) {
+		if (list.isExternal()) {
 			throw new UnsupportedOperationException();
-		} else if ( list.isEmpty() ) {
+		} else if (list.isEmpty()) {
 			codeListItemDao.deleteByCodeList(list);
 		} else {
 			list.removeAllItems();
@@ -629,14 +641,14 @@ public class CodeListManager {
 	public void deleteInvalidCodeListReferenceItems(CollectSurvey survey) {
 		codeListItemDao.deleteInvalidCodeListReferenceItems(survey);
 	}
-	
+
 	@Transactional
 	public void removeVersioningReference(CollectSurvey survey, ModelVersion version) {
 		List<CodeList> codeLists = survey.getCodeLists();
 		for (CodeList codeList : codeLists) {
-			if ( codeList.isExternal() ) {
-				//TODO
-			} else if ( codeList.isEmpty() ) {
+			if (codeList.isExternal()) {
+				// TODO
+			} else if (codeList.isEmpty()) {
 				codeListItemDao.removeVersioningInfo(codeList, version);
 			} else {
 				codeList.removeVersioningRecursive(version);
@@ -651,17 +663,17 @@ public class CodeListManager {
 			delete(codeList);
 		}
 	}
-	
+
 	@Transactional
 	public void shiftItem(CodeListItem item, int indexTo) {
 		CodeList list = item.getCodeList();
-		if ( list.isExternal() ) {
+		if (list.isExternal()) {
 			throw new UnsupportedOperationException();
-		} else if ( list.isEmpty()) {
+		} else if (list.isEmpty()) {
 			codeListItemDao.shiftItem((PersistedCodeListItem) item, indexTo);
 		} else {
 			CodeListItem parentItem = item.getParentItem();
-			if ( parentItem == null ) {
+			if (parentItem == null) {
 				CodeList codeList = item.getCodeList();
 				codeList.moveItem(item, indexTo);
 			} else {
@@ -669,40 +681,40 @@ public class CodeListManager {
 			}
 		}
 	}
-	
+
 	protected Set<CodeList> getUnusedCodeLists(CollectSurvey survey) {
 		Set<CodeList> result = new HashSet<CodeList>();
 		List<CodeList> codeLists = survey.getCodeLists();
 		for (CodeList list : codeLists) {
-			if ( ! isInUse(list) ) {
+			if (!isInUse(list)) {
 				result.add(list);
 			}
 		}
 		return result;
 	}
-	
+
 	public boolean isInUse(final CodeList list) {
 		Survey survey = list.getSurvey();
 		Schema schema = survey.getSchema();
 		NodeDefinition attrDefnUsingCodeList = schema.findNodeDefinition(new NodeDefinitionVerifier() {
 			@Override
 			public boolean verify(NodeDefinition definition) {
-				return definition instanceof CodeAttributeDefinition && 
-						((CodeAttributeDefinition) definition).getList() == list;
+				return definition instanceof CodeAttributeDefinition
+						&& ((CodeAttributeDefinition) definition).getList() == list;
 			}
 		});
 		return attrDefnUsingCodeList != null;
 	}
-	
+
 	@Transactional
 	public void persistCodeListItems(CodeList list) {
 		List<CodeListItem> items = list.getItems();
-		
+
 		saveItemsAndDescendants(items);
-		
+
 		list.removeAllItems();
 	}
-	
+
 	@Transactional
 	public void updateSurveyLanguages(CollectSurvey survey, List<String> newLanguageCodes) {
 		List<String> oldLanguageCodes = survey.getLanguages();
@@ -711,21 +723,23 @@ public class CodeListManager {
 			String oldLangCode = oldLanguageCodes.get(i);
 			int newLangCodeIndex = newLanguageCodes.indexOf(oldLangCode);
 			if (newLangCodeIndex < 0) {
-				Integer lastRemovedLangCodePosition = removedLanguageCodePositions.isEmpty() ? null: removedLanguageCodePositions.get(removedLanguageCodePositions.size() - 1);
-				if (lastRemovedLangCodePosition != null && ! lastRemovedLangCodePosition.equals(i)) {
-					throw new IllegalArgumentException("Cannot remove a language in the middle, only last languages remove is supported");
+				Integer lastRemovedLangCodePosition = removedLanguageCodePositions.isEmpty() ? null
+						: removedLanguageCodePositions.get(removedLanguageCodePositions.size() - 1);
+				if (lastRemovedLangCodePosition != null && !lastRemovedLangCodePosition.equals(i)) {
+					throw new IllegalArgumentException(
+							"Cannot remove a language in the middle, only last languages remove is supported");
 				}
 				removedLanguageCodePositions.add(i + 1);
 			} else if (newLangCodeIndex != i) {
 				throw new IllegalArgumentException("Cannot change position for language " + oldLangCode);
 			}
 		}
-		if (! removedLanguageCodePositions.isEmpty()) {
+		if (!removedLanguageCodePositions.isEmpty()) {
 			Integer fromLanguagePosition = removedLanguageCodePositions.get(0);
 			codeListItemDao.removeLabels(survey, fromLanguagePosition);
 		}
 	}
-	
+
 	public FileWrapper loadImageContent(PersistedCodeListItem item) {
 		return codeListItemDao.loadImageContent(item);
 	}
@@ -734,25 +748,24 @@ public class CodeListManager {
 	public void saveImageContent(PersistedCodeListItem item, FileWrapper fileWrapper) {
 		codeListItemDao.saveImageContent(item, fileWrapper);
 	}
-	
+
 	@Transactional
 	public void deleteImageContent(PersistedCodeListItem item) {
 		codeListItemDao.deleteImageContent(item);
 	}
-	
+
 	public long nextSystemId() {
 		return codeListItemDao.nextSystemId();
 	}
-	
-	public void setExternalCodeListProvider(
-			DatabaseExternalCodeListProvider externalCodeListProvider) {
+
+	public void setExternalCodeListProvider(DatabaseExternalCodeListProvider externalCodeListProvider) {
 		this.provider = externalCodeListProvider;
 	}
 
 	public void setCodeListItemDao(CodeListItemDao codeListItemDao) {
 		this.codeListItemDao = codeListItemDao;
 	}
-	
+
 	private CodeListItem getParentCodeListItem(CodeList list, ModelVersion version, List<String> ancestorCodes) {
 		String rootCode = ancestorCodes.get(0);
 		if (StringUtils.isBlank(rootCode)) {

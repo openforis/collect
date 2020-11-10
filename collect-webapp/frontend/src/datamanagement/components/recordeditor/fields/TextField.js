@@ -5,7 +5,7 @@ import { TextAttributeDefinition } from 'model/Survey'
 import { TextFieldDefinition } from 'model/ui/TextFieldDefinition'
 
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
-import AbstractSingleAttributeField from './AbstractSingleAttributeField'
+import AbstractField from './AbstractField'
 import * as FieldsSizes from './FieldsSizes'
 
 const tranformFunctions = {
@@ -14,7 +14,7 @@ const tranformFunctions = {
   [TextFieldDefinition.TextTranform.LOWERCASE]: (value) => value.toLowerCase(),
 }
 
-export default class TextField extends AbstractSingleAttributeField {
+export default class TextField extends AbstractField {
   constructor() {
     super()
     this.onChange = this.onChange.bind(this)

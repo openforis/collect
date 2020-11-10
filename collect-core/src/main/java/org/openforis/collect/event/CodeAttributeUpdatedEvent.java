@@ -1,5 +1,6 @@
 package org.openforis.collect.event;
 
+import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.model.Code;
 
 /**
@@ -9,5 +10,15 @@ import org.openforis.idm.model.Code;
  *
  */
 public class CodeAttributeUpdatedEvent extends AttributeValueUpdatedEvent<Code> {
+
+	private CodeListItem codeListItem;
+
+	public CodeListItem getCodeListItem() {
+		return codeListItem;
+	}
+	
+	public void setCodeListItem(CodeListItem item) {
+		this.codeListItem = item;
+	}
 
 }

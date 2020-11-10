@@ -1,10 +1,10 @@
 import React from 'react'
 import { Checkbox } from '@material-ui/core'
 
-import AbstractSingleAttributeField from './AbstractSingleAttributeField'
+import AbstractField from './AbstractField'
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 
-export default class BooleanField extends AbstractSingleAttributeField {
+export default class BooleanField extends AbstractField {
   constructor() {
     super()
     this.onChange = this.onChange.bind(this)

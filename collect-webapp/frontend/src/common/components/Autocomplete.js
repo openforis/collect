@@ -69,6 +69,11 @@ const Autocomplete = (props) => {
     }
   }, [initialInputValue])
 
+  // on inputProps change, close dialog and update state items
+  useEffect(() => {
+    setState({ open: false, items: itemsProps || [] })
+  }, [itemsProps])
+
   // on dialog open, trigger loading (if asyncrhonous)
   useEffect(() => {
     if (asynchronous) {

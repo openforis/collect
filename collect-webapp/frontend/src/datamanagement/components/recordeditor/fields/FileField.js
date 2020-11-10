@@ -12,7 +12,7 @@ import DeleteIconButton from 'common/components/DeleteIconButton'
 import Dropzone from 'common/components/Dropzone'
 import Image from 'common/components/Image'
 
-import AbstractSingleAttributeField from './AbstractSingleAttributeField'
+import AbstractField from './AbstractField'
 
 const EXTENSIONS_BY_FILE_TYPE = {
   [FileAttributeDefinition.FileTypes.AUDIO]: '.mp3,.wav,.3gp',
@@ -46,7 +46,7 @@ const FileThumbnail = (props) => {
   )
 }
 
-export default class FileField extends AbstractSingleAttributeField {
+export default class FileField extends AbstractField {
   constructor() {
     super()
 
