@@ -16,8 +16,8 @@ export default class AbstractField extends AbstractFormComponent {
       warnings: null,
     }
 
-    this.attributeUpdatedDebounced = null
-    this.onAttributeUpdate = this.onAttributeUpdate.bind(this)
+    this._updateAttributeValueDebounced = null
+    this.updateValue = this.updateValue.bind(this)
   }
 
   componentDidMount() {
@@ -42,27 +42,36 @@ export default class AbstractField extends AbstractFormComponent {
 
   getAttribute() {
     const { fieldDef, attribute: attributeParam } = this.props
+    if (fieldDef.attributeDefinition.multiple) {
+      return attributeParam
+    }
     const attributes = this.getAttributes()
-    return fieldDef.attributeDefinition.multiple ? attributeParam : attributes[0]
+    return attributes[0]
   }
 
   getAttributes() {
-    const { parentEntity, fieldDef, attribute: attributeParam } = this.props
+    const { parentEntity, fieldDef } = this.props
     const { attributeDefinitionId } = fieldDef
     return parentEntity ? parentEntity.getChildrenByDefinitionId(attributeDefinitionId) : []
   }
 
-  onAttributeUpdate({ value, debounced = true }) {
-    this.setState({ value, dirty: true })
+  updateValue({ value, debounced = true }) {
+    this.updateWithDebounce({
+      state: { value },
+      debounced,
+      updateFn: () =>
+        ServiceFactory.commandService.updateAttribute({ attribute: this.getAttribute(), valueByField: value }),
+    })
+  }
 
-    const attr = this.getAttribute()
-    if (this.attributeUpdatedDebounced) {
-      this.attributeUpdatedDebounced.cancel()
+  updateWithDebounce({ state, debounced, updateFn }) {
+    this.setState({ ...state, dirty: true })
+
+    if (this._updateAttributeValueDebounced) {
+      this._updateAttributeValueDebounced.cancel()
     }
-    this.attributeUpdatedDebounced = debounce(debounced ? 1000 : 0, false, () =>
-      ServiceFactory.commandService.updateAttribute(attr, value)
-    )
-    this.attributeUpdatedDebounced()
+    this._updateAttributeValueDebounced = debounce(debounced ? 1000 : 0, false, () => updateFn())
+    this._updateAttributeValueDebounced()
   }
 
   onRecordEvent(event) {

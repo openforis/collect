@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.metamodel.CollectAnnotations;
+import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIModelObject;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.uiconfiguration.view.Views;
@@ -65,9 +66,11 @@ public class SurveyViewGenerator {
 			UserInGroup.UserGroupRole userInSurveyGroupRole) {
 		String defaultLanguage = survey.getDefaultLanguage();
 		final CollectAnnotations annotations = survey.getAnnotations();
+		final UIConfiguration uiConfiguration = survey.getUIConfiguration();
+
 		// TODO use UIConfiguration instead
 		final UIOptions uiOptions = survey.getUIOptions();
-
+		
 		final SurveyView surveyView = new SurveyView(survey, new ViewContext(languageCode));
 
 		if (userGroup != null) {
@@ -141,9 +144,12 @@ public class SurveyViewGenerator {
 						int codeListId = codeAttrDef.getList() == null ? -1 : codeAttrDef.getList().getId();
 						CodeAttributeDefView attrDefView = new CodeAttributeDefView(id, name, label, attributeType, fieldNames, key, multiple);
 						attrDefView.setCodeListId(codeListId);
-						Integer codeAttributeDefId = codeAttrDef.getParentCodeAttributeDefinition() == null ? null
+						Integer codeParentDefId = codeAttrDef.getParentCodeAttributeDefinition() == null ? null
 								: codeAttrDef.getParentCodeAttributeDefinition().getId();
-						attrDefView.setParentCodeAttributeDefinitionId(codeAttributeDefId);
+						attrDefView.setParentCodeAttributeDefinitionId(codeParentDefId);
+						attrDefView.setShowCode(uiOptions.getShowCode(codeAttrDef));
+						attrDefView.setLayout(uiOptions.getLayoutType(codeAttrDef));
+						attrDefView.setItemsOrientation(uiOptions.getLayoutDirection(codeAttrDef));
 						view = attrDefView;
 					} else if (def instanceof CoordinateAttributeDefinition) {
 						CoordinateAttributeDefinition coordDef = (CoordinateAttributeDefinition) def;
@@ -203,7 +209,7 @@ public class SurveyViewGenerator {
 					attrDefView.setFieldLabels(fieldLabelsView);
 					attrDefView.setVisibilityByField(visibilityByField);
 				}
-				UIModelObject uiModelObject = survey.getUIConfiguration().getModelObjectByNodeDefinitionId(def.getId());
+				UIModelObject uiModelObject = uiConfiguration.getModelObjectByNodeDefinitionId(def.getId());
 				view.setHideWhenNotRelevant(uiModelObject != null && uiModelObject.isHideWhenNotRelevant());
 
 				NodeDefinition parentDef = def.getParentDefinition();

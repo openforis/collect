@@ -29,7 +29,6 @@ export default class CodeField extends AbstractField {
       ancestorCodes: null,
     }
 
-    this.onInputChange = this.onInputChange.bind(this)
     this.onCodeListItemSelect = this.onCodeListItemSelect.bind(this)
   }
 
@@ -49,9 +48,10 @@ export default class CodeField extends AbstractField {
 
   fromCodeToValue(code) {
     const { fieldDef } = this.props
-    const { layout } = fieldDef
+    const { attributeDefinition } = fieldDef
+    const { layout } = attributeDefinition
 
-    const nullCode = layout === CodeFieldDefinition.Layouts.DROPDOWN ? EMPTY_OPTION.value : ''
+    const nullCode = [CodeFieldDefinition.Layouts.DROPDOWN].includes(layout) ? EMPTY_OPTION.value : ''
     const codeUpdated = code === null ? nullCode : code
 
     return { code: codeUpdated }
@@ -153,18 +153,33 @@ export default class CodeField extends AbstractField {
     this.setState({ loading: false, selectedItems })
   }
 
-  onInputChange(event) {
-    const { fieldDef } = this.props
-    const { layout } = fieldDef
-    const debounced = layout === CodeFieldDefinition.Layouts.TEXT
-    const code = event.target.value
-    const value = this.fromCodeToValue(code)
-    this.onAttributeUpdate({ value, debounced })
-  }
+  onCodeListItemSelect(item, selected = true) {
+    const { parentEntity, fieldDef } = this.props
+    const { selectedItems } = this.state
+    const { attributeDefinition } = fieldDef
+    const { multiple } = attributeDefinition
 
-  onCodeListItemSelect(item) {
-    const value = item ? this.fromCodeToValue(item.code) : null
-    this.onAttributeUpdate({ value, debounced: false })
+    if (multiple) {
+      const selectedItemsUpdated = selected
+        ? [...selectedItems, item] // add item
+        : selectedItems.filter((itm) => itm.code !== item.code) // remove item
+
+      const values = this.extractValuesFromProps()
+      const valuesUpdated = selected
+        ? [...values, this.fromCodeToValue(item.code)] // add value
+        : values.filter((value) => value.code !== item.code) // remove value
+
+      this.updateWithDebounce({
+        state: { selectedItems: selectedItemsUpdated },
+        debounced: false,
+        updateFn: () =>
+          ServiceFactory.commandService.updateAttributes({ parentEntity, attributeDefinition, values: valuesUpdated }),
+      })
+    } else {
+      const code = selected ? item.code : null
+      const value = this.fromCodeToValue(code)
+      this.updateValue({ value, debounced: false })
+    }
   }
 
   render() {
@@ -175,7 +190,10 @@ export default class CodeField extends AbstractField {
       return <LoadingSpinnerSmall />
     }
 
-    const { attributeDefinition, layout } = fieldDef
+    const { attributeDefinition } = fieldDef
+    const { layout, showCode } = attributeDefinition
+
+    const itemLabelFunction = (item) => `${showCode ? `${item.code} - ` : ''}${item.label}`
 
     return !asynchronous && layout === CodeFieldDefinition.Layouts.RADIO ? (
       <CodeFieldRadio
@@ -183,7 +201,8 @@ export default class CodeField extends AbstractField {
         attributeDefinition={attributeDefinition}
         selectedItems={selectedItems}
         items={items}
-        onChange={this.onInputChange}
+        itemLabelFunction={itemLabelFunction}
+        onChange={this.onCodeListItemSelect}
       />
     ) : (
       <CodeFieldAutocomplete
@@ -192,7 +211,8 @@ export default class CodeField extends AbstractField {
         asynchronous={asynchronous}
         items={items}
         selectedItems={selectedItems}
-        onSelect={this.onCodeListItemSelect}
+        itemLabelFunction={itemLabelFunction}
+        onSelect={(item) => this.onCodeListItemSelect(item, true)}
       />
     )
   }

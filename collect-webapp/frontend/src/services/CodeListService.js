@@ -28,7 +28,7 @@ export default class CodeListService extends AbstractService {
     return this.postJson(`survey/${surveyId}/codelist/${codeListId}/item`, {
       versionId,
       ancestorCodes,
-      code,
+      searchString: code,
     })
   }
 }

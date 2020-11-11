@@ -28,7 +28,7 @@ export default class DateField extends AbstractField {
       return
     }
     const value = date === null ? null : fromDateToValue(date)
-    this.onAttributeUpdate({ value })
+    this.updateValue({ value })
   }
 
   render() {

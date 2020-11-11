@@ -39,13 +39,13 @@ export default class NumberField extends AbstractField {
   onTextValueChange(event) {
     const { value } = this.state
     const valueUpdated = { ...value, value: Number(event.target.value) }
-    this.onAttributeUpdate({ value: valueUpdated })
+    this.updateValue({ value: valueUpdated })
   }
 
   onUnitChange(event) {
     const { value } = this.state
     const valueUpdated = { ...value, unit: Number(event.target.value) }
-    this.onAttributeUpdate({ value: valueUpdated })
+    this.updateValue({ value: valueUpdated })
   }
 
   render() {

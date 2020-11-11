@@ -26,7 +26,7 @@ export default class TextField extends AbstractField {
     const value = event.target.value
     const valueTranformed = tranformFunctions[textTransform](value)
 
-    this.onAttributeUpdate({ value: { value: valueTranformed } })
+    this.updateValue({ value: { value: valueTranformed } })
   }
 
   render() {

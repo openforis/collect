@@ -29,8 +29,7 @@ export default class Arrays {
     if (keyProp === null) {
       return array.indexOf(item)
     } else {
-      const keyValuePairs = {}
-      keyValuePairs[keyProp] = item[keyProp]
+      const keyValuePairs = { [keyProp]: item[keyProp] }
       const idx = array.findIndex((el) => Objects.matchesKeyValuePairs(el, keyValuePairs))
       return idx
     }

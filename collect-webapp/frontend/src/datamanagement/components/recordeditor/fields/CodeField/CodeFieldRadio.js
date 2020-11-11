@@ -2,25 +2,25 @@ import React from 'react'
 import { Label, Input, FormGroup } from 'reactstrap'
 
 const CodeFieldRadio = (props) => {
-  const { parentEntity, attributeDefinition, selectedItems, items, onChange } = props
+  const { parentEntity, attributeDefinition, selectedItems, items, itemLabelFunction, onChange } = props
+  const { showCode, multiple } = attributeDefinition
 
-  const { showCode } = attributeDefinition
   return (
     <div>
       {items.map((item) => {
-        const checked = selectedItems && Boolean(selectedItems.find((selectedItem) => selectedItem.code === item.code))
+        const checked = selectedItems?.some((selectedItem) => selectedItem.code === item.code)
         return (
           <FormGroup check key={item.code}>
             <Label check>
               <Input
-                type="radio"
+                type={multiple ? 'checkbox' : 'radio'}
                 name={`code_group_${parentEntity.id}_${attributeDefinition.id}`}
                 value={item.code}
                 checked={checked}
-                onChange={onChange}
+                onChange={() => onChange(item, !checked)}
+                onClick={() => !multiple && checked && onChange(item, !checked)}
               />
-              {showCode ? `${item.code} - ` : ''}
-              {item.label}
+              {itemLabelFunction(item)}
             </Label>
           </FormGroup>
         )

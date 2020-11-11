@@ -34,7 +34,7 @@ export default class CoordinateField extends AbstractField {
         value['srs'] = null
       }
     }
-    this.onAttributeUpdate({ value })
+    this.updateValue({ value })
   }
 
   onChangeNumericField({ field, event }) {

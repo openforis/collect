@@ -22,7 +22,7 @@ const fetchCodeItems = ({ surveyId, codeListId, versionId, language, ancestorCod
   })
 
 const CodeFieldAutocomplete = (props) => {
-  const { parentEntity, fieldDef, inTable, selectedItems, asynchronous, items, onSelect } = props
+  const { parentEntity, fieldDef, inTable, selectedItems, asynchronous, items, itemLabelFunction, onSelect } = props
   const { survey, record } = parentEntity
   const { attributeDefinition } = fieldDef
 
@@ -39,7 +39,7 @@ const CodeFieldAutocomplete = (props) => {
       inputFieldWidth={FieldsSizes.getWidth({ fieldDef, inTable })}
       selectedItem={selectedItems && selectedItems.length > 0 ? selectedItems[0] : null}
       fetchFunction={fetchCodeItems({ surveyId, codeListId, versionId, language, ancestorCodes })}
-      itemLabelFunction={(item) => `${item.code}${item.label ? ` - ${item.label}` : ''}`}
+      itemLabelFunction={itemLabelFunction}
       itemSelectedFunction={(item, value) => item.code === value.code}
       onSelect={onSelect}
     />

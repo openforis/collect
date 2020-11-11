@@ -11,7 +11,7 @@ export default class BooleanField extends AbstractField {
   }
 
   onChange(event) {
-    this.onAttributeUpdate({ value: { value: event.target.checked }, debounced: false })
+    this.updateValue({ value: { value: event.target.checked }, debounced: false })
   }
 
   render() {

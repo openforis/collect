@@ -32,7 +32,7 @@ export default class TaxonField extends AbstractField {
       return (langCode) => {
         const { value } = this.state
         const valueUpdated = { ...value, [field]: langCode }
-        this.onAttributeUpdate({ value: valueUpdated, debounced: false })
+        this.updateValue({ value: valueUpdated, debounced: false })
       }
     } else {
       return (taxonOccurrence) => {
@@ -40,7 +40,7 @@ export default class TaxonField extends AbstractField {
           obj: taxonOccurrence,
           keysMapping: TaxonAttributeDefinition.FieldByValueField,
         })
-        this.setState({ previousValue: null }, () => this.onAttributeUpdate({ value, debounced: false }))
+        this.setState({ previousValue: null }, () => this.updateValue({ value, debounced: false }))
       }
     }
   }
