@@ -8,6 +8,7 @@ import org.openforis.collect.command.handler.DeleteNodeCommandHandler;
 import org.openforis.collect.command.handler.DeleteRecordHandler;
 import org.openforis.collect.command.handler.RecordCommandHandler;
 import org.openforis.collect.command.handler.UpdateAttributeCommandHandler;
+import org.openforis.collect.command.handler.UpdateMultipleAttributeCommandHandler;
 import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
@@ -45,8 +46,9 @@ public class SpringCommandDispatcher extends RegistryCommandDispatcher {
 		register(AddEntityCommand.class, addNodeCommandHandler);
 
 		UpdateAttributeCommandHandler updateAttributeCommandHandler = new UpdateAttributeCommandHandler<UpdateAttributeCommand<?>>();
+		UpdateMultipleAttributeCommandHandler updateMultipleAttributeCommandHandler = new UpdateMultipleAttributeCommandHandler<UpdateMultipleAttributeCommand<?>>();
 		register(UpdateBooleanAttributeCommand.class, updateAttributeCommandHandler);
-		register(UpdateCodeAttributeCommand.class, updateAttributeCommandHandler);
+		register(UpdateCodeAttributeCommand.class, updateMultipleAttributeCommandHandler);
 		register(UpdateCoordinateAttributeCommand.class, updateAttributeCommandHandler);
 		register(UpdateDateAttributeCommand.class, updateAttributeCommandHandler);
 		register(UpdateFileAttributeCommand.class, updateAttributeCommandHandler);

@@ -4,6 +4,7 @@ import ServiceFactory from 'services/ServiceFactory'
 import { CodeAttributeUpdatedEvent } from 'model/event/RecordEvent'
 import { CodeFieldDefinition } from 'model/ui/CodeFieldDefinition'
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
+import Strings from 'utils/Strings'
 import AbstractField from '../AbstractField'
 import CodeFieldRadio from './CodeFieldRadio'
 import CodeFieldAutocomplete from './CodeFieldAutocomplete'
@@ -159,24 +160,30 @@ export default class CodeField extends AbstractField {
     const { attributeDefinition } = fieldDef
     const { multiple } = attributeDefinition
 
+    const itemCode = item?.code
+
     if (multiple) {
       const selectedItemsUpdated = selected
         ? [...selectedItems, item] // add item
-        : selectedItems.filter((itm) => itm.code !== item.code) // remove item
+        : selectedItems.filter((itm) => itm.code !== itemCode) // remove item
 
       const values = this.extractValuesFromProps()
       const valuesUpdated = selected
         ? [...values, this.fromCodeToValue(item.code)] // add value
-        : values.filter((value) => value.code !== item.code) // remove value
+        : values.filter((value) => value.code !== itemCode) // remove value
 
       this.updateWithDebounce({
         state: { selectedItems: selectedItemsUpdated },
         debounced: false,
         updateFn: () =>
-          ServiceFactory.commandService.updateAttributes({ parentEntity, attributeDefinition, values: valuesUpdated }),
+          ServiceFactory.commandService.updateMultipleAttribute({
+            parentEntity,
+            attributeDefinition,
+            valuesByField: valuesUpdated,
+          }),
       })
     } else {
-      const code = selected ? item.code : null
+      const code = selected ? itemCode : null
       const value = this.fromCodeToValue(code)
       this.updateValue({ value, debounced: false })
     }
@@ -193,7 +200,16 @@ export default class CodeField extends AbstractField {
     const { attributeDefinition } = fieldDef
     const { layout, showCode } = attributeDefinition
 
-    const itemLabelFunction = (item) => `${showCode ? `${item.code} - ` : ''}${item.label}`
+    const itemLabelFunction = (item) => {
+      const parts = []
+      if (showCode || Strings.isBlank(item.label)) {
+        parts.push(item.code)
+      }
+      if (Strings.isNotBlank(item.label)) {
+        parts.push(item.label)
+      }
+      return parts.join(' - ')
+    }
 
     return !asynchronous && layout === CodeFieldDefinition.Layouts.RADIO ? (
       <CodeFieldRadio
