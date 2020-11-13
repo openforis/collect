@@ -6,6 +6,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ import org.openforis.collect.command.UpdateCoordinateAttributeCommand;
 import org.openforis.collect.command.UpdateDateAttributeCommand;
 import org.openforis.collect.command.UpdateFileAttributeCommand;
 import org.openforis.collect.command.UpdateIntegerAttributeCommand;
+import org.openforis.collect.command.UpdateMultipleAttributeCommand;
 import org.openforis.collect.command.UpdateRealAttributeCommand;
 import org.openforis.collect.command.UpdateTaxonAttributeCommand;
 import org.openforis.collect.command.UpdateTextAttributeCommand;
@@ -277,23 +279,18 @@ public class CommandController {
 		}
 	}
 
-	static class UpdateAttributeCommandWrapper extends UpdateAttributeCommand<Value> {
-
-		private static final long serialVersionUID = 1L;
-
-		AttributeType attributeType;
-		Type numericType;
-		Map<String, Object> valueByField;
-
-		Value extractValue(CollectSurvey survey) {
+	static class ValueExtractor {
+		@SuppressWarnings("unchecked")
+		static <V extends Value> V extractValue(AttributeType attributeType, Type numericType,
+				Map<String, Object> valueByField) {
 			if (valueByField == null) {
 				return null;
 			}
 			switch (attributeType) {
 			case BOOLEAN:
-				return new BooleanValue((Boolean) valueByField.get(BooleanAttributeDefinition.VALUE_FIELD));
+				return (V) new BooleanValue((Boolean) valueByField.get(BooleanAttributeDefinition.VALUE_FIELD));
 			case CODE:
-				return new Code((String) valueByField.get(CodeAttributeDefinition.CODE_FIELD),
+				return (V) new Code((String) valueByField.get(CodeAttributeDefinition.CODE_FIELD),
 						(String) valueByField.get(CodeAttributeDefinition.QUALIFIER_FIELD));
 			case COORDINATE:
 				Number xValue = (Number) valueByField.get(CoordinateAttributeDefinition.X_FIELD_NAME);
@@ -305,19 +302,20 @@ public class CommandController {
 				Double y = yValue == null ? null : yValue.doubleValue();
 				Double altitude = altitudeValue == null ? null : altitudeValue.doubleValue();
 				Double accuracy = accuracyValue == null ? null : accuracyValue.doubleValue();
-				return new Coordinate(x, y, srsId, altitude, accuracy);
+				return (V) new Coordinate(x, y, srsId, altitude, accuracy);
 			case DATE:
-				return new Date((Integer) valueByField.get(DateAttributeDefinition.YEAR_FIELD_NAME),
+				return (V) new Date((Integer) valueByField.get(DateAttributeDefinition.YEAR_FIELD_NAME),
 						(Integer) valueByField.get(DateAttributeDefinition.MONTH_FIELD_NAME),
 						(Integer) valueByField.get(DateAttributeDefinition.DAY_FIELD_NAME));
 			case FILE:
-				return new File((String) valueByField.get(FileAttributeDefinition.FILE_NAME_FIELD),
+				return (V) new File((String) valueByField.get(FileAttributeDefinition.FILE_NAME_FIELD),
 						(Long) valueByField.get(FileAttributeDefinition.FILE_SIZE_FIELD));
 			case NUMBER:
 				Integer unitId = (Integer) valueByField.get(NumberAttributeDefinition.UNIT_FIELD);
 				Number number = (Number) valueByField.get(NumberAttributeDefinition.VALUE_FIELD);
-				return numericType == Type.INTEGER ? new IntegerValue(number == null ? null : number.intValue(), unitId)
-						: new RealValue(number == null ? null : number.doubleValue(), unitId);
+				return (V) (numericType == Type.INTEGER
+						? new IntegerValue(number == null ? null : number.intValue(), unitId)
+						: new RealValue(number == null ? null : number.doubleValue(), unitId));
 			case TAXON:
 				String code = (String) valueByField.get(TaxonAttributeDefinition.CODE_FIELD_NAME);
 				String scientificName = (String) valueByField.get(TaxonAttributeDefinition.SCIENTIFIC_NAME_FIELD_NAME);
@@ -332,26 +330,55 @@ public class CommandController {
 						languageCode, languageVariety);
 				taxonOccurrence.setFamilyCode(familyCode);
 				taxonOccurrence.setFamilyScientificName(familyScientificName);
-				return taxonOccurrence;
+				return (V) taxonOccurrence;
 			case TEXT:
-				return new TextValue((String) valueByField.get(TextAttributeDefinition.VALUE_FIELD));
+				return (V) new TextValue((String) valueByField.get(TextAttributeDefinition.VALUE_FIELD));
 			case TIME:
 				Integer hour = (Integer) valueByField.get(TimeAttributeDefinition.HOUR_FIELD);
 				Integer minute = (Integer) valueByField.get(TimeAttributeDefinition.MINUTE_FIELD);
-				return new Time(hour, minute);
+				return (V) new Time(hour, minute);
 			default:
 				throw new IllegalStateException("Unsupported command type: " + attributeType);
 			}
 		}
+	}
+
+	static class UpdateAttributeCommandWrapper extends UpdateAttributeCommand<Value> {
+
+		private static final long serialVersionUID = 1L;
+
+		AttributeType attributeType;
+		Type numericType;
+		Map<String, Object> valueByField;
+		List<Map<String, Object>> valuesByField;
+
+		<V extends Value> V extractValue(CollectSurvey survey) {
+			return ValueExtractor.extractValue(attributeType, numericType, valueByField);
+		}
+
+		private <V extends Value> List<V> extractValues(CollectSurvey survey) {
+			if (valuesByField == null) {
+				return Collections.emptyList();
+			}
+			List<V> values = new ArrayList<V>(valuesByField.size());
+			for (Map<String, Object> valueByField : valuesByField) {
+				values.add(ValueExtractor.extractValue(attributeType, numericType, valueByField));
+			}
+			return values;
+		}
 
 		@SuppressWarnings("unchecked")
-		public UpdateAttributeCommand<Value> toCommand(CollectSurvey survey) {
-			UpdateAttributeCommand<Value> c;
+		public <V extends Value> UpdateAttributeCommand<V> toCommand(CollectSurvey survey) {
+			UpdateAttributeCommand<V> c;
 			Class<? extends UpdateAttributeCommand<?>> commandType = toCommandType();
 			try {
-				c = (UpdateAttributeCommand<Value>) commandType.getConstructor().newInstance();
-				BeanUtils.copyProperties(this, c, "attributeType", "value");
+				c = (UpdateAttributeCommand<V>) commandType.getConstructor().newInstance();
+				BeanUtils.copyProperties(this, c, "attributeType", "value", "values");
 				c.setValue(extractValue(survey));
+
+				if (c instanceof UpdateMultipleAttributeCommand) {
+					((UpdateMultipleAttributeCommand<V>) c).setValues(extractValues(survey));
+				}
 				return c;
 			} catch (Exception e) {
 				throw new RuntimeException(e);
@@ -406,6 +433,14 @@ public class CommandController {
 
 		public void setValueByField(Map<String, Object> valueByField) {
 			this.valueByField = valueByField;
+		}
+
+		public List<Map<String, Object>> getValuesByField() {
+			return valuesByField;
+		}
+
+		public void setValuesByField(List<Map<String, Object>> valuesByField) {
+			this.valuesByField = valuesByField;
 		}
 	}
 

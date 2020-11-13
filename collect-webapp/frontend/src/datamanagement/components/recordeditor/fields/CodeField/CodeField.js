@@ -3,7 +3,10 @@ import React from 'react'
 import ServiceFactory from 'services/ServiceFactory'
 import { CodeAttributeUpdatedEvent } from 'model/event/RecordEvent'
 import { CodeFieldDefinition } from 'model/ui/CodeFieldDefinition'
-import AbstractSingleAttributeField from '../AbstractSingleAttributeField'
+import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
+import Arrays from 'utils/Arrays'
+import Strings from 'utils/Strings'
+import AbstractField from '../AbstractField'
 import CodeFieldRadio from './CodeFieldRadio'
 import CodeFieldAutocomplete from './CodeFieldAutocomplete'
 
@@ -15,7 +18,7 @@ const EMPTY_OPTION = (
   </option>
 )
 
-export default class CodeField extends AbstractSingleAttributeField {
+export default class CodeField extends AbstractField {
   constructor(props) {
     super(props)
 
@@ -28,7 +31,6 @@ export default class CodeField extends AbstractSingleAttributeField {
       ancestorCodes: null,
     }
 
-    this.onInputChange = this.onInputChange.bind(this)
     this.onCodeListItemSelect = this.onCodeListItemSelect.bind(this)
   }
 
@@ -48,27 +50,20 @@ export default class CodeField extends AbstractSingleAttributeField {
 
   fromCodeToValue(code) {
     const { fieldDef } = this.props
-    const { layout } = fieldDef
+    const { attributeDefinition } = fieldDef
+    const { layout } = attributeDefinition
 
-    const nullCode = layout === CodeFieldDefinition.Layouts.DROPDOWN ? EMPTY_OPTION.value : ''
+    const nullCode = [CodeFieldDefinition.Layouts.DROPDOWN].includes(layout) ? EMPTY_OPTION.value : ''
     const codeUpdated = code === null ? nullCode : code
 
     return { code: codeUpdated }
   }
 
   onParentEntityChange() {
-    const { parentEntity, fieldDef } = this.props
-    const { attributeDefinition } = fieldDef
+    const { parentEntity } = this.props
 
     if (parentEntity) {
-      const { record } = parentEntity
-
-      const ancestorCodes = record.getAncestorCodeValues({
-        contextEntity: parentEntity,
-        attributeDefinition,
-      })
-
-      this.setState({ loading: true, ancestorCodes }, () => this.loadCodeListItems())
+      this.setState({ loading: true, items: [] }, () => this.loadCodeListItems())
     }
   }
 
@@ -89,71 +84,170 @@ export default class CodeField extends AbstractSingleAttributeField {
   }
 
   async loadCodeListItems() {
-    const { ancestorCodes } = this.state
-    const attr = this.getAttribute()
-    if (attr) {
-      const { definition, survey, record } = attr
-      const { versionId } = record
-      const { codeListId, levelIndex } = definition
+    const { parentEntity, fieldDef } = this.props
+    const { survey, record } = parentEntity
+    const { id: surveyId } = survey
+    const { versionId } = record
+    const { attributeDefinition } = fieldDef
+    const { codeListId, levelIndex } = attributeDefinition
 
-      if (levelIndex === 0 || (ancestorCodes && ancestorCodes.length >= levelIndex)) {
-        const value = this.extractValueFromProps()
+    const ancestorCodes = record.getAncestorCodeValues({
+      contextEntity: parentEntity,
+      attributeDefinition,
+    })
 
-        const count = await ServiceFactory.codeListService.countAvailableItems({
-          surveyId: survey.id,
-          codeListId,
-          versionId,
-          ancestorCodes,
-        })
+    if (levelIndex === 0 || (ancestorCodes && ancestorCodes.length == levelIndex)) {
+      const count = await ServiceFactory.codeListService.countAvailableItems({
+        surveyId,
+        codeListId,
+        versionId,
+        ancestorCodes,
+      })
 
-        const asynchronous = count > MAX_ITEMS
-        const items = asynchronous
-          ? null
-          : await ServiceFactory.codeListService.loadAllAvailableItems({
-              surveyId: survey.id,
-              codeListId,
-              versionId,
-              ancestorCodes,
-            })
-        this.setState({ loading: false, value, asynchronous, items })
-      }
+      const asynchronous = count > MAX_ITEMS
+      const items = asynchronous
+        ? null
+        : await ServiceFactory.codeListService.loadAllAvailableItems({
+            surveyId,
+            codeListId,
+            versionId,
+            ancestorCodes,
+          })
+
+      this.setState({ asynchronous, items, ancestorCodes }, () => this.updateStateFromProps())
+    } else {
+      this.setState({ loading: false, asynchronous: false, items: [] })
     }
   }
 
-  onInputChange(event) {
-    const { fieldDef } = this.props
-    const { layout } = fieldDef
-    const debounced = layout === CodeFieldDefinition.Layouts.TEXT
-    const code = event.target.value
-    const value = this.fromCodeToValue(code)
-    this.onAttributeUpdate({ value, debounced })
+  async updateStateFromProps() {
+    const { ancestorCodes, asynchronous, items } = this.state
+    const { parentEntity, fieldDef } = this.props
+
+    const values = this.extractValuesFromProps()
+
+    let selectedItems = null
+    if (asynchronous) {
+      const { survey, record } = parentEntity
+      const { id: surveyId } = survey
+      const { versionId } = record
+      const { attributeDefinition } = fieldDef
+      const { codeListId } = attributeDefinition
+
+      const selectedItemsFetched = await Promise.all(
+        values.map((value) =>
+          ServiceFactory.codeListService.loadItem({
+            surveyId,
+            codeListId,
+            versionId,
+            ancestorCodes,
+            code: value.code,
+          })
+        )
+      )
+      selectedItems = selectedItemsFetched.map((item, index) => (item ? item : values[index]))
+    } else {
+      selectedItems = values.map((value) => {
+        const item = items.find((item) => item.code === value.code)
+        return item ? item : value
+      })
+    }
+    this.setState({ loading: false, selectedItems })
   }
 
-  onCodeListItemSelect(item) {
-    const value = item ? this.fromCodeToValue(item.code) : null
-    this.onAttributeUpdate({ value, debounced: false })
+  onCodeListItemSelect(item, selected = true) {
+    const { fieldDef } = this.props
+    const { selectedItems } = this.state
+    const { attributeDefinition } = fieldDef
+    const { multiple } = attributeDefinition
+
+    const itemCode = item?.code
+
+    if (multiple) {
+      const selectedItemsUpdated = itemCode
+        ? selected
+          ? [...selectedItems, item] // add item
+          : selectedItems.filter((itm) => itm.code !== itemCode) // remove item
+        : []
+      const values = this.extractValuesFromProps()
+      const valuesUpdated = itemCode
+        ? selected
+          ? [...values, this.fromCodeToValue(itemCode)] // add value
+          : values.filter((value) => value.code !== itemCode) // remove value
+        : []
+      this._updateValues({ selectedItems: selectedItemsUpdated, valuesByField: valuesUpdated })
+    } else {
+      const code = selected ? itemCode : null
+      const value = this.fromCodeToValue(code)
+      this.updateValue({ value, debounced: false })
+    }
+  }
+
+  onCodeListItemsSelect(items) {
+    const selectedItemsUpdated = items
+    const values = this.extractValuesFromProps()
+    const selectedCodesPrev = values.map((value) => value.code)
+    const selectedCodesCurrent = items.map((item) => item.code)
+    const selectedCodesAdded = Arrays.difference(selectedCodesCurrent, selectedCodesPrev)
+    const selectedCodesRemoved = Arrays.difference(selectedCodesPrev, selectedCodesCurrent)
+    let valuesUpdated = [...values]
+    valuesUpdated = selectedCodesRemoved.reduce(
+      (valuesAcc, codeRemoved) => valuesAcc.filter((item) => item.code !== codeRemoved),
+      valuesUpdated
+    )
+    valuesUpdated = selectedCodesAdded.reduce(
+      (valuesAcc, codeAdded) => [...valuesAcc, this.fromCodeToValue(codeAdded)],
+      valuesUpdated
+    )
+    this._updateValues({ selectedItems: selectedItemsUpdated, valuesByField: valuesUpdated })
+  }
+
+  _updateValues({ selectedItems, valuesByField }) {
+    const { parentEntity, fieldDef } = this.props
+    const { attributeDefinition } = fieldDef
+
+    this.updateWithDebounce({
+      state: { selectedItems },
+      debounced: false,
+      updateFn: () =>
+        ServiceFactory.commandService.updateMultipleAttribute({
+          parentEntity,
+          attributeDefinition,
+          valuesByField,
+        }),
+    })
   }
 
   render() {
     const { fieldDef, parentEntity } = this.props
-    const { items, value, asynchronous, loading } = this.state
-    const { code } = value || {}
-
-    const selectedItem = code ? { code } : null
+    const { items, selectedItems, asynchronous, loading, ancestorCodes } = this.state
 
     if (loading) {
-      return <div>Loading...</div>
+      return <LoadingSpinnerSmall />
     }
 
-    const { attributeDefinition, layout } = fieldDef
+    const { attributeDefinition } = fieldDef
+    const { layout, showCode, multiple } = attributeDefinition
+
+    const itemLabelFunction = (item) => {
+      const parts = []
+      if (showCode || Strings.isBlank(item.label)) {
+        parts.push(item.code)
+      }
+      if (Strings.isNotBlank(item.label)) {
+        parts.push(item.label)
+      }
+      return parts.join(' - ')
+    }
 
     return !asynchronous && layout === CodeFieldDefinition.Layouts.RADIO ? (
       <CodeFieldRadio
         parentEntity={parentEntity}
         attributeDefinition={attributeDefinition}
-        selectedItem={items.find((itm) => itm.code === code)}
+        selectedItems={selectedItems}
         items={items}
-        onChange={this.onInputChange}
+        itemLabelFunction={itemLabelFunction}
+        onChange={this.onCodeListItemSelect}
       />
     ) : (
       <CodeFieldAutocomplete
@@ -161,8 +255,12 @@ export default class CodeField extends AbstractSingleAttributeField {
         fieldDef={fieldDef}
         asynchronous={asynchronous}
         items={items}
-        selectedItem={selectedItem}
-        onSelect={this.onCodeListItemSelect}
+        selectedItems={selectedItems}
+        ancestorCodes={ancestorCodes}
+        itemLabelFunction={itemLabelFunction}
+        onSelect={(selection) =>
+          multiple ? this.onCodeListItemsSelect(selection) : this.onCodeListItemSelect(selection, true)
+        }
       />
     )
   }

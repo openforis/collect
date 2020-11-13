@@ -36,11 +36,18 @@ const extractValidation = (props) => {
     warnings = null
   if (parentEntity) {
     const attrDef = itemDef.attributeDefinition
-    const attr = attrDef.multiple ? attributeParam : parentEntity.getSingleChild(attrDef.id)
-    const { errors: errorsArray, warnings: warningsArray } = attr.validationResults
-    errors = errorsArray ? errorsArray.join('; ') : null
-    warnings = warningsArray ? warningsArray.join('; ') : null
-    return { errors, warnings }
+    let attr = null
+    if (!attrDef.multiple) {
+      attr = parentEntity.getSingleChild(attrDef.id)
+    } else if (attributeParam) {
+      attr = attributeParam
+    }
+    if (attr) {
+      const { errors: errorsArray, warnings: warningsArray } = attr.validationResults
+      errors = errorsArray ? errorsArray.join('; ') : null
+      warnings = warningsArray ? warningsArray.join('; ') : null
+      return { errors, warnings }
+    }
   }
   return { errors, warnings }
 }

@@ -3,9 +3,9 @@ import React from 'react'
 import { Input } from 'reactstrap'
 
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
-import AbstractSingleAttributeField from './AbstractSingleAttributeField'
+import AbstractField from './AbstractField'
 
-export default class NumberField extends AbstractSingleAttributeField {
+export default class NumberField extends AbstractField {
   constructor(props) {
     super(props)
 
@@ -39,13 +39,13 @@ export default class NumberField extends AbstractSingleAttributeField {
   onTextValueChange(event) {
     const { value } = this.state
     const valueUpdated = { ...value, value: Number(event.target.value) }
-    this.onAttributeUpdate({ value: valueUpdated })
+    this.updateValue({ value: valueUpdated })
   }
 
   onUnitChange(event) {
     const { value } = this.state
     const valueUpdated = { ...value, unit: Number(event.target.value) }
-    this.onAttributeUpdate({ value: valueUpdated })
+    this.updateValue({ value: valueUpdated })
   }
 
   render() {

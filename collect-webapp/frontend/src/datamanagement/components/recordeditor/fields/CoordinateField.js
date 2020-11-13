@@ -6,11 +6,11 @@ import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 import Objects from 'utils/Objects'
 import L from 'utils/Labels'
 
-import AbstractSingleAttributeField from './AbstractSingleAttributeField'
+import AbstractField from './AbstractField'
 import CompositeAttributeFormItem from './CompositeAttributeFormItem'
 import { COORDINATE_FIELD_WIDTH_PX } from './FieldsSizes'
 
-export default class CoordinateField extends AbstractSingleAttributeField {
+export default class CoordinateField extends AbstractField {
   constructor() {
     super()
     this.onChangeSrs = this.onChangeSrs.bind(this)
@@ -34,7 +34,7 @@ export default class CoordinateField extends AbstractSingleAttributeField {
         value['srs'] = null
       }
     }
-    this.onAttributeUpdate({ value })
+    this.updateValue({ value })
   }
 
   onChangeNumericField({ field, event }) {

@@ -15,7 +15,7 @@ export default class CommandService extends AbstractService {
     return this.postJson('command/record/attribute/new', command)
   }
 
-  updateAttribute(attribute, valueByField) {
+  updateAttribute({ attribute, valueByField }) {
     const { record, definition, parent } = attribute
     const { attributeType } = definition
     const numericType = attributeType === AttributeDefinition.Types.NUMBER ? definition.numericType : null
@@ -30,6 +30,22 @@ export default class CommandService extends AbstractService {
       attributeType,
       numericType,
       valueByField,
+    }
+    return this.postJson('command/record/attribute', command)
+  }
+
+  updateMultipleAttribute({ parentEntity, attributeDefinition, valuesByField }) {
+    const { record } = parentEntity
+    const { attributeType, id: attributeDefinitionId } = attributeDefinition
+
+    const command = {
+      surveyId: record.survey.id,
+      recordId: record.id,
+      recordStep: record.step,
+      parentEntityPath: parentEntity.path,
+      nodeDefId: attributeDefinitionId,
+      attributeType,
+      valuesByField,
     }
     return this.postJson('command/record/attribute', command)
   }

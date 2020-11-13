@@ -3,6 +3,7 @@ import { Label, Row, Col } from 'reactstrap'
 import classNames from 'classnames'
 
 import { FieldDefinition } from 'model/ui/FieldDefinition'
+import { CodeAttributeDefinition } from 'model/Survey'
 import FormItemTypes from 'model/ui/FormItemTypes'
 import { ValidationResultFlag } from 'model/ValidationResultFlag'
 import { NodeCountUpdatedEvent, NodeCountValidationUpdatedEvent } from 'model/event/RecordEvent'
@@ -63,7 +64,10 @@ const FormItem = (props) => {
     itemDef.attributeDefinitionId || itemDef.entityDefinitionId
   }`
 
-  const InternalComponentClass = internalComponentByFieldType[itemDef.type]
+  const InternalComponentClass =
+    itemDef.attributeDefinition instanceof CodeAttributeDefinition
+      ? FormItemFieldComponent
+      : internalComponentByFieldType[itemDef.type]
 
   const internalComponent = <InternalComponentClass itemDef={itemDef} parentEntity={parentEntity} />
 

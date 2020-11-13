@@ -325,16 +325,11 @@ public class EventProducer {
 				event = new TextAttributeUpdatedEvent();
 			} else if (attribute instanceof TimeAttribute) {
 				event = new TimeAttributeUpdatedEvent();
-//			} else {
-//				TODO fail for not supported node types
-//				throw new IllegalArgumentException("Unexpected node type: " + node.getClass().getSimpleName());
 			}
-			if (event != null) {
-				event.setValue(attribute.getValue());
-				fillRecordEvent(event);
-				event.setValidationResults(new ValidationResultsView(attribute, context.messageSource, context.locale));
-				consumer.onEvent(event);
-			}
+			event.setValue(attribute.getValue());
+			fillRecordEvent(event);
+			event.setValidationResults(new ValidationResultsView(attribute, context.messageSource, context.locale));
+			consumer.onEvent(event);
 		}
 
 		void nodeDeleted() {
