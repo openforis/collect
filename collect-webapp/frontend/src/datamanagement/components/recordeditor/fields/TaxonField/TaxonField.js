@@ -4,6 +4,7 @@ import React from 'react'
 
 import { TaxonAttributeDefinition } from 'model/Survey'
 
+import Arrays from 'utils/Arrays'
 import Objects from 'utils/Objects'
 import L from 'utils/Labels'
 import Languages from 'utils/Languages'
@@ -92,7 +93,7 @@ export default class TaxonField extends AbstractField {
             disabled={!code || code !== 'UNL' || !vernacularName}
             items={langOptions}
             inputFieldWidth={FieldsSizes.TaxonFieldWidths[field]}
-            selectedItem={selectedOption}
+            selectedItems={Arrays.singleton(selectedOption)}
             itemLabelFunction={(option) => `${option.code} - ${option.label}`}
             itemSelectedFunction={(item) => item.code === langCode}
             onSelect={(option) => this.onChangeField(field)(option.code)}

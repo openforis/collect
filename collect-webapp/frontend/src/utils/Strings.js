@@ -4,15 +4,15 @@ export default class Strings {
   }
 
   static trimToEmpty(value) {
-    return value === null ? '' : value.toString().trim()
+    return value === null || value === undefined ? '' : value.toString().trim()
   }
 
   static isBlank(value) {
-    return value === null || value === undefined || value.trim().length === 0
+    return Strings.trimToEmpty(value).length === 0
   }
 
   static isNotBlank(value) {
-    return value !== null && value.trim().length > 0
+    return Strings.trimToEmpty(value).length > 0
   }
 
   static compare(a, b) {

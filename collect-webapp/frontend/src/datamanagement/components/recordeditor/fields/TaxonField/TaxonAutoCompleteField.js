@@ -4,6 +4,7 @@ import { debounce } from 'throttle-debounce'
 
 import ServiceFactory from 'services/ServiceFactory'
 import { TaxonAttributeDefinition } from 'model/Survey'
+import Arrays from 'utils/Arrays'
 import Objects from 'utils/Objects'
 
 import TaxonAutoCompleteDialogItem from './TaxonAutoCompleteDialogItem'
@@ -74,7 +75,7 @@ const TaxonAutoCompleteField = (props) => {
       asynchronous
       inputFieldValue={initialInputValue}
       inputFieldWidth={FieldsSizes.TaxonFieldWidths[field]}
-      selectedItem={selectedTaxonOccurrence}
+      selectedItems={Arrays.singleton(selectedTaxonOccurrence)}
       fetchFunction={fetchTaxa({ surveyId, fieldDef, queryField })}
       itemLabelFunction={Objects.getProp(valueField, '')}
       itemSelectedFunction={(item, value) => item.code === value.code}

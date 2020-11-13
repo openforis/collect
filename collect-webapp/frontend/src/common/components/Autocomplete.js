@@ -3,17 +3,19 @@ import PropTypes from 'prop-types'
 import MuiAutocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete'
 import { TextField } from '@material-ui/core'
 
+import Arrays from 'utils/Arrays'
 import LoadingSpinnerSmall from './LoadingSpinnerSmall'
 
 const Autocomplete = (props) => {
   const {
     asynchronous,
+    multiple,
     className,
     disabled,
     items: itemsProps,
     inputValue: initialInputValue,
     inputFieldWidth,
-    selectedItem,
+    selectedItems,
     fetchFunction,
     itemRenderFunction,
     itemLabelFunction,
@@ -27,7 +29,7 @@ const Autocomplete = (props) => {
     open: false,
     loading: false,
     items: itemsProps || [],
-    inputValue: initialInputValue,
+    inputValue: initialInputValue || selectedItems.length > 0 ? itemLabelFunction(selectedItems[0]) : '',
     fetchDebounced: null,
   })
   const setState = (stateUpdated) => setStateInternal({ ...state, ...stateUpdated })
@@ -117,9 +119,9 @@ const Autocomplete = (props) => {
       openOnFocus={false}
       onOpen={onOpen}
       onClose={onClose}
-      value={selectedItem}
+      value={multiple ? selectedItems : Arrays.head(selectedItems)}
       inputValue={inputValue}
-      onChange={(_, item) => onSelect(item, inputValue)}
+      onChange={(_, selection) => onSelect(selection, inputValue)}
       onInputChange={onInputChange}
       getOptionLabel={itemLabelFunction}
       getOptionSelected={itemSelectedFunction}
@@ -146,22 +148,24 @@ const Autocomplete = (props) => {
       renderOption={itemRenderFunction}
       className={className}
       disabled={disabled}
+      multiple={multiple}
     />
   )
 }
 
 Autocomplete.propTypes = {
   asynchronous: PropTypes.bool,
+  multiple: PropTypes.bool,
   fetchFunction: PropTypes.func,
   disabled: PropTypes.bool,
   className: PropTypes.string,
-  inputValue: PropTypes.string,
+  inputValue: PropTypes.string, // text shown in input field
   inputFieldWidth: PropTypes.number,
   items: PropTypes.array,
   itemRenderFunction: PropTypes.func,
   itemLabelFunction: PropTypes.func,
   itemSelectedFunction: PropTypes.func,
-  selectedItem: PropTypes.object,
+  selectedItems: PropTypes.array,
   onSelect: PropTypes.func.isRequired,
   onInputChange: PropTypes.func,
   onDismiss: PropTypes.func,
@@ -169,16 +173,17 @@ Autocomplete.propTypes = {
 
 Autocomplete.defaultProps = {
   asynchronous: false,
+  multiple: false,
   fetchFunction: null,
   disabled: false,
   className: null,
-  inputValue: '',
+  inputValue: null,
   inputFieldWidth: 300,
   items: [],
   itemRenderFunction: null,
   itemLabelFunction: null,
   itemSelectedFunction: null,
-  selectedItem: null,
+  selectedItems: [],
   onInputChange: () => {},
   onDismiss: () => {},
 }

@@ -135,7 +135,15 @@ export default class Arrays {
     return array2.filter((item) => array1.includes(item))
   }
 
+  static difference(array1, array2) {
+    return array1.filter((item) => !array2.includes(item))
+  }
+
   static head(array) {
     return array && array.length > 0 ? array[0] : null
+  }
+
+  static singleton(item) {
+    return item ? [item] : []
   }
 }

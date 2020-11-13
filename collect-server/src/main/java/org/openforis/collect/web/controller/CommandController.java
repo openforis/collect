@@ -6,6 +6,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -356,6 +357,9 @@ public class CommandController {
 		}
 
 		private <V extends Value> List<V> extractValues(CollectSurvey survey) {
+			if (valuesByField == null) {
+				return Collections.emptyList();
+			}
 			List<V> values = new ArrayList<V>(valuesByField.size());
 			for (Map<String, Object> valueByField : valuesByField) {
 				values.add(ValueExtractor.extractValue(attributeType, numericType, valueByField));
