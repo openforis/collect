@@ -4,6 +4,7 @@ import { debounce } from 'throttle-debounce'
 import ServiceFactory from 'services/ServiceFactory'
 import Autocomplete from 'common/components/Autocomplete'
 import * as FieldsSizes from '../FieldsSizes'
+import Strings from 'utils/Strings'
 
 const CodeFieldAutocomplete = (props) => {
   const {
@@ -22,12 +23,12 @@ const CodeFieldAutocomplete = (props) => {
   const { versionId } = record
   const { codeListId, multiple } = attributeDefinition
 
-  const language = null //TODO
+  const language = survey.defaultLanguage // TODO
   const surveyId = survey.id
 
   const fetchCodeItems = useCallback(
     ({ surveyId, codeListId, versionId, language, ancestorCodes }) => ({ searchString, onComplete }) =>
-      debounce(1000, false, async () => {
+      debounce(Strings.isBlank(searchString) ? 0 : 1000, false, async () => {
         const items = await ServiceFactory.codeListService.findAvailableItems({
           surveyId,
           codeListId,
@@ -51,6 +52,7 @@ const CodeFieldAutocomplete = (props) => {
       fetchFunction={fetchCodeItems({ surveyId, codeListId, versionId, language, ancestorCodes })}
       itemLabelFunction={itemLabelFunction}
       itemSelectedFunction={(item, value) => item.code === value.code}
+      itemRenderFunction={(item) => <div title={item.description}>{itemLabelFunction(item)}</div>}
       onSelect={onSelect}
     />
   )

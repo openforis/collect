@@ -62,7 +62,7 @@ public class CodeListController {
 		CodeList list = survey.getCodeListById(codeListId);
 		ModelVersion version = params.versionId == null ? null : survey.getVersionById(params.versionId);
 		List<CodeListItem> items = codeListManager.loadValidItems(list, version, params.ancestorCodes);
-		return toViews(items);
+		return toViews(items, params.language);
 	}
 
 	@RequestMapping(value = "survey/{surveyId}/codelist/{codeListId}/finditems", method = POST)
@@ -73,7 +73,7 @@ public class CodeListController {
 		ModelVersion version = params.versionId == null ? null : survey.getVersionById(params.versionId);
 		List<CodeListItem> items = codeListManager.findValidItems(list, version, params.language, params.ancestorCodes,
 				params.searchString);
-		return toViews(items);
+		return toViews(items, params.language);
 	}
 
 	@RequestMapping(value = "survey/{surveyId}/codelist/{codeListId}/item", method = POST)
@@ -83,7 +83,7 @@ public class CodeListController {
 		CodeList list = survey.getCodeListById(codeListId);
 		ModelVersion version = params.versionId == null ? null : survey.getVersionById(params.versionId);
 		CodeListItem item = codeListManager.loadItem(list, version, params.ancestorCodes, params.searchString);
-		return item == null ? null : toView(item);
+		return item == null ? null : toView(item, params.language);
 	}
 	
 	protected String exportCodeList(HttpServletResponse response, int surveyId, int codeListId) throws IOException {
@@ -97,18 +97,19 @@ public class CodeListController {
 		return "ok";
 	}
 
-	private List<CodeListItemView> toViews(List<CodeListItem> items) {
+	private List<CodeListItemView> toViews(List<CodeListItem> items, String langCode) {
 		List<CodeListItemView> views = new ArrayList<CodeListItemView>(items.size());
 		for (CodeListItem item : items) {
-			views.add(toView(item));
+			views.add(toView(item, langCode));
 		}
 		return views;
 	}
 
-	private CodeListItemView toView(CodeListItem item) {
+	private CodeListItemView toView(CodeListItem item, String langCode) {
 		CodeListItemView view = new CodeListItemView();
 		view.setCode(item.getCode());
-		view.setLabel(item.getLabel());
+		view.setLabel(item.getLabel(langCode));
+		view.setDescription(item.getDescription(langCode));
 		return view;
 	}
 

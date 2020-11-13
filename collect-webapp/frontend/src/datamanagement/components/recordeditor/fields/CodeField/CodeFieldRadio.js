@@ -1,6 +1,7 @@
 import React from 'react'
 import { Checkbox, FormControlLabel, Radio, RadioGroup } from '@material-ui/core'
-import { CodeAttributeDefinition } from '../../../../../model/Survey'
+
+import { CodeAttributeDefinition } from 'model/Survey'
 
 const CodeFieldRadio = (props) => {
   const { attributeDefinition, selectedItems, items, itemLabelFunction, onChange } = props
@@ -32,7 +33,15 @@ const CodeFieldRadio = (props) => {
         ) : (
           <Radio color="primary" onClick={() => onChange(item, !checked)} />
         )
-        return <FormControlLabel key={item.code} value={item.code} control={control} label={itemLabelFunction(item)} />
+        return (
+          <FormControlLabel
+            key={item.code}
+            value={item.code}
+            control={control}
+            label={itemLabelFunction(item)}
+            title={item.description}
+          />
+        )
       })}
     </Wrapper>
   )

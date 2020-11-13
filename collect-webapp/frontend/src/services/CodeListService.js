@@ -8,9 +8,10 @@ export default class CodeListService extends AbstractService {
     })
   }
 
-  loadAllAvailableItems({ surveyId, codeListId, versionId, ancestorCodes }) {
+  loadAllAvailableItems({ surveyId, codeListId, versionId, language, ancestorCodes }) {
     return this.postJson(`survey/${surveyId}/codelist/${codeListId}/validitems`, {
       versionId,
+      language,
       ancestorCodes,
     })
   }
@@ -18,15 +19,16 @@ export default class CodeListService extends AbstractService {
   findAvailableItems({ surveyId, codeListId, versionId, language, ancestorCodes, searchString }) {
     return this.postJson(`survey/${surveyId}/codelist/${codeListId}/finditems`, {
       versionId,
-      ancestorCodes,
       language,
+      ancestorCodes,
       searchString,
     })
   }
 
-  loadItem({ surveyId, codeListId, versionId, ancestorCodes, code }) {
+  loadItem({ surveyId, codeListId, versionId, language, ancestorCodes, code }) {
     return this.postJson(`survey/${surveyId}/codelist/${codeListId}/item`, {
       versionId,
+      language,
       ancestorCodes,
       searchString: code,
     })
