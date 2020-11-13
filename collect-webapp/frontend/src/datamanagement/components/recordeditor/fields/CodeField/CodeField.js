@@ -169,13 +169,7 @@ export default class CodeField extends AbstractField {
           ? [...selectedItems, item] // add item
           : selectedItems.filter((itm) => itm.code !== itemCode) // remove item
         : []
-      const values = this.extractValuesFromProps()
-      const valuesUpdated = itemCode
-        ? selected
-          ? [...values, this.fromCodeToValue(itemCode)] // add value
-          : values.filter((value) => value.code !== itemCode) // remove value
-        : []
-      this._updateValues({ selectedItems: selectedItemsUpdated, valuesByField: valuesUpdated })
+      this.onCodeListItemsSelect(selectedItemsUpdated)
     } else {
       const code = selected ? itemCode : null
       const value = this.fromCodeToValue(code)
@@ -184,6 +178,9 @@ export default class CodeField extends AbstractField {
   }
 
   onCodeListItemsSelect(items) {
+    const { parentEntity, fieldDef } = this.props
+    const { attributeDefinition } = fieldDef
+
     const selectedItemsUpdated = items
     const values = this.extractValuesFromProps()
     const selectedCodesPrev = values.map((value) => value.code)
@@ -199,21 +196,15 @@ export default class CodeField extends AbstractField {
       (valuesAcc, codeAdded) => [...valuesAcc, this.fromCodeToValue(codeAdded)],
       valuesUpdated
     )
-    this._updateValues({ selectedItems: selectedItemsUpdated, valuesByField: valuesUpdated })
-  }
-
-  _updateValues({ selectedItems, valuesByField }) {
-    const { parentEntity, fieldDef } = this.props
-    const { attributeDefinition } = fieldDef
 
     this.updateWithDebounce({
-      state: { selectedItems },
+      state: { selectedItems: selectedItemsUpdated },
       debounced: false,
       updateFn: () =>
         ServiceFactory.commandService.updateMultipleAttribute({
           parentEntity,
           attributeDefinition,
-          valuesByField,
+          valuesByField: valuesUpdated,
         }),
     })
   }

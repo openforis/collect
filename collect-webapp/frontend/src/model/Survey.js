@@ -307,6 +307,12 @@ export class CodeAttributeDefinition extends AttributeDefinition {
   codeListId
   parentCodeAttributeDefinitionId
   mandatoryFieldNames = ['code']
+  itemsOrientation
+
+  static ItemsOrientations = {
+    VERTICAL: 'VERTICAL',
+    HORIZONTAL: 'HORIZONTAL',
+  }
 
   get parentCodeAttributeDefinition() {
     const id = this.parentCodeAttributeDefinitionId

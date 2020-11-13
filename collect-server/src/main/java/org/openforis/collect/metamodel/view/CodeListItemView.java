@@ -8,6 +8,7 @@ public class CodeListItemView extends SurveyObjectView {
 	String code;
 	String label;
 	String color;
+	String description;
 	
 	List<CodeListItemView> items = new ArrayList<CodeListItemView>();
 
@@ -25,6 +26,14 @@ public class CodeListItemView extends SurveyObjectView {
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public String getColor() {

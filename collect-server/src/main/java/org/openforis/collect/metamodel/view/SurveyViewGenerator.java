@@ -233,6 +233,7 @@ public class SurveyViewGenerator {
 		itemView.id = item.getId();
 		itemView.code = item.getCode();
 		itemView.label = item.getLabel(languageCode);
+		itemView.description = item.getDescription(languageCode);
 		itemView.color = item.getColor();
 
 		List<CodeListItemView> childItemsView = new ArrayList<CodeListItemView>();
