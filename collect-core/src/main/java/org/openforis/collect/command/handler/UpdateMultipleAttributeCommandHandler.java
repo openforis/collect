@@ -18,14 +18,15 @@ public class UpdateMultipleAttributeCommandHandler<C extends UpdateMultipleAttri
 		CollectRecord record = findRecord(command);
 		Entity parentEntity = record.findNodeByPath(command.getParentEntityPath());
 		AttributeDefinition attrDef = record.getSurvey().getSchema().getDefinitionById(command.getNodeDefId());
+		@SuppressWarnings("unchecked")
+		List<Value> values = (List<Value>) command.getValues();
 		NodeChangeSet nodeChangeSet;
 		if (attrDef.isMultiple()) {
-			@SuppressWarnings("unchecked")
-			List<Value> values = (List<Value>) command.getValues();
 			nodeChangeSet = recordUpdater.updateMultipleAttribute(parentEntity, attrDef, values);
 		} else {
-			Attribute<?, Value> attribute = record.findNodeByPath(command.getNodePath());
-			nodeChangeSet = recordUpdater.updateAttribute(attribute, command.getValue());
+			Attribute<?, Value> attribute = parentEntity.getChild(attrDef);
+			Value value = values == null || values.isEmpty() ? command.getValue() : values.get(0);
+			nodeChangeSet = recordUpdater.updateAttribute(attribute, value);
 		}
 		return new RecordCommandResult(record, nodeChangeSet);
 	}
