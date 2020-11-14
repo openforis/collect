@@ -87,6 +87,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Controller
 @Scope(WebApplicationContext.SCOPE_SESSION)
 @RequestMapping("api/command")
+@Transactional
 public class CommandController {
 
 	@Autowired
@@ -105,7 +106,6 @@ public class CommandController {
 	private transient AppWS appWS;
 
 	@RequestMapping(value = "record", method = POST, consumes = APPLICATION_JSON_VALUE)
-	@Transactional
 	public @ResponseBody Response createRecord(@RequestBody CreateRecordCommand command) {
 		return submitCommand(command);
 	}
@@ -116,19 +116,16 @@ public class CommandController {
 	}
 
 	@RequestMapping(value = "record", method = DELETE, consumes = APPLICATION_JSON_VALUE)
-	@Transactional
 	public @ResponseBody Response deleteRecord(@RequestBody DeleteRecordCommand command) {
 		return submitCommand(command);
 	}
 
 	@RequestMapping(value = "record/attribute/new", method = POST, consumes = APPLICATION_JSON_VALUE)
-	@Transactional
 	public @ResponseBody Response addAttribute(@RequestBody AddAttributeCommand command) {
 		return submitCommand(command);
 	}
 
 	@RequestMapping(value = "record/attributes", method = POST, consumes = APPLICATION_JSON_VALUE)
-	@Transactional
 	public @ResponseBody Response addOrUpdateAttributes(@RequestBody UpdateAttributesCommandWrapper commandsWrapper) {
 		List<UpdateAttributeCommandWrapper> commands = commandsWrapper.getCommands();
 		if (!commands.isEmpty()) {
@@ -142,7 +139,6 @@ public class CommandController {
 	}
 
 	@RequestMapping(value = "record/attribute", method = POST, consumes = APPLICATION_JSON_VALUE)
-	@Transactional
 	public @ResponseBody Object updateAttribute(@RequestBody UpdateAttributeCommandWrapper commandWrapper) {
 		CollectSurvey survey = getSurvey(commandWrapper);
 		UpdateAttributeCommand<?> command = commandWrapper.toCommand(survey);
@@ -150,7 +146,6 @@ public class CommandController {
 	}
 
 	@RequestMapping(value = "record/attribute/file", method = POST, consumes = MULTIPART_FORM_DATA_VALUE)
-	@Transactional
 	public @ResponseBody Response updateAttributeFile(@RequestParam("command") String commandWrapperJsonString,
 			@RequestParam("file") MultipartFile multipartFile) throws Exception {
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -183,7 +178,6 @@ public class CommandController {
 	}
 
 	@RequestMapping(value = "record/attribute/file/delete", method = POST, consumes = APPLICATION_JSON_VALUE)
-	@Transactional
 	public @ResponseBody Object deleteAttributeFile(@RequestBody DeleteAttributeCommand command) throws Exception {
 		CollectSurvey survey = getSurvey(command);
 		CollectRecord record = sessionRecordProvider.provide(survey, command.getRecordId(),
@@ -201,19 +195,16 @@ public class CommandController {
 	}
 
 	@RequestMapping(value = "record/attribute/delete", method = POST, consumes = APPLICATION_JSON_VALUE)
-	@Transactional
 	public @ResponseBody Object deleteAttribute(@RequestBody DeleteAttributeCommand command) {
 		return submitCommand(command);
 	}
 
 	@RequestMapping(value = "record/entity", method = POST, consumes = APPLICATION_JSON_VALUE)
-	@Transactional
 	public @ResponseBody Object addEntity(@RequestBody AddEntityCommand command) {
 		return submitCommand(command);
 	}
 
 	@RequestMapping(value = "record/entity/delete", method = POST, consumes = APPLICATION_JSON_VALUE)
-	@Transactional
 	public @ResponseBody Object deleteEntity(@RequestBody DeleteEntityCommand command) {
 		return submitCommand(command);
 	}

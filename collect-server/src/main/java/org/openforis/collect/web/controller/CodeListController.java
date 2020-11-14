@@ -22,6 +22,8 @@ import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("api")
+@Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 public class CodeListController {
 
 	private static final String CSV_EXTENSION = ".csv";
