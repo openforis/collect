@@ -271,6 +271,7 @@ export default class CodeField extends AbstractField {
         asynchronous={asynchronous}
         items={items}
         selectedItems={selectedItems}
+        values={values}
         ancestorCodes={ancestorCodes}
         itemLabelFunction={itemLabelFunction}
         onSelect={(selection) =>
@@ -278,6 +279,7 @@ export default class CodeField extends AbstractField {
             ? this.onCodeListItemsSelect(selection)
             : this.onCodeListItemSelect({ item: selection, selected: Boolean(selection) })
         }
+        onChangeQualifier={this.onChangeQualifier}
       />
     )
   }

@@ -21,6 +21,7 @@ const Autocomplete = (props) => {
     itemLabelFunction,
     itemSelectedFunction,
     onInputChange: onInputChangeProps,
+    tagsRenderFunction,
     onSelect,
     onDismiss,
   } = props
@@ -145,6 +146,7 @@ const Autocomplete = (props) => {
           }}
         />
       )}
+      renderTags={tagsRenderFunction}
       renderOption={itemRenderFunction}
       className={className}
       disabled={disabled}
@@ -166,6 +168,7 @@ Autocomplete.propTypes = {
   itemLabelFunction: PropTypes.func,
   itemSelectedFunction: PropTypes.func,
   selectedItems: PropTypes.array,
+  tagsRenderFunction: PropTypes.func,
   onSelect: PropTypes.func.isRequired,
   onInputChange: PropTypes.func,
   onDismiss: PropTypes.func,
@@ -184,6 +187,7 @@ Autocomplete.defaultProps = {
   itemLabelFunction: null,
   itemSelectedFunction: null,
   selectedItems: [],
+  tagsRenderFunction: null,
   onInputChange: () => {},
   onDismiss: () => {},
 }

@@ -3,8 +3,10 @@ import { debounce } from 'throttle-debounce'
 
 import ServiceFactory from 'services/ServiceFactory'
 import Autocomplete from 'common/components/Autocomplete'
-import * as FieldsSizes from '../FieldsSizes'
 import Strings from 'utils/Strings'
+
+import * as FieldsSizes from '../FieldsSizes'
+import CodeFieldRadioItem from './CodeFieldRadioItem'
 
 const CodeFieldAutocomplete = (props) => {
   const {
@@ -12,11 +14,13 @@ const CodeFieldAutocomplete = (props) => {
     fieldDef,
     inTable,
     selectedItems,
+    values,
     asynchronous,
     items,
     ancestorCodes,
     itemLabelFunction,
     onSelect,
+    onChangeQualifier,
   } = props
   const { survey, record } = parentEntity
   const { attributeDefinition } = fieldDef
@@ -53,6 +57,22 @@ const CodeFieldAutocomplete = (props) => {
       itemLabelFunction={itemLabelFunction}
       itemSelectedFunction={(item, value) => item.code === value.code}
       itemRenderFunction={(item) => <div title={item.description}>{itemLabelFunction(item)}</div>}
+      tagsRenderFunction={(tagValue, getTagProps) =>
+        tagValue.map((item, index) => {
+          const tagProps = getTagProps({ index })
+          return (
+            <CodeFieldRadioItem
+              key={item.code}
+              item={item}
+              itemLabelFunction={itemLabelFunction}
+              multiple
+              onChange={tagProps.onDelete}
+              onChangeQualifier={onChangeQualifier}
+              value={values?.find((value) => value.code === item.code)}
+            />
+          )
+        })
+      }
       onSelect={onSelect}
     />
   )
