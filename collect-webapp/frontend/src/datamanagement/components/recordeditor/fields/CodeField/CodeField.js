@@ -25,6 +25,7 @@ export default class CodeField extends AbstractField {
     this.state = {
       ...this.state,
       value: { code: '' },
+      values: [],
       items: [],
       loading: true,
       asynchronous: false,
@@ -32,6 +33,7 @@ export default class CodeField extends AbstractField {
     }
 
     this.onCodeListItemSelect = this.onCodeListItemSelect.bind(this)
+    this.onChangeQualifier = this.onChangeQualifier.bind(this)
   }
 
   componentDidMount() {
@@ -153,37 +155,57 @@ export default class CodeField extends AbstractField {
         return item ? item : value
       })
     }
-    this.setState({ loading: false, selectedItems })
+    this.setState({ loading: false, selectedItems, values })
   }
 
-  onCodeListItemSelect(item, selected = true) {
+  onChangeQualifier({ code, qualifier }) {
+    const { parentEntity, fieldDef } = this.props
+    const { values } = this.state
+    const { attributeDefinition } = fieldDef
+
+    const valuesUpdated = [...values]
+    const valueIndex = values.findIndex((value) => value.code === code)
+    const value = values[valueIndex]
+    valuesUpdated[valueIndex] = { ...value, qualifier }
+
+    this.updateWithDebounce({
+      state: { values: valuesUpdated },
+      updateFn: () =>
+        ServiceFactory.commandService.updateMultipleAttribute({
+          parentEntity,
+          attributeDefinition,
+          valuesByField: valuesUpdated,
+        }),
+    })
+  }
+
+  onCodeListItemSelect({ item, selected = true }) {
     const { fieldDef } = this.props
     const { selectedItems } = this.state
     const { attributeDefinition } = fieldDef
     const { multiple } = attributeDefinition
 
-    const itemCode = item?.code
+    const code = item?.code
 
     if (multiple) {
-      const selectedItemsUpdated = itemCode
+      const selectedItemsUpdated = code
         ? selected
           ? [...selectedItems, item] // add item
-          : selectedItems.filter((itm) => itm.code !== itemCode) // remove item
+          : selectedItems.filter((itm) => itm.code !== code) // remove item
         : []
       this.onCodeListItemsSelect(selectedItemsUpdated)
     } else {
-      const code = selected ? itemCode : null
-      const value = this.fromCodeToValue(code)
+      const value = this.fromCodeToValue(selected ? code : null)
       this.updateValue({ value, debounced: false })
     }
   }
 
   onCodeListItemsSelect(items) {
     const { parentEntity, fieldDef } = this.props
+    const { values } = this.state
     const { attributeDefinition } = fieldDef
 
     const selectedItemsUpdated = items
-    const values = this.extractValuesFromProps()
     const selectedCodesPrev = values.map((value) => value.code)
     const selectedCodesCurrent = items.map((item) => item.code)
     const selectedCodesAdded = Arrays.difference(selectedCodesCurrent, selectedCodesPrev)
@@ -199,7 +221,7 @@ export default class CodeField extends AbstractField {
     )
 
     this.updateWithDebounce({
-      state: { selectedItems: selectedItemsUpdated },
+      state: { values: valuesUpdated, selectedItems: selectedItemsUpdated },
       debounced: false,
       updateFn: () =>
         ServiceFactory.commandService.updateMultipleAttribute({
@@ -212,7 +234,7 @@ export default class CodeField extends AbstractField {
 
   render() {
     const { fieldDef, parentEntity } = this.props
-    const { items, selectedItems, asynchronous, loading, ancestorCodes } = this.state
+    const { items, selectedItems, asynchronous, loading, ancestorCodes, values } = this.state
 
     if (loading) {
       return <LoadingSpinnerSmall />
@@ -236,10 +258,11 @@ export default class CodeField extends AbstractField {
       <CodeFieldRadio
         parentEntity={parentEntity}
         attributeDefinition={attributeDefinition}
-        selectedItems={selectedItems}
+        values={values}
         items={items}
         itemLabelFunction={itemLabelFunction}
         onChange={this.onCodeListItemSelect}
+        onChangeQualifier={this.onChangeQualifier}
       />
     ) : (
       <CodeFieldAutocomplete
@@ -251,7 +274,9 @@ export default class CodeField extends AbstractField {
         ancestorCodes={ancestorCodes}
         itemLabelFunction={itemLabelFunction}
         onSelect={(selection) =>
-          multiple ? this.onCodeListItemsSelect(selection) : this.onCodeListItemSelect(selection, true)
+          multiple
+            ? this.onCodeListItemsSelect(selection)
+            : this.onCodeListItemSelect({ item: selection, selected: Boolean(selection) })
         }
       />
     )

@@ -84,6 +84,8 @@ export class CodeList extends Serializable {
 export class CodeListItem extends Serializable {
   code
   label
+  description
+  qualifiable
   color
 }
 

@@ -1,14 +1,14 @@
 import React from 'react'
-import { Checkbox, FormControlLabel, Radio, RadioGroup } from '@material-ui/core'
+import { Checkbox, FormControlLabel, Radio, RadioGroup, TextField } from '@material-ui/core'
 
 import { CodeAttributeDefinition } from 'model/Survey'
 
 const CodeFieldRadio = (props) => {
-  const { attributeDefinition, selectedItems, items, itemLabelFunction, onChange } = props
+  const { attributeDefinition, values, items, itemLabelFunction, onChange, onChangeQualifier } = props
   const { multiple, itemsOrientation } = attributeDefinition
 
-  const selectedItem = multiple ? null : selectedItems[0]
-  const selectedCode = selectedItem?.code
+  const value = multiple ? null : values[0]
+  const selectedCode = value ? value.code : null
 
   const wrapperStyle = {
     display: 'flex',
@@ -27,20 +27,26 @@ const CodeFieldRadio = (props) => {
   return (
     <Wrapper>
       {items.map((item) => {
-        const checked = selectedItems?.some((selectedItem) => selectedItem.code === item.code)
+        const { code } = item
+        const value = values?.find((value) => value.code === code)
+        const selected = Boolean(value)
+        const qualifier = value?.qualifier || ''
         const control = multiple ? (
-          <Checkbox checked={checked} onChange={() => onChange(item, !checked)} />
+          <Checkbox checked={selected} color="primary" onChange={() => onChange({ item, selected: !selected })} />
         ) : (
-          <Radio color="primary" onClick={() => onChange(item, !checked)} />
+          <Radio value={code} color="primary" onClick={() => onChange({ item, selected: !selected })} />
         )
         return (
-          <FormControlLabel
-            key={item.code}
-            value={item.code}
-            control={control}
-            label={itemLabelFunction(item)}
-            title={item.description}
-          />
+          <div key={code}>
+            <FormControlLabel value={code} control={control} label={itemLabelFunction(item)} title={item.description} />
+            {item.qualifiable && selected && (
+              <TextField
+                value={qualifier}
+                variant="outlined"
+                onChange={(event) => onChangeQualifier({ code, qualifier: event.target.value })}
+              />
+            )}
+          </div>
         )
       })}
     </Wrapper>

@@ -9,6 +9,7 @@ public class CodeListItemView extends SurveyObjectView {
 	String label;
 	String color;
 	String description;
+	boolean qualifiable;
 	
 	List<CodeListItemView> items = new ArrayList<CodeListItemView>();
 
@@ -35,6 +36,14 @@ public class CodeListItemView extends SurveyObjectView {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	
+	public boolean isQualifiable() {
+		return qualifiable;
+	}
+	
+	public void setQualifiable(boolean qualifiable) {
+		this.qualifiable = qualifiable;
+	}
 
 	public String getColor() {
 		return color;
@@ -51,5 +60,5 @@ public class CodeListItemView extends SurveyObjectView {
 	public void setItems(List<CodeListItemView> items) {
 		this.items = items;
 	}
-	
+
 }

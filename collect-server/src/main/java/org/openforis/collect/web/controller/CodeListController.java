@@ -110,6 +110,7 @@ public class CodeListController {
 		view.setCode(item.getCode());
 		view.setLabel(item.getLabel(langCode));
 		view.setDescription(item.getDescription(langCode));
+		view.setQualifiable(item.isQualifiable());
 		return view;
 	}
 

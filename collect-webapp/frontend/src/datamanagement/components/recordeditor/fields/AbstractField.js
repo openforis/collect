@@ -64,13 +64,13 @@ export default class AbstractField extends AbstractFormComponent {
     })
   }
 
-  updateWithDebounce({ state, debounced, updateFn }) {
+  updateWithDebounce({ state, updateFn, debounced = true }) {
     this.setState({ ...state, dirty: true })
 
     if (this._updateAttributeValueDebounced) {
       this._updateAttributeValueDebounced.cancel()
     }
-    this._updateAttributeValueDebounced = debounce(debounced ? 1000 : 0, false, () => updateFn())
+    this._updateAttributeValueDebounced = debounce(debounced ? 1000 : 0, false, updateFn)
     this._updateAttributeValueDebounced()
   }
 
