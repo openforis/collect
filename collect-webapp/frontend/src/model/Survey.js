@@ -84,6 +84,8 @@ export class CodeList extends Serializable {
 export class CodeListItem extends Serializable {
   code
   label
+  description
+  qualifiable
   color
 }
 
@@ -307,6 +309,12 @@ export class CodeAttributeDefinition extends AttributeDefinition {
   codeListId
   parentCodeAttributeDefinitionId
   mandatoryFieldNames = ['code']
+  itemsOrientation
+
+  static ItemsOrientations = {
+    VERTICAL: 'VERTICAL',
+    HORIZONTAL: 'HORIZONTAL',
+  }
 
   get parentCodeAttributeDefinition() {
     const id = this.parentCodeAttributeDefinitionId
