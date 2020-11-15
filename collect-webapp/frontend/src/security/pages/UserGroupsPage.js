@@ -54,7 +54,7 @@ class UserGroupsPage extends AbstractItemsListPage {
 		Dialogs.confirm(L.l('userGroup.delete.confirmTitle'), confirmMessage, () => {
 			const loggedUser = this.props.loggedUser
 			this.props.dispatch(UserGroupActions.deleteUserGroups(loggedUser.id, ids))
-		}, null, {confirmButtonLabel: L.l('global.delete')})
+		}, null, {confirmButtonLabel: L.l('common.delete.label')})
 	}
 
   	render() {

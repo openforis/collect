@@ -105,7 +105,7 @@ class DataManagementPage extends React.Component {
 		Dialogs.confirm(L.l('dataManagement.deleteRecords.confirmDeleteTitle'), confirmMessage, function () {
 			deleteRecords(surveyId, loggedUserId, selectedItemIds)
 			$this.deselectAllRecords()
-		}, null, { confirmButtonLabel: L.l('global.delete') })
+		}, null, { confirmButtonLabel: L.l('common.delete.label') })
 	}
 
 	deselectAllRecords() {

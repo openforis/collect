@@ -130,7 +130,10 @@ public class SurveyViewGenerator {
 				boolean multiple = def.isMultiple();
 				NodeDefView view;
 				if (def instanceof EntityDefinition) {
-					view = new EntityDefView(((EntityDefinition) def).isRoot(), id, name, label, multiple);
+					EntityDefinition entityDefinition = (EntityDefinition) def;
+					EntityDefView entityDefView = new EntityDefView(entityDefinition.isRoot(), id, name, label, multiple);
+					entityDefView.setEnumerate(annotations.isEnumerate(entityDefinition));
+					view = entityDefView;
 				} else {
 					AttributeDefinition attrDef = (AttributeDefinition) def;
 					boolean qualifier = annotations.isQualifier(attrDef);
@@ -144,6 +147,7 @@ public class SurveyViewGenerator {
 						int codeListId = codeAttrDef.getList() == null ? -1 : codeAttrDef.getList().getId();
 						CodeAttributeDefView attrDefView = new CodeAttributeDefView(id, name, label, attributeType, fieldNames, key, multiple);
 						attrDefView.setCodeListId(codeListId);
+						attrDefView.setEnumerator(codeAttrDef.isEnumerator());
 						Integer codeParentDefId = codeAttrDef.getParentCodeAttributeDefinition() == null ? null
 								: codeAttrDef.getParentCodeAttributeDefinition().getId();
 						attrDefView.setParentCodeAttributeDefinitionId(codeParentDefId);

@@ -9,6 +9,7 @@ public class EntityDefView extends NodeDefView {
 
 	private List<NodeDefView> children;
 	private boolean root;
+	private boolean enumerate;
 	
 	public EntityDefView(boolean root, int id, String name, String label, 
 			boolean multiple) {
@@ -31,6 +32,14 @@ public class EntityDefView extends NodeDefView {
 	
 	public void setChildren(List<NodeDefView> children) {
 		this.children = children;
+	}
+
+	public boolean isEnumerate() {
+		return enumerate;
+	}
+	
+	public void setEnumerate(boolean enumerate) {
+		this.enumerate = enumerate;
 	}
 	
 }

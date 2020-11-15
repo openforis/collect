@@ -5,7 +5,7 @@ import { CodeAttributeDefinition } from 'model/Survey'
 import CodeFieldRadioItem from './CodeFieldRadioItem'
 
 const CodeFieldRadio = (props) => {
-  const { attributeDefinition, values, items, itemLabelFunction, onChange, onChangeQualifier } = props
+  const { attributeDefinition, values, items, onChange, onChangeQualifier } = props
   const { multiple, itemsOrientation } = attributeDefinition
 
   const value = multiple ? null : values[0]
@@ -19,8 +19,8 @@ const CodeFieldRadio = (props) => {
   const itemComponents = items.map((item) => (
     <CodeFieldRadioItem
       key={item.code}
+      attributeDefinition={attributeDefinition}
       item={item}
-      itemLabelFunction={itemLabelFunction}
       multiple={multiple}
       onChange={onChange}
       onChangeQualifier={onChangeQualifier}

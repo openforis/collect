@@ -198,6 +198,7 @@ export class NodeDefinition extends SurveyObject {
 
 export class EntityDefinition extends NodeDefinition {
   children = []
+  enumerated
 
   fillFromJSON(jsonObj) {
     super.fillFromJSON(jsonObj)
@@ -310,6 +311,7 @@ export class CodeAttributeDefinition extends AttributeDefinition {
   parentCodeAttributeDefinitionId
   mandatoryFieldNames = ['code']
   itemsOrientation
+  enumerator
 
   static ItemsOrientations = {
     VERTICAL: 'VERTICAL',

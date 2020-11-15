@@ -3,11 +3,11 @@ import { debounce } from 'throttle-debounce'
 
 import ServiceFactory from 'services/ServiceFactory'
 import Autocomplete from 'common/components/Autocomplete'
-import InfoIcon from 'common/components/InfoIcon'
 import Strings from 'utils/Strings'
 
 import * as FieldsSizes from '../FieldsSizes'
 import CodeFieldRadioItem from './CodeFieldRadioItem'
+import CodeFieldItemLabel from './CodeFieldItemLabel'
 
 const CodeFieldAutocomplete = (props) => {
   const {
@@ -57,18 +57,14 @@ const CodeFieldAutocomplete = (props) => {
       fetchFunction={fetchCodeItems({ surveyId, codeListId, versionId, language, ancestorCodes })}
       itemLabelFunction={itemLabelFunction}
       itemSelectedFunction={(item, value) => item.code === value.code}
-      itemRenderFunction={(item) => (
-        <span title={item.description}>
-          {itemLabelFunction(item)}
-          {item.description && <InfoIcon />}
-        </span>
-      )}
+      itemRenderFunction={(item) => <CodeFieldItemLabel item={item} attributeDefinition={attributeDefinition} />}
       tagsRenderFunction={(tagValue, getTagProps) =>
         tagValue.map((item, index) => {
           const tagProps = getTagProps({ index })
           return (
             <CodeFieldRadioItem
               key={item.code}
+              attributeDefinition={attributeDefinition}
               item={item}
               itemLabelFunction={itemLabelFunction}
               multiple

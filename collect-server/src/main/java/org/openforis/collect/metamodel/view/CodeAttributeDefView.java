@@ -13,6 +13,7 @@ public class CodeAttributeDefView extends AttributeDefView {
 	private Orientation itemsOrientation;
 	private boolean showCode;
 	private CodeAttributeLayoutType layout;
+	private boolean enumerator;
 
 	public CodeAttributeDefView(int id, String name, String label, AttributeType type, List<String> fieldNames,
 			boolean key, boolean multiple) {
@@ -59,4 +60,11 @@ public class CodeAttributeDefView extends AttributeDefView {
 		this.layout = layout;
 	}
 
+	public boolean isEnumerator() {
+		return enumerator;
+	}
+	
+	public void setEnumerator(boolean enumerator) {
+		this.enumerator = enumerator;
+	}
 }

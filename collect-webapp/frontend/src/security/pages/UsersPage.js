@@ -74,7 +74,7 @@ class UsersPage extends AbstractItemsListPage {
 		if (this.checkCanDeleteUsers()) {
 			Dialogs.confirm(L.l('user.delete.confirmTitle'), L.l(confirmMessageKey, [selectedItemIds.length]), () => {
 				dispatch(UserActions.deleteUsers(loggedUser.id, selectedItemIds))
-			}, null, {confirmButtonLabel: L.l('global.delete')})
+			}, null, {confirmButtonLabel: L.l('common.delete.label')})
 		}
 	}
 
