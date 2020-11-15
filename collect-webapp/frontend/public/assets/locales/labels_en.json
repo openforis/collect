@@ -1,6 +1,7 @@
 {
     "common": {
-        "parameters": "Parameters"
+        "parameters": "Parameters",
+        "specify": "Specify"
     },
     "general": {
         "account": "Account",

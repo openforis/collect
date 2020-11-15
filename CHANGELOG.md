@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.26.27] - NOT RELEASED YET
 ### Added
-- Data entry new UI: support hierarchical code attributes
+- Data entry new UI / code attributes: support hierarchical code list; show code item description (as tooltip); support qualifiable code list attributes (specify text)
 
 ## [3.26.26] - 2020-11-03
 ### Fixed
