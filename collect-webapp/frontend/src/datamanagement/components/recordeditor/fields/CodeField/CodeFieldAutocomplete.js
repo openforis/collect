@@ -3,6 +3,7 @@ import { debounce } from 'throttle-debounce'
 
 import ServiceFactory from 'services/ServiceFactory'
 import Autocomplete from 'common/components/Autocomplete'
+import InfoIcon from 'common/components/InfoIcon'
 import Strings from 'utils/Strings'
 
 import * as FieldsSizes from '../FieldsSizes'
@@ -56,7 +57,12 @@ const CodeFieldAutocomplete = (props) => {
       fetchFunction={fetchCodeItems({ surveyId, codeListId, versionId, language, ancestorCodes })}
       itemLabelFunction={itemLabelFunction}
       itemSelectedFunction={(item, value) => item.code === value.code}
-      itemRenderFunction={(item) => <div title={item.description}>{itemLabelFunction(item)}</div>}
+      itemRenderFunction={(item) => (
+        <span title={item.description}>
+          {itemLabelFunction(item)}
+          {item.description && <InfoIcon />}
+        </span>
+      )}
       tagsRenderFunction={(tagValue, getTagProps) =>
         tagValue.map((item, index) => {
           const tagProps = getTagProps({ index })
