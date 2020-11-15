@@ -449,7 +449,6 @@ input.is-invalid.warning:focus {
 
 .MuiAutocomplete-root {
   padding: 0;
-  height: 40px;
 }
 
 .MuiInputBase-root.MuiOutlinedInput-root.MuiAutocomplete-inputRoot {

@@ -695,7 +695,7 @@ public class SurveyManager {
 			if (survey.isTemporary()) {
 				survey.setAvailability(UNPUBLISHED);
 			}
-			codeListManager.deleteInvalidCodeListReferenceItems(survey);
+			//codeListManager.deleteInvalidCodeListReferenceItems(survey);
 			survey.getUIOptions().removeUnassignedTabs();
 			
 			if ( survey.getSamplingDesignCodeList() == null ) {
