@@ -93,4 +93,8 @@ export class TableDefinition extends UIModelObjectDefinition {
   get entityDefinition() {
     return this.survey.schema.getDefinitionById(this.entityDefinitionId)
   }
+
+  get nodeDefinition() {
+    return this.entityDefinition
+  }
 }

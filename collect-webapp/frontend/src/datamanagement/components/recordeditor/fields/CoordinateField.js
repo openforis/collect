@@ -1,5 +1,5 @@
 import React from 'react'
-import { Input } from 'reactstrap'
+import { MenuItem, Select, TextField as MuiTextField } from '@material-ui/core'
 import { CoordinateAttributeDefinition } from 'model/Survey'
 
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
@@ -53,15 +53,16 @@ export default class CoordinateField extends AbstractField {
   render() {
     const { inTable, fieldDef } = this.props
     const { dirty, value } = this.state
-    const { srs } = value || {}
+    const { srs = '' } = value || {}
     const { attributeDefinition } = fieldDef
     const { availableFieldNames } = attributeDefinition
 
     const numericField = ({ field }) => (
-      <Input
+      <MuiTextField
         key={field}
         value={Objects.getProp(field, '')(value)}
         type="number"
+        variant="outlined"
         onChange={(event) => this.onChangeNumericField({ field, event })}
         style={{ width: COORDINATE_FIELD_WIDTH_PX }}
       />
@@ -70,28 +71,21 @@ export default class CoordinateField extends AbstractField {
     const inputFields = availableFieldNames.map((field) => {
       if (field === CoordinateAttributeDefinition.Fields.SRS) {
         const srss = this.getSpatialReferenceSystems()
+        const style = { width: COORDINATE_FIELD_WIDTH_PX }
 
         return srss.length === 1 ? (
-          <Input key="srs" value={srss[0].label} readOnly style={{ width: COORDINATE_FIELD_WIDTH_PX }} />
+          <MuiTextField key="srs" variant="outlined" value={srss[0].label} readOnly style={style} />
         ) : (
-          <Input
-            key="srs"
-            value={srs}
-            type="select"
-            onChange={this.onChangeSrs}
-            style={{ width: COORDINATE_FIELD_WIDTH_PX }}
-          >
-            {[
-              <option key="empty" value="">
-                Select...
-              </option>,
-              ...srss.map((srs) => (
-                <option key={srs.id} value={srs.id}>
-                  {srs.label}
-                </option>
-              )),
-            ]}
-          </Input>
+          <Select key="srs" value={srs} variant="outlined" onChange={this.onChangeSrs} style={style}>
+            <MenuItem key="empty" value="">
+              <em>Select...</em>
+            </MenuItem>
+            {srss.map((srs) => (
+              <MenuItem key={srs.id} value={srs.id}>
+                {srs.label}
+              </MenuItem>
+            ))}
+          </Select>
         )
       }
       return numericField({ field })

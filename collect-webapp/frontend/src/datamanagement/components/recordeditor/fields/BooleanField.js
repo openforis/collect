@@ -20,7 +20,7 @@ export default class BooleanField extends AbstractField {
     const checked = value || false
     return (
       <div>
-        <Checkbox checked={checked} onChange={this.onChange} />
+        <Checkbox color="primary" checked={checked} onChange={this.onChange} />
         {dirty && <LoadingSpinnerSmall />}
       </div>
     )

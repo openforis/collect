@@ -1,5 +1,5 @@
 import React from 'react'
-import { Input } from 'reactstrap'
+import MuiTextField from '@material-ui/core/TextField'
 
 import { TextAttributeDefinition } from 'model/Survey'
 import { TextFieldDefinition } from 'model/ui/TextFieldDefinition'
@@ -41,10 +41,11 @@ export default class TextField extends AbstractField {
 
     return (
       <>
-        <Input
+        <MuiTextField
           value={text}
           type={inputFieldType}
           onChange={this.onChange}
+          variant="outlined"
           style={{ width: FieldsSizes.getWidth({ fieldDef, inTable }) }}
         />
         {dirty && <LoadingSpinnerSmall />}

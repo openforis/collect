@@ -211,6 +211,7 @@ export default class Table extends EntityCollectionComponent {
         <TableVirtualized
           headerRowRenderer={this.headerRowRenderer}
           width={totalWidth}
+          className="form-item-table"
           rowStyle={{ display: 'grid', gridTemplateColumns }}
           height={300}
           rowHeight={40}

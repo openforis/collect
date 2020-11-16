@@ -1,6 +1,5 @@
-import { FormControl, InputLabel, Select } from '@material-ui/core'
 import React from 'react'
-import { Input } from 'reactstrap'
+import { FormControl, InputLabel, Select, TextField as MuiTextField } from '@material-ui/core'
 
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 import AbstractField from './AbstractField'
@@ -60,7 +59,7 @@ export default class NumberField extends AbstractField {
     return (
       <>
         <div style={hasPrecisions ? { display: 'grid', gridTemplateColumns: '1fr 150px' } : null}>
-          <Input type="number" value={text} onChange={this.onTextValueChange} />
+          <MuiTextField variant="outlined" type="number" value={text} onChange={this.onTextValueChange} />
 
           {hasPrecisions && (
             <FormControl>
