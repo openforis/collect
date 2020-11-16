@@ -11,17 +11,23 @@ import AbstractFormComponent from './AbstractFormComponent'
 
 const FormItemsItem = (props) => {
   const { itemDef, parentEntity, fullSize } = props
+  const { nodeDefinition } = itemDef
+  const { id: nodeDefId, hideWhenNotRelevant } = nodeDefinition
+  const relevant = parentEntity.childrenRelevanceByDefinitionId[nodeDefId]
+  const visible = relevant || !hideWhenNotRelevant
 
-  const nodeDefinition = itemDef.attributeDefinition || itemDef.entityDefinition
-  const relevant = parentEntity.childrenRelevanceByDefinitionId[nodeDefinition.id]
-  const visible = relevant || !nodeDefinition.hideWhenNotRelevant
+  const className = classnames('form-item-external-wrapper', { 'full-height': fullSize, 'not-relevant': !relevant })
 
-  return (
+  const formItem = <FormItem parentEntity={parentEntity} itemDef={itemDef} fullSize={fullSize} />
+
+  return hideWhenNotRelevant ? (
     visible && (
-      <Fade in={visible} className={classnames('form-item-external-wrapper', { 'full-height': fullSize })}>
-        <FormItem parentEntity={parentEntity} itemDef={itemDef} fullSize={fullSize} />
+      <Fade in={visible} className={className}>
+        {formItem}
       </Fade>
     )
+  ) : (
+    <div className={className}>{formItem}</div>
   )
 }
 

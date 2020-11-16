@@ -416,6 +416,14 @@ input.is-invalid.warning:focus {
   margin-top: 4px;
 }
 
+.form-item-external-wrapper.not-relevant input {
+  background-color: #d4d4d4;
+}
+
+.form-item-external-wrapper.not-relevant label {
+  font-style: italic;
+}
+
 /**
 * === VALIDATION FEEDBACK
 **/
@@ -429,7 +437,8 @@ input.is-invalid.warning:focus {
   border: 1px solid red;
 }
 
-.form-item-field-wrapper.error input {
+.form-item-field-wrapper.error input,
+.form-item-field-wrapper.error .MuiSelect-select {
   background-color: #ffdbdb;
 }
 
