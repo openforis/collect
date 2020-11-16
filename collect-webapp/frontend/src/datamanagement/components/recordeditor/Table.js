@@ -6,11 +6,12 @@ import { Button } from 'reactstrap'
 
 import { CoordinateAttributeDefinition, TaxonAttributeDefinition } from 'model/Survey'
 import { ColumnGroupDefinition } from 'model/ui/TableDefinition'
+import L from 'utils/Labels'
+import DeleteIconButton from 'common/components/DeleteIconButton'
 
 import EntityCollectionComponent from './EntityCollectionComponent'
 import FormItemFieldComponent from './FormItemFieldComponent'
 import * as FieldsSizes from './fields/FieldsSizes'
-import L from 'utils/Labels'
 
 const ROW_NUMBER_COLUMN_WIDTH = 60
 const DELETE_COLUMN_WIDTH = 60
@@ -124,7 +125,8 @@ export default class Table extends EntityCollectionComponent {
     const { itemDef } = this.props
     const readOnly = false
 
-    const { headingColumns, showRowNumbers } = itemDef
+    const { headingColumns, showRowNumbers, entityDefinition } = itemDef
+    const { enumerate } = entityDefinition
     const headingColumnWidths = headingColumns.reduce((acc, headingColumn) => {
       acc.push(calculateWidth(headingColumn))
       return acc
@@ -135,7 +137,7 @@ export default class Table extends EntityCollectionComponent {
       columnWidths.push(ROW_NUMBER_COLUMN_WIDTH)
     }
     columnWidths.push(...headingColumnWidths)
-    if (!readOnly) {
+    if (!readOnly && !enumerate) {
       columnWidths.push(DELETE_COLUMN_WIDTH)
     }
     const totalWidth = columnWidths.reduce((acc, width) => acc + width, 0)
@@ -143,6 +145,7 @@ export default class Table extends EntityCollectionComponent {
 
     this.setState({
       ...this.state,
+      entities: this.determineEntities(),
       totalWidth,
       gridTemplateColumns,
     })
@@ -155,7 +158,8 @@ export default class Table extends EntityCollectionComponent {
   headerRowRenderer() {
     const { itemDef } = this.props
     const { gridTemplateColumns } = this.state
-    const { headingRows, totalHeadingColumns, showRowNumbers } = itemDef
+    const { headingRows, totalHeadingColumns, showRowNumbers, entityDefinition } = itemDef
+    const { enumerate } = entityDefinition
     const readOnly = false
 
     return (
@@ -168,7 +172,7 @@ export default class Table extends EntityCollectionComponent {
             totalHeadingColumns={totalHeadingColumns}
             firstRow={index === 0}
             includeRowNumberColumn={showRowNumbers}
-            includeDeleteColumn={!readOnly}
+            includeDeleteColumn={!readOnly && !enumerate}
           />
         ))}
       </div>
@@ -189,21 +193,17 @@ export default class Table extends EntityCollectionComponent {
   }
 
   deleteCellRenderer({ rowData: entity }) {
-    return (
-      <div>
-        <Button color="danger" onClick={() => this.handleDeleteButtonClick(entity)}>
-          <span className="fa fa-trash" />
-        </Button>
-      </div>
-    )
+    return <DeleteIconButton onClick={() => this.handleDeleteButtonClick(entity)} />
   }
 
   render() {
     const { itemDef } = this.props
     const { totalWidth, gridTemplateColumns, entities } = this.state
 
-    const { headingColumns, showRowNumbers } = itemDef
+    const { headingColumns, showRowNumbers, entityDefinition } = itemDef
+    const { enumerate } = entityDefinition
     const readOnly = false
+    const canAddOrDeleteRows = !readOnly && !enumerate
 
     return (
       <fieldset>
@@ -240,9 +240,8 @@ export default class Table extends EntityCollectionComponent {
                 className="grid-cell"
               />
             )),
-            ...(readOnly
-              ? []
-              : [
+            ...(canAddOrDeleteRows
+              ? [
                   <Column
                     key="delete-col"
                     width={DELETE_COLUMN_WIDTH}
@@ -250,12 +249,15 @@ export default class Table extends EntityCollectionComponent {
                     cellRenderer={this.deleteCellRenderer}
                     className="grid-cell"
                   />,
-                ]),
+                ]
+              : []),
           ]}
         </TableVirtualized>
-        <Button variant="outlined" color="primary" onClick={this.handleNewButtonClick}>
-          Add
-        </Button>
+        {canAddOrDeleteRows && (
+          <Button variant="outlined" color="primary" onClick={this.handleNewButtonClick}>
+            {L.l('common.add')}
+          </Button>
+        )}
       </fieldset>
     )
   }

@@ -399,6 +399,13 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 			return idx;
 		}
 	}
+	
+	public boolean isEnumerator() {
+		EntityDefinition parentDefinition = (EntityDefinition) getParentDefinition();
+		return isKey() 
+				&& parentDefinition.isEnumerable() 
+				&& parentDefinition.isEnumerate();
+	}
 
 	public boolean isAllowValuesSorting() {
 		return allowValuesSorting;

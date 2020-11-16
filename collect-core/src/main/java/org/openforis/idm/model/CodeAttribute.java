@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
-import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 
 /**
@@ -134,9 +133,6 @@ public class CodeAttribute extends Attribute<CodeAttributeDefinition, Code> {
 	}
 
 	public boolean isEnumerator() {
-		EntityDefinition parentDefinition = (EntityDefinition) definition.getParentDefinition();
-		return definition.isKey() 
-				&& parentDefinition.isEnumerable() 
-				&& parentDefinition.isEnumerate();
+		return definition.isEnumerator();
 	}
 }

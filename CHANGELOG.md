@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.26.27] - NOT RELEASED YET
+## [3.26.27] - 2020-11-15
 ### Added
 - Data entry new UI / code attributes: support hierarchical code list; show code item description (as tooltip); support qualifiable code list attributes (specify text)
 

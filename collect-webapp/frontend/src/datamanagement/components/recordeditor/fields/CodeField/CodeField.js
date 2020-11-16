@@ -1,14 +1,19 @@
 import React from 'react'
+import { InputLabel } from '@material-ui/core'
 
 import ServiceFactory from 'services/ServiceFactory'
 import { CodeAttributeUpdatedEvent } from 'model/event/RecordEvent'
 import { CodeFieldDefinition } from 'model/ui/CodeFieldDefinition'
+
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
+
 import Arrays from 'utils/Arrays'
-import Strings from 'utils/Strings'
+
 import AbstractField from '../AbstractField'
 import CodeFieldRadio from './CodeFieldRadio'
 import CodeFieldAutocomplete from './CodeFieldAutocomplete'
+import CodeFieldItemLabel, { itemLabelFunction } from './CodeFieldItemLabel'
+import * as FieldsSizes from '../FieldsSizes'
 
 const MAX_ITEMS = 100
 
@@ -98,7 +103,7 @@ export default class CodeField extends AbstractField {
       attributeDefinition,
     })
 
-    if (levelIndex === 0 || (ancestorCodes && ancestorCodes.length == levelIndex)) {
+    if (levelIndex === 0 || (ancestorCodes && ancestorCodes.length === levelIndex)) {
       const count = await ServiceFactory.codeListService.countAvailableItems({
         surveyId,
         codeListId,
@@ -241,30 +246,29 @@ export default class CodeField extends AbstractField {
     }
 
     const { attributeDefinition } = fieldDef
-    const { layout, showCode, multiple } = attributeDefinition
+    const { layout, multiple, enumerator } = attributeDefinition
 
-    const itemLabelFunction = (item) => {
-      const parts = []
-      if (showCode || Strings.isBlank(item.label)) {
-        parts.push(item.code)
-      }
-      if (Strings.isNotBlank(item.label)) {
-        parts.push(item.label)
-      }
-      return parts.join(' - ')
+    if (enumerator) {
+      return (
+        <InputLabel style={{ width: FieldsSizes.getWidth({ fieldDef, textAlign: 'left' }) }}>
+          <CodeFieldItemLabel item={Arrays.head(selectedItems)} attributeDefinition={attributeDefinition} />
+        </InputLabel>
+      )
     }
 
-    return !asynchronous && layout === CodeFieldDefinition.Layouts.RADIO ? (
-      <CodeFieldRadio
-        parentEntity={parentEntity}
-        attributeDefinition={attributeDefinition}
-        values={values}
-        items={items}
-        itemLabelFunction={itemLabelFunction}
-        onChange={this.onCodeListItemSelect}
-        onChangeQualifier={this.onChangeQualifier}
-      />
-    ) : (
+    if (!asynchronous && layout === CodeFieldDefinition.Layouts.RADIO) {
+      return (
+        <CodeFieldRadio
+          parentEntity={parentEntity}
+          attributeDefinition={attributeDefinition}
+          values={values}
+          items={items}
+          onChange={this.onCodeListItemSelect}
+          onChangeQualifier={this.onChangeQualifier}
+        />
+      )
+    }
+    return (
       <CodeFieldAutocomplete
         parentEntity={parentEntity}
         fieldDef={fieldDef}
@@ -273,7 +277,7 @@ export default class CodeField extends AbstractField {
         selectedItems={selectedItems}
         values={values}
         ancestorCodes={ancestorCodes}
-        itemLabelFunction={itemLabelFunction}
+        itemLabelFunction={itemLabelFunction(attributeDefinition)}
         onSelect={(selection) =>
           multiple
             ? this.onCodeListItemsSelect(selection)

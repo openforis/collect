@@ -8,11 +8,11 @@ const DeleteIconButton = (props) => {
   const { onClick: onClickParam, confirmTitle, confirmMessage } = props
 
   const onClick = () => {
-    const confirmTitleFinal = confirmTitle || L.l('global.deleteConfirmTitle')
-    const confirmMessageFinal = confirmMessage || L.l('global.deleteConfirmMessage')
+    const confirmTitleFinal = confirmTitle || L.l('common.delete.confirm.title')
+    const confirmMessageFinal = confirmMessage || L.l('common.delete.confirm.message')
 
     Dialogs.confirm(confirmTitleFinal, confirmMessageFinal, onClickParam, null, {
-      confirmButtonLabel: L.l('global.delete'),
+      confirmButtonLabel: L.l('common.delete.label'),
     })
   }
 

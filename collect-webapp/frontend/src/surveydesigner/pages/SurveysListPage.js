@@ -84,9 +84,9 @@ class SurveysListPage extends React.Component {
                 Dialogs.confirm(L.l('survey.delete.published.confirm.title'),
                     L.l('survey.delete.published.confirm.message', survey.name), () => {
                         this.performSurveyDelete(survey)
-                    }, null, { confirmButtonLabel: L.l('global.delete') })
+                    }, null, { confirmButtonLabel: L.l('common.delete.label') })
             }
-        }, null, { confirmButtonLabel: L.l('global.delete') })
+        }, null, { confirmButtonLabel: L.l('common.delete.label') })
     }
 
     performSurveyDelete(survey) {
@@ -272,7 +272,7 @@ class SurveysListPage extends React.Component {
                                     }
                                     <DropdownItem color="primary" onClick={this.handleCloneButtonClick}><i className="fa fa-clone" aria-hidden="true"></i>{L.l('survey.clone')}</DropdownItem>
                                     <DropdownItem divider />
-                                    <DropdownItem color="danger" onClick={this.handleDeleteButtonClick}><i className="fa fa-trash" />{L.l('global.delete')}</DropdownItem>
+                                    <DropdownItem color="danger" onClick={this.handleDeleteButtonClick}><i className="fa fa-trash" />{L.l('common.delete.label')}</DropdownItem>
                                 </DropdownMenu>
                             </UncontrolledButtonDropdown>
                         </Col>
