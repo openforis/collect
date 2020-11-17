@@ -7,14 +7,18 @@ import CodeFieldItemLabel from './CodeFieldItemLabel'
 
 const CodeFieldRadioItem = (props) => {
   const { item, attributeDefinition, multiple, onChange, onChangeQualifier, value } = props
+  const { calculated } = attributeDefinition
   const { code } = item
   const selected = Boolean(value)
   const qualifier = value?.qualifier || ''
-  const control = multiple ? (
-    <Checkbox checked={selected} color="primary" onChange={() => onChange({ item, selected: !selected })} />
-  ) : (
-    <Radio value={code} color="primary" onClick={() => onChange({ item, selected: !selected })} />
-  )
+
+  const commonProps = {
+    color: 'primary',
+    disabled: calculated,
+    onChange: () => onChange({ item, selected: !selected }),
+  }
+  const control = multiple ? <Checkbox checked={selected} {...commonProps} /> : <Radio value={code} {...commonProps} />
+
   return (
     <div key={code} style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline' }}>
       <FormControlLabel
@@ -28,6 +32,7 @@ const CodeFieldRadioItem = (props) => {
           value={qualifier}
           variant="outlined"
           placeholder={L.l('common.specify')}
+          disabled={calculated}
           onChange={(event) => onChangeQualifier({ code, qualifier: event.target.value })}
         />
       )}

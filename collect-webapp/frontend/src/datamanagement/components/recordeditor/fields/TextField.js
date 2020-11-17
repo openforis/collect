@@ -35,7 +35,7 @@ export default class TextField extends AbstractField {
     const { value } = valueState || {}
     const text = value || ''
     const { attributeDefinition } = fieldDef
-    const { textType } = attributeDefinition
+    const { textType, calculated } = attributeDefinition
 
     const inputFieldType = textType === TextAttributeDefinition.TextTypes.MEMO ? 'textarea' : 'text'
 
@@ -46,6 +46,7 @@ export default class TextField extends AbstractField {
           type={inputFieldType}
           onChange={this.onChange}
           variant="outlined"
+          disabled={calculated}
           style={{ width: FieldsSizes.getWidth({ fieldDef, inTable }) }}
         />
         {dirty && <LoadingSpinnerSmall />}

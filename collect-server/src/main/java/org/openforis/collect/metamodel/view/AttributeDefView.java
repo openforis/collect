@@ -14,42 +14,43 @@ public class AttributeDefView extends NodeDefView {
 	private boolean showInRecordSummaryList;
 	private boolean qualifier;
 	private Map<String, Boolean> visibilityByField;
-	
-	public AttributeDefView(int id, String name, String label, AttributeType type, 
-			List<String> fieldNames, boolean key, boolean multiple) {
+	private boolean calculated;
+
+	public AttributeDefView(int id, String name, String label, AttributeType type, List<String> fieldNames, boolean key,
+			boolean multiple) {
 		super(id, name, label, NodeType.ATTRIBUTE, key, multiple);
 		this.attributeType = type;
 		this.fieldNames = fieldNames;
 	}
-	
+
 	public AttributeType getAttributeType() {
 		return attributeType;
 	}
-	
+
 	public List<String> getFieldNames() {
 		return this.fieldNames;
 	}
-	
+
 	public boolean isShowInRecordSummaryList() {
 		return showInRecordSummaryList;
 	}
-	
+
 	public void setShowInRecordSummaryList(boolean showInRecordSummaryList) {
 		this.showInRecordSummaryList = showInRecordSummaryList;
 	}
-	
+
 	public boolean isQualifier() {
 		return qualifier;
 	}
-	
+
 	public void setQualifier(boolean qualifier) {
 		this.qualifier = qualifier;
 	}
-	
+
 	public List<String> getFieldLabels() {
 		return fieldLabels;
 	}
-	
+
 	public void setFieldLabels(List<String> fieldLabels) {
 		this.fieldLabels = fieldLabels;
 	}
@@ -57,8 +58,17 @@ public class AttributeDefView extends NodeDefView {
 	public Map<String, Boolean> getVisibilityByField() {
 		return visibilityByField;
 	}
-	
+
 	public void setVisibilityByField(Map<String, Boolean> visibilityByField) {
 		this.visibilityByField = visibilityByField;
 	}
+
+	public boolean isCalculated() {
+		return calculated;
+	}
+
+	public void setCalculated(boolean calculated) {
+		this.calculated = calculated;
+	}
+
 }

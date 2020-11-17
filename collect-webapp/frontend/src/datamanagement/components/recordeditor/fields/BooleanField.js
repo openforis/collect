@@ -1,4 +1,5 @@
 import React from 'react'
+import classNames from 'classnames'
 import { Checkbox } from '@material-ui/core'
 
 import AbstractField from './AbstractField'
@@ -15,12 +16,28 @@ export default class BooleanField extends AbstractField {
   }
 
   render() {
+    const { fieldDef } = this.props
     const { dirty, value: valueState = {} } = this.state
+    const { attributeDefinition } = fieldDef
+    const { calculated } = attributeDefinition
     const { value } = valueState || {}
     const checked = value || false
+
     return (
       <div>
-        <Checkbox color="primary" checked={checked} onChange={this.onChange} />
+        <Checkbox
+          color="primary"
+          className={classNames({ readOnly: calculated })}
+          checked={checked}
+          onChange={(event) => {
+            if (calculated) {
+              event.preventDefault()
+              event.stopPropagation()
+            } else {
+              this.onChange(event)
+            }
+          }}
+        />
         {dirty && <LoadingSpinnerSmall />}
       </div>
     )

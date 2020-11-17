@@ -33,6 +33,9 @@ export default class TimeField extends AbstractField {
   render() {
     const { fieldDef, inTable } = this.props
     const { dirty, value: valueState } = this.state
+    const { attributeDefinition } = fieldDef
+    const { calculated } = attributeDefinition
+
     const selectedTime = fromValueToDate(valueState)
     const width = FieldSizes.getWidth({ fieldDef, inTable })
 
@@ -45,6 +48,7 @@ export default class TimeField extends AbstractField {
             format={Dates.TIME_FORMAT}
             ampm={false}
             margin="none"
+            disabled={calculated}
             value={selectedTime}
             onChange={this.onChange}
             keyboardIcon={<span className="far fa-clock" />}

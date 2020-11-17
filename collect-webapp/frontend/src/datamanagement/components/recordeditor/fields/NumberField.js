@@ -1,7 +1,9 @@
 import React from 'react'
+import classNames from 'classnames'
 import { FormControl, InputLabel, Select, TextField as MuiTextField } from '@material-ui/core'
 
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
+import L from 'utils/Labels'
 import AbstractField from './AbstractField'
 
 export default class NumberField extends AbstractField {
@@ -51,20 +53,35 @@ export default class NumberField extends AbstractField {
     const { fieldDef } = this.props
     const { dirty, value: valueState } = this.state
     const { value, unit: unitId } = valueState || {}
+    const { attributeDefinition: attrDef } = fieldDef
+    const { precisions, calculated } = attrDef
     const text = value || ''
-    const attrDef = fieldDef.attributeDefinition
-    const precisions = attrDef.precisions
     const hasPrecisions = precisions.length > 0
+    const wrapperStyle = hasPrecisions ? { display: 'grid', gridTemplateColumns: '1fr 150px' } : null
 
     return (
       <>
-        <div style={hasPrecisions ? { display: 'grid', gridTemplateColumns: '1fr 150px' } : null}>
-          <MuiTextField variant="outlined" type="number" value={text} onChange={this.onTextValueChange} />
+        <div style={wrapperStyle}>
+          <MuiTextField
+            variant="outlined"
+            type="number"
+            value={text}
+            className={classNames({ readOnly: calculated })}
+            disabled={calculated}
+            onChange={this.onTextValueChange}
+          />
 
           {hasPrecisions && (
             <FormControl>
-              <InputLabel>Unit</InputLabel>
-              <Select variant="outlined" native value={unitId} onChange={this.onUnitChange} label="Unit">
+              <InputLabel>{L.l('common.unit')}</InputLabel>
+              <Select
+                variant="outlined"
+                native
+                value={unitId}
+                disabled={calculated}
+                onChange={this.onUnitChange}
+                label="Unit"
+              >
                 {precisions.map((precision) => {
                   const unit = attrDef.survey.units.find((unit) => unit.id === precision.unitId)
                   return (

@@ -41,7 +41,7 @@ const FileThumbnail = (props) => {
     <Image src={thumbnailUrl} maxWidth={150} maxHeight={150} onClick={onClick} />
   ) : (
     <Button type="button" onClick={onClick}>
-      Download
+      {L.l('common.download')}
     </Button>
   )
 }
