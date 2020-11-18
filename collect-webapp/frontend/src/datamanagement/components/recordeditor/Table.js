@@ -16,8 +16,8 @@ import * as FieldsSizes from './fields/FieldsSizes'
 const ROW_NUMBER_COLUMN_WIDTH = 60
 const DELETE_COLUMN_WIDTH = 60
 
-const getHeadingLabel = ({ attributeDefinition }) => {
-  const { label } = attributeDefinition
+const getHeadingLabel = ({ headingComponent }) => {
+  const { label, attributeDefinition } = headingComponent
   if (attributeDefinition instanceof NumericAttributeDefinition) {
     const { precisions } = attributeDefinition
     if (precisions && precisions.length === 1) {
@@ -70,7 +70,6 @@ const HeadingRow = ({
   ...headingRow.map((headingComponent) => {
     const { colSpan, col, row, rowSpan } = headingComponent
     const { attributeDefinition } = headingComponent
-    const compositeAttribute = isCompositeAttribute(attributeDefinition)
 
     return (
       <div
@@ -84,8 +83,8 @@ const HeadingRow = ({
         }}
       >
         <div style={{ width: '100%' }}>
-          <div style={{ textAlign: 'center' }}>{getHeadingLabel({ attributeDefinition })}</div>
-          {compositeAttribute && (
+          <div style={{ textAlign: 'center' }}>{getHeadingLabel({ headingComponent })}</div>
+          {isCompositeAttribute(attributeDefinition) && (
             <div style={{ display: 'flex' }}>
               {attributeDefinition.availableFieldNames.map((fieldName) => (
                 <div
