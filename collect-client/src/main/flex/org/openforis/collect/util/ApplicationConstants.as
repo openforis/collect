@@ -28,7 +28,7 @@ package org.openforis.collect.util {
 		
 		private static const FILE_UPLOAD_SERVLET_NAME:String = "uploadFile.htm";
 
-		private static const RECORD_FILE_DOWNLOAD_SERVLET_NAME:String = "downloadRecordFile.htm";
+		private static const RECORD_FILE_DOWNLOAD_SERVLET_NAME:String = "api/downloadRecordFile.htm";
 		private static const RECORD_FILE_DELETE_SERVLET_NAME:String = "deleteRecordFile.htm";
 		
 		private static const DOWNLOAD_EXPORTED_DATA_SERVLET_NAME:String = "downloadDataExport.htm";
