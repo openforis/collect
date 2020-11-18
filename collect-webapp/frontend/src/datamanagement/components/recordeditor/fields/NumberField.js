@@ -50,14 +50,15 @@ export default class NumberField extends AbstractField {
   }
 
   render() {
-    const { fieldDef } = this.props
+    const { fieldDef, inTable } = this.props
     const { dirty, value: valueState } = this.state
     const { value, unit: unitId } = valueState || {}
     const { attributeDefinition: attrDef } = fieldDef
     const { precisions, calculated } = attrDef
     const text = value || ''
     const hasPrecisions = precisions.length > 0
-    const wrapperStyle = hasPrecisions ? { display: 'grid', gridTemplateColumns: '1fr 80px' } : null
+    const unitVisible = hasPrecisions && !(inTable && precisions.length === 1)
+    const wrapperStyle = unitVisible ? { display: 'grid', gridTemplateColumns: '1fr 80px' } : null
 
     return (
       <>
@@ -71,7 +72,7 @@ export default class NumberField extends AbstractField {
             onChange={this.onTextValueChange}
           />
 
-          {hasPrecisions && (
+          {unitVisible && (
             <FormControl>
               <InputLabel>{L.l('common.unit')}</InputLabel>
               <Select

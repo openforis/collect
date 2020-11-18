@@ -4,7 +4,7 @@ import React from 'react'
 import { Column, Table as TableVirtualized } from 'react-virtualized'
 import { Button } from 'reactstrap'
 
-import { CoordinateAttributeDefinition, TaxonAttributeDefinition } from 'model/Survey'
+import { CoordinateAttributeDefinition, NumericAttributeDefinition, TaxonAttributeDefinition } from 'model/Survey'
 import { ColumnGroupDefinition } from 'model/ui/TableDefinition'
 import L from 'utils/Labels'
 import DeleteIconButton from 'common/components/DeleteIconButton'
@@ -15,6 +15,22 @@ import * as FieldsSizes from './fields/FieldsSizes'
 
 const ROW_NUMBER_COLUMN_WIDTH = 60
 const DELETE_COLUMN_WIDTH = 60
+
+const getHeadingLabel = ({ attributeDefinition }) => {
+  const { label } = attributeDefinition
+  if (attributeDefinition instanceof NumericAttributeDefinition) {
+    const { precisions } = attributeDefinition
+    if (precisions && precisions.length === 1) {
+      const precision = precisions[0]
+      const unit = attributeDefinition.survey.units.find((unit) => unit.id === precision.unitId)
+      const suffix = ` (${unit.abbreviation})`
+      if (!label.endsWith(suffix)) {
+        return label + suffix
+      }
+    }
+  }
+  return label
+}
 
 const isCompositeAttribute = (attrDef) =>
   attrDef instanceof CoordinateAttributeDefinition || attrDef instanceof TaxonAttributeDefinition
@@ -52,7 +68,7 @@ const HeadingRow = ({
       ]
     : []),
   ...headingRow.map((headingComponent) => {
-    const { colSpan, col, label, row, rowSpan } = headingComponent
+    const { colSpan, col, row, rowSpan } = headingComponent
     const { attributeDefinition } = headingComponent
     const compositeAttribute = isCompositeAttribute(attributeDefinition)
 
@@ -68,7 +84,7 @@ const HeadingRow = ({
         }}
       >
         <div style={{ width: '100%' }}>
-          <div style={{ textAlign: 'center' }}>{label}</div>
+          <div style={{ textAlign: 'center' }}>{getHeadingLabel({ attributeDefinition })}</div>
           {compositeAttribute && (
             <div style={{ display: 'flex' }}>
               {attributeDefinition.availableFieldNames.map((fieldName) => (
