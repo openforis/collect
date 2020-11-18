@@ -12,6 +12,7 @@ import org.openforis.idm.metamodel.Calculable;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListService;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.Entity;
@@ -40,7 +41,7 @@ public class MinCountValidator implements ValidationRule<Entity> {
 		}
 		if( entity.isRelevant(nodeDefinition) ) {
 			int minCount = entity.getMinCount(nodeDefinition);
-			if ( minCount == 0 ) {
+			if ( minCount == 0  || (nodeDefinition instanceof EntityDefinition && !nodeDefinition.isMultiple())) {
 				return OK;
 			} else {
 				int nonEmptyCount = 0;
@@ -70,7 +71,7 @@ public class MinCountValidator implements ValidationRule<Entity> {
 	
 	private boolean isAvailableCodeListItems(Entity parentEntity) {
 		CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) nodeDefinition;
-		SurveyContext context = codeAttrDef.getSurvey().getContext();
+		SurveyContext<?> context = codeAttrDef.getSurvey().getContext();
 		CodeListService codeListService = context.getCodeListService();
 		if (codeListService == null) {
 			//test context does not have a CodeListService
