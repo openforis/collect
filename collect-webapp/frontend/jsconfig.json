@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "ES6",
-    "baseUrl": "src",
-    "mapRoot": "src",
-    "rootDir": "src",
-    "sourceRoot": "src"
+    "baseUrl": ".",
+    "paths": {
+      "common/*": ["./src/common/*"],
+      "model/*": ["./src/model/*"],
+      "services/*": ["./src/services/*"],
+      "utils/*": ["./src/utils/*"]
+    }
   },
-  "include": ["common", "model", "services", "utils"]
+  "exclude": ["node_modules", "build"]
 }
