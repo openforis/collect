@@ -1,6 +1,6 @@
 import React from 'react'
 import classNames from 'classnames'
-import { FormControl, InputLabel, Select, TextField as MuiTextField } from '@material-ui/core'
+import { FormControl, InputLabel, MenuItem, Select, TextField as MuiTextField } from '@material-ui/core'
 
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 import L from 'utils/Labels'
@@ -57,7 +57,7 @@ export default class NumberField extends AbstractField {
     const { precisions, calculated } = attrDef
     const text = value || ''
     const hasPrecisions = precisions.length > 0
-    const wrapperStyle = hasPrecisions ? { display: 'grid', gridTemplateColumns: '1fr 150px' } : null
+    const wrapperStyle = hasPrecisions ? { display: 'grid', gridTemplateColumns: '1fr 80px' } : null
 
     return (
       <>
@@ -76,18 +76,17 @@ export default class NumberField extends AbstractField {
               <InputLabel>{L.l('common.unit')}</InputLabel>
               <Select
                 variant="outlined"
-                native
                 value={unitId}
                 disabled={calculated}
                 onChange={this.onUnitChange}
-                label="Unit"
+                label={L.l('common.unit')}
               >
                 {precisions.map((precision) => {
                   const unit = attrDef.survey.units.find((unit) => unit.id === precision.unitId)
                   return (
-                    <option key={unit.id} value={unit.id}>
-                      {unit.label}
-                    </option>
+                    <MenuItem key={unit.id} value={unit.id} title={unit.label}>
+                      {unit.abbreviation}
+                    </MenuItem>
                   )
                 })}
               </Select>

@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "paths": {
-      "common/*": ["./src/common/*"],
-      "model/*": ["./src/model/*"],
-      "services/*": ["./src/services/*"],
-      "utils/*": ["./src/utils/*"]
+      "common/*": ["./common/*"],
+      "model/*": ["./model/*"],
+      "services/*": ["./services/*"],
+      "utils/*": ["./utils/*"]
     }
   },
-  "exclude": ["node_modules", "build"]
+  "exclude": ["../node_modules", "../build"]
 }

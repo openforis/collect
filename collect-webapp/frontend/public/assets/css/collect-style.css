@@ -9,6 +9,22 @@ body {
   overflow: hidden;
 }
 
+/** Remove number arrows START */
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+/** Remove number arrows END */
+
 /* ==== start of Reactstrap style ==== */
 
 .nav-tabs .nav-link {
@@ -140,7 +156,7 @@ header .breadcrumb {
 }
 
 .btn-delete {
-  height: 40px;
+  height: 32px;
 }
 
 fieldset {
@@ -428,6 +444,11 @@ input.is-invalid.warning:focus {
   font-style: italic;
 }
 
+.form-item-composite-wrapper {
+  display: flex;
+  gap: 6px;
+}
+
 /**
 * === VALIDATION FEEDBACK
 **/
@@ -454,14 +475,31 @@ input.is-invalid.warning:focus {
 /**
 * === Material UI components
 **/
+.MuiInputLabel-root.MuiInputLabel-animated {
+  top: 0;
+  left: 0;
+  position: absolute;
+  transform: translate(6px, 10px) scale(1);
+}
+
+.MuiInputLabel-root.MuiInputLabel-animated.MuiInputLabel-shrink {
+  transform: translate(0, 1.5px) scale(0.75);
+  transform-origin: top left;
+}
+
 .MuiOutlinedInput-input,
 .MuiInputBase-input.MuiOutlinedInput-input,
-.MuiSelect-outlined.MuiSelect-outlined {
-  padding: 10px;
+.MuiSelect-outlined,
+.MuiAutocomplete-inputRoot[class*='MuiOutlinedInput-root'] .MuiAutocomplete-input:first-child {
+  padding: 6px;
 }
 
 .MuiAutocomplete-root {
   padding: 0;
+}
+
+label.MuiFormControlLabel-root {
+  margin-left: 0px;
 }
 
 .MuiInputBase-root.MuiOutlinedInput-root.MuiAutocomplete-inputRoot {
@@ -470,4 +508,9 @@ input.is-invalid.warning:focus {
 
 .MuiInputBase-input.MuiOutlinedInput-input.MuiAutocomplete-input {
   padding: 0;
+}
+
+.MuiButtonBase-root.MuiIconButton-root.MuiCheckbox-root,
+.MuiButtonBase-root.MuiIconButton-root.MuiRadio-root {
+  padding: 2px;
 }

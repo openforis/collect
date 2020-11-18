@@ -102,18 +102,23 @@ export default class TaxonField extends AbstractField {
       }
     })
 
-    return inTable ? (
-      <div style={{ display: 'flex' }}>{inputFields}</div>
-    ) : (
-      availableFieldNames.map((field, index) => (
-        <CompositeAttributeFormItem
-          key={field}
-          field={field}
-          label={L.l(`dataManagement.dataEntry.attribute.taxon.${field}`)}
-          inputField={inputFields[index]}
-          labelWidth={FieldsSizes.TaxonFormFieldLabelWidth}
-        />
-      ))
+    return (
+      <div
+        style={{ display: 'flex', flexDirection: inTable ? 'row' : 'column' }}
+        className="form-item-composite-wrapper"
+      >
+        {inTable
+          ? inputFields
+          : availableFieldNames.map((field, index) => (
+              <CompositeAttributeFormItem
+                key={field}
+                field={field}
+                label={L.l(`dataManagement.dataEntry.attribute.taxon.${field}`)}
+                inputField={inputFields[index]}
+                labelWidth={FieldsSizes.TaxonFormFieldLabelWidth}
+              />
+            ))}
+      </div>
     )
   }
 }

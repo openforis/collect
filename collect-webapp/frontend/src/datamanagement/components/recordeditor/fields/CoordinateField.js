@@ -112,7 +112,7 @@ export default class CoordinateField extends AbstractField {
     )
 
     return (
-      <div style={{ display: inTable ? 'flex' : 'block' }}>
+      <div style={{ flexDirection: inTable ? 'row' : 'column' }} className="form-item-composite-wrapper">
         {inTable
           ? inputFields
           : availableFieldNames.map((field, index) => getFormItem({ field, inputField: inputFields[index] }))}

@@ -14,6 +14,7 @@ const CodeFieldRadioItem = (props) => {
 
   const commonProps = {
     color: 'primary',
+    size: 'small',
     disabled: calculated,
     onChange: () => onChange({ item, selected: !selected }),
   }

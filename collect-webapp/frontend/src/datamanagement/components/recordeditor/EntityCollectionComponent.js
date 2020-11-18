@@ -10,6 +10,7 @@ export default class EntityCollectionComponent extends AbstractFormComponent {
 
     this.state = {
       entities: [],
+      addingEntity: false,
     }
 
     this.determineEntities = this.determineEntities.bind(this)
@@ -35,7 +36,7 @@ export default class EntityCollectionComponent extends AbstractFormComponent {
       (event instanceof EntityCreationCompletedEvent || event instanceof EntityDeletedEvent) &&
       event.isRelativeToNodes({ parentEntity, nodeDefId: itemDef.entityDefinitionId })
     ) {
-      this.setState({ entities: this.determineEntities() }, () => this.onEntitiesUpdated())
+      this.setState({ addingEntity: false, entities: this.determineEntities() }, () => this.onEntitiesUpdated())
     }
   }
 
@@ -45,6 +46,7 @@ export default class EntityCollectionComponent extends AbstractFormComponent {
     const { itemDef, parentEntity } = this.props
     const { record } = parentEntity
 
+    this.setState({ addingEntity: true })
     this.commandService.addEntity(record, parentEntity, itemDef.entityDefinition)
   }
 }

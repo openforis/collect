@@ -118,6 +118,7 @@ const Autocomplete = (props) => {
   return (
     <MuiAutocomplete
       open={open}
+      size="small"
       openOnFocus={false}
       onOpen={onOpen}
       onClose={onClose}

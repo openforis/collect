@@ -116,6 +116,7 @@ export default class Table extends EntityCollectionComponent {
     this.state = {
       ...this.state,
       totalWidth: 0,
+      addingRow: false,
     }
   }
 
@@ -157,13 +158,13 @@ export default class Table extends EntityCollectionComponent {
 
   headerRowRenderer() {
     const { itemDef } = this.props
-    const { gridTemplateColumns } = this.state
+    const { gridTemplateColumns, totalWidth } = this.state
     const { headingRows, totalHeadingColumns, showRowNumbers, entityDefinition } = itemDef
     const { enumerate } = entityDefinition
     const readOnly = false
 
     return (
-      <div className="grid header" style={{ gridTemplateColumns }}>
+      <div className="grid header" style={{ gridTemplateColumns, width: `${totalWidth}px` }}>
         {headingRows.map((headingRow, index) => (
           <HeadingRow
             key={`heading-row-${index + 1}`}
@@ -198,7 +199,7 @@ export default class Table extends EntityCollectionComponent {
 
   render() {
     const { itemDef } = this.props
-    const { totalWidth, gridTemplateColumns, entities } = this.state
+    const { totalWidth, gridTemplateColumns, entities, addingEntity } = this.state
 
     const { headingColumns, showRowNumbers, entityDefinition } = itemDef
     const { enumerate } = entityDefinition
@@ -210,11 +211,11 @@ export default class Table extends EntityCollectionComponent {
         <legend>{itemDef.entityDefinition.label}</legend>
         <TableVirtualized
           headerRowRenderer={this.headerRowRenderer}
-          width={totalWidth}
           className="form-item-table"
           rowStyle={{ display: 'grid', gridTemplateColumns }}
+          width={totalWidth}
           height={300}
-          rowHeight={40}
+          rowHeight={32}
           rowCount={entities.length}
           rowGetter={({ index }) => entities[index]}
           onDelete={(entity) => this.handleDeleteButtonClick(entity)}
@@ -255,7 +256,7 @@ export default class Table extends EntityCollectionComponent {
           ]}
         </TableVirtualized>
         {canAddOrDeleteRows && (
-          <Button variant="outlined" color="primary" onClick={this.handleNewButtonClick}>
+          <Button variant="outlined" color="primary" disabled={addingEntity} onClick={this.handleNewButtonClick}>
             {L.l('common.add')}
           </Button>
         )}
