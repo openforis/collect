@@ -26,7 +26,7 @@ const CodeFieldAutocomplete = (props) => {
   const { survey, record } = parentEntity
   const { attributeDefinition } = fieldDef
   const { versionId } = record
-  const { codeListId, multiple } = attributeDefinition
+  const { calculated, codeListId, multiple } = attributeDefinition
 
   const language = survey.defaultLanguage // TODO
   const surveyId = survey.id
@@ -50,6 +50,7 @@ const CodeFieldAutocomplete = (props) => {
   return (
     <Autocomplete
       asynchronous={asynchronous}
+      readOnly={calculated}
       multiple={multiple}
       items={items}
       inputFieldWidth={FieldsSizes.getWidth({ fieldDef, inTable })}

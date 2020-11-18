@@ -212,6 +212,7 @@ public class SurveyViewGenerator {
 					}
 					attrDefView.setFieldLabels(fieldLabelsView);
 					attrDefView.setVisibilityByField(visibilityByField);
+					attrDefView.setCalculated(attrDef.isCalculated());
 				}
 				UIModelObject uiModelObject = uiConfiguration.getModelObjectByNodeDefinitionId(def.getId());
 				view.setHideWhenNotRelevant(uiModelObject != null && uiModelObject.isHideWhenNotRelevant());

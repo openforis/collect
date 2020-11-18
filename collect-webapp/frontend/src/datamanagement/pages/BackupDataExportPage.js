@@ -49,7 +49,7 @@ class BackupDataExportPage extends Component {
             this.props.dispatch(JobActions.startJobMonitor({
                 jobId: job.id,
                 title: L.l('dataManagement.backupDataExport.exportingDataJobTitle'),
-                okButtonLabel: L.l('general.download'),
+                okButtonLabel: L.l('common.download'),
                 handleJobCompleted: this.handleBackupDataExportJobCompleted,
                 handleOkButtonClick: this.handleBackupDataExportModalOkButtonClick
             }))

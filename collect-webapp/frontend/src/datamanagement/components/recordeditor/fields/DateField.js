@@ -34,6 +34,9 @@ export default class DateField extends AbstractField {
   render() {
     const { fieldDef, inTable } = this.props
     const { dirty, value: valueState } = this.state
+    const { attributeDefinition } = fieldDef
+    const { calculated } = attributeDefinition
+
     const selectedDate = fromValueToDate(valueState)
 
     return (
@@ -45,6 +48,7 @@ export default class DateField extends AbstractField {
             format={Dates.DATE_FORMAT}
             margin="none"
             value={selectedDate}
+            disabled={calculated}
             onChange={this.onChange}
             style={{ width: `${FieldSizes.getWidth({ fieldDef, inTable })}px` }}
           />

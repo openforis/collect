@@ -55,7 +55,7 @@ export default class CoordinateField extends AbstractField {
     const { dirty, value } = this.state
     const { srs = '' } = value || {}
     const { attributeDefinition } = fieldDef
-    const { availableFieldNames } = attributeDefinition
+    const { availableFieldNames, calculated } = attributeDefinition
 
     const numericField = ({ field }) => (
       <MuiTextField
@@ -63,6 +63,7 @@ export default class CoordinateField extends AbstractField {
         value={Objects.getProp(field, '')(value)}
         type="number"
         variant="outlined"
+        disabled={calculated}
         onChange={(event) => this.onChangeNumericField({ field, event })}
         style={{ width: COORDINATE_FIELD_WIDTH_PX }}
       />
@@ -76,7 +77,14 @@ export default class CoordinateField extends AbstractField {
         return srss.length === 1 ? (
           <MuiTextField key="srs" variant="outlined" value={srss[0].label} readOnly style={style} />
         ) : (
-          <Select key="srs" value={srs} variant="outlined" onChange={this.onChangeSrs} style={style}>
+          <Select
+            key="srs"
+            value={srs}
+            variant="outlined"
+            disabled={calculated}
+            onChange={this.onChangeSrs}
+            style={style}
+          >
             <MenuItem key="empty" value="">
               <em>Select...</em>
             </MenuItem>
