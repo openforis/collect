@@ -238,7 +238,7 @@ class SurveysListPage extends React.Component {
                 }
                 <Row className="action-bar justify-content-between">
                     <Col sm={3}>
-                        <Button color="info" onClick={this.handleNewButtonClick}>{L.l('general.new')}</Button>
+                        <Button color="info" onClick={this.handleNewButtonClick}>{L.l('common.new')}</Button>
                     </Col>
                     {selectedSurvey &&
                         <Col sm={1}>

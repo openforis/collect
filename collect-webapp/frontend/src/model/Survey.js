@@ -1,6 +1,7 @@
 import Serializable from './Serializable'
 import { UIConfiguration } from './ui/UIConfiguration'
 import Arrays from 'utils/Arrays'
+import Strings from 'utils/Strings'
 
 export class SurveyObject extends Serializable {
   id
@@ -191,8 +192,16 @@ export class NodeDefinition extends SurveyObject {
     return [...this.ancestorIds, this.id]
   }
 
+  isDescendantOf(entityDef) {
+    return this.ancestorIds.includes(entityDef.id)
+  }
+
   get single() {
     return !this.multiple
+  }
+
+  get labelOrName() {
+    return Strings.isNotBlank(this.label) ? this.label : this.name
   }
 }
 

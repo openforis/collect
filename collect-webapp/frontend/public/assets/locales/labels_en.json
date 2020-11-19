@@ -9,7 +9,10 @@
             }
         },
         "download": "Download",
+        "new": "New",
         "parameters": "Parameters",
+        "selectItemLabelWithParam": "Select a {0}:",
+        "selectOne": "Select one",
         "specify": "Specify",
         "unit": "Unit"
     },
@@ -18,7 +21,6 @@
         "cancel": "Cancel",
         "close": "Close",
         "additionalOptions": "Additional Options",
-        "new": "New",
         "import": "Import",
         "ok": "Ok",
         "warning": "Warning"

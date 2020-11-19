@@ -2,20 +2,29 @@ import React from 'react'
 import { Button, Input } from 'reactstrap'
 
 import DeleteIconButton from 'common/components/DeleteIconButton'
+import L from 'utils/Labels'
 
 import FormItems from './FormItems'
 import EntityCollectionComponent from './EntityCollectionComponent'
 import TabSetContent from './TabSetContent'
+import { AttributeValueUpdatedEvent } from 'model/event/RecordEvent'
 
 export default class MultipleFieldset extends EntityCollectionComponent {
   constructor() {
     super()
     this.state = {
       ...this.state,
+      entitiesSummary: [],
       selectedEntityIndex: -1,
     }
 
     this.handleDeleteButtonClick = this.handleDeleteButtonClick.bind(this)
+  }
+
+  componentDidMount() {
+    super.componentDidMount()
+
+    this.updateEntitiesSummary()
   }
 
   getSelectedEntity() {
@@ -23,9 +32,30 @@ export default class MultipleFieldset extends EntityCollectionComponent {
     return selectedEntityIndex >= 0 && selectedEntityIndex < entities.length ? entities[selectedEntityIndex] : null
   }
 
+  onRecordEvent(event) {
+    super.onRecordEvent(event)
+
+    const { entities } = this.state
+
+    if (
+      event instanceof AttributeValueUpdatedEvent &&
+      entities.some((entity) => event.isRelativeToEntityKeyAttributes({ entity }))
+    ) {
+      this.updateEntitiesSummary()
+    }
+  }
+
+  updateEntitiesSummary() {
+    const { entities } = this.state
+    this.setState({ entitiesSummary: entities.map((entity) => entity.summaryLabel) })
+  }
+
   onEntitiesUpdated() {
     super.onEntitiesUpdated()
+
     const { entities } = this.state
+
+    this.updateEntitiesSummary()
     this.setState({ selectedEntityIndex: entities.length - 1 })
   }
 
@@ -42,19 +72,20 @@ export default class MultipleFieldset extends EntityCollectionComponent {
 
   render() {
     const { parentEntity, itemDef } = this.props
-    const { entities, selectedEntityIndex } = this.state
+    const { entitiesSummary, selectedEntityIndex } = this.state
+    const { entityDefinition } = itemDef
 
     if (!parentEntity) {
       return <div>Loading...</div>
     }
     const entityOptions = [
       <option key="-1" value="-1">
-        Select entity
+        {L.l('common.selectOne')}
       </option>,
     ].concat(
-      entities.map((entity, index) => (
+      entitiesSummary.map((summary, index) => (
         <option key={`entity_${index}`} value={index}>
-          {entity.summaryLabel}
+          {summary}
         </option>
       ))
     )
@@ -63,7 +94,7 @@ export default class MultipleFieldset extends EntityCollectionComponent {
 
     return (
       <>
-        <label>Select a {itemDef.label}:</label>
+        <label>{L.l('common.selectItemLabelWithParam', [entityDefinition.labelOrName])}</label>
         <Input
           type="select"
           id="entityDropdown"
@@ -74,7 +105,7 @@ export default class MultipleFieldset extends EntityCollectionComponent {
           {entityOptions}
         </Input>
         <Button color="success" onClick={this.handleNewButtonClick}>
-          New
+          {L.l('common.new')}
         </Button>
         {selectedEntity && <DeleteIconButton onClick={this.handleDeleteButtonClick} />}
         {selectedEntity && (

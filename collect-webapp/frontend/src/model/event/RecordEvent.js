@@ -60,6 +60,15 @@ export class AttributeDeletedEvent extends RecordEvent {}
 
 export class AttributeValueUpdatedEvent extends AttributeEvent {
   value
+
+  isRelativeToEntityKeyAttributes({ entity }) {
+    const { definition } = entity
+    const { keyAttributeDefinitions } = definition
+
+    return keyAttributeDefinitions.some((keyDef) =>
+      this.isRelativeToNodes({ parentEntity: entity, nodeDefId: keyDef.id })
+    )
+  }
 }
 
 export class BooleanAttributeUpdatedEvent extends AttributeValueUpdatedEvent {}

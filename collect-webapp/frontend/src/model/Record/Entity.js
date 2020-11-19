@@ -19,16 +19,25 @@ export class Entity extends Node {
   childrenMinCountValidationByDefinitionId
   childrenMaxCountValidationByDefinitionId
 
-  get summaryLabel() {
+  get keyNodes() {
     const { definition } = this
-    const keyDefs = definition.keyAttributeDefinitions
-    const keyValuePairs = keyDefs.map((keyDef) => {
-      const keyNodes = this.childrenByDefinitionId[keyDef.id]
-      const keyNode = keyNodes && keyNodes.length ? keyNodes[0] : null
+    const { keyAttributeDefinitions } = definition
+
+    return keyAttributeDefinitions.reduce((keyNodesAcc, keyDef) => {
+      const keyNodeParent = this.getDescendantEntityClosestToNode(keyDef)
+      const keyNodes = keyNodeParent?.getChildrenByDefinitionId(keyDef.id)
+      const keyNode = keyNodes?.length > 0 ? keyNodes[0] : null
+      keyNodesAcc.push(keyNode)
+      return keyNodesAcc
+    }, [])
+  }
+
+  get summaryLabel() {
+    const keyValuePairs = this.keyNodes.map((keyNode) => {
       const keyValue = keyNode ? keyNode.humanReadableValue : ''
-      return `${keyDef.label}: ${keyValue}`
+      return `${keyNode.definition.labelOrName}: ${keyValue}`
     })
-    return `${definition.label} [${keyValuePairs.join(', ')}]`
+    return `${keyValuePairs.join(', ')}`
   }
 
   fillFromJSON(jsonObj) {

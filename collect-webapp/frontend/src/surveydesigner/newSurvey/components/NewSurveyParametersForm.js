@@ -65,7 +65,7 @@ const NewSurveyParametersForm = props => {
             >{userGroupOptions}</SelectFormItem>
             <Row>
                 <Col sm={{ size: 1, offset: 5 }}>
-                    <SubmitButton {...props}>{L.l('general.new')}</SubmitButton>
+                    <SubmitButton {...props}>{L.l('common.new')}</SubmitButton>
                 </Col>
             </Row>
         </Form>
