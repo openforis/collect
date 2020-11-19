@@ -222,7 +222,7 @@ export default class Table extends EntityCollectionComponent {
   }
 
   render() {
-    const { itemDef } = this.props
+    const { itemDef, fullSize } = this.props
     const { totalWidth, gridTemplateColumns, entities, addingEntity } = this.state
 
     const { headingColumns, showRowNumbers, entityDefinition } = itemDef
@@ -230,9 +230,8 @@ export default class Table extends EntityCollectionComponent {
     const readOnly = false
     const canAddOrDeleteRows = !readOnly && !enumerate
 
-    return (
-      <fieldset>
-        <legend>{itemDef.entityDefinition.label}</legend>
+    const content = (
+      <>
         <TableVirtualized
           headerRowRenderer={this.headerRowRenderer}
           className="form-item-table"
@@ -280,11 +279,20 @@ export default class Table extends EntityCollectionComponent {
               : []),
           ]}
         </TableVirtualized>
+
         {canAddOrDeleteRows && (
           <Button variant="outlined" color="primary" disabled={addingEntity} onClick={this.handleNewButtonClick}>
             {L.l('common.add')}
           </Button>
         )}
+      </>
+    )
+    return fullSize ? (
+      content
+    ) : (
+      <fieldset>
+        <legend>{itemDef.entityDefinition.label}</legend>
+        {content}
       </fieldset>
     )
   }

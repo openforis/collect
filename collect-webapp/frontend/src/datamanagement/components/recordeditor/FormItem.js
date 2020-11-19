@@ -69,7 +69,7 @@ const FormItem = (props) => {
       ? FormItemFieldComponent
       : internalComponentByFieldType[itemDef.type]
 
-  const internalComponent = <InternalComponentClass itemDef={itemDef} parentEntity={parentEntity} />
+  const internalComponent = <InternalComponentClass itemDef={itemDef} parentEntity={parentEntity} fullSize={fullSize} />
 
   return fullSize ? (
     internalComponent
