@@ -139,6 +139,9 @@ export default class Table extends EntityCollectionComponent {
     super.componentDidMount()
 
     const { itemDef } = this.props
+
+    this.tableRef = React.createRef(null)
+
     const readOnly = false
 
     const { headingColumns, showRowNumbers, entityDefinition } = itemDef
@@ -165,6 +168,12 @@ export default class Table extends EntityCollectionComponent {
       totalWidth,
       gridTemplateColumns,
     })
+  }
+
+  onEntitiesUpdated() {
+    const { entities } = this.state
+    // make last row visible
+    this.tableRef.current.scrollToRow(entities.length - 1)
   }
 
   handleDeleteButtonClick(entity) {
@@ -234,6 +243,7 @@ export default class Table extends EntityCollectionComponent {
           rowCount={entities.length}
           rowGetter={({ index }) => entities[index]}
           onDelete={(entity) => this.handleDeleteButtonClick(entity)}
+          ref={this.tableRef}
         >
           {[
             ...(showRowNumbers
