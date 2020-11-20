@@ -28,8 +28,10 @@ import org.openforis.collect.command.UpdateCoordinateAttributeCommand;
 import org.openforis.collect.command.UpdateDateAttributeCommand;
 import org.openforis.collect.command.UpdateFileAttributeCommand;
 import org.openforis.collect.command.UpdateIntegerAttributeCommand;
+import org.openforis.collect.command.UpdateIntegerRangeAttributeCommand;
 import org.openforis.collect.command.UpdateMultipleAttributeCommand;
 import org.openforis.collect.command.UpdateRealAttributeCommand;
+import org.openforis.collect.command.UpdateRealRangeAttributeCommand;
 import org.openforis.collect.command.UpdateTaxonAttributeCommand;
 import org.openforis.collect.command.UpdateTextAttributeCommand;
 import org.openforis.collect.command.UpdateTimeAttributeCommand;
@@ -55,6 +57,7 @@ import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
+import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
@@ -64,7 +67,9 @@ import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.File;
 import org.openforis.idm.model.FileAttribute;
+import org.openforis.idm.model.IntegerRange;
 import org.openforis.idm.model.IntegerValue;
+import org.openforis.idm.model.RealRange;
 import org.openforis.idm.model.RealValue;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.TextValue;
@@ -301,12 +306,23 @@ public class CommandController {
 			case FILE:
 				return (V) new File((String) valueByField.get(FileAttributeDefinition.FILE_NAME_FIELD),
 						(Long) valueByField.get(FileAttributeDefinition.FILE_SIZE_FIELD));
-			case NUMBER:
+			case NUMBER: {
 				Integer unitId = (Integer) valueByField.get(NumberAttributeDefinition.UNIT_FIELD);
 				Number number = (Number) valueByField.get(NumberAttributeDefinition.VALUE_FIELD);
 				return (V) (numericType == Type.INTEGER
 						? new IntegerValue(number == null ? null : number.intValue(), unitId)
 						: new RealValue(number == null ? null : number.doubleValue(), unitId));
+			}
+			case RANGE: {
+				Integer unitId = (Integer) valueByField.get(RangeAttributeDefinition.UNIT_FIELD);
+				Number from = (Number) valueByField.get(RangeAttributeDefinition.FROM_FIELD);
+				Number to = (Number) valueByField.get(RangeAttributeDefinition.TO_FIELD);
+				return (V) (numericType == Type.INTEGER
+						? new IntegerRange(from == null ? null : from.intValue(), to == null ? null : to.intValue(),
+								unitId)
+						: new RealRange(from == null ? null : from.doubleValue(), to == null ? null : to.doubleValue(),
+								unitId));
+			}
 			case TAXON:
 				String code = (String) valueByField.get(TaxonAttributeDefinition.CODE_FIELD_NAME);
 				String scientificName = (String) valueByField.get(TaxonAttributeDefinition.SCIENTIFIC_NAME_FIELD_NAME);
@@ -391,6 +407,9 @@ public class CommandController {
 			case NUMBER:
 				return numericType == Type.INTEGER ? UpdateIntegerAttributeCommand.class
 						: UpdateRealAttributeCommand.class;
+			case RANGE:
+				return numericType == Type.INTEGER ? UpdateIntegerRangeAttributeCommand.class
+						: UpdateRealRangeAttributeCommand.class;
 			case TAXON:
 				return UpdateTaxonAttributeCommand.class;
 			case TEXT:

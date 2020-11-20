@@ -77,10 +77,11 @@ public class RangeAttributeDefinition extends NumericAttributeDefinition {
 			return null;
 		} 
 		Unit unit = getDefaultUnit();
+		Integer unitId = unit == null ? null : unit.getId();
 		if (isInteger()) {
-			return new IntegerRange(Numbers.toIntegerObject(from), Numbers.toIntegerObject(to), unit);
+			return new IntegerRange(Numbers.toIntegerObject(from), Numbers.toIntegerObject(to), unitId);
 		} else if (isReal()) {
-			return new RealRange(Numbers.toDoubleObject(from), Numbers.toDoubleObject(to), unit);
+			return new RealRange(Numbers.toDoubleObject(from), Numbers.toDoubleObject(to), unitId);
 		}
 		throw new RuntimeException("Invalid range type " + getType());
 	}

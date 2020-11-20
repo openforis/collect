@@ -1,15 +1,20 @@
-import {
-  CoordinateAttributeDefinition,
-  FileAttributeDefinition,
-  EntityDefinition,
-  TaxonAttributeDefinition,
-} from '../Survey'
+import { AttributeDefinition, EntityDefinition } from '../Survey'
 
 import { Node } from './Node'
 import { Attribute } from './Attribute'
 import { CoordinateAttribute } from './CoordinateAttribute'
 import { FileAttribute } from './FileAttribute'
 import { TaxonAttribute } from './TaxonAttribute'
+import { RangeAttribute } from './RangeAttribute'
+import { NumberAttribute } from './NumberAttribute'
+
+const attributeClassByType = {
+  [AttributeDefinition.Types.COORDINATE]: CoordinateAttribute,
+  [AttributeDefinition.Types.FILE]: FileAttribute,
+  [AttributeDefinition.Types.NUMBER]: NumberAttribute,
+  [AttributeDefinition.Types.RANGE]: RangeAttribute,
+  [AttributeDefinition.Types.TAXON]: TaxonAttribute,
+}
 
 export class Entity extends Node {
   childrenByDefinitionId = {}
@@ -56,19 +61,14 @@ export class Entity extends Node {
     }
   }
 
-  _createChildInstance(def) {
-    let childClass
+  _getChildInstanceClass(def) {
     if (def instanceof EntityDefinition) {
-      childClass = Entity
-    } else if (def instanceof CoordinateAttributeDefinition) {
-      childClass = CoordinateAttribute
-    } else if (def instanceof FileAttributeDefinition) {
-      childClass = FileAttribute
-    } else if (def instanceof TaxonAttributeDefinition) {
-      childClass = TaxonAttribute
-    } else {
-      childClass = Attribute
+      return Entity
     }
+    return attributeClassByType[def.attributeType] || Attribute
+  }
+  _createChildInstance(def) {
+    const childClass = this._getChildInstanceClass(def)
     return new childClass(this.record, def, this)
   }
 

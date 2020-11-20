@@ -288,6 +288,10 @@
                     },
                     "acceptedFileDescription": "{0} file types ({1})"
                 },
+                "range": { 
+                    "from": "From",
+                    "to": "To"
+                },
                 "taxon": {
                     "code": "Code",
                     "scientific_name": "Scientific name",

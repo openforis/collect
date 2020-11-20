@@ -132,7 +132,7 @@ export class Schema extends Serializable {
     this.rootEntities = jsonObj.rootEntities.map((rootEntityJsonObj) => {
       var rootEntity = new EntityDefinition(rootEntityJsonObj.id, this.survey, null)
       rootEntity.fillFromJSON(rootEntityJsonObj)
-      rootEntity.traverse(function (nodeDef) {
+      rootEntity.traverse((nodeDef) => {
         $this.definitions[nodeDef.id] = nodeDef
       })
       return rootEntity
@@ -166,12 +166,8 @@ export class NodeDefinition extends SurveyObject {
     this.parent = parent
   }
 
-  get rootEntity() {
-    let currentParent = this.parent
-    while (currentParent.parent != null) {
-      currentParent = currentParent.parent
-    }
-    return currentParent
+  get single() {
+    return !this.multiple
   }
 
   visitAncestors(visitor) {
@@ -180,6 +176,25 @@ export class NodeDefinition extends SurveyObject {
       visitor(currentParent)
       currentParent = currentParent.parent
     }
+  }
+
+  findAncestor(predicate) {
+    let currentParent = this.parent
+    while (currentParent != null) {
+      if (predicate(currentParent)) {
+        return currentParent
+      }
+      currentParent = currentParent.parent
+    }
+    return null
+  }
+
+  get rootEntity() {
+    return this.findAncestor((ancestor) => !ancestor.parent)
+  }
+
+  get parentMultipleEntity() {
+    return this.findAncestor((ancestor) => ancestor.multiple)
   }
 
   get ancestorIds() {
@@ -194,10 +209,6 @@ export class NodeDefinition extends SurveyObject {
 
   isDescendantOf(entityDef) {
     return this.ancestorIds.includes(entityDef.id)
-  }
-
-  get single() {
-    return !this.multiple
   }
 
   get labelOrName() {
@@ -297,6 +308,7 @@ export class AttributeDefinition extends NodeDefinition {
     DATE: 'DATE',
     FILE: 'FILE',
     NUMBER: 'NUMBER',
+    RANGE: 'RANGE',
     TAXON: 'TAXON',
     TEXT: 'TEXT',
     TIME: 'TIME',
@@ -548,7 +560,18 @@ export class FileAttributeDefinition extends AttributeDefinition {
 export class NumericAttributeDefinition extends AttributeDefinition {
   numericType
   precisions
+
+  isUnitVisible({ inTable }) {
+    return this.precisions.length > 0 && !(inTable && this.precisions.length === 1)
+  }
+}
+
+export class NumberAttributeDefinition extends NumericAttributeDefinition {
   mandatoryFieldNames = ['value']
+}
+
+export class RangeAttributeDefinition extends NumericAttributeDefinition {
+  mandatoryFieldNames = ['from', 'to']
 }
 
 export class TextAttributeDefinition extends AttributeDefinition {
@@ -564,6 +587,7 @@ const attributeDefinitionClassByType = {
   [AttributeDefinition.Types.CODE]: CodeAttributeDefinition,
   [AttributeDefinition.Types.COORDINATE]: CoordinateAttributeDefinition,
   [AttributeDefinition.Types.FILE]: FileAttributeDefinition,
-  [AttributeDefinition.Types.NUMBER]: NumericAttributeDefinition,
+  [AttributeDefinition.Types.NUMBER]: NumberAttributeDefinition,
+  [AttributeDefinition.Types.RANGE]: RangeAttributeDefinition,
   [AttributeDefinition.Types.TAXON]: TaxonAttributeDefinition,
 }

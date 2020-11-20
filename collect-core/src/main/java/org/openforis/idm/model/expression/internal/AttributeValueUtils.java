@@ -120,14 +120,15 @@ public class AttributeValueUtils {
 				Number from = value.getFrom();
 				Number to = value.getTo();
 				NumericRange<?> normalizedValue;
+				int defaultUnitId = defaultUnit.getId();
 				if (attr instanceof IntegerRangeAttribute) {
 					int normalizedFrom = getNormalizedValue(from, unit, defaultUnit).intValue();
 					int normalizedTo = getNormalizedValue(to, unit, defaultUnit).intValue();
-					normalizedValue = new IntegerRange(normalizedFrom, normalizedTo, defaultUnit);
+					normalizedValue = new IntegerRange(normalizedFrom, normalizedTo, defaultUnitId);
 				} else {
 					double normalizedFrom = getNormalizedValue(from, unit, defaultUnit).doubleValue();
 					double normalizedTo = getNormalizedValue(to, unit, defaultUnit).doubleValue();
-					normalizedValue = new RealRange(normalizedFrom, normalizedTo, defaultUnit);
+					normalizedValue = new RealRange(normalizedFrom, normalizedTo, defaultUnitId);
 				}
 				return normalizedValue;
 			} else {

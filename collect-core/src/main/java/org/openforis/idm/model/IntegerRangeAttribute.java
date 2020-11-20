@@ -1,7 +1,6 @@
 package org.openforis.idm.model;
 
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
-import org.openforis.idm.metamodel.Unit;
 
 /**
  * @author G. Miceli
@@ -19,8 +18,8 @@ public class IntegerRangeAttribute extends NumericRangeAttribute<IntegerRange, I
 	}
 
 	@Override
-	protected IntegerRange createRange(Integer from, Integer to, Unit unit) {
-		return new IntegerRange(from, to, unit);
+	protected IntegerRange createRange(Integer from, Integer to, Integer unitId) {
+		return new IntegerRange(from, to, unitId);
 	}
-	
+
 }

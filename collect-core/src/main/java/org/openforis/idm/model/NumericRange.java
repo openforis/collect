@@ -3,11 +3,10 @@ package org.openforis.idm.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openforis.idm.metamodel.Unit;
-
 /**
  * @author G. Miceli
  * @author M. Togna
+ * @author S. Ricci
  */
 public abstract class NumericRange<T extends Number> extends AbstractValue {
 
@@ -17,14 +16,14 @@ public abstract class NumericRange<T extends Number> extends AbstractValue {
 	
 	private final T from;
 	private final T to;
-	private final Unit unit;
+	private final Integer unitId;
 	
 	protected static final String DELIM = "-";
 
-	NumericRange(T from, T to, Unit unit) {
+	NumericRange(T from, T to, Integer unitId) {
 		this.from = from;
 		this.to = to;
-		this.unit = unit;
+		this.unitId = unitId;
 	}
 
 	public T getFrom() {
@@ -35,8 +34,8 @@ public abstract class NumericRange<T extends Number> extends AbstractValue {
 		return to;
 	}
 
-	public Unit getUnit() {
-		return unit;
+	public Integer getUnitId() {
+		return unitId;
 	}
 	
 	@Override
@@ -45,7 +44,7 @@ public abstract class NumericRange<T extends Number> extends AbstractValue {
 		return new HashMap<String, Object>() {{
 			put(FROM_FIELD, from);
 			put(TO_FIELD, to);
-			put(UNIT_ID_FIELD, unit == null ? null: unit.getId());
+			put(UNIT_ID_FIELD, unitId);
 		}};
 	}
 	

@@ -43,11 +43,12 @@ const WIDTH_CALCULATORS_BY_ATTRIBUTE_TYPE = {
   [AttributeDefinition.Types.DATE]: () => 180,
   [AttributeDefinition.Types.FILE]: () => 200,
   [AttributeDefinition.Types.NUMBER]: ({ fieldDef, inTable }) => {
-    const { attributeDefinition: attrDef } = fieldDef
-    const precisions = attrDef.precisions
-    const hasPrecisions = precisions.length > 0
-    const unitVisible = hasPrecisions && (!inTable || precisions.length > 1)
-    return unitVisible ? 150 : 120
+    const { attributeDefinition } = fieldDef
+    return attributeDefinition.isUnitVisible({ inTable }) ? 150 : 120
+  },
+  [AttributeDefinition.Types.RANGE]: ({ fieldDef, inTable }) => {
+    const { attributeDefinition } = fieldDef
+    return attributeDefinition.isUnitVisible({ inTable }) ? 270 : 240
   },
   [AttributeDefinition.Types.TAXON]: ({ fieldDef, inTable }) => {
     const { attributeDefinition } = fieldDef

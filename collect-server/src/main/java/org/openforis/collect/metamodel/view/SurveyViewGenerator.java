@@ -29,6 +29,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
+import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.Precision;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
@@ -70,7 +71,7 @@ public class SurveyViewGenerator {
 
 		// TODO use UIConfiguration instead
 		final UIOptions uiOptions = survey.getUIOptions();
-		
+
 		final SurveyView surveyView = new SurveyView(survey, new ViewContext(languageCode));
 
 		if (userGroup != null) {
@@ -131,7 +132,8 @@ public class SurveyViewGenerator {
 				NodeDefView view;
 				if (def instanceof EntityDefinition) {
 					EntityDefinition entityDefinition = (EntityDefinition) def;
-					EntityDefView entityDefView = new EntityDefView(entityDefinition.isRoot(), id, name, label, multiple);
+					EntityDefView entityDefView = new EntityDefView(entityDefinition.isRoot(), id, name, label,
+							multiple);
 					entityDefView.setEnumerate(annotations.isEnumerate(entityDefinition));
 					view = entityDefView;
 				} else {
@@ -145,7 +147,8 @@ public class SurveyViewGenerator {
 					if (def instanceof CodeAttributeDefinition) {
 						CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) def;
 						int codeListId = codeAttrDef.getList() == null ? -1 : codeAttrDef.getList().getId();
-						CodeAttributeDefView attrDefView = new CodeAttributeDefView(id, name, label, attributeType, fieldNames, key, multiple);
+						CodeAttributeDefView attrDefView = new CodeAttributeDefView(id, name, label, attributeType,
+								fieldNames, key, multiple);
 						attrDefView.setCodeListId(codeListId);
 						attrDefView.setEnumerator(codeAttrDef.isEnumerator());
 						Integer codeParentDefId = codeAttrDef.getParentCodeAttributeDefinition() == null ? null
@@ -172,13 +175,14 @@ public class SurveyViewGenerator {
 						attrDefView.setMaxSize(fileDef.getMaxSize());
 						attrDefView.setExtensions(fileDef.getExtensions());
 						view = attrDefView;
-					} else if (def instanceof NumberAttributeDefinition) {
-						NumberAttributeDefinition numberDef = (NumberAttributeDefinition) def;
-						List<Precision> precisions = numberDef.getPrecisionDefinitions();
+					} else if (def instanceof NumericAttributeDefinition) {
+						NumericAttributeDefinition numericDef = (NumericAttributeDefinition) def;
+						NumericAttributeDefView attrDefView = def instanceof NumberAttributeDefinition
+								? new NumberAttributeDefView(id, name, label, attributeType, fieldNames, key, multiple)
+								: new RangeAttributeDefView(id, name, label, attributeType, fieldNames, key, multiple);
+						attrDefView.setNumericType(numericDef.getType());
+						List<Precision> precisions = numericDef.getPrecisionDefinitions();
 						List<PrecisionView> precisionViews = Views.fromObjects(precisions, PrecisionView.class);
-						NumericAttributeDefView attrDefView = new NumberAttributeDefView(id, name, label, attributeType,
-								fieldNames, key, multiple);
-						attrDefView.setNumericType(numberDef.getType());
 						attrDefView.setPrecisions(precisionViews);
 						view = attrDefView;
 					} else if (def instanceof TaxonAttributeDefinition) {

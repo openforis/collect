@@ -18,7 +18,9 @@ export default class CommandService extends AbstractService {
   updateAttribute({ attribute, valueByField }) {
     const { record, definition, parent } = attribute
     const { attributeType } = definition
-    const numericType = attributeType === AttributeDefinition.Types.NUMBER ? definition.numericType : null
+    const numericType = [AttributeDefinition.Types.NUMBER, AttributeDefinition.Types.RANGE].includes(attributeType)
+      ? definition.numericType
+      : null
 
     const command = {
       surveyId: record.survey.id,
