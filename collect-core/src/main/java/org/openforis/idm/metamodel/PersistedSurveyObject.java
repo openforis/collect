@@ -75,7 +75,7 @@ public abstract class PersistedSurveyObject<I extends Number> extends SurveyObje
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PersistedSurveyObject other = (PersistedSurveyObject) obj;
+		PersistedSurveyObject<?> other = (PersistedSurveyObject<?>) obj;
 		if (creationDate == null) {
 			if (other.creationDate != null)
 				return false;
@@ -117,7 +117,7 @@ public abstract class PersistedSurveyObject<I extends Number> extends SurveyObje
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PersistedSurveyObject other = (PersistedSurveyObject) obj;
+		PersistedSurveyObject<?> other = (PersistedSurveyObject<?>) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

@@ -272,6 +272,12 @@
         },
         "dataEntry": {
             "attribute": {
+                "boolean": {
+                    "textValue": {
+                        "yes": "Y",
+                        "no": "N"
+                    }
+                },
                 "coordinate": {
                     "x": "X",
                     "y": "Y",

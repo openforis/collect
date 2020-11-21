@@ -118,7 +118,7 @@ public abstract class Node<D extends NodeDefinition> implements Serializable, De
 		path = sb.toString();
 	}
 
-	public <C extends SurveyContext> C getSurveyContext() {
+	public <C extends SurveyContext<?>> C getSurveyContext() {
 		return getSurvey().getContext();
 	}
 	

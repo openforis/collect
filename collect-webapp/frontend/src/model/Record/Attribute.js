@@ -1,6 +1,8 @@
 import Serializable from '../Serializable'
 import { Node } from './Node'
 
+import Objects from 'utils/Objects'
+
 class Field extends Serializable {
   value = null
   remarks = null
@@ -28,7 +30,7 @@ export class Attribute extends Node {
     if (!this.fields) {
       return true
     }
-    return this.fields.every((field) => !field.value)
+    return this.fields.every((field) => Objects.isNullOrUndefined(field.value))
   }
 
   isEmpty() {
@@ -71,7 +73,7 @@ export class Attribute extends Node {
         field = new Field()
         fields.push(field)
       }
-      field.value = value ? value[fieldName] : null
+      field.value = Objects.isNullOrUndefined(value) ? null : value[fieldName]
     })
   }
 }

@@ -132,7 +132,7 @@ public class JSONValueParser implements ValueParser {
 			return null;
 		}
 		Integer unitId = getInteger(map, NumberValue.UNIT_ID_FIELD);
-		Unit unit = attrDef.getActualUnit(unitId);
+		Unit unit = attrDef.getUnitOrDefault(unitId);
 		Integer unitIdActual = unit == null ? null : unit.getId();
 		return new IntegerValue(getInteger(map, NumberValue.VALUE_FIELD), unitIdActual);
 	}
@@ -148,8 +148,8 @@ public class JSONValueParser implements ValueParser {
 			to = from;
 		}
 		Integer unitId = getInteger(map, NumberValue.UNIT_ID_FIELD);
-		Unit unit = attrDef.getActualUnit(unitId);
-		return new IntegerRange(from, to, unit);
+		Unit unit = attrDef.getUnitOrDefault(unitId);
+		return new IntegerRange(from, to, unit == null ? null : unit.getId());
 	}
 	
 	public RealValue parseReal(NumberAttributeDefinition attrDef, String value) {
@@ -158,7 +158,7 @@ public class JSONValueParser implements ValueParser {
 			return null;
 		}
 		Integer unitId = getInteger(map, RealValue.UNIT_ID_FIELD);
-		Unit unit = attrDef.getActualUnit(unitId);
+		Unit unit = attrDef.getUnitOrDefault(unitId);
 		Integer unitIdActual = unit == null ? null : unit.getId();
 		return new RealValue(getDouble(map, RealValue.VALUE_FIELD), unitIdActual);
 	}
@@ -174,8 +174,9 @@ public class JSONValueParser implements ValueParser {
 			to = from;
 		}
 		Integer unitId = getInteger(map, RealRange.UNIT_ID_FIELD);
-		Unit unit = attrDef.getActualUnit(unitId);
-		return new RealRange(from, to, unit);
+		Unit unit = attrDef.getUnitOrDefault(unitId);
+		Integer unitIdActual = unit == null ? null : unit.getId();
+		return new RealRange(from, to, unitIdActual);
 	}
 	
 	public TaxonOccurrence parseTaxonOccurrence(String value) {

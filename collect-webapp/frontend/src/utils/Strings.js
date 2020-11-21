@@ -19,6 +19,13 @@ export default class Strings {
     return a > b ? 1 : b > a ? -1 : 0
   }
 
+  static equalsIgnoreCase(a, b) {
+    if (a === null && b === null) return true
+    if (a === null) return false
+    if (b === null) return false
+    return a.localeCompare(b, undefined, { sensitivity: 'accent' }) === 0
+  }
+
   static join(values, separator) {
     if (!separator) {
       separator = ', '

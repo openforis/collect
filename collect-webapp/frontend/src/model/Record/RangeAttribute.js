@@ -10,6 +10,20 @@ export class RangeAttribute extends AbstractNumericAttribute {
   }
 
   get unitField() {
-    return this.fields[2]
+    return this.fields[3]
+  }
+
+  get value() {
+    return super.value
+  }
+
+  set value(value) {
+    if (value) {
+      // Workaround: Range value field "unitId" matches field "unit" in the attribute
+      const { unitId: unit, ...other } = value
+      super.value = { ...other, unit }
+    } else {
+      super.value = null
+    }
   }
 }

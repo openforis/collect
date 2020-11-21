@@ -9,11 +9,17 @@ const UnitField = (props) => {
   return (
     <FormControl>
       <InputLabel>{L.l('common.unit')}</InputLabel>
-      <Select variant="outlined" value={unitId} disabled={calculated} onChange={onChange} label={L.l('common.unit')}>
+      <Select
+        variant="outlined"
+        value={String(unitId)}
+        disabled={calculated}
+        onChange={onChange}
+        label={L.l('common.unit')}
+      >
         {precisions.map((precision) => {
           const unit = attributeDefinition.survey.units.find((unit) => unit.id === precision.unitId)
           return (
-            <MenuItem key={unit.id} value={unit.id} title={unit.label}>
+            <MenuItem key={unit.id} value={String(unit.id)} title={unit.label}>
               {unit.abbreviation}
             </MenuItem>
           )

@@ -327,6 +327,15 @@ export class AttributeDefinition extends NodeDefinition {
   }
 }
 
+export class BooleanAttributeDefinition extends AttributeDefinition {
+  layoutType
+
+  static LayoutTypes = {
+    CHECKBOX: 'CHECKBOX',
+    TEXTBOX: 'TEXTBOX',
+  }
+}
+
 export class CodeAttributeDefinition extends AttributeDefinition {
   codeListId
   parentCodeAttributeDefinitionId
@@ -584,6 +593,7 @@ export class TextAttributeDefinition extends AttributeDefinition {
 }
 
 const attributeDefinitionClassByType = {
+  [AttributeDefinition.Types.BOOLEAN]: BooleanAttributeDefinition,
   [AttributeDefinition.Types.CODE]: CodeAttributeDefinition,
   [AttributeDefinition.Types.COORDINATE]: CoordinateAttributeDefinition,
   [AttributeDefinition.Types.FILE]: FileAttributeDefinition,

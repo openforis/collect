@@ -11,11 +11,13 @@ import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIModelObject;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.uiconfiguration.view.Views;
+import org.openforis.collect.metamodel.view.BooleanAttributeDefView.LayoutType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserInGroup;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.AttributeDefinition.FieldLabel;
+import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -66,11 +68,9 @@ public class SurveyViewGenerator {
 	public SurveyView generateView(final CollectSurvey survey, UserGroup userGroup,
 			UserInGroup.UserGroupRole userInSurveyGroupRole) {
 		String defaultLanguage = survey.getDefaultLanguage();
+
 		final CollectAnnotations annotations = survey.getAnnotations();
 		final UIConfiguration uiConfiguration = survey.getUIConfiguration();
-
-		// TODO use UIConfiguration instead
-		final UIOptions uiOptions = survey.getUIOptions();
 
 		final SurveyView surveyView = new SurveyView(survey, new ViewContext(languageCode));
 
@@ -138,85 +138,7 @@ public class SurveyViewGenerator {
 					view = entityDefView;
 				} else {
 					AttributeDefinition attrDef = (AttributeDefinition) def;
-					boolean qualifier = annotations.isQualifier(attrDef);
-					boolean showInSummary = annotations.isShowInSummary(attrDef);
-					AttributeType attributeType = AttributeType.valueOf(attrDef);
-					List<String> fieldNames = attrDef.getFieldNames();
-					boolean key = attrDef.isKey();
-
-					if (def instanceof CodeAttributeDefinition) {
-						CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) def;
-						int codeListId = codeAttrDef.getList() == null ? -1 : codeAttrDef.getList().getId();
-						CodeAttributeDefView attrDefView = new CodeAttributeDefView(id, name, label, attributeType,
-								fieldNames, key, multiple);
-						attrDefView.setCodeListId(codeListId);
-						attrDefView.setEnumerator(codeAttrDef.isEnumerator());
-						Integer codeParentDefId = codeAttrDef.getParentCodeAttributeDefinition() == null ? null
-								: codeAttrDef.getParentCodeAttributeDefinition().getId();
-						attrDefView.setParentCodeAttributeDefinitionId(codeParentDefId);
-						attrDefView.setShowCode(uiOptions.getShowCode(codeAttrDef));
-						attrDefView.setLayout(uiOptions.getLayoutType(codeAttrDef));
-						attrDefView.setItemsOrientation(uiOptions.getLayoutDirection(codeAttrDef));
-						view = attrDefView;
-					} else if (def instanceof CoordinateAttributeDefinition) {
-						CoordinateAttributeDefinition coordDef = (CoordinateAttributeDefinition) def;
-						CoordinateAttributeDefView attrDefView = new CoordinateAttributeDefView(id, name, label,
-								attributeType, fieldNames, key, multiple);
-						attrDefView.setFieldsOrder(uiOptions.getFieldsOrder(coordDef));
-						attrDefView.setShowSrsField(annotations.isShowSrsField(coordDef));
-						attrDefView.setIncludeAccuracyField(annotations.isIncludeCoordinateAccuracy(coordDef));
-						attrDefView.setIncludeAltitudeField(annotations.isIncludeCoordinateAltitude(coordDef));
-						view = attrDefView;
-					} else if (def instanceof FileAttributeDefinition) {
-						FileAttributeDefinition fileDef = (FileAttributeDefinition) def;
-						FileAttributeDefView attrDefView = new FileAttributeDefView(id, name, label, attributeType,
-								fieldNames, key, multiple);
-						attrDefView.setFileType(annotations.getFileType(fileDef));
-						attrDefView.setMaxSize(fileDef.getMaxSize());
-						attrDefView.setExtensions(fileDef.getExtensions());
-						view = attrDefView;
-					} else if (def instanceof NumericAttributeDefinition) {
-						NumericAttributeDefinition numericDef = (NumericAttributeDefinition) def;
-						NumericAttributeDefView attrDefView = def instanceof NumberAttributeDefinition
-								? new NumberAttributeDefView(id, name, label, attributeType, fieldNames, key, multiple)
-								: new RangeAttributeDefView(id, name, label, attributeType, fieldNames, key, multiple);
-						attrDefView.setNumericType(numericDef.getType());
-						List<Precision> precisions = numericDef.getPrecisionDefinitions();
-						List<PrecisionView> precisionViews = Views.fromObjects(precisions, PrecisionView.class);
-						attrDefView.setPrecisions(precisionViews);
-						view = attrDefView;
-					} else if (def instanceof TaxonAttributeDefinition) {
-						TaxonAttributeDefinition taxonDef = (TaxonAttributeDefinition) def;
-						TaxonAttributeDefView attrDefView = new TaxonAttributeDefView(id, name, label, attributeType,
-								fieldNames, key, multiple);
-						attrDefView.setTaxonomyName(taxonDef.getTaxonomy());
-						attrDefView.setHighestRank(taxonDef.getHighestTaxonRank());
-						attrDefView.setShowFamily(annotations.isShowFamily(taxonDef));
-						attrDefView.setIncludeUniqueVernacularName(annotations.isIncludeUniqueVernacularName(taxonDef));
-						attrDefView.setAllowUnlisted(annotations.isAllowUnlisted(taxonDef));
-						view = attrDefView;
-					} else if (def instanceof TextAttributeDefinition) {
-						TextAttributeDefinition textDef = (TextAttributeDefinition) def;
-						TextAttributeDefView attrDefView = new TextAttributeDefView(id, name, label, attributeType,
-								fieldNames, key, multiple);
-						attrDefView.setTextType(textDef.getType());
-						view = attrDefView;
-					} else {
-						view = new AttributeDefView(id, name, label, attributeType, fieldNames, key, multiple);
-					}
-					AttributeDefView attrDefView = (AttributeDefView) view;
-					attrDefView.setShowInRecordSummaryList(showInSummary);
-					attrDefView.setQualifier(qualifier);
-					List<FieldLabel> fieldLabels = attrDef.getFieldLabels();
-					Map<String, Boolean> visibilityByField = new HashMap<String, Boolean>();
-					List<String> fieldLabelsView = new ArrayList<String>(fieldLabels.size());
-					for (String fieldName : attrDef.getFieldNames()) {
-						fieldLabelsView.add(attrDef.getFieldLabel(fieldName, languageCode));
-						visibilityByField.put(fieldName, uiOptions.isVisibleField(attrDef, fieldName));
-					}
-					attrDefView.setFieldLabels(fieldLabelsView);
-					attrDefView.setVisibilityByField(visibilityByField);
-					attrDefView.setCalculated(attrDef.isCalculated());
+					view = createAttributeDefView(attrDef);
 				}
 				UIModelObject uiModelObject = uiConfiguration.getModelObjectByNodeDefinitionId(def.getId());
 				view.setHideWhenNotRelevant(uiModelObject != null && uiModelObject.isHideWhenNotRelevant());
@@ -252,6 +174,104 @@ public class SurveyViewGenerator {
 		}
 		itemView.items.addAll(childItemsView);
 		return itemView;
+	}
+
+	private AttributeDefView createAttributeDefView(AttributeDefinition def) {
+		CollectSurvey survey = def.getSurvey();
+		CollectAnnotations annotations = survey.getAnnotations();
+		// TODO use UIConfiguration instead
+		UIOptions uiOptions = survey.getUIOptions();
+
+		int id = def.getId();
+		String name = def.getName();
+		String label = getLabel(def);
+		boolean multiple = def.isMultiple();
+		AttributeDefView view;
+		boolean qualifier = annotations.isQualifier(def);
+		boolean showInSummary = annotations.isShowInSummary(def);
+		AttributeType attributeType = AttributeType.valueOf(def);
+		List<String> fieldNames = def.getFieldNames();
+		boolean key = def.isKey();
+
+		if (def instanceof BooleanAttributeDefinition) {
+			BooleanAttributeDefinition booleanAttrDef = (BooleanAttributeDefinition) def;
+			BooleanAttributeDefView attrDefView = new BooleanAttributeDefView(id, name, label, attributeType,
+					fieldNames, key, multiple);
+			attrDefView.setLayoutType(booleanAttrDef.isAffirmativeOnly() ? LayoutType.CHECKBOX : LayoutType.TEXTBOX);
+			view = attrDefView;
+		} else if (def instanceof CodeAttributeDefinition) {
+			CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) def;
+			int codeListId = codeAttrDef.getList() == null ? -1 : codeAttrDef.getList().getId();
+			CodeAttributeDefView attrDefView = new CodeAttributeDefView(id, name, label, attributeType, fieldNames, key,
+					multiple);
+			attrDefView.setCodeListId(codeListId);
+			attrDefView.setEnumerator(codeAttrDef.isEnumerator());
+			Integer codeParentDefId = codeAttrDef.getParentCodeAttributeDefinition() == null ? null
+					: codeAttrDef.getParentCodeAttributeDefinition().getId();
+			attrDefView.setParentCodeAttributeDefinitionId(codeParentDefId);
+			attrDefView.setShowCode(uiOptions.getShowCode(codeAttrDef));
+			attrDefView.setLayout(uiOptions.getLayoutType(codeAttrDef));
+			attrDefView.setItemsOrientation(uiOptions.getLayoutDirection(codeAttrDef));
+			view = attrDefView;
+		} else if (def instanceof CoordinateAttributeDefinition) {
+			CoordinateAttributeDefinition coordDef = (CoordinateAttributeDefinition) def;
+			CoordinateAttributeDefView attrDefView = new CoordinateAttributeDefView(id, name, label, attributeType,
+					fieldNames, key, multiple);
+			attrDefView.setFieldsOrder(uiOptions.getFieldsOrder(coordDef));
+			attrDefView.setShowSrsField(annotations.isShowSrsField(coordDef));
+			attrDefView.setIncludeAccuracyField(annotations.isIncludeCoordinateAccuracy(coordDef));
+			attrDefView.setIncludeAltitudeField(annotations.isIncludeCoordinateAltitude(coordDef));
+			view = attrDefView;
+		} else if (def instanceof FileAttributeDefinition) {
+			FileAttributeDefinition fileDef = (FileAttributeDefinition) def;
+			FileAttributeDefView attrDefView = new FileAttributeDefView(id, name, label, attributeType, fieldNames, key,
+					multiple);
+			attrDefView.setFileType(annotations.getFileType(fileDef));
+			attrDefView.setMaxSize(fileDef.getMaxSize());
+			attrDefView.setExtensions(fileDef.getExtensions());
+			view = attrDefView;
+		} else if (def instanceof NumericAttributeDefinition) {
+			NumericAttributeDefinition numericDef = (NumericAttributeDefinition) def;
+			NumericAttributeDefView attrDefView = def instanceof NumberAttributeDefinition
+					? new NumberAttributeDefView(id, name, label, attributeType, fieldNames, key, multiple)
+					: new RangeAttributeDefView(id, name, label, attributeType, fieldNames, key, multiple);
+			attrDefView.setNumericType(numericDef.getType());
+			List<Precision> precisions = numericDef.getPrecisionDefinitions();
+			List<PrecisionView> precisionViews = Views.fromObjects(precisions, PrecisionView.class);
+			attrDefView.setPrecisions(precisionViews);
+			view = attrDefView;
+		} else if (def instanceof TaxonAttributeDefinition) {
+			TaxonAttributeDefinition taxonDef = (TaxonAttributeDefinition) def;
+			TaxonAttributeDefView attrDefView = new TaxonAttributeDefView(id, name, label, attributeType, fieldNames,
+					key, multiple);
+			attrDefView.setTaxonomyName(taxonDef.getTaxonomy());
+			attrDefView.setHighestRank(taxonDef.getHighestTaxonRank());
+			attrDefView.setShowFamily(annotations.isShowFamily(taxonDef));
+			attrDefView.setIncludeUniqueVernacularName(annotations.isIncludeUniqueVernacularName(taxonDef));
+			attrDefView.setAllowUnlisted(annotations.isAllowUnlisted(taxonDef));
+			view = attrDefView;
+		} else if (def instanceof TextAttributeDefinition) {
+			TextAttributeDefinition textDef = (TextAttributeDefinition) def;
+			TextAttributeDefView attrDefView = new TextAttributeDefView(id, name, label, attributeType, fieldNames, key,
+					multiple);
+			attrDefView.setTextType(textDef.getType());
+			view = attrDefView;
+		} else {
+			view = new AttributeDefView(id, name, label, attributeType, fieldNames, key, multiple);
+		}
+		view.setShowInRecordSummaryList(showInSummary);
+		view.setQualifier(qualifier);
+		List<FieldLabel> fieldLabels = def.getFieldLabels();
+		Map<String, Boolean> visibilityByField = new HashMap<String, Boolean>();
+		List<String> fieldLabelsView = new ArrayList<String>(fieldLabels.size());
+		for (String fieldName : def.getFieldNames()) {
+			fieldLabelsView.add(def.getFieldLabel(fieldName, languageCode));
+			visibilityByField.put(fieldName, uiOptions.isVisibleField(def, fieldName));
+		}
+		view.setFieldLabels(fieldLabelsView);
+		view.setVisibilityByField(visibilityByField);
+		view.setCalculated(def.isCalculated());
+		return view;
 	}
 
 	private String getLabel(NodeDefinition def) {

@@ -108,12 +108,12 @@ public class AttributeDefault implements Serializable, DeepComparable, Cloneable
 	}
 	
 	private ExpressionEvaluator getExpressionEvaluator(Node<?> node) {
-		SurveyContext context = node.getSurvey().getContext();
+		SurveyContext<?> context = node.getSurvey().getContext();
 		return context.getExpressionEvaluator();
 	}
 	
 	private ExpressionEvaluator getExpressionEvaluator(SurveyObject surveyObj) {
-		SurveyContext context = surveyObj.getSurvey().getContext();
+		SurveyContext<?> context = surveyObj.getSurvey().getContext();
 		return context.getExpressionEvaluator();
 	}
 

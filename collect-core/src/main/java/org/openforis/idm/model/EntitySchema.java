@@ -7,7 +7,6 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.Survey;
 
 import com.dyuproject.protostuff.Input;
 import com.dyuproject.protostuff.Output;

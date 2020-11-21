@@ -139,7 +139,7 @@ public abstract class NumericAttributeDefinition extends AttributeDefinition {
 		return unit;
 	}
 	
-	public Unit getActualUnit(Integer unitId) {
+	public Unit getUnitOrDefault(Integer unitId) {
 		Unit unit = unitId == null ? null: getSurvey().getUnit(unitId.intValue());
 		if (unit == null) {
 			unit = getDefaultUnit();

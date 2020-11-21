@@ -6,6 +6,20 @@ export class NumberAttribute extends AbstractNumericAttribute {
   }
 
   get unitField() {
-    return this.fields[1]
+    return this.fields[2]
+  }
+
+  get value() {
+    return super.value
+  }
+
+  set value(value) {
+    if (value) {
+      // Workaround: Numeric value field "unitId" matches field "unit" in the attribute
+      const { unitId: unit, ...other } = value
+      super.value = { ...other, unit }
+    } else {
+      super.value = null
+    }
   }
 }
