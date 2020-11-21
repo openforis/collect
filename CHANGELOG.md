@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.26.29] - NOT RELEASED YET
 ### Added
-- Data entry new UI: layout improvements
+- Data entry new UI: layout improvements; support Range attributes.
 
 ## [3.26.28] - 2020-11-18
 ### Fixed
