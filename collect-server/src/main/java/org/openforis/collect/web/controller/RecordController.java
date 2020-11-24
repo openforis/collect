@@ -325,7 +325,8 @@ public class RecordController extends BasicController implements Serializable {
 		}
 		CollectSurvey survey = params.isPreview() ? surveyManager.loadSurvey(surveyId) : surveyManager.getById(surveyId);
 		params.setRootEntityName(ObjectUtils.defaultIfNull(params.getRootEntityName(), survey.getSchema().getFirstRootEntityDefinition().getName()));
-		params.setVersionName(ObjectUtils.defaultIfNull(params.getVersionName(), survey.getLatestVersion() != null ? survey.getLatestVersion().getName(): null));
+		Integer latestVersionId = survey.getLatestVersion() != null ? survey.getLatestVersion().getId(): null;
+		params.setVersionId(ObjectUtils.defaultIfNull(params.getVersionId(), latestVersionId));
 		params.setUserId(user.getId());
 		CollectRecord record = recordGenerator.generate(survey, params);
 		sessionRecordProvider.putRecord(record);

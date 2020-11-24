@@ -59,6 +59,10 @@ export class Survey extends Serializable {
     this.uiConfiguration = new UIConfiguration(this)
     this.uiConfiguration.fillFromJSON(jsonObj.uiConfiguration)
   }
+
+  getVersionById(versionId) {
+    return this.modelVersions.find((version) => version.id === versionId)
+  }
 }
 
 export class CodeList extends Serializable {
@@ -154,6 +158,8 @@ export class NodeDefinition extends SurveyObject {
   name
   label
   multiple
+  sinceVersionId
+  deprecatedVersionId
 
   static Types = {
     ENTITY: 'ENTITY',
@@ -213,6 +219,36 @@ export class NodeDefinition extends SurveyObject {
 
   get labelOrName() {
     return Strings.isNotBlank(this.label) ? this.label : this.name
+  }
+
+  get sinceVersion() {
+    return this.sinceVersionId ? this.survey.getVersionById(this.sinceVersionId) : null
+  }
+
+  get deprecatedVersion() {
+    return this.deprecatedVersionId ? this.survey.getVersionById(this.deprecatedVersionId) : null
+  }
+
+  isInVersion(version) {
+    if (version === null) {
+      return true
+    }
+    // check since version
+    if (this.sinceVersionId) {
+      if (this.sinceVersionId === version.id) {
+        return true
+      }
+      if (this.sinceVersion.date > version.date) {
+        return false
+      }
+    }
+    // check deprecated version
+    if (this.deprecatedVersionId) {
+      if (this.deprecatedVersionId === version.id || this.deprecatedVersion.date < version.date) {
+        return false
+      }
+    }
+    return true
   }
 }
 

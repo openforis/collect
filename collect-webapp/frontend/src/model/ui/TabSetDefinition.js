@@ -29,4 +29,10 @@ export class TabSetDefinition extends UIModelObjectDefinition {
   get survey() {
     return this.uiConfiguration.survey
   }
+
+  isInVersion(version) {
+    const innerTabsInVersion = this.tabs.filter((tab) => tab.isInVersion(version))
+    const itemsInVersion = this.items.filter((item) => item.isInVersion(version))
+    return innerTabsInVersion.length > 0 || itemsInVersion.length > 0
+  }
 }

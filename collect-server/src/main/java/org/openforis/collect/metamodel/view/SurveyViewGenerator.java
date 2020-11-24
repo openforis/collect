@@ -15,6 +15,7 @@ import org.openforis.collect.metamodel.view.BooleanAttributeDefView.LayoutType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserInGroup;
+import org.openforis.collect.utils.Dates;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.AttributeDefinition.FieldLabel;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
@@ -101,7 +102,7 @@ public class SurveyViewGenerator {
 			versionView.setId(version.getId());
 			versionView.setName(version.getName());
 			versionView.setLabel(version.getLabel(languageCode));
-			versionView.setDate(version.getDate());
+			versionView.setDate(Dates.formatDate(version.getDate()));
 			surveyView.addModelVersion(versionView);
 		}
 
@@ -137,12 +138,14 @@ public class SurveyViewGenerator {
 					entityDefView.setEnumerate(annotations.isEnumerate(entityDefinition));
 					view = entityDefView;
 				} else {
-					AttributeDefinition attrDef = (AttributeDefinition) def;
-					view = createAttributeDefView(attrDef);
+					view = createAttributeDefView((AttributeDefinition) def);
 				}
+				view.setSinceVersionId(def.getSinceVersionId());
+				view.setDeprecatedVersionId(def.getDeprecatedVersionId());
+				
 				UIModelObject uiModelObject = uiConfiguration.getModelObjectByNodeDefinitionId(def.getId());
 				view.setHideWhenNotRelevant(uiModelObject != null && uiModelObject.isHideWhenNotRelevant());
-
+				
 				NodeDefinition parentDef = def.getParentDefinition();
 				if (parentDef == null) {
 					surveyView.getSchema().addRootEntity((EntityDefView) view);

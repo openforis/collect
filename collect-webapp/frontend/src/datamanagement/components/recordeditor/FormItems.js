@@ -48,16 +48,22 @@ export default class FormItems extends AbstractFormComponent {
 
   render() {
     const { itemDefs, parentEntity } = this.props
+    const { record } = parentEntity
+    const { version } = record
+    const itemDefsInVersion =
+      version === null ? itemDefs : itemDefs.filter((itemDef) => itemDef.nodeDefinition.isInVersion(version))
+
+    const firstDef = itemDefsInVersion[0]
 
     const onlyOneMultipleEntity =
-      itemDefs.length === 1 &&
-      (itemDefs[0] instanceof TableDefinition || itemDefs[0] instanceof MultipleFieldsetDefinition)
+      itemDefsInVersion.length === 1 &&
+      (firstDef instanceof TableDefinition || firstDef instanceof MultipleFieldsetDefinition)
 
     return onlyOneMultipleEntity ? (
-      <FormItemsItem itemDef={itemDefs[0]} parentEntity={parentEntity} fullSize />
-    ) : itemDefs.length > 0 ? (
+      <FormItemsItem itemDef={firstDef} parentEntity={parentEntity} fullSize />
+    ) : itemDefsInVersion.length > 0 ? (
       <Container className="formItems">
-        {itemDefs.map((itemDef) => (
+        {itemDefsInVersion.map((itemDef) => (
           <FormItemsItem key={itemDef.id} itemDef={itemDef} parentEntity={parentEntity} />
         ))}
       </Container>

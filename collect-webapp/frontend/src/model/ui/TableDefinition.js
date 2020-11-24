@@ -8,6 +8,10 @@ export class ColumnDefinition extends TableHeadingComponentDefinition {
   get attributeDefinition() {
     return this.survey.schema.getDefinitionById(this.attributeDefinitionId)
   }
+
+  get nodeDefinition() {
+    return this.attributeDefinition
+  }
 }
 
 export class ColumnGroupDefinition extends TableHeadingComponentDefinition {
@@ -34,6 +38,10 @@ export class ColumnGroupDefinition extends TableHeadingComponentDefinition {
     return this.survey.schema.getDefinitionById(this.entityDefinitionId)
   }
 
+  get nodeDefinition() {
+    return this.attributeDefinition
+  }
+
   get descendantColumns() {
     const columns = []
     const stack = []
@@ -47,6 +55,10 @@ export class ColumnGroupDefinition extends TableHeadingComponentDefinition {
       }
     }
     return columns
+  }
+
+  isInVersion(version) {
+    return super.isInVersion(version) && this.headingComponents.filter((comp) => comp.isInVersion(version)).length > 0
   }
 }
 
@@ -96,5 +108,9 @@ export class TableDefinition extends UIModelObjectDefinition {
 
   get nodeDefinition() {
     return this.entityDefinition
+  }
+
+  isInVersion(version) {
+    return super.isInVersion(version) && this.headingComponents.filter((comp) => comp.isInVersion(version)).length > 0
   }
 }

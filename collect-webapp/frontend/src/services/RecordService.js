@@ -6,15 +6,15 @@ import Workflow from '../model/Workflow'
 export default class RecordService extends AbstractService {
   fetchRecordSummaries(surveyId, rootEntityName, userId, filterOptions, sortFields, fullSummary = false) {
     return this.get('survey/' + surveyId + '/data/records/summary', {
-      rootEntityName: rootEntityName,
+      rootEntityName,
       userId: userId,
       maxNumberOfRows: filterOptions.recordsPerPage,
       offset: (filterOptions.page - 1) * filterOptions.recordsPerPage,
       keyValues: filterOptions.keyValues,
       summaryValues: filterOptions.summaryValues,
       ownerIds: filterOptions.ownerIds,
-      sortFields: sortFields,
-      fullSummary: fullSummary,
+      sortFields,
+      fullSummary,
       includeOwners: true,
     }).then((res) => {
       return { ...res, records: res.records.map((r) => new RecordSummary(r)) }
@@ -48,10 +48,10 @@ export default class RecordService extends AbstractService {
     })
   }
 
-  createRecord({ surveyId, rootEntityName = null, versionName = null, step = Workflow.STEPS.entry, preview = false }) {
+  createRecord({ surveyId, rootEntityName = null, versionId = null, step = Workflow.STEPS.entry, preview = false }) {
     return this.postJson('survey/' + surveyId + '/data/records', {
       rootEntityName,
-      versionName,
+      versionId,
       step: step.code,
       preview,
     })
@@ -93,8 +93,8 @@ export default class RecordService extends AbstractService {
 
   delete(surveyId, userId, recordIds) {
     return super.delete('survey/' + surveyId + '/data/records', {
-      userId: userId,
-      recordIds: recordIds,
+      userId,
+      recordIds,
     })
   }
 
@@ -103,7 +103,7 @@ export default class RecordService extends AbstractService {
       'survey/' + survey.id + '/data/import/records/summary',
       file,
       {
-        rootEntityName: rootEntityName,
+        rootEntityName,
       },
       onError,
       onProgress
@@ -133,14 +133,14 @@ export default class RecordService extends AbstractService {
     newRecordVersionName
   ) {
     return this.postFormData('survey/' + survey.id + '/data/csvimport/records', {
-      rootEntityName: rootEntityName,
+      rootEntityName,
       file: file,
-      importType: importType,
-      steps: steps,
-      entityDefinitionId: entityDefinitionId,
-      validateRecords: validateRecords,
-      deleteEntitiesBeforeImport: deleteEntitiesBeforeImport,
-      newRecordVersionName: newRecordVersionName,
+      importType,
+      steps,
+      entityDefinitionId,
+      validateRecords,
+      deleteEntitiesBeforeImport,
+      newRecordVersionName,
     })
   }
 
@@ -150,8 +150,8 @@ export default class RecordService extends AbstractService {
 
   startRecordMoveJob(surveyId, fromStep, promote) {
     return this.post('survey/' + surveyId + '/data/move/records', {
-      fromStep: fromStep,
-      promote: promote,
+      fromStep,
+      promote,
     })
   }
 }

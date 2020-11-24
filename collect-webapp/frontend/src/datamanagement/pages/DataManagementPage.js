@@ -83,9 +83,9 @@ class DataManagementPage extends React.Component {
 		}
 	}
 
-	handleNewRecordParametersSelected(versionName) {
+	handleNewRecordParametersSelected(versionId) {
 		const { survey } = this.props
-		ServiceFactory.recordService.createRecord({survey: survey.id, versionName}).then(record => {
+		ServiceFactory.recordService.createRecord({surveyId: survey.id, versionId}).then(record => {
 			this.navigateToItemEditView(record.id)
 		})
 	}

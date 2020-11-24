@@ -39,12 +39,20 @@ public abstract class VersionableSurveyObject extends IdentifiableSurveyObject<V
 		return sinceVersion == null ? null : sinceVersion.getName();
 	}
 	
+	public Integer getSinceVersionId() {
+		return sinceVersion == null ? null : sinceVersion.getId();
+	}
+	
 	public void setSinceVersionByName(String name) {
 		this.sinceVersion = name == null ? null : findVersion(name);
 	}
 
 	public String getDeprecatedVersionName() {
 		return deprecatedVersion == null ? null : deprecatedVersion.getName();
+	}
+	
+	public Integer getDeprecatedVersionId() {
+		return deprecatedVersion == null ? null : deprecatedVersion.getId();
 	}
 	
 	public void setDeprecatedVersionByName(String name) {

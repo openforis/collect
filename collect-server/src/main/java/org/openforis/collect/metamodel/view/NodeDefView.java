@@ -10,6 +10,8 @@ public abstract class NodeDefView extends SurveyObjectView {
 	private boolean key;
 	private boolean multiple;
 	private boolean hideWhenNotRelevant;
+	private Integer sinceVersionId;
+	private Integer deprecatedVersionId;
 
 	public NodeDefView(int id, String name, String label, NodeType type, boolean key, boolean multiple) {
 		super();
@@ -47,6 +49,22 @@ public abstract class NodeDefView extends SurveyObjectView {
 
 	public void setHideWhenNotRelevant(boolean hideWhenNotRelevant) {
 		this.hideWhenNotRelevant = hideWhenNotRelevant;
+	}
+
+	public Integer getSinceVersionId() {
+		return sinceVersionId;
+	}
+
+	public void setSinceVersionId(Integer sinceVersionId) {
+		this.sinceVersionId = sinceVersionId;
+	}
+
+	public Integer getDeprecatedVersionId() {
+		return deprecatedVersionId;
+	}
+
+	public void setDeprecatedVersionId(Integer deprecatedVersionId) {
+		this.deprecatedVersionId = deprecatedVersionId;
 	}
 
 }

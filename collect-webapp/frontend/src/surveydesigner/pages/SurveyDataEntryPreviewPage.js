@@ -17,12 +17,16 @@ export default class SurveyDataEntryPreviewPage extends Component {
   }
 
   componentDidMount() {
-    const { id: idParam } = this.props.match.params
+    const { match, location } = this.props
+    const { id: idParam } = match.params
+    
+    const versionId = new URLSearchParams(location.search).get('versionId')
+
     const surveyId = Number(idParam)
 
     ServiceFactory.surveyService.fetchById(surveyId).then((survey) => {
       ServiceFactory.recordService
-        .createRecord({ surveyId, step: Workflow.STEPS.cleansing, preview: true })
+        .createRecord({ surveyId, step: Workflow.STEPS.cleansing, versionId, preview: true })
         .then((recordRes) => {
           const record = new Record(survey, recordRes)
           this.recordUpdater = new RecordUpdater(record)

@@ -21,6 +21,7 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.EntityDefinition.TraversalType;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.model.Attribute;
@@ -61,7 +62,7 @@ public class RecordGenerator {
 				survey.getSchema().getFirstRootEntityDefinition() 
 				: survey.getSchema().getRootEntityDefinition(parameters.getRootEntityName());
 				
-		CollectRecord record = createRecord(survey, rootEntityDef, parameters.getVersionName(), 
+		CollectRecord record = createRecord(survey, rootEntityDef, parameters.getVersionId(), 
 				parameters.getStep(), user, recordKey);
 		record.setPreview(parameters.isPreview());
 
@@ -75,8 +76,10 @@ public class RecordGenerator {
 	}
 	
 	private CollectRecord createRecord(CollectSurvey survey, EntityDefinition rootEntityDef, 
-			String versionName, Step step, User user, RecordKey recordKey) {
+			Integer versionId, Step step, User user, RecordKey recordKey) {
 		String rootEntityName = rootEntityDef.getName();
+		ModelVersion version = versionId == null ? null : survey.getVersionById(versionId);
+		String versionName = version == null ? null : version.getName();
 		CollectRecord record = recordManager.create(survey, rootEntityName, user, versionName, null, step);
 		if (recordKey.isNotEmpty()) {
 			setRecordKeyValues(record, recordKey);
@@ -186,7 +189,7 @@ public class RecordGenerator {
 		private String username;
 		private Integer userId;
 		private String rootEntityName;
-		private String versionName;
+		private Integer versionId;
 		private Step step = Step.ENTRY;
 		private boolean preview;
 		private boolean addSecondLevelEntities = false;
@@ -216,13 +219,13 @@ public class RecordGenerator {
 		public void setRootEntityName(String rootEntityName) {
 			this.rootEntityName = rootEntityName;
 		}
-		
-		public String getVersionName() {
-			return versionName;
+
+		public Integer getVersionId() {
+			return versionId;
 		}
 		
-		public void setVersionName(String versionName) {
-			this.versionName = versionName;
+		public void setVersionId(Integer versionId) {
+			this.versionId = versionId;
 		}
 		
 		public Step getStep() {

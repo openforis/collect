@@ -19,4 +19,10 @@ export class TabDefinition extends UIModelObjectDefinition {
     this.tabs = TabContainers.createTabsFromJSON({ json: jsonObj.tabs, parent: this })
     this.items = TabContainers.createItemsFromJSON({ json: jsonObj.children, parent: this })
   }
+
+  isInVersion(version) {
+    const innerTabsInVersion = this.tabs.filter((tab) => tab.isInVersion(version))
+    const itemsInVersion = this.items.filter((item) => item.isInVersion(version))
+    return innerTabsInVersion.length > 0 || itemsInVersion.length > 0
+  }
 }

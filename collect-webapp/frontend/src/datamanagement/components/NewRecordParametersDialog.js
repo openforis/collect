@@ -13,57 +13,54 @@ import L from 'utils/Labels'
 import Dates from 'utils/Dates'
 
 export default class NewRecordParametersDialog extends Component {
+  constructor(props) {
+    super()
 
-    constructor(props) {
-        super(props)
+    this.handleVersionClick = this.handleVersionClick.bind(this)
+    this.handleClose = this.handleClose.bind(this)
+  }
 
-        this.handleVersionClick = this.handleVersionClick.bind(this)
-        this.handleClose = this.handleClose.bind(this)
-    }
+  handleVersionClick = (versionId) => {
+    this.props.onOk(versionId)
+  }
 
-    handleVersionClick = versionName => {
-        this.props.onOk(versionName)
-    }
+  handleClose = () => {
+    this.props.onClose()
+  }
 
-    handleClose = () => {
-        this.props.onClose()
-    }
+  render() {
+    const { onClose, versions, onOk, ...other } = this.props
 
-    render() {
-        const { onClose, versions, onOk, ...other } = this.props
-
-        return (
-            <Dialog onClose={this.handleClose} aria-labelledby="new-record-parameters-dialog-title" {...other}>
-                <DialogTitle id="new-record-parameters-dialog-title">
-                    {L.l('dataManagement.formVersioning.selectFormVersion')}
-                </DialogTitle>
-                <div>
-                    <Table>
-                        <TableBody>
-                            {versions.map(v => {
-                                return (
-                                <TableRow key={v.id} hover onClick={event => this.handleVersionClick(v.name)}>
-                                    <TableCell>{v.name}</TableCell>
-                                    <TableCell>{v.label}</TableCell>
-                                    <TableCell>{Dates.format(v.date)}</TableCell>
-                                </TableRow>
-                                )
-                            })}
-                        </TableBody>
-                    </Table>
-                </div>
-                <DialogActions>
-                    <Button onClick={this.handleClose}>
-                        {L.l('general.cancel')}
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        )
-    }
+    return (
+      <Dialog onClose={this.handleClose} aria-labelledby="new-record-parameters-dialog-title" {...other}>
+        <DialogTitle id="new-record-parameters-dialog-title">
+          {L.l('dataManagement.formVersioning.selectFormVersion')}
+        </DialogTitle>
+        <div>
+          <Table>
+            <TableBody>
+              {versions.map((v) => {
+                return (
+                  <TableRow key={v.id} hover onClick={() => this.handleVersionClick(v.id)}>
+                    <TableCell>{v.name}</TableCell>
+                    <TableCell>{v.label}</TableCell>
+                    <TableCell>{Dates.format(v.date)}</TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </div>
+        <DialogActions>
+          <Button onClick={this.handleClose}>{L.l('general.cancel')}</Button>
+        </DialogActions>
+      </Dialog>
+    )
+  }
 }
 
 NewRecordParametersDialog.propTypes = {
-    versions: PropTypes.array.isRequired,
-    onClose: PropTypes.func.isRequired,
-    onOk: PropTypes.func.isRequired
+  versions: PropTypes.array.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onOk: PropTypes.func.isRequired,
 }

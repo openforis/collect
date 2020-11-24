@@ -9,10 +9,13 @@ import Tab from './Tab'
 
 const TabSetContent = (props) => {
   const { tabSetDef, parentEntity } = props
-  const { tabs: tabDefs } = tabSetDef
+  const { tabs } = tabSetDef
 
-  const hasTabs = Boolean(tabDefs.length)
-  const firstTabDefId = hasTabs ? tabDefs[0].id : null
+  const version = parentEntity.record.version
+  const tabsInVersion = tabs.filter((tabDef) => tabDef.isInVersion(version))
+
+  const hasTabs = Boolean(tabsInVersion.length)
+  const firstTabDefId = hasTabs ? tabsInVersion[0].id : null
 
   const [activeTab, setActiveTab] = useState(firstTabDefId)
 
@@ -38,10 +41,12 @@ const TabSetContent = (props) => {
     adjustSize()
   }, [wrapperRef])
 
-  return hasTabs ? (
+  if (!hasTabs) return null
+
+  return (
     <div className="tabset-wrapper" ref={wrapperRef}>
       <Nav tabs>
-        {tabDefs.map((tabDef) => (
+        {tabsInVersion.map((tabDef) => (
           <NavItem key={tabDef.id}>
             <NavLink
               className={classnames({ active: activeTab === tabDef.id })}
@@ -53,7 +58,7 @@ const TabSetContent = (props) => {
         ))}
       </Nav>
       <TabContent activeTab={activeTab}>
-        {tabDefs.map((tabDef) => {
+        {tabsInVersion.map((tabDef) => {
           const onlyOneMultipleFieldset =
             tabDef.items.length === 1 && tabDef.items[0] instanceof MultipleFieldsetDefinition
           return (
@@ -68,7 +73,7 @@ const TabSetContent = (props) => {
         })}
       </TabContent>
     </div>
-  ) : null
+  )
 }
 
 export default TabSetContent

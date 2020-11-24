@@ -1,13 +1,11 @@
 package org.openforis.collect.metamodel.view;
 
-import java.util.Date;
-
 public class ModelVersionView extends SurveyObjectView {
 	
 	private String name;
 	private String label;
 	private String description;
-	private Date date;
+	private String date;
 	
 	public String getName() {
 		return name;
@@ -33,11 +31,11 @@ public class ModelVersionView extends SurveyObjectView {
 		this.description = description;
 	}
 	
-	public Date getDate() {
+	public String getDate() {
 		return date;
 	}
-
-	public void setDate(Date date) {
+	
+	public void setDate(String date) {
 		this.date = date;
 	}
 }
