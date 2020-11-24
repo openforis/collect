@@ -866,18 +866,26 @@ public class RecordUpdater {
 		changeMap.addValueChanges(calculatedAttributes);
 		
 		//relevance
-		Set<NodePointer> pointersToRecalculateRelevanceFor = new HashSet<NodePointer>();
-		pointersToRecalculateRelevanceFor.addAll(getChildNodePointers(entity));
-		pointersToRecalculateRelevanceFor.addAll(record.determineRelevanceDependentNodes(calculatedAttributes));
-		if (entity.getParent() != null) {
-			pointersToRecalculateRelevanceFor.addAll(record.determineRelevanceDependentNodePointers(
-					Arrays.asList(new NodePointer(entity))));
+		{
+			Set<NodePointer> pointersToRecalculateRelevanceFor = new HashSet<NodePointer>();
+			pointersToRecalculateRelevanceFor.addAll(getChildNodePointers(entity));
+			pointersToRecalculateRelevanceFor.addAll(record.determineRelevanceDependentNodes(calculatedAttributes));
+			if (entity.getParent() != null) {
+				pointersToRecalculateRelevanceFor.addAll(record.determineRelevanceDependentNodePointers(
+						Arrays.asList(new NodePointer(entity))));
+			}
+			Set<NodePointer> updatedRelevancePointers = new RelevanceUpdater(new ArrayList<NodePointer>(pointersToRecalculateRelevanceFor)).update();
+			changeMap.addRelevanceChanges(updatedRelevancePointers);
 		}
-		Set<NodePointer> updatedRelevancePointers = new RelevanceUpdater(new ArrayList<NodePointer>(pointersToRecalculateRelevanceFor)).update();
-		changeMap.addRelevanceChanges(updatedRelevancePointers);
 		
 		//default values
-		applyInitialValues(entity);
+		List<Attribute<?, ?>> attributesWithInitialValuesApplied = applyInitialValues(entity);
+		if (!attributesWithInitialValuesApplied.isEmpty()) {
+			//re-calculate relevance of default value applied attributes dependents
+			Set<NodePointer> pointersToRecalculateRelevanceFor = new HashSet<NodePointer>(record.determineRelevanceDependentNodes(attributesWithInitialValuesApplied));
+			Set<NodePointer> updatedRelevancePointers = new RelevanceUpdater(new ArrayList<NodePointer>(pointersToRecalculateRelevanceFor)).update();
+			changeMap.addRelevanceChanges(updatedRelevancePointers);
+		}
 		
 		if (validateAfterUpdate) {
 			//recalculate descendant pointers after empty nodes have been added
@@ -1062,7 +1070,7 @@ public class RecordUpdater {
 			return defn.getFixedMinCount();
 		}
 		try {
-			SurveyContext surveyContext = defn.getSurvey().getContext();
+			SurveyContext<?> surveyContext = defn.getSurvey().getContext();
 			ExpressionEvaluator expressionEvaluator = surveyContext.getExpressionEvaluator();
 			Number value = expressionEvaluator.evaluateNumericValue(entity, null, expression);
 			return value == null ? 0: value.intValue();
@@ -1084,7 +1092,7 @@ public class RecordUpdater {
 			return defn.getFixedMaxCount();
 		}
 		try {
-			SurveyContext surveyContext = defn.getSurvey().getContext();
+			SurveyContext<?> surveyContext = defn.getSurvey().getContext();
 			ExpressionEvaluator expressionEvaluator = surveyContext.getExpressionEvaluator();
 			Number value = expressionEvaluator.evaluateNumericValue(entity, null, expression);
 			return value == null ? Integer.MAX_VALUE: value.intValue();

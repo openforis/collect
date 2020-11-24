@@ -4,13 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.26.29] - NOT RELEASED YET
+## [3.26.29] - 2020-11-25
+### Fixed
+- Fixed evaluation of relevancy when default value is applied.
+
 ### Added
-- Data entry new UI: layout improvements; support Range attributes; support Boolean attributes with text mode.
+- Data entry new UI: layout improvements; support Range attributes, Boolean attributes with text mode, form versions.
 
 ## [3.26.28] - 2020-11-18
 ### Fixed
 - Fixed error showing/downloading uploaded images
+
 ### Added
 - Data entry new UI: support calculated attributes (shown as disabled)
 

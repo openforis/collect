@@ -436,7 +436,8 @@ input.is-invalid.warning:focus {
 }
 
 .form-item-external-wrapper.not-relevant input,
-.form-item-external-wrapper.not-relevant .form-item-table {
+.form-item-external-wrapper.not-relevant .form-item-table,
+.form-item-external-wrapper.not-relevant .MuiFormControl-root.MuiTextField-root {
   background-color: #d4d4d4;
 }
 

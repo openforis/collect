@@ -594,6 +594,20 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 	}
 	
 	@Test
+	public void testRelevanceUpdatedWithSiblingDefaultValue() {
+		record(
+			rootEntityDef(
+				attributeDef("source")
+					.defaultValue("'true'"),
+				attributeDef("dependent")
+					.relevant("source = 'true'")
+			)
+		);
+		boolean relevant = record.getRootEntity().isRelevant("dependent");
+		assertTrue(relevant);
+	}
+	
+	@Test
 	public void testInitializeCalculatedAttributeInNestedNode() {
 		record(
 			rootEntityDef(

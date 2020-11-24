@@ -131,13 +131,13 @@ public abstract class NodeDefinitionBuilder {
 		}
 
 		@Override
-		public EntityDefinitionBuilder relevant(String expression) {
-			return (EntityDefinitionBuilder) super.relevant(expression);
+		public EntityDefinitionBuilder required(String expression) {
+			return (EntityDefinitionBuilder) super.required(expression);
 		}
 		
 		@Override
-		public EntityDefinitionBuilder required(String expression) {
-			return (EntityDefinitionBuilder) super.required(expression);
+		public EntityDefinitionBuilder relevant(String expression) {
+			return (EntityDefinitionBuilder) super.relevant(expression);
 		}
 		
 		public EntityDefinitionBuilder virtual() {
@@ -168,6 +168,7 @@ public abstract class NodeDefinitionBuilder {
 	public static class AttributeDefinitionBuilder extends NodeDefinitionBuilder {
 
 		private boolean key;
+		private boolean calculated;
 		private List<AttributeDefault> defaultValues;
 		private String validationExpression;
 
@@ -191,6 +192,15 @@ public abstract class NodeDefinitionBuilder {
 		}
 		
 		public AttributeDefinitionBuilder calculated(String expression, String condition) {
+			this.calculated = true;
+			return defaultValue(expression, condition);
+		}
+		
+		public AttributeDefinitionBuilder defaultValue(String expression) {
+			return defaultValue(expression, null);
+		}
+		
+		public AttributeDefinitionBuilder defaultValue(String expression, String condition) {
 			this.defaultValues.add(new AttributeDefault(expression, condition));
 			return this;
 		}
@@ -227,7 +237,7 @@ public abstract class NodeDefinitionBuilder {
 			if ( def instanceof KeyAttributeDefinition) {
 				((KeyAttributeDefinition) def).setKey(key);
 			}
-			def.setCalculated(! defaultValues.isEmpty());
+			def.setCalculated(calculated);
 			for (AttributeDefault attributeDefault : defaultValues) {
 				def.addAttributeDefault(attributeDefault);
 			}
