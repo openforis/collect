@@ -52,6 +52,9 @@ export class RecordUpdater {
         if (attr == null) {
           attr = parentEntity.addNewAttribute(definition)
         }
+        if (event.nodeId) {
+          attr.id = event.nodeId
+        }
         attr.value = event.value
         attr.validationResults = event.validationResults
       } else if (event instanceof AttributeDeletedEvent || event instanceof EntityDeletedEvent) {

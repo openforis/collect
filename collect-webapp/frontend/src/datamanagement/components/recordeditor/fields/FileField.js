@@ -15,10 +15,10 @@ import Image from 'common/components/Image'
 import AbstractField from './AbstractField'
 
 const EXTENSIONS_BY_FILE_TYPE = {
-  [FileAttributeDefinition.FileTypes.AUDIO]: '.mp3,.wav,.3gp',
-  [FileAttributeDefinition.FileTypes.IMAGE]: '.jpg,.jpeg,.png,.btm',
-  [FileAttributeDefinition.FileTypes.VIDEO]: '.avi,.mkv',
-  [FileAttributeDefinition.FileTypes.DOCUMENT]: '.doc,.docx,.xls,.xlsx,.pdf,.odt,.xml',
+  [FileAttributeDefinition.FileTypes.AUDIO]: '.3gp,.mp3,.wav',
+  [FileAttributeDefinition.FileTypes.IMAGE]: '.jpg,.jpeg,.png,.bmp',
+  [FileAttributeDefinition.FileTypes.VIDEO]: '.avi,.mov,.mkv',
+  [FileAttributeDefinition.FileTypes.DOCUMENT]: '.doc,.docx,.odt,.pdf,.xml,.xls,.xlsx,.zip',
 }
 
 const FileThumbnail = (props) => {
