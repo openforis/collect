@@ -86,7 +86,7 @@ export default class CoordinateField extends AbstractField {
             style={style}
           >
             <MenuItem key="empty" value="">
-              <em>Select...</em>
+              <em>{L.l('common.selectOne')}</em>
             </MenuItem>
             {srss.map((srs) => (
               <MenuItem key={srs.id} value={srs.id}>
