@@ -94,20 +94,22 @@ export default class MultipleFieldset extends EntityCollectionComponent {
 
     return (
       <>
-        <label>{L.l('common.selectItemLabelWithParam', [entityDefinition.labelOrName])}</label>
-        <Input
-          type="select"
-          id="entityDropdown"
-          style={{ display: 'inline-block', width: '200px' }}
-          onChange={(event) => this.onSelectedEntityChange(event)}
-          value={selectedEntityIndex}
-        >
-          {entityOptions}
-        </Input>
-        <Button color="success" onClick={this.handleNewButtonClick}>
-          {L.l('common.new')}
-        </Button>
-        {selectedEntity && <DeleteIconButton onClick={this.handleDeleteButtonClick} />}
+        <div className="multiple-fieldset-header">
+          <label>{entityDefinition.labelOrName}:</label>
+          <Input
+            type="select"
+            id="entityDropdown"
+            style={{ display: 'inline-block', width: '200px' }}
+            onChange={(event) => this.onSelectedEntityChange(event)}
+            value={selectedEntityIndex}
+          >
+            {entityOptions}
+          </Input>
+          <Button color="success" onClick={this.handleNewButtonClick}>
+            {L.l('common.new')}
+          </Button>
+          {selectedEntity && <DeleteIconButton onClick={this.handleDeleteButtonClick} />}
+        </div>
         {selectedEntity && (
           <>
             <FormItems itemDefs={itemDef.items} parentEntity={selectedEntity} />

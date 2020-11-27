@@ -450,6 +450,12 @@ input.is-invalid.warning:focus {
   gap: 6px;
 }
 
+.multiple-fieldset-header {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
 /**
 * === VALIDATION FEEDBACK
 **/
