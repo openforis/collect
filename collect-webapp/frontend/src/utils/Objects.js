@@ -63,6 +63,6 @@ export default class Objects {
 
   static getProp = (prop, defaultTo = null) => (obj) => {
     const val = obj ? obj[prop] : null
-    return val || defaultTo
+    return Objects.isNullOrUndefined(val) ? defaultTo : val
   }
 }

@@ -2,7 +2,9 @@ import React from 'react'
 import classNames from 'classnames'
 import { TextField as MuiTextField } from '@material-ui/core'
 
+import Numbers from 'utils/Numbers'
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
+
 import UnitField from './UnitField'
 import AbstractNumericField from './AbstractNumericField'
 
@@ -23,7 +25,7 @@ export default class NumberField extends AbstractNumericField {
 
   onInputValueChange(event) {
     const { value } = this.state
-    const valueUpdated = { ...value, value: Number(event.target.value) }
+    const valueUpdated = { ...value, value: Numbers.toNumber(event.target.value) }
     this.updateValue({ value: valueUpdated })
   }
 
@@ -42,7 +44,7 @@ export default class NumberField extends AbstractNumericField {
           <MuiTextField
             variant="outlined"
             type="number"
-            value={value || ''}
+            value={Numbers.toString(value)}
             className={classNames({ readOnly: calculated })}
             disabled={calculated}
             onChange={this.onInputValueChange}

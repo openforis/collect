@@ -3,8 +3,9 @@ import { MenuItem, Select, TextField as MuiTextField } from '@material-ui/core'
 import { CoordinateAttributeDefinition } from 'model/Survey'
 
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
-import Objects from 'utils/Objects'
 import L from 'utils/Labels'
+import Objects from 'utils/Objects'
+import Numbers from 'utils/Numbers'
 
 import AbstractField from './AbstractField'
 import CompositeAttributeFormItem from './CompositeAttributeFormItem'
@@ -38,8 +39,7 @@ export default class CoordinateField extends AbstractField {
   }
 
   onChangeNumericField({ field, event }) {
-    const value = event.target.value
-    this.onChangeField({ field, fieldValue: value === '' ? null : Number(value) })
+    this.onChangeField({ field, fieldValue: Numbers.toNumber(event.target.value) })
   }
 
   onChangeSrs(event) {

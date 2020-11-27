@@ -5,6 +5,7 @@ import { TextField as MuiTextField } from '@material-ui/core'
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 import L from 'utils/Labels'
 import Objects from 'utils/Objects'
+import Numbers from 'utils/Numbers'
 
 import AbstractNumericField from './AbstractNumericField'
 import UnitField from './UnitField'
@@ -52,7 +53,7 @@ export default class RangeField extends AbstractNumericField {
         value={Objects.getProp(fieldName, '')(value)}
         className={classNames({ readOnly: calculated })}
         disabled={calculated}
-        onChange={(event) => this.onInputValueChange({ fieldName, fieldValue: Number(event.target.value) })}
+        onChange={(event) => this.onInputValueChange({ fieldName, fieldValue: Numbers.toNumber(event.target.value) })}
       />
     )
 
