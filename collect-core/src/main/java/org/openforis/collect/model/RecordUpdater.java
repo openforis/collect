@@ -439,14 +439,13 @@ public class RecordUpdater {
 		Validator validator = record.getSurveyContext().getValidator();
 		
 		for (Attribute<?, ?> a : attributes) {
-			ValidationResults validationResults;
-			if ( a.isRelevant() ) {
-				validationResults = validator.validate(a);
-			} else {
-				validationResults = new ValidationResults(); 
+			ValidationResults validationResultsNew = a.isRelevant() ? validator.validate(a) : new ValidationResults();
+			ValidationResults validationResultsOld = a.getValidationResults();
+			if (validationResultsOld == null && !validationResultsNew.isEmpty()
+					|| validationResultsOld != null && !validationResultsNew.equals(validationResultsOld)) {
+				a.setValidationResults(validationResultsNew);
+				changeMap.addValidationResultChange(a, validationResultsNew);
 			}
-			a.setValidationResults(validationResults);
-			changeMap.addValidationResultChange(a, validationResults);
 		}
 	}
 

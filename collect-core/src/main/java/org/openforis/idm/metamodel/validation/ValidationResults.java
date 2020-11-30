@@ -89,6 +89,10 @@ public class ValidationResults {
 		return !warnings.isEmpty();
 	}
 	
+	public boolean isEmpty() {
+		return !hasErrors() && !hasWarnings();
+	}
+	
 	@Override
 	@SuppressWarnings("serial")
 	public String toString() {
@@ -97,4 +101,36 @@ public class ValidationResults {
 			put("warnings", warnings);
 		}}.toString();
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((errors == null) ? 0 : errors.hashCode());
+		result = prime * result + ((warnings == null) ? 0 : warnings.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ValidationResults other = (ValidationResults) obj;
+		if (errors == null) {
+			if (other.errors != null)
+				return false;
+		} else if (!errors.equals(other.errors))
+			return false;
+		if (warnings == null) {
+			if (other.warnings != null)
+				return false;
+		} else if (!warnings.equals(other.warnings))
+			return false;
+		return true;
+	}
+	
 }

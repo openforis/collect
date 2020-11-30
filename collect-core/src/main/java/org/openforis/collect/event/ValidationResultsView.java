@@ -20,6 +20,9 @@ public class ValidationResultsView {
 	public ValidationResultsView(Attribute<?, ?> attribute,
 			MessageSource messageSource, Locale locale) {
 		ValidationResults validationResults = attribute.getValidationResults();
+		if (validationResults == null) {
+			validationResults = new ValidationResults();
+		}
 		this.errors = extractValidationResultMessages(validationResults.getErrors(), attribute, messageSource, locale);
 		this.warnings = extractValidationResultMessages(validationResults.getWarnings(), attribute, messageSource,
 				locale);
