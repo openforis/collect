@@ -6,8 +6,10 @@ const UnitField = (props) => {
   const { attributeDefinition, onChange, unitId } = props
   const { calculated, precisions } = attributeDefinition
 
+  const selectedUnitId = unitId ? String(unitId) : ''
+
   return (
-    <Select variant="outlined" value={String(unitId)} disabled={calculated} onChange={onChange}>
+    <Select variant="outlined" value={selectedUnitId} disabled={calculated} onChange={onChange}>
       <MenuItem key="" value="">
         <em>{L.l('common.selectOne')}</em>
       </MenuItem>

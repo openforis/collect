@@ -232,53 +232,55 @@ export default class Table extends EntityCollectionComponent {
 
     const content = (
       <>
-        <TableVirtualized
-          headerRowRenderer={this.headerRowRenderer}
-          className="form-item-table"
-          rowStyle={{ display: 'grid', gridTemplateColumns }}
-          width={totalWidth}
-          height={300}
-          rowHeight={32}
-          rowCount={entities.length}
-          rowGetter={({ index }) => entities[index]}
-          onDelete={(entity) => this.handleDeleteButtonClick(entity)}
-          ref={this.tableRef}
-        >
-          {[
-            ...(showRowNumbers
-              ? [
-                  <Column
-                    key="row-num-col"
-                    width={ROW_NUMBER_COLUMN_WIDTH}
-                    dataKey="row-num-col"
-                    cellRenderer={this.rowNumberCellRenderer}
-                    className="grid-cell row-number"
-                  />,
-                ]
-              : []),
-            ...headingColumns.map((headingColumn) => (
-              <Column
-                key={headingColumn.attributeDefinitionId}
-                width={FieldsSizes.getWidth({ fieldDef: headingColumn, inTable: true })}
-                cellRenderer={this.cellRenderer}
-                dataKey={headingColumn}
-                headingColumn={headingColumn}
-                className="grid-cell"
-              />
-            )),
-            ...(canAddOrDeleteRows
-              ? [
-                  <Column
-                    key="delete-col"
-                    width={DELETE_COLUMN_WIDTH}
-                    dataKey="delete-col"
-                    cellRenderer={this.deleteCellRenderer}
-                    className="grid-cell"
-                  />,
-                ]
-              : []),
-          ]}
-        </TableVirtualized>
+        <div className="table-wrapper" style={{ width: totalWidth }}>
+          <TableVirtualized
+            headerRowRenderer={this.headerRowRenderer}
+            className="form-item-table"
+            rowStyle={{ display: 'grid', gridTemplateColumns }}
+            width={totalWidth}
+            height={300}
+            rowHeight={32}
+            rowCount={entities.length}
+            rowGetter={({ index }) => entities[index]}
+            onDelete={(entity) => this.handleDeleteButtonClick(entity)}
+            ref={this.tableRef}
+          >
+            {[
+              ...(showRowNumbers
+                ? [
+                    <Column
+                      key="row-num-col"
+                      width={ROW_NUMBER_COLUMN_WIDTH}
+                      dataKey="row-num-col"
+                      cellRenderer={this.rowNumberCellRenderer}
+                      className="grid-cell row-number"
+                    />,
+                  ]
+                : []),
+              ...headingColumns.map((headingColumn) => (
+                <Column
+                  key={headingColumn.attributeDefinitionId}
+                  width={FieldsSizes.getWidth({ fieldDef: headingColumn, inTable: true })}
+                  cellRenderer={this.cellRenderer}
+                  dataKey={headingColumn}
+                  headingColumn={headingColumn}
+                  className="grid-cell"
+                />
+              )),
+              ...(canAddOrDeleteRows
+                ? [
+                    <Column
+                      key="delete-col"
+                      width={DELETE_COLUMN_WIDTH}
+                      dataKey="delete-col"
+                      cellRenderer={this.deleteCellRenderer}
+                      className="grid-cell"
+                    />,
+                  ]
+                : []),
+            ]}
+          </TableVirtualized>
+        </div>
 
         {canAddOrDeleteRows && (
           <Button variant="outlined" color="primary" disabled={addingEntity} onClick={this.handleNewButtonClick}>

@@ -6,7 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.26.30] - TO BE RELEASED
 ### Fixed
+- CE: fixed hierarchical code attribute not working in enumerated entities
 - Dashboard: fixed error writing dates in period fields.
+- Data entry new UI: fixed cannot enter 0 into numeric fields;
 
 ## [3.26.29] - 2020-11-25
 ### Fixed
