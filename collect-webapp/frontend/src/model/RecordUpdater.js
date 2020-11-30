@@ -37,6 +37,9 @@ export class RecordUpdater {
       const survey = record.survey
       const definition = survey.schema.getDefinitionById(Number(event.definitionId))
       const parentEntity = event.parentEntityPath ? record.getNodeByPath(event.parentEntityPath) : record.rootEntity
+      if (parentEntity === null) {
+        console.log('===RecordUpdater=== : cannot find parent entity with path', event.parentEntityPath)
+      }
       const node = record.getNodeByPath(event.nodePath)
 
       if (event instanceof EntityCreatedEvent) {

@@ -431,10 +431,6 @@ input.is-invalid.warning:focus {
 /**
 * ==== FORM ITEMS
 **/
-.form-item-external-wrapper {
-  margin-top: 4px;
-}
-
 .form-item-external-wrapper.not-relevant input,
 .form-item-external-wrapper.not-relevant .form-item-table,
 .form-item-external-wrapper.not-relevant .MuiFormControl-root.MuiTextField-root {
