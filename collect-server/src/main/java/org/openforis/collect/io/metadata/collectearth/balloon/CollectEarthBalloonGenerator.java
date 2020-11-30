@@ -345,13 +345,11 @@ public class CollectEarthBalloonGenerator {
 			}
 		} else {
 			AttributeDefinition attrDef = (AttributeDefinition) def;
-			String htmlParameterName;
-			boolean insideEnumeratedEntity = def.getParentEntityDefinition().isEnumerable();
-			if (insideEnumeratedEntity) {
-				htmlParameterName = getEnumeratedEntityComponentHtmlParameterName(def.getParentEntityDefinition(), entityPosition, def);
-			} else {
-				htmlParameterName = getHtmlParameterName(def);
-			}
+			EntityDefinition parentEntityDef = def.getParentEntityDefinition();
+			boolean insideEnumeratedEntity = parentEntityDef.isEnumerable();
+			String htmlParameterName = insideEnumeratedEntity
+					? getEnumeratedEntityComponentHtmlParameterName(parentEntityDef, entityPosition, def)
+					: getHtmlParameterName(def);
 			
 			String tooltip = attrDef.getDescription(language);
 			
@@ -364,8 +362,7 @@ public class CollectEarthBalloonGenerator {
 				CodeList list = codeAttrDef.getList();
 				Integer listLevelIndex = codeAttrDef.getListLevelIndex();
 				Map<Integer, List<CodeListItem>> codeItemsByParentCodeItemId = getCodeListItemsByParentId(list, listLevelIndex);
-				CodeAttributeDefinition parentCodeAttributeDef = codeAttrDef.getParentCodeAttributeDefinition();
-				String parentName = parentCodeAttributeDef == null ? null: getHtmlParameterName(parentCodeAttributeDef);
+				String parentName = getParentCodeParameterName(parentEntityDef, entityPosition, codeAttrDef);
 				comp = new CECodeField(htmlParameterName, def.getName(), label, tooltip, type, multiple, key, codeItemsByParentCodeItemId, parentName);
 			} else {
 				comp = new CEField(htmlParameterName, def.getName(), label, tooltip,  multiple, type, key);
@@ -459,6 +456,22 @@ public class CollectEarthBalloonGenerator {
 	private String getEnumeratedEntityComponentHtmlParameterName(EntityDefinition entityDef, int entityPosition, NodeDefinition childDef) {
 		String nodePath = entityDef.getPath() + "[" + entityPosition + "]/" + childDef.getName(); //$NON-NLS-1$ //$NON-NLS-2$
 		return htmlParameterNameByNodePath.get(nodePath);
+	}
+	
+	private String getParentCodeParameterName(EntityDefinition parentDef, int entityPosition, CodeAttributeDefinition codeAttrDef) {
+		CodeAttributeDefinition parentCodeAttrDef = codeAttrDef.getParentCodeAttributeDefinition();
+		if (parentCodeAttrDef == null) {
+			return null;
+		}
+		// if parent code attribute is inside the same entity and the entity is
+		// enumerated, get the name in a different way
+		EntityDefinition parentCodeAttributeDefParentEntity = parentCodeAttrDef.getParentEntityDefinition();
+		if (parentCodeAttributeDefParentEntity.equals(parentDef)
+				&& parentCodeAttributeDefParentEntity.isEnumerable()) {
+			return getEnumeratedEntityComponentHtmlParameterName(parentDef, entityPosition, parentCodeAttrDef);
+		} else {
+			return getHtmlParameterName(parentCodeAttrDef);
+		}
 	}
 	
 	private CEFieldType getFieldType(NodeDefinition def) {
