@@ -44,7 +44,7 @@ const WIDTH_CALCULATORS_BY_ATTRIBUTE_TYPE = {
   [AttributeDefinition.Types.FILE]: () => 200,
   [AttributeDefinition.Types.NUMBER]: ({ fieldDef, inTable }) => {
     const { attributeDefinition } = fieldDef
-    return attributeDefinition.isUnitVisible({ inTable }) ? 150 : 120
+    return 120 + (attributeDefinition.isUnitVisible({ inTable }) ? 30 : 0)
   },
   [AttributeDefinition.Types.RANGE]: ({ fieldDef, inTable }) => {
     const { attributeDefinition } = fieldDef

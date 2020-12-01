@@ -3,9 +3,9 @@ import { MenuItem, Select, TextField as MuiTextField } from '@material-ui/core'
 import { CoordinateAttributeDefinition } from 'model/Survey'
 
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
+import InputNumber from 'common/components/InputNumber'
 import L from 'utils/Labels'
 import Objects from 'utils/Objects'
-import Numbers from 'utils/Numbers'
 
 import AbstractField from './AbstractField'
 import CompositeAttributeFormItem from './CompositeAttributeFormItem'
@@ -15,7 +15,6 @@ export default class CoordinateField extends AbstractField {
   constructor() {
     super()
     this.onChangeSrs = this.onChangeSrs.bind(this)
-    this.onChangeNumericField = this.onChangeNumericField.bind(this)
   }
 
   onChangeField({ field, fieldValue }) {
@@ -38,10 +37,6 @@ export default class CoordinateField extends AbstractField {
     this.updateValue({ value })
   }
 
-  onChangeNumericField({ field, event }) {
-    this.onChangeField({ field, fieldValue: Numbers.toNumber(event.target.value) })
-  }
-
   onChangeSrs(event) {
     this.onChangeField({ field: 'srs', fieldValue: event.target.value })
   }
@@ -58,14 +53,12 @@ export default class CoordinateField extends AbstractField {
     const { availableFieldNames, calculated } = attributeDefinition
 
     const numericField = ({ field }) => (
-      <MuiTextField
-        key={field}
+      <InputNumber
+        decimalScale={10}
         value={Objects.getProp(field, '')(value)}
-        type="number"
-        variant="outlined"
-        disabled={calculated}
-        onChange={(event) => this.onChangeNumericField({ field, event })}
-        style={{ width: COORDINATE_FIELD_WIDTH_PX }}
+        readOnly={calculated}
+        onChange={(fieldValue) => this.onChangeField({ field, fieldValue })}
+        width={COORDINATE_FIELD_WIDTH_PX}
       />
     )
 

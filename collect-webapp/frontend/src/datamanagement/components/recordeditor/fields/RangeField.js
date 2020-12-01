@@ -1,11 +1,9 @@
 import React from 'react'
-import classNames from 'classnames'
-import { TextField as MuiTextField } from '@material-ui/core'
 
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
+import InputNumber from 'common/components/InputNumber'
 import L from 'utils/Labels'
 import Objects from 'utils/Objects'
-import Numbers from 'utils/Numbers'
 
 import AbstractNumericField from './AbstractNumericField'
 import UnitField from './UnitField'
@@ -46,14 +44,12 @@ export default class RangeField extends AbstractNumericField {
     }
 
     const getInputField = ({ fieldName }) => (
-      <MuiTextField
-        variant="outlined"
-        type="number"
-        label={L.l(`dataManagement.dataEntry.attribute.range.${fieldName}`)}
+      <InputNumber
+        decimalScale={attributeDefinition.isInteger() ? 0 : 10}
         value={Objects.getProp(fieldName, '')(value)}
-        className={classNames({ readOnly: calculated })}
-        disabled={calculated}
-        onChange={(event) => this.onInputValueChange({ fieldName, fieldValue: Numbers.toNumber(event.target.value) })}
+        readOnly={calculated}
+        onChange={(fieldValue) => this.onInputValueChange({ fieldName, fieldValue })}
+        label={L.l(`dataManagement.dataEntry.attribute.range.${fieldName}`)}
       />
     )
 
