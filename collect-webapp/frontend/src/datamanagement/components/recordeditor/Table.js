@@ -17,19 +17,21 @@ const ROW_NUMBER_COLUMN_WIDTH = 60
 const DELETE_COLUMN_WIDTH = 60
 
 const getHeadingLabel = ({ headingComponent }) => {
-  const { label, attributeDefinition } = headingComponent
-  if (attributeDefinition instanceof NumericAttributeDefinition) {
-    const { precisions } = attributeDefinition
+  const { nodeDefinition } = headingComponent
+  const { labelOrName } = nodeDefinition
+
+  if (nodeDefinition instanceof NumericAttributeDefinition) {
+    const { precisions } = nodeDefinition
     if (precisions && precisions.length === 1) {
       const precision = precisions[0]
-      const unit = attributeDefinition.survey.units.find((unit) => unit.id === precision.unitId)
+      const unit = nodeDefinition.survey.units.find((unit) => unit.id === precision.unitId)
       const suffix = ` (${unit.abbreviation})`
-      if (!label.endsWith(suffix)) {
-        return label + suffix
+      if (!labelOrName.endsWith(suffix)) {
+        return labelOrName + suffix
       }
     }
   }
-  return label
+  return labelOrName
 }
 
 const isCompositeAttribute = (attrDef) =>
