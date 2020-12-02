@@ -37,9 +37,7 @@ export default class SurveyDataEntryPreviewPage extends Component {
   }
 
   componentWillUnmount() {
-    if (this.recordUpdater) {
-      this.recordUpdater.destroy()
-    }
+    this.recordUpdater?.destroy()
   }
 
   render() {

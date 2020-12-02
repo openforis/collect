@@ -28,7 +28,7 @@ const CodeFieldAutocomplete = (props) => {
   const { versionId } = record
   const { calculated, codeListId, multiple } = attributeDefinition
 
-  const language = survey.defaultLanguage // TODO
+  const language = survey.preferredLanguage
   const surveyId = survey.id
 
   const fetchCodeItems = useCallback(

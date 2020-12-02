@@ -119,7 +119,7 @@ export default class CodeField extends AbstractField {
             codeListId,
             versionId,
             ancestorCodes,
-            language: survey.defaultLanguage,
+            language: survey.preferredLanguage,
           })
 
       this.setState({ asynchronous, items, ancestorCodes }, () => this.updateStateFromProps())
