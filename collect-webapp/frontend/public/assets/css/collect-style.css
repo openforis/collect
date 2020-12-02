@@ -445,8 +445,17 @@ input.is-invalid.warning:focus {
 }
 
 .form-item-wrapper.error,
+.form-item-wrapper.warning,
+.form-item-field-wrapper.error,
+.form-item-field-wrapper.warning {
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 4px;
+  }
+
+.form-item-wrapper.error,
 .form-item-field-wrapper.error {
-  border: 1px solid red;
+    border-color: red;
 }
 
 .form-item-field-wrapper.error input,
@@ -455,8 +464,13 @@ input.is-invalid.warning:focus {
 }
 
 .form-item-wrapper.warning,
-.form-item-field-wrapper.warnings {
-  border: 1px solid orangered;
+.form-item-field-wrapper.warning {
+  border-color: orange;
+}
+
+.form-item-field-wrapper.warning input,
+.form-item-field-wrapper.warning .MuiSelect-select {
+  background-color: #ffeba2;
 }
 
 /**
