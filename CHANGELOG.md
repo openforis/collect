@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Data Management: fixed error selecting survey with versions.
 
+### Added
+- Data entry new UI / numeric fields: avoid scroll on input fields.
+
 ## [3.26.30] - 2020-12-01
 ### Fixed
 - CE: fixed hierarchical code attribute not working in enumerated entities
