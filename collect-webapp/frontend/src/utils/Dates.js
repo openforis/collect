@@ -4,6 +4,7 @@ const dateFnsUtils = new DateFnsUtils()
 
 export default class Dates {
   static DATE_FORMAT = 'dd/MM/yyyy'
+  static DATE_FORMAT_ISO = 'yyyy-MM-dd'
   static TIME_FORMAT = 'HH:mm'
   static DATETIME_FORMAT = `${Dates.DATE_FORMAT} ${Dates.TIME_FORMAT}`
   static MILLIS = 'millis'
@@ -17,6 +18,15 @@ export default class Dates {
 
   static formatDatetime(dateTime) {
     return Dates.format(dateTime, Dates.DATETIME_FORMAT)
+  }
+
+  static parseDateISO(dateStr) {
+    return dateStr ? dateFnsUtils.parse(dateStr, Dates.DATE_FORMAT_ISO) : null
+  }
+
+  static formatDateIso(dateStr) {
+    const date = Dates.parseDateISO(dateStr)
+    return date ? Dates.format(date) : null
   }
 
   static compare(date1, date2, datePart) {

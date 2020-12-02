@@ -1,6 +1,7 @@
 {
     "common": {
         "add": "Add",
+        "date": "Date",
         "delete": {
             "label": "Delete",
             "confirm": {
@@ -9,6 +10,8 @@
             }
         },
         "download": "Download",
+        "label": "Label",
+        "name": "Name",
         "new": "New",
         "parameters": "Parameters",
         "selectOne": "Select one",
