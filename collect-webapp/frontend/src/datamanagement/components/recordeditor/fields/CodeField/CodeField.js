@@ -238,7 +238,7 @@ export default class CodeField extends AbstractField {
   }
 
   render() {
-    const { fieldDef, parentEntity } = this.props
+    const { fieldDef, inTable, parentEntity } = this.props
     const { items, selectedItems, asynchronous, loading, ancestorCodes, values } = this.state
 
     if (loading) {
@@ -256,7 +256,7 @@ export default class CodeField extends AbstractField {
       )
     }
 
-    if (!asynchronous && layout === CodeFieldDefinition.Layouts.RADIO) {
+    if (!asynchronous && !inTable && layout === CodeFieldDefinition.Layouts.RADIO) {
       return (
         <CodeFieldRadio
           parentEntity={parentEntity}

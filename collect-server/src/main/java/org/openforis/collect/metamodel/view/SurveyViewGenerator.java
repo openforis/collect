@@ -70,7 +70,6 @@ public class SurveyViewGenerator {
 			UserInGroup.UserGroupRole userInSurveyGroupRole) {
 		String defaultLanguage = survey.getDefaultLanguage();
 
-		final CollectAnnotations annotations = survey.getAnnotations();
 		final UIConfiguration uiConfiguration = survey.getUIConfiguration();
 
 		final SurveyView surveyView = new SurveyView(survey, new ViewContext(languageCode));
@@ -135,7 +134,7 @@ public class SurveyViewGenerator {
 					EntityDefinition entityDefinition = (EntityDefinition) def;
 					EntityDefView entityDefView = new EntityDefView(entityDefinition.isRoot(), id, name, label,
 							multiple);
-					entityDefView.setEnumerate(annotations.isEnumerate(entityDefinition));
+					entityDefView.setEnumerate(entityDefinition.isEnumerate() && entityDefinition.isEnumerable());
 					view = entityDefView;
 				} else {
 					view = createAttributeDefView((AttributeDefinition) def);

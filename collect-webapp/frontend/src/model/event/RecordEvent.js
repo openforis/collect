@@ -56,6 +56,8 @@ export class AttributeCreatedEvent extends AttributeEvent {
   value
 }
 
+export class AttributeCollectionCreatedEvent extends RecordEvent {}
+
 export class AttributeDeletedEvent extends RecordEvent {}
 
 export class AttributeValueUpdatedEvent extends AttributeEvent {
@@ -146,6 +148,7 @@ const EVENT_CLASS_BY_TYPE = {
   NodeMinCountValidationUpdatedEvent,
   NodeRelevanceUpdatedEvent,
   AttributeCreatedEvent,
+  AttributeCollectionCreatedEvent,
   AttributeDeletedEvent,
   BooleanAttributeUpdatedEvent,
   CodeAttributeUpdatedEvent,

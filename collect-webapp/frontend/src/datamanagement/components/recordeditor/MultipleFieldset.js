@@ -1,5 +1,6 @@
 import React from 'react'
-import { Button, Input } from 'reactstrap'
+import { Button } from 'reactstrap'
+import { MenuItem, Select } from '@material-ui/core'
 
 import DeleteIconButton from 'common/components/DeleteIconButton'
 import L from 'utils/Labels'
@@ -8,6 +9,30 @@ import FormItems from './FormItems'
 import EntityCollectionComponent from './EntityCollectionComponent'
 import TabSetContent from './TabSetContent'
 import { AttributeValueUpdatedEvent } from 'model/event/RecordEvent'
+
+const EntitySelect = (props) => {
+  const { entitiesSummary, selectedEntityIndex, onChange } = props
+
+  return (
+    <Select
+      value={selectedEntityIndex}
+      variant="outlined"
+      onChange={onChange}
+      style={{ display: 'inline-block', width: '200px' }}
+    >
+      {[
+        <MenuItem key="-1" value="-1">
+          <em>{L.l('common.selectOne')}</em>
+        </MenuItem>,
+        ...entitiesSummary.map((summary, index) => (
+          <MenuItem key={`entity_${index}`} value={index}>
+            {summary}
+          </MenuItem>
+        )),
+      ]}
+    </Select>
+  )
+}
 
 export default class MultipleFieldset extends EntityCollectionComponent {
   constructor() {
@@ -78,17 +103,6 @@ export default class MultipleFieldset extends EntityCollectionComponent {
     if (!parentEntity) {
       return <div>Loading...</div>
     }
-    const entityOptions = [
-      <option key="-1" value="-1">
-        {L.l('common.selectOne')}
-      </option>,
-    ].concat(
-      entitiesSummary.map((summary, index) => (
-        <option key={`entity_${index}`} value={index}>
-          {summary}
-        </option>
-      ))
-    )
 
     const selectedEntity = this.getSelectedEntity()
 
@@ -96,15 +110,13 @@ export default class MultipleFieldset extends EntityCollectionComponent {
       <>
         <div className="multiple-fieldset-header">
           <label>{entityDefinition.labelOrName}:</label>
-          <Input
-            type="select"
-            id="entityDropdown"
-            style={{ display: 'inline-block', width: '200px' }}
-            onChange={(event) => this.onSelectedEntityChange(Number(event.target.value))}
-            value={selectedEntityIndex}
-          >
-            {entityOptions}
-          </Input>
+          {entitiesSummary.length > 0 && (
+            <EntitySelect
+              selectedEntityIndex={selectedEntityIndex}
+              entitiesSummary={entitiesSummary}
+              onChange={(event) => this.onSelectedEntityChange(Number(event.target.value))}
+            />
+          )}
           <Button color="success" onClick={this.handleNewButtonClick}>
             {L.l('common.new')}
           </Button>
