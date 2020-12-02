@@ -18,13 +18,14 @@ export default class SurveyDataEntryPreviewPage extends Component {
 
   componentDidMount() {
     const { match, location } = this.props
-    const { id: idParam } = match.params
-    
+    const { id: surveyIdParam } = match.params
+
     const versionId = new URLSearchParams(location.search).get('versionId')
+    const langCode = new URLSearchParams(location.search).get('locale')
 
-    const surveyId = Number(idParam)
+    const surveyId = Number(surveyIdParam)
 
-    ServiceFactory.surveyService.fetchById(surveyId).then((survey) => {
+    ServiceFactory.surveyService.fetchById(surveyId, langCode).then((survey) => {
       ServiceFactory.recordService
         .createRecord({ surveyId, step: Workflow.STEPS.cleansing, versionId, preview: true })
         .then((recordRes) => {
@@ -36,9 +37,7 @@ export default class SurveyDataEntryPreviewPage extends Component {
   }
 
   componentWillUnmount() {
-    if (this.recordUpdater) {
-      this.recordUpdater.destroy()
-    }
+    this.recordUpdater?.destroy()
   }
 
   render() {

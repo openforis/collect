@@ -26,6 +26,7 @@ export class Survey extends Serializable {
   published
   publishedId
   languages = []
+  preferredLanguage
 
   constructor(jsonData) {
     super()

@@ -4,7 +4,6 @@ import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.metamodel.ui.UIField;
 import org.openforis.collect.metamodel.view.ViewContext;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.NodeLabel.Type;
 
 public class UIFieldView<O extends UIField> extends UIModelObjectView<O> implements UITabComponentView<O> {
 
@@ -26,11 +25,6 @@ public class UIFieldView<O extends UIField> extends UIModelObjectView<O> impleme
 	
 	public Integer getAttributeDefinitionId() {
 		return uiObject.getAttributeDefinitionId();
-	}
-	
-	public String getLabel() {
-		AttributeDefinition attrDef = (AttributeDefinition) getNodeDefinition(uiObject.getAttributeDefinitionId());
-		return attrDef.getLabel(Type.INSTANCE);
 	}
 	
 	@Override

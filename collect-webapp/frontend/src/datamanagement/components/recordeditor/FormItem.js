@@ -28,14 +28,14 @@ const internalComponentByFieldType = {
 const _includeLabel = (itemDef) => itemDef instanceof FieldDefinition
 
 const _getCardinalityErrors = ({ itemDef, parentEntity }) => {
-  const { nodeDefinitionId: nodeDefId } = itemDef
+  const { nodeDefinitionId: nodeDefId, nodeDefinition } = itemDef
   const minCount = parentEntity.childrenMinCountByDefinitionId[nodeDefId]
   const maxCount = parentEntity.childrenMaxCountByDefinitionId[nodeDefId]
   const validationMinCount = parentEntity.childrenMinCountValidationByDefinitionId[nodeDefId]
   const validationMaxCount = parentEntity.childrenMaxCountValidationByDefinitionId[nodeDefId]
 
   if (validationMinCount === ValidationResultFlag.ERROR) {
-    return itemDef.nodeDefinition.multiple
+    return nodeDefinition.multiple
       ? L.l('dataManagement.dataEntry.validation.minCount', minCount)
       : L.l('dataManagement.dataEntry.validation.required')
   } else if (validationMaxCount === ValidationResultFlag.ERROR) {
@@ -45,6 +45,8 @@ const _getCardinalityErrors = ({ itemDef, parentEntity }) => {
 
 const FormItem = (props) => {
   const { itemDef, parentEntity, fullSize } = props
+  const { nodeDefinitionId, nodeDefinition, type } = itemDef
+  const { labelOrName } = nodeDefinition
 
   const [cardinalityErrors, setCardinalityErrors] = useState(_getCardinalityErrors({ itemDef, parentEntity }))
 
@@ -53,21 +55,17 @@ const FormItem = (props) => {
     onEvent: (event) => {
       if (
         (event instanceof NodeCountValidationUpdatedEvent || event instanceof NodeCountUpdatedEvent) &&
-        event.isRelativeToNodes({ parentEntity, nodeDefId: itemDef.attributeDefinitionId })
+        event.isRelativeToNodes({ parentEntity, nodeDefId: nodeDefinitionId })
       ) {
         setCardinalityErrors(_getCardinalityErrors({ itemDef, parentEntity }))
       }
     },
   })
 
-  const wrapperId = `form-item-${parentEntity.id}-node-def-${
-    itemDef.attributeDefinitionId || itemDef.entityDefinitionId
-  }`
+  const wrapperId = `form-item-${parentEntity.id}-node-def-${nodeDefinitionId}`
 
   const InternalComponentClass =
-    itemDef.attributeDefinition instanceof CodeAttributeDefinition
-      ? FormItemFieldComponent
-      : internalComponentByFieldType[itemDef.type]
+    nodeDefinition instanceof CodeAttributeDefinition ? FormItemFieldComponent : internalComponentByFieldType[type]
 
   const internalComponent = <InternalComponentClass itemDef={itemDef} parentEntity={parentEntity} fullSize={fullSize} />
 
@@ -77,7 +75,7 @@ const FormItem = (props) => {
     <Row>
       {_includeLabel(itemDef) && (
         <Col style={{ maxWidth: '150px' }}>
-          <Label>{itemDef.label}</Label>
+          <Label>{labelOrName}</Label>
         </Col>
       )}
       <Col>

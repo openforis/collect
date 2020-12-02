@@ -128,7 +128,7 @@ public class SurveyViewGenerator {
 			public void visit(NodeDefinition def) {
 				int id = def.getId();
 				String name = def.getName();
-				String label = getLabel(def);
+				String label = def.getLabel(Type.INSTANCE, languageCode);
 				boolean multiple = def.isMultiple();
 				NodeDefView view;
 				if (def instanceof EntityDefinition) {
@@ -187,7 +187,7 @@ public class SurveyViewGenerator {
 
 		int id = def.getId();
 		String name = def.getName();
-		String label = getLabel(def);
+		String label = def.getLabel(Type.INSTANCE, languageCode);
 		boolean multiple = def.isMultiple();
 		AttributeDefView view;
 		boolean qualifier = annotations.isQualifier(def);
@@ -275,14 +275,6 @@ public class SurveyViewGenerator {
 		view.setVisibilityByField(visibilityByField);
 		view.setCalculated(def.isCalculated());
 		return view;
-	}
-
-	private String getLabel(NodeDefinition def) {
-		String label = def.getLabel(Type.INSTANCE, languageCode);
-		if (label == null && !def.getSurvey().isDefaultLanguage(languageCode)) {
-			label = def.getLabel(Type.INSTANCE);
-		}
-		return label;
 	}
 
 	public void setIncludeCodeListValues(boolean includeCodeListValues) {
