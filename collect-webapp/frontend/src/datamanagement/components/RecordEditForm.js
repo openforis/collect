@@ -13,7 +13,7 @@ export default (props) => {
   const tabSetDefinition = uiConfiguration.getTabSetByRootEntityDefinitionId(rootEntity.definition.id)
 
   return (
-    <MaxAvailableSpaceContainer>
+    <MaxAvailableSpaceContainer className="record-edit-form">
       <TabSet tabSetDef={tabSetDefinition} record={record} />
     </MaxAvailableSpaceContainer>
   )

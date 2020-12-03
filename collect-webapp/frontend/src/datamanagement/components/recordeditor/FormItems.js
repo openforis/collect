@@ -62,11 +62,11 @@ export default class FormItems extends AbstractFormComponent {
     return onlyOneMultipleEntity ? (
       <FormItemsItem itemDef={firstDef} parentEntity={parentEntity} fullSize />
     ) : itemDefsInVersion.length > 0 ? (
-      <Container className="formItems">
+      <div className="form-items">
         {itemDefsInVersion.map((itemDef) => (
           <FormItemsItem key={itemDef.id} itemDef={itemDef} parentEntity={parentEntity} />
         ))}
-      </Container>
+      </div>
     ) : null
   }
 }

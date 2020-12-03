@@ -18,6 +18,10 @@ body {
   border-top-right-radius: 6px;
 }
 
+.tabset-wrapper .nav-tabs .nav-link:hover {
+  border-color: #1976d2;
+}
+
 .tabset-wrapper .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link,
 .tab-content {
   border-color: #00000055;
@@ -32,14 +36,11 @@ body {
   height: calc(100% - 32px);
   overflow-y: auto;
 }
-
+/* TODO check this
 .tab-pane.only-one-multiple-fieldset {
   overflow-y: hidden;
-}
-
-.tab-content .tab-pane {
-  padding: .5rem;
-}
+} 
+*/
 
 /* ==== end of Reactstrap style ==== */
 
@@ -433,6 +434,13 @@ input.is-invalid.warning:focus {
 /**
 * ==== FORM ITEMS
 **/
+.form-items {
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .form-item-external-wrapper.not-relevant input,
 .form-item-external-wrapper.not-relevant .form-item-table,
 .form-item-external-wrapper.not-relevant .MuiFormControl-root.MuiTextField-root {
@@ -494,6 +502,10 @@ input.is-invalid.warning:focus {
 .form-item-field-wrapper.warning input,
 .form-item-field-wrapper.warning .MuiSelect-select {
   background-color: #ffeba2;
+}
+
+.record-edit-form fieldset {
+  padding: 0 .5rem .5rem .5rem !important;
 }
 
 /**
