@@ -22,7 +22,7 @@ export const TaxonFieldWidths = {
 export const TaxonFormFieldLabelWidth = 160
 
 const WIDTH_CALCULATORS_BY_ATTRIBUTE_TYPE = {
-  [AttributeDefinition.Types.BOOLEAN]: () => 50,
+  [AttributeDefinition.Types.BOOLEAN]: () => 100,
   [AttributeDefinition.Types.CODE]: ({ fieldDef }) => {
     const { layout } = fieldDef
     switch (layout) {

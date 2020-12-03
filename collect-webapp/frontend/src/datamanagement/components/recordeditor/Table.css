@@ -9,6 +9,7 @@
 .grid.header > .grid-cell {
   border: 1px solid black;
   text-align: center;
+  align-items: center;
 }
 
 .grid-cell {

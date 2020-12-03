@@ -11,8 +11,21 @@ body {
 
 /* ==== start of Reactstrap style ==== */
 
-.nav-tabs .nav-link {
+.tabset-wrapper .nav-tabs .nav-link {
   cursor: pointer;
+  border: 1px solid gray;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
+.tabset-wrapper .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link,
+.tab-content {
+  border-color: #00000055;
+}
+
+.tabset-wrapper .nav-tabs .nav-link.active {
+  background-color:#1976d2;
+  color: white;
 }
 
 .tab-pane {
@@ -22,6 +35,10 @@ body {
 
 .tab-pane.only-one-multiple-fieldset {
   overflow-y: hidden;
+}
+
+.tab-content .tab-pane {
+  padding: .5rem;
 }
 
 /* ==== end of Reactstrap style ==== */
@@ -146,12 +163,13 @@ header .breadcrumb {
 fieldset {
   border: 1px solid #c0c0c0 !important;
   margin: 0 2px !important;
-  padding: 0.35em 1.625em 0.75em !important;
+  padding: .35em 1.625em .75em !important;
 }
 
 fieldset legend {
   width: auto;
-  font-size: 1.5em;
+  font-size: 1.2em;
+  padding-top: 2px;
 }
 
 .card fieldset {
@@ -489,7 +507,7 @@ input.is-invalid.warning:focus {
 }
 
 .MuiInputLabel-root.MuiInputLabel-animated.MuiInputLabel-shrink {
-  transform: translate(0, 1.5px) scale(0.75);
+  transform: translate(0, 1.5px) scale(.75);
   transform-origin: top left;
 }
 
