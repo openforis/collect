@@ -17,15 +17,15 @@ public class ValidationResultsView {
 	private List<String> warnings;
 	private boolean specifiedErrorPresent;
 
-	public ValidationResultsView(Attribute<?, ?> attribute,
-			MessageSource messageSource, Locale locale) {
+	public ValidationResultsView(Attribute<?, ?> attribute, MessageSource messageSource, String preferredLanguage) {
 		ValidationResults validationResults = attribute.getValidationResults();
 		if (validationResults == null) {
 			validationResults = new ValidationResults();
 		}
-		this.errors = extractValidationResultMessages(validationResults.getErrors(), attribute, messageSource, locale);
+		this.errors = extractValidationResultMessages(validationResults.getErrors(), attribute, messageSource,
+				preferredLanguage);
 		this.warnings = extractValidationResultMessages(validationResults.getWarnings(), attribute, messageSource,
-				locale);
+				preferredLanguage);
 		this.specifiedErrorPresent = calculateSpecifiedErrorPresent(validationResults.getErrors());
 	}
 
@@ -43,7 +43,7 @@ public class ValidationResultsView {
 
 	private boolean calculateSpecifiedErrorPresent(List<ValidationResult> validationResultList) {
 		for (ValidationResult validationResult : validationResultList) {
-			if(validationResult.getValidator() instanceof SpecifiedValidator) {
+			if (validationResult.getValidator() instanceof SpecifiedValidator) {
 				return true;
 			}
 		}
@@ -51,7 +51,8 @@ public class ValidationResultsView {
 	}
 
 	private List<String> extractValidationResultMessages(List<ValidationResult> validationResultList,
-			Attribute<?, ?> attribute, MessageSource messageSource, Locale locale) {
+			Attribute<?, ?> attribute, MessageSource messageSource, String preferredLanguage) {
+		Locale locale = Locale.forLanguageTag(preferredLanguage);
 		List<String> result = new ArrayList<String>();
 		ValidationMessageBuilder validationMessageBuilder = ValidationMessageBuilder.createInstance(messageSource);
 		for (ValidationResult validationResult : validationResultList) {

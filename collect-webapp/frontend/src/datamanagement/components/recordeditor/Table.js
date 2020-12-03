@@ -179,7 +179,7 @@ export default class Table extends EntityCollectionComponent {
   }
 
   handleDeleteButtonClick(entity) {
-    this.commandService.deleteEntity(entity)
+    this.commandService.deleteEntity({ entity })
   }
 
   headerRowRenderer() {

@@ -24,12 +24,10 @@ const CodeFieldAutocomplete = (props) => {
     onChangeQualifier,
   } = props
   const { survey, record } = parentEntity
+  const { id: surveyId, preferredLanguage: language } = survey
   const { attributeDefinition } = fieldDef
   const { versionId } = record
   const { calculated, codeListId, multiple } = attributeDefinition
-
-  const language = survey.preferredLanguage
-  const surveyId = survey.id
 
   const fetchCodeItems = useCallback(
     ({ surveyId, codeListId, versionId, language, ancestorCodes }) => ({ searchString, onComplete }) =>

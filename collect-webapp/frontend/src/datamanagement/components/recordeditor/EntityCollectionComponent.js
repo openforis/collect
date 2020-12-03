@@ -47,6 +47,10 @@ export default class EntityCollectionComponent extends AbstractFormComponent {
     const { record } = parentEntity
 
     this.setState({ addingEntity: true })
-    this.commandService.addEntity(record, parentEntity, itemDef.entityDefinition)
+    this.commandService.addEntity({
+      record,
+      parentEntity,
+      entityDef: itemDef.entityDefinition,
+    })
   }
 }

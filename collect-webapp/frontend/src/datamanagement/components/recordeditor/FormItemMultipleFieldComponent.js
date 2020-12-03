@@ -53,7 +53,7 @@ export default class FormItemMultipleFieldComponent extends AbstractFormComponen
   }
 
   onDeleteButtonClick = (attribute) => {
-    this.commandService.deleteAttribute(attribute)
+    this.commandService.deleteAttribute({ attribute })
   }
 
   render() {

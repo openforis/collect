@@ -10,6 +10,7 @@ public abstract class RecordCommand implements Command {
 	private int surveyId;
 	private Integer recordId;
 	private RecordStep recordStep;
+	private String preferredLanguage;
 
 	public String getUsername() {
 		return username;
@@ -38,8 +39,17 @@ public abstract class RecordCommand implements Command {
 	public RecordStep getRecordStep() {
 		return recordStep;
 	}
-	
+
 	public void setRecordStep(RecordStep recordStep) {
 		this.recordStep = recordStep;
 	}
+
+	public String getPreferredLanguage() {
+		return preferredLanguage;
+	}
+
+	public void setPreferredLanguage(String preferredLanguage) {
+		this.preferredLanguage = preferredLanguage;
+	}
+
 }

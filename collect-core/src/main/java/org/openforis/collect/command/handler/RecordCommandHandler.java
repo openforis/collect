@@ -1,7 +1,6 @@
 package org.openforis.collect.command.handler;
 
 import java.util.List;
-import java.util.Locale;
 
 import org.openforis.collect.command.NodeCommand;
 import org.openforis.collect.command.RecordCommand;
@@ -16,12 +15,12 @@ import org.openforis.collect.manager.RecordProvider;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.NodeChangeSet;
-import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.concurrency.Job;
-import org.openforis.concurrency.JobManager;
 import org.openforis.concurrency.JobConfig;
+import org.openforis.concurrency.JobManager;
 import org.openforis.concurrency.Task;
 
 public abstract class RecordCommandHandler<C extends RecordCommand> implements CommandHandler<C> {
@@ -85,8 +84,8 @@ public abstract class RecordCommandHandler<C extends RecordCommand> implements C
 
 	private void notifyEvents(final RecordCommandResult result, final C command, final EventListener eventListener) {
 		if (result.getChangeSet() != null) {
-			EventProducerContext context = new EventProducer.EventProducerContext(messageSource, Locale.ENGLISH,
-					command.getUsername());
+			EventProducerContext context = new EventProducer.EventProducerContext(messageSource,
+					command.getPreferredLanguage(), command.getUsername());
 			new EventProducer(context, new EventListener() {
 				public void onEvent(RecordEvent event) {
 					eventListener.onEvent(transformEvent(result, event));

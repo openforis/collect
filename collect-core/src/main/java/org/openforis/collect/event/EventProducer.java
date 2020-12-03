@@ -277,7 +277,7 @@ public class EventProducer {
 			if (node.hasData()) {
 				event.setValue(attribute.getValue());
 			}
-			event.setValidationResults(new ValidationResultsView(attribute, context.messageSource, context.locale));
+			event.setValidationResults(new ValidationResultsView(attribute, context.messageSource, context.preferredLanguage));
 			consumer.onEvent(event);
 		}
 
@@ -328,7 +328,7 @@ public class EventProducer {
 			}
 			event.setValue(attribute.getValue());
 			fillRecordEvent(event);
-			event.setValidationResults(new ValidationResultsView(attribute, context.messageSource, context.locale));
+			event.setValidationResults(new ValidationResultsView(attribute, context.messageSource, context.preferredLanguage));
 			consumer.onEvent(event);
 		}
 
@@ -390,13 +390,13 @@ public class EventProducer {
 
 	public static class EventProducerContext {
 		MessageSource messageSource;
-		Locale locale;
+		String preferredLanguage;
 		String userName;
 
-		public EventProducerContext(MessageSource messageSource, Locale locale, String userName) {
+		public EventProducerContext(MessageSource messageSource, String preferredLanguage, String userName) {
 			super();
 			this.messageSource = messageSource;
-			this.locale = locale;
+			this.preferredLanguage = preferredLanguage;
 			this.userName = userName;
 		}
 	}
