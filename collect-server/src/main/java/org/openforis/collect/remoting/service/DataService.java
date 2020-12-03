@@ -99,7 +99,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DataService {
 	
 	@Autowired
-	private SurveyContext surveyContext;
+	private SurveyContext<?> surveyContext;
 	@Autowired
 	private MessageSource messageSource;
 	@Autowired
@@ -243,7 +243,7 @@ public class DataService {
 		CollectRecord record = recordManager.instantiateRecord(activeSurvey, rootEntityName, user, versionName, recordStep);
 		NodeChangeSet changeSet = recordManager.initializeRecord(record);
 
-		EventProducerContext context = new EventProducer.EventProducerContext(messageSource, sessionState.getLocale(), user.getUsername());
+		EventProducerContext context = createEventProducerContext();
 		new EventProducer(context, sessionManager).produceFor(changeSet);
 		
 		sessionManager.setActiveRecord(record);
@@ -302,9 +302,7 @@ public class DataService {
 			recordIndexService.temporaryIndex(activeRecord);
 		}
 		
-		SessionState sessionState = sessionManager.getSessionState();
-		String userName = sessionState.getUser().getUsername();
-		EventProducerContext context = new EventProducer.EventProducerContext(messageSource, sessionState.getLocale(), userName);
+		EventProducerContext context = createEventProducerContext();
 		new EventProducer(context, sessionManager).produceFor(changeSet);
 		
 		NodeChangeSetProxy result = new NodeChangeSetProxy(activeRecord, changeSet, getProxyContext());
@@ -612,8 +610,7 @@ public class DataService {
 		if (! eventQueue.isEnabled()) {
 			return;
 		}
-		SessionState sessionState = getSessionState();
-		EventProducerContext context = new EventProducer.EventProducerContext(messageSource, sessionState.getLocale(), userName);
+		EventProducerContext context = createEventProducerContext(userName);
 		final List<RecordEvent> events = new ArrayList<RecordEvent>();
 		new EventProducer(context, new EventListenerToList(events)).produceFor(record);
 		eventQueue.publish(new RecordTransaction(record.getSurvey().getName(), record.getId(), record.getStep().toRecordStep(), events));
@@ -637,8 +634,16 @@ public class DataService {
 	
 	protected Locale getCurrentLocale() {
 		SessionState sessionState = getSessionState();
-		Locale locale = sessionState.getLocale();
-		return locale;
+		return sessionState.getLocale();
+	}
+
+	private EventProducerContext createEventProducerContext() {
+		return createEventProducerContext(getSessionState().getUser().getUsername());
+	}
+		
+	
+	private EventProducerContext createEventProducerContext(String userName) {
+		return new EventProducer.EventProducerContext(messageSource, getCurrentLocale(), userName);
 	}
 
 	private RecordProxy toProxy(CollectRecord record) {

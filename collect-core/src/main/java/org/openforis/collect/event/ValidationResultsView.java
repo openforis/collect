@@ -17,15 +17,13 @@ public class ValidationResultsView {
 	private List<String> warnings;
 	private boolean specifiedErrorPresent;
 
-	public ValidationResultsView(Attribute<?, ?> attribute, MessageSource messageSource, String preferredLanguage) {
-		ValidationResults validationResults = attribute.getValidationResults();
+	public ValidationResultsView(Attribute<?, ?> attr, MessageSource messageSource, Locale locale) {
+		ValidationResults validationResults = attr.getValidationResults();
 		if (validationResults == null) {
 			validationResults = new ValidationResults();
 		}
-		this.errors = extractValidationResultMessages(validationResults.getErrors(), attribute, messageSource,
-				preferredLanguage);
-		this.warnings = extractValidationResultMessages(validationResults.getWarnings(), attribute, messageSource,
-				preferredLanguage);
+		this.errors = extractValidationResultMessages(validationResults.getErrors(), attr, messageSource, locale);
+		this.warnings = extractValidationResultMessages(validationResults.getWarnings(), attr, messageSource, locale);
 		this.specifiedErrorPresent = calculateSpecifiedErrorPresent(validationResults.getErrors());
 	}
 
@@ -51,8 +49,7 @@ public class ValidationResultsView {
 	}
 
 	private List<String> extractValidationResultMessages(List<ValidationResult> validationResultList,
-			Attribute<?, ?> attribute, MessageSource messageSource, String preferredLanguage) {
-		Locale locale = Locale.forLanguageTag(preferredLanguage);
+			Attribute<?, ?> attribute, MessageSource messageSource, Locale locale) {
 		List<String> result = new ArrayList<String>();
 		ValidationMessageBuilder validationMessageBuilder = ValidationMessageBuilder.createInstance(messageSource);
 		for (ValidationResult validationResult : validationResultList) {

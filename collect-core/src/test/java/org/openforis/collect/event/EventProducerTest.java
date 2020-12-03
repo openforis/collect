@@ -69,7 +69,7 @@ public class EventProducerTest extends AbstractRecordTest {
 				return null;
 			}
 		};
-		EventProducerContext context = new EventProducerContext(messageSource, Locale.ENGLISH, "user_name");
+		EventProducerContext context = new EventProducerContext(messageSource, "user_name");
 		EventProducer eventProducer = new EventProducer(context, new EventListenerToList(events));
 		return eventProducer;
 	}

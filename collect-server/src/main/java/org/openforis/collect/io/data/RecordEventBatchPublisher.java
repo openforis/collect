@@ -41,7 +41,7 @@ public class RecordEventBatchPublisher implements EventListener, NodeChangeBatch
 		if (! eventQueue.isEnabled()) {
 			return;
 		}
-		EventProducerContext context = new EventProducer.EventProducerContext(messageSource, Locale.ENGLISH, userName);
+		EventProducerContext context = new EventProducer.EventProducerContext(messageSource, userName);
 		new EventProducer(context, this).produceFor(nodeChanges);
 	}
 	
