@@ -6,6 +6,7 @@ public abstract class NodeDefView extends SurveyObjectView {
 
 	private String name;
 	private String label;
+	private String description;
 	private NodeType type;
 	private boolean key;
 	private boolean multiple;
@@ -43,6 +44,14 @@ public abstract class NodeDefView extends SurveyObjectView {
 		return multiple;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+	
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
 	public boolean isHideWhenNotRelevant() {
 		return hideWhenNotRelevant;
 	}

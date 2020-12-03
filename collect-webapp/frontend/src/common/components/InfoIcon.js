@@ -1,6 +1,6 @@
 import React from 'react'
-import { InfoOutlined } from '@material-ui/icons'
+import { Info } from '@material-ui/icons'
 
-const InfoIcon = () => <InfoOutlined fontSize="small" />
+const InfoIcon = () => <Info className="icon-info" />
 
 export default InfoIcon

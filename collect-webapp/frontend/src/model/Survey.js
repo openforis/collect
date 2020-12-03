@@ -158,6 +158,7 @@ export class NodeDefinition extends SurveyObject {
   parent
   name
   label
+  description
   multiple
   sinceVersionId
   deprecatedVersionId

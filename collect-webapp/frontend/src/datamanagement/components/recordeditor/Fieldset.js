@@ -1,21 +1,27 @@
 import React from 'react'
 
+import InfoIcon from 'common/components/InfoIcon'
 import FormItems from './FormItems'
 import TabSetContent from './TabSetContent'
+import NodeDefLabel from './NodeDefLabel'
 
 const Fieldset = (props) => {
   const { itemDef, parentEntity } = props
   const { entityDefinition } = itemDef
 
-  const entity = parentEntity ? parentEntity.getSingleChild(entityDefinition.id) : null
+  if (!parentEntity) return null
 
-  return entity ? (
+  const entity = parentEntity.getSingleChild(entityDefinition.id)
+
+  return (
     <fieldset>
-      <legend>{entityDefinition.labelOrName}</legend>
+      <legend>
+        <NodeDefLabel nodeDefinition={entityDefinition} />
+      </legend>
       <FormItems itemDefs={itemDef.items} parentEntity={entity} />
       <TabSetContent tabSetDef={itemDef} parentEntity={entity} />
     </fieldset>
-  ) : null
+  )
 }
 
 export default Fieldset

@@ -9,6 +9,7 @@ import FormItems from './FormItems'
 import EntityCollectionComponent from './EntityCollectionComponent'
 import TabSetContent from './TabSetContent'
 import { AttributeValueUpdatedEvent } from 'model/event/RecordEvent'
+import NodeDefLabel from './NodeDefLabel'
 
 const EntitySelect = (props) => {
   const { entitiesSummary, selectedEntityIndex, onChange } = props
@@ -109,7 +110,7 @@ export default class MultipleFieldset extends EntityCollectionComponent {
     return (
       <>
         <div className="multiple-fieldset-header">
-          <label>{entityDefinition.labelOrName}:</label>
+          <NodeDefLabel nodeDefinition={entityDefinition} />:
           {entitiesSummary.length > 0 && (
             <EntitySelect
               selectedEntityIndex={selectedEntityIndex}

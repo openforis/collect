@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Label, Row, Col } from 'reactstrap'
+import { Row, Col } from 'reactstrap'
 import classNames from 'classnames'
 
 import { FieldDefinition } from 'model/ui/FieldDefinition'
@@ -10,12 +10,13 @@ import { NodeCountUpdatedEvent, NodeCountValidationUpdatedEvent } from 'model/ev
 import L from 'utils/Labels'
 
 import ValidationTooltip from 'common/components/ValidationTooltip'
+import { useRecordEvent } from 'common/hooks'
 import Fieldset from './Fieldset'
 import MultipleFieldset from './MultipleFieldset'
 import Table from './Table'
 import FormItemFieldComponent from './FormItemFieldComponent'
 import FormItemMultipleFieldComponent from './FormItemMultipleFieldComponent'
-import { useRecordEvent } from '../../../common/hooks'
+import NodeDefLabel from './NodeDefLabel'
 
 const internalComponentByFieldType = {
   [FormItemTypes.FIELD]: FormItemFieldComponent,
@@ -46,7 +47,7 @@ const _getCardinalityErrors = ({ itemDef, parentEntity }) => {
 const FormItem = (props) => {
   const { itemDef, parentEntity, fullSize } = props
   const { nodeDefinitionId, nodeDefinition, type } = itemDef
-  const { labelOrName } = nodeDefinition
+  const { labelOrName, description } = nodeDefinition
 
   const [cardinalityErrors, setCardinalityErrors] = useState(_getCardinalityErrors({ itemDef, parentEntity }))
 
@@ -75,7 +76,7 @@ const FormItem = (props) => {
     <Row>
       {_includeLabel(itemDef) && (
         <Col style={{ maxWidth: '150px' }}>
-          <Label>{labelOrName}</Label>
+          <NodeDefLabel nodeDefinition={nodeDefinition} />
         </Col>
       )}
       <Col>

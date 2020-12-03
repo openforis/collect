@@ -139,12 +139,13 @@ public class SurveyViewGenerator {
 				} else {
 					view = createAttributeDefView((AttributeDefinition) def);
 				}
+				view.setDescription(def.getDescription(languageCode));
 				view.setSinceVersionId(def.getSinceVersionId());
 				view.setDeprecatedVersionId(def.getDeprecatedVersionId());
-				
+
 				UIModelObject uiModelObject = uiConfiguration.getModelObjectByNodeDefinitionId(def.getId());
 				view.setHideWhenNotRelevant(uiModelObject != null && uiModelObject.isHideWhenNotRelevant());
-				
+
 				NodeDefinition parentDef = def.getParentDefinition();
 				if (parentDef == null) {
 					surveyView.getSchema().addRootEntity((EntityDefView) view);

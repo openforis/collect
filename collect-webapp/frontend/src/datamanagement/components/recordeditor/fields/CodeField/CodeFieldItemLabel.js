@@ -22,7 +22,7 @@ const CodeFieldItemLabel = (props) => {
   const { item, attributeDefinition } = props
 
   return (
-    <span title={item.description}>
+    <span className="code-field-item-label" title={item.description}>
       {itemLabelFunction(attributeDefinition)(item)}
       {item.description && <InfoIcon />}
     </span>

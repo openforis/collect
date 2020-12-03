@@ -436,6 +436,11 @@ input.is-invalid.warning:focus {
   align-items: baseline;
 }
 
+.icon-info {
+  color: #1976d2;
+  padding-left: 5px;
+}
+
 /**
 * === VALIDATION FEEDBACK
 **/
