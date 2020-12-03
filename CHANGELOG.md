@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.26.32] - NOT RELEASED YET
 ### Added
-- Data entry new UI: show labels in selected survey language; show warnings feedback.
+- Data entry new UI: show labels in selected survey language; show warnings feedback; show node definition tooltips (descriptions) and info icons; numeric attributes: do not show unit dropdown when only one unit is defined;
 
 ## [3.26.31] - 2020-12-02
 ### Fixed

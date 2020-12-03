@@ -5,4 +5,8 @@ export class AbstractNumericAttribute extends Attribute {
     // to be extended by subclasses
     return null
   }
+
+  get unitId() {
+    return this.unitField?.value
+  }
 }

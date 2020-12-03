@@ -9,7 +9,7 @@ export default class AbstractNumericField extends AbstractField {
 
   getSelectedUnitIdFromProps() {
     const attr = this.getAttribute()
-    const unitId = attr.unitField.value
+    const { unitId } = attr
     if (unitId) {
       return unitId
     }
