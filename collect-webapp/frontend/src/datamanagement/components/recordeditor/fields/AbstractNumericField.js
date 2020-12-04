@@ -1,4 +1,4 @@
-const { default: AbstractField } = require('./AbstractField')
+import AbstractField from './AbstractField'
 
 export default class AbstractNumericField extends AbstractField {
   constructor(props) {

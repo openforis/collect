@@ -3,9 +3,10 @@ import { Survey } from '../model/Survey'
 
 export default class SurveyService extends AbstractService {
   fetchById(surveyId, langCode = 'en') {
-    return this.get(`survey/${surveyId}?langCode=${langCode}&includeCodeListValues=false`).then((res) => {
+    const preferredLanguage = langCode || 'en'
+    return this.get(`survey/${surveyId}?langCode=${preferredLanguage}&includeCodeListValues=false`).then((res) => {
       const survey = new Survey(res)
-      survey.preferredLanguage = langCode
+      survey.preferredLanguage = preferredLanguage
       return survey
     })
   }

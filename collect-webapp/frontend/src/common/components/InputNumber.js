@@ -31,8 +31,10 @@ const InputNumber = (props) => {
   const { decimalScale, maxLength, onChange: onChangeProps, readOnly, size, value, width } = props
 
   const onChange = (values) => {
-    const { floatValue: valueChanged } = values
-    onChangeProps(valueChanged)
+    const { floatValue: valueChanged, value: inputValue } = values
+    if (inputValue !== String(value)) {
+      onChangeProps(valueChanged)
+    }
   }
 
   return (
