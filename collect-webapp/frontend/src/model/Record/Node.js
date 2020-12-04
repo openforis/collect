@@ -52,4 +52,18 @@ export class Node extends Serializable {
     }
     return currentParent.definition.id === defId ? currentParent : null
   }
+
+  /**
+   * Returns a human readable path (with node definition labels instead of names)
+   */
+  get pathHR() {
+    const { definition, parent, index } = this
+
+    if (!parent) return '' // Do not show root entity path
+
+    const parentPath = parent.pathHR
+    const positionSuffix = definition.multiple ? `[${index + 1}]` : ''
+
+    return `${parentPath ? `${parentPath} / ` : ''} ${definition.labelOrName} ${positionSuffix}`
+  }
 }

@@ -5,9 +5,8 @@ import classNames from 'classnames'
 import { FieldDefinition } from 'model/ui/FieldDefinition'
 import { CodeAttributeDefinition } from 'model/Survey'
 import FormItemTypes from 'model/ui/FormItemTypes'
-import { ValidationResultFlag } from 'model/ValidationResultFlag'
+import * as Validations from 'model/Validations'
 import { NodeCountUpdatedEvent, NodeCountValidationUpdatedEvent } from 'model/event/RecordEvent'
-import L from 'utils/Labels'
 
 import ValidationTooltip from 'common/components/ValidationTooltip'
 import { useRecordEvent } from 'common/hooks'
@@ -28,28 +27,13 @@ const internalComponentByFieldType = {
 
 const _includeLabel = (itemDef) => itemDef instanceof FieldDefinition
 
-const _getCardinalityErrors = ({ itemDef, parentEntity }) => {
-  const { nodeDefinitionId: nodeDefId, nodeDefinition } = itemDef
-  const minCount = parentEntity.childrenMinCountByDefinitionId[nodeDefId]
-  const maxCount = parentEntity.childrenMaxCountByDefinitionId[nodeDefId]
-  const validationMinCount = parentEntity.childrenMinCountValidationByDefinitionId[nodeDefId]
-  const validationMaxCount = parentEntity.childrenMaxCountValidationByDefinitionId[nodeDefId]
-
-  if (validationMinCount === ValidationResultFlag.ERROR) {
-    return nodeDefinition.multiple
-      ? L.l('dataManagement.dataEntry.validation.minCount', minCount)
-      : L.l('dataManagement.dataEntry.validation.required')
-  } else if (validationMaxCount === ValidationResultFlag.ERROR) {
-    return L.l('dataManagement.dataEntry.validation.maxCount', maxCount)
-  }
-}
-
 const FormItem = (props) => {
   const { itemDef, parentEntity, fullSize } = props
   const { nodeDefinitionId, nodeDefinition, type } = itemDef
-  const { labelOrName, description } = nodeDefinition
 
-  const [cardinalityErrors, setCardinalityErrors] = useState(_getCardinalityErrors({ itemDef, parentEntity }))
+  const [cardinalityErrors, setCardinalityErrors] = useState(
+    Validations.getCardinalityErrors({ nodeDefinition: itemDef.nodeDefinition, parentEntity })
+  )
 
   useRecordEvent({
     parentEntity,

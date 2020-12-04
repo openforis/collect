@@ -11,8 +11,10 @@
         },
         "download": "Download",
         "label": "Label",
+        "message": "Message",
         "name": "Name",
         "new": "New",
+        "node": "Node",
         "parameters": "Parameters",
         "selectOne": "Select one",
         "specify": "Specify",
@@ -315,6 +317,9 @@
                 "minCount": "At least {0} items required",
                 "maxCount": "Only {0} item(s) allowed"
             }
+        },
+        "recordValidationReport": {
+            "title": "Record validation report"
         }
     },
     "survey": {

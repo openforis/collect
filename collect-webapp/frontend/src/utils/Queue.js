@@ -6,6 +6,11 @@ export default class Queue {
     return this
   }
 
+  enqueueItems(items) {
+    this.arr.push(...items)
+    return this
+  }
+
   dequeue() {
     return this.isEmpty() ? undefined : this.arr.shift()
   }
