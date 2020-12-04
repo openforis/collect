@@ -72,7 +72,7 @@ const App = () => (
       />
       <DefaultRoute path="/datamanagement/csvimport" exact name="CsvDataImport" component={CsvDataImportPage} />
       <DefaultRoute path="/datamanagement/:id" name="RecordDetails" component={OldClientRecordEditPage} />
-      <DefaultRoute path="/datamanagement_new/:id" name="RecordDetailsNew" component={RecordEditPage} />
+      <DefaultRoute path="/datamanagement_new/:id" name="RecordEditNew" component={RecordEditPage} />
       <DefaultRoute path="/datacleansing" exact name="DataCleansing" component={DataCleansingPage} />
       <DefaultRoute path="/map" exact name="Map" component={MapPage} />
       <DefaultRoute path="/restore" exact name="Restore" component={RestorePage} />

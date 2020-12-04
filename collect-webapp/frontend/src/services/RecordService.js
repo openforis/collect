@@ -22,7 +22,7 @@ export default class RecordService extends AbstractService {
   }
 
   fetchSurveyId(recordId) {
-    return this.get('data/records/' + recordId + '/surveyId')
+    return this.get(`data/records/${recordId}/surveyId`)
   }
 
   fetchById(survey, recordId, lock = false) {

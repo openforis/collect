@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 
-import { RecordUpdater } from '../../model/RecordUpdater'
-
+import { RecordUpdater } from 'model/RecordUpdater'
 import ServiceFactory from 'services/ServiceFactory'
 
 import RecordEditForm from '../components/RecordEditForm'
 
-export default class RecordEditPage extends Component {
+class RecordEditPage extends Component {
   recordUpdater = null
 
   constructor() {
@@ -17,12 +17,15 @@ export default class RecordEditPage extends Component {
   }
 
   componentDidMount() {
-    const { id: idParam } = this.props.match.params
+    const { match, language } = this.props
+    const { id: idParam } = match.params
+
     const recordId = Number(idParam)
 
     ServiceFactory.recordService.fetchSurveyId(recordId).then((res) => {
       const surveyId = Number(res)
-      ServiceFactory.surveyService.fetchById(surveyId).then((survey) => {
+
+      ServiceFactory.surveyService.fetchById(surveyId, language).then((survey) => {
         ServiceFactory.recordService.fetchById(survey, recordId).then((record) => {
           this.recordUpdater = new RecordUpdater(record)
           this.setState({ record })
@@ -43,5 +46,11 @@ export default class RecordEditPage extends Component {
     return <RecordEditForm record={record} />
   }
 }
+const mapStateToProps = (state) => {
+  const { activeSurvey } = state
+  const { survey, language } = activeSurvey
 
-RecordEditPage.propTypes = {}
+  return { survey, language }
+}
+
+export default connect(mapStateToProps)(RecordEditPage)

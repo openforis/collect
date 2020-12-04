@@ -1,69 +1,71 @@
 import Constants from 'Constants'
 
 export default class RouterUtils {
-
-    static navigateToHomePage(history) {
-        if (history) {
-            RouterUtils._navigateToUrl(history, '')
-        } else {
-            window.location.assign(Constants.BASE_URL)
-        }
+  static navigateToHomePage(history) {
+    if (history) {
+      RouterUtils._navigateToUrl(history, '')
+    } else {
+      window.location.assign(Constants.BASE_URL)
     }
+  }
 
-    static navigateToLoginPage(logout = false) {
-        window.location.assign(Constants.BASE_URL + 'login.html?logout=true')
-    }
+  static navigateToLoginPage(logout = false) {
+    window.location.assign(Constants.BASE_URL + 'login.html?logout=true')
+  }
 
-    static navigateToPasswordChangePage(history) {
-        RouterUtils._navigateToUrl(history, '/users/changepassword')
-    }
+  static navigateToPasswordChangePage(history) {
+    RouterUtils._navigateToUrl(history, '/users/changepassword')
+  }
 
-    static navigateToDataManagementHomePage(history) {
-        RouterUtils._navigateToUrl(history, '/datamanagement')
-    }
+  static navigateToDataManagementHomePage(history) {
+    RouterUtils._navigateToUrl(history, '/datamanagement')
+  }
 
-    static navigateToRecordEditPage(history, recordId) {
-        RouterUtils._navigateToUrl(history, '/datamanagement/' + recordId)        
-    }
+  static navigateToRecordEditPage(history, recordId) {
+    RouterUtils._navigateToUrl(history, `/datamanagement/${recordId}`)
+  }
 
-    static navigateToRecordCsvExportPage(history) {
-        RouterUtils._navigateToUrl(history, '/datamanagement/csvexport')
-    }
+  static navigateToRecordEditPageNew(history, recordId) {
+    RouterUtils._navigateToUrl(history, `/datamanagement_new/${recordId}`)
+  }
 
-    static navigateToRecordBackupPage(history) {
-        RouterUtils._navigateToUrl(history, '/datamanagement/backup')
-    }
+  static navigateToRecordCsvExportPage(history) {
+    RouterUtils._navigateToUrl(history, '/datamanagement/csvexport')
+  }
 
-    static navigateToRecordBackupImportPage(history) {
-        RouterUtils._navigateToUrl(history, '/datamanagement/backupimport')
-    }
+  static navigateToRecordBackupPage(history) {
+    RouterUtils._navigateToUrl(history, '/datamanagement/backup')
+  }
 
-    static navigateToRecordCsvImportPage(history) {
-        RouterUtils._navigateToUrl(history, '/datamanagement/csvimport')
-    }
+  static navigateToRecordBackupImportPage(history) {
+    RouterUtils._navigateToUrl(history, '/datamanagement/backupimport')
+  }
 
-    static navigateToNewSurveyPage(history) {
-        RouterUtils._navigateToUrl(history, '/surveydesigner/new')
-    }
+  static navigateToRecordCsvImportPage(history) {
+    RouterUtils._navigateToUrl(history, '/datamanagement/csvimport')
+  }
 
-    static navigateToSurveyEditPage(history, surveyId) {
-        RouterUtils._navigateToUrl(history, '/surveydesigner/' + surveyId)
-    }
+  static navigateToNewSurveyPage(history) {
+    RouterUtils._navigateToUrl(history, '/surveydesigner/new')
+  }
 
-    static navigateToSurveyExportPage(history, surveyId) {
-        RouterUtils._navigateToUrl(history, '/surveydesigner/export/' + surveyId)
-    }
+  static navigateToSurveyEditPage(history, surveyId) {
+    RouterUtils._navigateToUrl(history, '/surveydesigner/' + surveyId)
+  }
 
-    static navigateToSurveyClonePage(history, surveyName) {
-        RouterUtils._navigateToUrl(history, '/surveydesigner/clone/' + surveyName)
-    }
-    
-    static navigateToUserGroupEditPage(history, userGroupId) {
-        RouterUtils._navigateToUrl(history, '/usergroups/' + userGroupId)
-    }
+  static navigateToSurveyExportPage(history, surveyId) {
+    RouterUtils._navigateToUrl(history, '/surveydesigner/export/' + surveyId)
+  }
 
-    static _navigateToUrl(history, url) {
-        history.push(url)
-    }
+  static navigateToSurveyClonePage(history, surveyName) {
+    RouterUtils._navigateToUrl(history, '/surveydesigner/clone/' + surveyName)
+  }
 
+  static navigateToUserGroupEditPage(history, userGroupId) {
+    RouterUtils._navigateToUrl(history, '/usergroups/' + userGroupId)
+  }
+
+  static _navigateToUrl(history, url) {
+    history.push(url)
+  }
 }

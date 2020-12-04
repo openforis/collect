@@ -1,148 +1,153 @@
 const routes = [
   {
     path: '/',
-    name: 'Home'
+    name: 'Home',
   },
   {
     path: '/home',
-    name: 'Home'
+    name: 'Home',
   },
   {
     path: '/signin',
-    name: "Signin"
+    name: 'Signin',
   },
   {
     path: '/dashboard',
-    name: "Dashboard",
-    surveySelectRequired: true
+    name: 'Dashboard',
+    surveySelectRequired: true,
   },
   {
     path: '/datamanagement',
-    name: "Data Management",
-    surveySelectRequired: true
+    name: 'Data Management',
+    surveySelectRequired: true,
   },
   {
     path: '/datamanagement/export',
-    name: "Export Data",
-    surveySelectRequired: true
+    name: 'Export Data',
+    surveySelectRequired: true,
   },
   {
     path: '/datamanagement/csvexport',
-    name: "Export to CSV",
-    surveySelectRequired: true
+    name: 'Export to CSV',
+    surveySelectRequired: true,
   },
   {
     path: '/datamanagement/backup',
-    name: "Backup data",
-    surveySelectRequired: true
+    name: 'Backup data',
+    surveySelectRequired: true,
   },
   {
     path: '/datamanagement/csvimport',
-    name: "Import Data from CSV/Excel",
-    surveySelectRequired: true
+    name: 'Import Data from CSV/Excel',
+    surveySelectRequired: true,
   },
   {
     path: '/datamanagement/backupimport',
-    name: "Import Backup file",
-    surveySelectRequired: true
+    name: 'Import Backup file',
+    surveySelectRequired: true,
   },
   {
     path: '/datamanagement/:id',
     name: 'Record',
     pathRegExp: new RegExp('/datamanagement/(\\d)+'),
-    surveySelectRequired: true
+    surveySelectRequired: true,
+  },
+  {
+    path: '/datamanagement_new/:id',
+    name: 'Record New UI',
+    pathRegExp: new RegExp('/datamanagement_new/(\\d)+'),
+    surveySelectRequired: true,
   },
   {
     path: '/surveydesigner',
-    name: "Survey Designer"
+    name: 'Survey Designer',
   },
   {
     path: '/surveydesigner/export/:id',
     name: 'Export survey',
-    pathRegExp: new RegExp('/surveydesigner/export/(\\d)+')
+    pathRegExp: new RegExp('/surveydesigner/export/(\\d)+'),
   },
   {
     path: '/surveydesigner/clone/:surveyName',
     name: 'Clone survey',
-    pathRegExp: new RegExp('/surveydesigner/clone/(.)+')
+    pathRegExp: new RegExp('/surveydesigner/clone/(.)+'),
   },
   {
     path: '/surveydesigner/new',
-    name: "New survey"
+    name: 'New survey',
   },
   {
     path: '/surveydesigner/surveyimport',
-    name: "Import survey"
+    name: 'Import survey',
   },
   {
     path: '/surveydesigner/:id',
-    name: "Edit survey",
-    pathRegExp: new RegExp('/surveydesigner/(\\d)+')
+    name: 'Edit survey',
+    pathRegExp: new RegExp('/surveydesigner/(\\d)+'),
   },
   {
     path: '/datacleansing',
-    name: "Data Cleansing"
+    name: 'Data Cleansing',
   },
   {
     path: '/backup',
-    name: "Backup",
-    surveySelectRequired: true
+    name: 'Backup',
+    surveySelectRequired: true,
   },
   {
     path: '/restore',
-    name: "Restore",
-    surveySelectRequired: true
+    name: 'Restore',
+    surveySelectRequired: true,
   },
   {
     path: '/map',
-    name: "Map"
+    name: 'Map',
   },
   {
     path: '/saiku',
-    name: "Saiku",
-    surveySelectRequired: true
+    name: 'Saiku',
+    surveySelectRequired: true,
   },
   {
     path: '/users',
-    name: "Users"
+    name: 'Users',
   },
   {
     path: '/users/changepassword',
-    name: "Change Password"
+    name: 'Change Password',
   },
   {
     path: '/usergroups',
-    name: "User Groups"
+    name: 'User Groups',
   },
   {
     path: '/usergroups/:id',
     name: 'User Group',
-    pathRegExp: new RegExp('/usergroups/(\\d)+')
+    pathRegExp: new RegExp('/usergroups/(\\d)+'),
   },
   {
     path: '/usergroups/new',
-    name: 'New User Group'
-  }
-];
+    name: 'New User Group',
+  },
+]
 
 export default class Routes {
-
   static findRouteByPath(path) {
-    let route = routes.find(route => {
+    let route = routes.find((route) => {
       if (route.path === path) {
-        return true;
+        return true
       } else if (route.pathRegExp && route.pathRegExp.test(path)) {
-          return true;
+        return true
       } else {
-        return false;
+        return false
       }
-    });
+    })
     return route
   }
 
   static findRouteNameByPath(path) {
     const route = Routes.findRouteByPath(path)
-    return route ? route.name: undefined
+    return route ? route.name : undefined
   }
 
   static isSurveySelectRequiredForPath(path) {

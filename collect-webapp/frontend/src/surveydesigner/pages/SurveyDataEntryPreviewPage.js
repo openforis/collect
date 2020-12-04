@@ -20,8 +20,9 @@ export default class SurveyDataEntryPreviewPage extends Component {
     const { match, location } = this.props
     const { id: surveyIdParam } = match.params
 
-    const versionId = new URLSearchParams(location.search).get('versionId')
-    const langCode = new URLSearchParams(location.search).get('locale')
+    const urlSearchParams = new URLSearchParams(location.search)
+    const versionId = urlSearchParams.get('versionId')
+    const langCode = urlSearchParams.get('locale')
 
     const surveyId = Number(surveyIdParam)
 
