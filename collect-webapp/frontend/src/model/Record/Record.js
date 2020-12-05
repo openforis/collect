@@ -3,8 +3,6 @@ import Arrays from 'utils/Arrays'
 import Serializable from '../Serializable'
 import { Entity } from './Entity'
 
-import Queue from 'utils/Queue'
-
 export class Record extends Serializable {
   id
   survey
@@ -115,16 +113,7 @@ export class Record extends Serializable {
   }
 
   traverse(visitor) {
-    const queue = new Queue()
-    queue.enqueue(this.rootEntity)
-
-    while (!queue.isEmpty()) {
-      const node = queue.dequeue()
-      visitor(node)
-      if (node instanceof Entity) {
-        const children = Object.values(node.childrenByDefinitionId).flat()
-        queue.enqueueItems(children)
-      }
-    }
+    visitor(this.rootEntity)
+    this.rootEntity.visitDescendants(visitor)
   }
 }

@@ -37,6 +37,13 @@ export class Entity extends Node {
     }, [])
   }
 
+  get summaryValues() {
+    return this.keyNodes
+      .filter((keyNode) => !!keyNode)
+      .map((keyNode) => keyNode.humanReadableValue)
+      .join('-')
+  }
+
   get summaryLabel() {
     const keyValuePairs = this.keyNodes.map((keyNode) => {
       const keyValue = keyNode ? keyNode.humanReadableValue : ''
@@ -138,6 +145,18 @@ export class Entity extends Node {
     super.updatePath()
     Object.values(this.childrenByDefinitionId).forEach((children) => {
       children.forEach((child) => child.updatePath())
+    })
+  }
+
+  visitDescendants(visitor) {
+    this.definition.children.forEach((childDef) => {
+      const children = this.getChildrenByDefinitionId(childDef.id)
+      children.forEach((child) => {
+        visitor(child)
+        if (child instanceof Entity) {
+          child.visitDescendants(visitor)
+        }
+      })
     })
   }
 }

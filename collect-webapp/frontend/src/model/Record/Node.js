@@ -64,6 +64,6 @@ export class Node extends Serializable {
     const parentPath = parent.pathHR
     const positionSuffix = definition.multiple ? `[${index + 1}]` : ''
 
-    return `${parentPath ? `${parentPath} / ` : ''} ${definition.labelOrName} ${positionSuffix}`
+    return `${parentPath ? `${parentPath} / ` : ''}${definition.labelOrName}${positionSuffix}`
   }
 }

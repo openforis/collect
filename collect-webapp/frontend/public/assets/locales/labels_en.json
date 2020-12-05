@@ -1,6 +1,7 @@
 {
     "common": {
         "add": "Add",
+        "close": "Close",
         "date": "Date",
         "delete": {
             "label": "Delete",
@@ -10,6 +11,7 @@
             }
         },
         "download": "Download",
+        "exportToCsv": "Export to CSV",
         "label": "Label",
         "message": "Message",
         "name": "Name",
