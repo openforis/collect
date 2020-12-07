@@ -47,12 +47,8 @@ public class CollectValidator extends Validator {
 	@Autowired
 	private CodeListManager codeListManager;
 	
-	private boolean validateSpecified;
+	private boolean validateSpecified = false;
 
-	public CollectValidator() {
-		validateSpecified = true;
-	}
-	
 	@Override
 	public ValidationResults validate(Attribute<?, ?> attribute) {
 		ValidationResults results = new ValidationResults();
@@ -247,6 +243,8 @@ public class CollectValidator extends Validator {
 	}
 	
 	public void setValidateSpecified(boolean validateSpecified) {
-		this.validateSpecified = validateSpecified;
+		// SPECIFIED FIELD VALIDATION ALWAYS DISABLED!
+		// Keep this for backwards compatibility with Collect Earth
+//		this.validateSpecified = validateSpecified;
 	}
 }
