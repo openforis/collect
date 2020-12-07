@@ -19,7 +19,7 @@ public abstract class RecordEvent {
 	private String nodeId;
 	private String nodePath;
 	private String parentEntityPath;
-	private Date timestamp;
+	private Date timestamp = new Date();
 	private String userName;
 	
 	public RecordEvent() {

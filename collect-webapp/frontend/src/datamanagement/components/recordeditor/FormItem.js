@@ -32,7 +32,7 @@ const FormItem = (props) => {
   const { nodeDefinitionId, nodeDefinition, type } = itemDef
 
   const [cardinalityErrors, setCardinalityErrors] = useState(
-    Validations.getCardinalityErrors({ nodeDefinition: itemDef.nodeDefinition, parentEntity })
+    Validations.getCardinalityErrors({ nodeDefinition, parentEntity })
   )
 
   useRecordEvent({
@@ -42,7 +42,7 @@ const FormItem = (props) => {
         (event instanceof NodeCountValidationUpdatedEvent || event instanceof NodeCountUpdatedEvent) &&
         event.isRelativeToNodes({ parentEntity, nodeDefId: nodeDefinitionId })
       ) {
-        setCardinalityErrors(_getCardinalityErrors({ itemDef, parentEntity }))
+        setCardinalityErrors(Validations.getCardinalityErrors({ nodeDefinition, parentEntity }))
       }
     },
   })

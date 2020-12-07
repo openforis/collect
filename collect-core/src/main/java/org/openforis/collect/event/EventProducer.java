@@ -2,7 +2,6 @@ package org.openforis.collect.event;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -176,7 +175,6 @@ public class EventProducer {
 		List<String> ancestorIds;
 		String parentEntityPath;
 		Node<?> node;
-		Date timestamp;
 
 		EventFactory(Integer recordId, RecordStep recordStep, List<String> ancestorIds, Node<?> node) {
 			this(recordId, recordStep, ancestorIds, node.getParent().getPath(), node);
@@ -189,7 +187,6 @@ public class EventProducer {
 			this.ancestorIds = ancestorIds;
 			this.parentEntityPath = parentEntityPath;
 			this.node = node;
-			this.timestamp = new Date();
 		}
 
 		void entityCreated(Map<Integer, Boolean> relevanceByChildDefinitionId,
@@ -384,7 +381,6 @@ public class EventProducer {
 			event.setNodeId(String.valueOf(node.getInternalId()));
 			event.setNodePath(node.getPath());
 			event.setParentEntityPath(parentEntityPath);
-			event.setTimestamp(timestamp);
 			event.setUserName(context.userName);
 			return event;
 		}

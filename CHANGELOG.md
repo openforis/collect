@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.26.33] - NOT RELEASED YET
 ### Added
-- Data entry new UI: 
+- Data entry new UI: record validation report
 
 ## [3.26.32] - 2020-12-03
 ### Added
