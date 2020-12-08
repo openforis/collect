@@ -39,7 +39,8 @@ export default class TextField extends AbstractField {
     const { textType, calculated } = attributeDefinition
     const readOnly = record.readOnly || calculated
 
-    const inputFieldType = textType === TextAttributeDefinition.TextTypes.MEMO ? 'textarea' : 'text'
+    const showAsTextArea = textType === TextAttributeDefinition.TextTypes.MEMO && !inTable
+    const inputFieldType = showAsTextArea ? 'textarea' : 'text'
 
     return (
       <>
@@ -48,6 +49,8 @@ export default class TextField extends AbstractField {
           type={inputFieldType}
           onChange={this.onChange}
           variant="outlined"
+          multiline={showAsTextArea}
+          rows={showAsTextArea ? 3 : 1}
           disabled={readOnly}
           style={{ width: FieldsSizes.getWidth({ fieldDef, inTable }) }}
         />

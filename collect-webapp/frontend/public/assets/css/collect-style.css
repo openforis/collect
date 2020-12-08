@@ -526,7 +526,8 @@ input.is-invalid.warning:focus {
 .MuiOutlinedInput-input,
 .MuiInputBase-input.MuiOutlinedInput-input,
 .MuiSelect-outlined,
-.MuiAutocomplete-inputRoot[class*='MuiOutlinedInput-root'] .MuiAutocomplete-input:first-child {
+.MuiAutocomplete-inputRoot[class*='MuiOutlinedInput-root'] .MuiAutocomplete-input:first-child,
+.MuiInputBase-formControl.MuiInputBase-multiline.MuiOutlinedInput-multiline {
   padding: 6px;
 }
 
