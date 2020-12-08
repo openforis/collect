@@ -253,7 +253,7 @@ public class RecordValidationCache {
 		return result;
 	}
 	
-	protected Integer getAttributeValidationCount(Map<Integer, Integer> map) {
+	protected int getAttributeValidationCount(Map<Integer, Integer> map) {
 		int count = 0;
 		for (Integer i : map.values()) {
 			count += i;

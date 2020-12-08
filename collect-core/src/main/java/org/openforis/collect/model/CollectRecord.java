@@ -429,7 +429,7 @@ public class CollectRecord extends Record {
 		this.owner = owner;
 	}
 
-	public Integer getSkipped() {
+	public int getSkipped() {
 		if ( skipped == null ) {
 			skipped = validationCache.getSkippedNodeIds().size();
 		}
@@ -440,21 +440,21 @@ public class CollectRecord extends Record {
 		this.skipped = skipped;
 	}
 
-	public Integer getMissing() {
+	public int getMissing() {
 		if (missing == null) {
 			missing = getMissingErrors();
 		}
 		return missing;
 	}
 	
-	public Integer getMissingErrors() {
+	public int getMissingErrors() {
 		if ( missingErrors == null ) {
 			missingErrors = validationCache.getTotalMissingMinCountErrors();
 		}
 		return missingErrors;
 	}
 	
-	public Integer getMissingWarnings() {
+	public int getMissingWarnings() {
 		if ( missingWarnings == null ) {
 			missingWarnings = validationCache.getTotalMissingMinCountWarnings();
 		}
@@ -465,7 +465,7 @@ public class CollectRecord extends Record {
 		this.missing = missing;
 	}
 
-	public Integer getTotalErrors() {
+	public int getTotalErrors() {
 		switch(step) {
 		case ENTRY:
 			return Numbers.sum(getErrors(), getSkipped());
@@ -474,7 +474,7 @@ public class CollectRecord extends Record {
 		}
 	}
 	
-	public Integer getErrors() {
+	public int getErrors() {
 		if(errors == null) {
 			errors = validationCache.getTotalAttributeErrors() +
 					validationCache.getTotalMaxCountErrors();
@@ -486,7 +486,7 @@ public class CollectRecord extends Record {
 		this.errors = errors;
 	}
 
-	public Integer getWarnings() {
+	public int getWarnings() {
 		if(warnings == null) {
 			warnings = validationCache.getTotalAttributeWarnings() +
 						validationCache.getTotalMinCountWarnings() +

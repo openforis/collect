@@ -10,5 +10,9 @@
 }
 
 .icon.validation-report {
+    color: green;
+}
+
+.icon.validation-report.error {
     color: orange;
 }

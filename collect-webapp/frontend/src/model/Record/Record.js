@@ -13,6 +13,10 @@ export class Record extends Serializable {
   owner
   version
   readOnly
+  errorsMissingValues
+  errorsInvalidValues
+  warnings
+  warningsMissingValues
 
   constructor(survey, jsonData) {
     super()
@@ -23,7 +27,10 @@ export class Record extends Serializable {
   }
 
   fillFromJSON(jsonObj) {
-    super.fillFromJSON(jsonObj)
+    super.fillFromJSON(jsonObj, { skipFields: ['missing', 'missingErrors', 'missingWarnings'] })
+    this.errorsMissingValues = jsonObj.missingErrors
+    this.errorsInvalidValues = jsonObj.errors
+    this.warningsMissingValues = jsonObj.missingWarnings
 
     const rootEntityDefId = Number(jsonObj.rootEntity.definitionId)
     const rootEntityDef = this.survey.schema.getDefinitionById(rootEntityDefId)
@@ -53,6 +60,19 @@ export class Record extends Serializable {
 
   get versionId() {
     return this.version ? this.version.id : null
+  }
+
+  get errors() {
+    return this.errorsMissingValues || 0 + this.errorsInvalidValues || 0
+  }
+
+  get validationSummary() {
+    return {
+      errors: this.errors,
+      errorsMissingValues: this.errorsMissingValues,
+      warnings: this.warnings,
+      warningsMissingValues: this.warningsMissingValues,
+    }
   }
 
   getParentCodeAttribute({ parentEntity, attributeDefinition }) {

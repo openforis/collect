@@ -13,7 +13,6 @@ import java.util.Map;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.openforis.collect.command.AddAttributeCommand;
 import org.openforis.collect.command.AddEntityCommand;
-import org.openforis.collect.command.Command;
 import org.openforis.collect.command.CommandDispatcher;
 import org.openforis.collect.command.CreateRecordCommand;
 import org.openforis.collect.command.CreateRecordPreviewCommand;
@@ -160,8 +159,7 @@ public class CommandController {
 		UpdateAttributeCommand<Value> command = commandWrapper.toCommand(survey);
 		FileAttributeDefinition attrDef = survey.getSchema().getDefinitionById(command.getNodeDefId());
 		if (multipartFile.getSize() <= attrDef.getMaxSize()) {
-			CollectRecord record = sessionRecordProvider.provide(survey, command.getRecordId(),
-					Step.fromRecordStep(command.getRecordStep()));
+			CollectRecord record = provideRecord(command);
 			FileAttribute fileAttr = record.findNodeByPath(command.getNodePath());
 			File value;
 			if (record.isPreview()) {
@@ -184,9 +182,7 @@ public class CommandController {
 
 	@RequestMapping(value = "record/attribute/file/delete", method = POST, consumes = APPLICATION_JSON_VALUE)
 	public @ResponseBody Object deleteAttributeFile(@RequestBody DeleteAttributeCommand command) throws Exception {
-		CollectSurvey survey = getSurvey(command);
-		CollectRecord record = sessionRecordProvider.provide(survey, command.getRecordId(),
-				Step.fromRecordStep(command.getRecordStep()));
+		CollectRecord record = provideRecord(command);
 		FileAttribute fileAttr = record.findNodeByPath(command.getNodePath());
 		if (record.isPreview()) {
 			sessionRecordFileManager.deleteTempFile(record, fileAttr.getInternalId());
@@ -214,27 +210,24 @@ public class CommandController {
 		return submitCommand(command);
 	}
 
-	private Response submitCommand(Command command) {
-		if (command instanceof RecordCommand) {
-			((RecordCommand) command).setUsername(sessionManager.getLoggedUsername());
-		}
+	private Response submitCommand(RecordCommand command) {
+		command.setUsername(sessionManager.getLoggedUsername());
+		CollectRecord record = provideRecord(command);
 		commandDispatcher.submit(command, new EventListener() {
 			public void onEvent(RecordEvent event) {
-				appWS.sendMessage(new RecordEventMessage(new RecordEventView(event)));
+				appWS.sendMessage(new RecordEventMessage(new RecordEventView(event, record)));
 			}
 		});
 		return new Response();
 	}
 
-	private List<RecordEventView> submitCommandSync(Command command) {
-		if (command instanceof RecordCommand) {
-			((RecordCommand) command).setUsername(sessionManager.getLoggedUsername());
-		}
+	private List<RecordEventView> submitCommandSync(RecordCommand command) {
+		command.setUsername(sessionManager.getLoggedUsername());
 		List<RecordEvent> events = commandDispatcher.submitSync(command);
-
+		CollectRecord record = provideRecord(command);
 		List<RecordEventView> result = new ArrayList<RecordEventView>(events.size());
 		for (RecordEvent event : events) {
-			result.add(new RecordEventView(event));
+			result.add(new RecordEventView(event, record));
 		}
 		return result;
 	}
@@ -243,13 +236,27 @@ public class CommandController {
 		return surveyManager.getOrLoadSurveyById(command.getSurveyId());
 	}
 
+	private CollectRecord provideRecord(RecordCommand command) {
+		CollectSurvey survey = getSurvey(command);
+		return sessionRecordProvider.provide(survey, command.getRecordId(),
+				Step.fromRecordStep(command.getRecordStep()));
+	}
+
 	static class RecordEventView {
 
 		private RecordEvent event;
+		private int recordErrorsInvalidValues;
+		private int recordErrorsMissingValues;
+		private int recordWarnings;
+		private int recordWarningsMissingValues;
 
-		public RecordEventView(RecordEvent event) {
+		public RecordEventView(RecordEvent event, CollectRecord record) {
 			super();
 			this.event = event;
+			this.recordErrorsInvalidValues = record.getErrors();
+			this.recordErrorsMissingValues = record.getMissingErrors();
+			this.recordWarnings = record.getWarnings();
+			this.recordWarningsMissingValues = record.getMissingWarnings();
 		}
 
 		public String getEventType() {
@@ -260,6 +267,21 @@ public class CommandController {
 			return event;
 		}
 
+		public Integer getRecordErrorsInvalidValues() {
+			return recordErrorsInvalidValues;
+		}
+
+		public Integer getRecordErrorsMissingValues() {
+			return recordErrorsMissingValues;
+		}
+
+		public Integer getRecordWarnings() {
+			return recordWarnings;
+		}
+
+		public Integer getRecordWarningsMissingValues() {
+			return recordWarningsMissingValues;
+		}
 	}
 
 	static class UpdateAttributesCommandWrapper {

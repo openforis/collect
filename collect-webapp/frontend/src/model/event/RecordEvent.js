@@ -12,6 +12,10 @@ export class RecordEvent extends Event {
   nodePath
   timestamp
   userName
+  recordErrorsInvalidValues
+  recordErrorsMissingValues
+  recordWarnings
+  recordWarningsMissingValues
 
   static TYPE = 'recordEvent'
 
@@ -181,10 +185,22 @@ export class RecordEventWrapper extends Serializable {
   }
 
   _parseEvent(jsonObj) {
-    const { eventType, event } = jsonObj
+    const {
+      eventType,
+      event: eventJson,
+      recordErrorsInvalidValues,
+      recordErrorsMissingValues,
+      recordWarnings,
+      recordWarningsMissingValues,
+    } = jsonObj
     const eventClass = EVENT_CLASS_BY_TYPE[eventType]
     if (eventClass) {
-      return new eventClass(event)
+      const event = new eventClass(eventJson)
+      event.recordErrorsInvalidValues = recordErrorsInvalidValues
+      event.recordErrorsMissingValues = recordErrorsMissingValues
+      event.recordWarnings = recordWarnings
+      event.recordWarningsMissingValues = recordWarningsMissingValues
+      return event
     } else {
       console.log('Unsupported event type: ' + eventType)
     }

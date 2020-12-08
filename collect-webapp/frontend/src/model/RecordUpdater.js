@@ -73,6 +73,11 @@ export class RecordUpdater {
       } else if (event instanceof NodeMaxCountValidationUpdatedEvent) {
         node.childrenMaxCountValidationByDefinitionId[event.childDefinitionId] = event.flag
       }
+
+      record.errorsInvalidValues = event.recordErrorsInvalidValues
+      record.errorsMissingValues = event.recordErrorsMissingValues
+      record.warnings = event.recordWarnings
+      record.warningsMissingValues = event.recordWarningsMissingValues
     }
   }
 }

@@ -326,7 +326,9 @@
             }
         },
         "recordValidationReport": {
-            "title": "Record validation report"
+            "title": "Record validation report",
+            "tooltipErrors": "Record Validation Report - Errors: {0} - Warnings: {1}",
+            "tooltipOk": "Record Validation Report - No errors found"
         }
     },
     "survey": {
