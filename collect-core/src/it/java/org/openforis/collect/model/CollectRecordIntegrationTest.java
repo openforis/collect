@@ -63,7 +63,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		Entity cluster = record.getRootEntity();
 		NodeChangeSet changeSet = recordUpdater.addEntity(cluster, "plot");
 		assertNotNull(changeSet);
-		assertEquals(32, changeSet.size());
+		assertEquals(11, changeSet.size());
 		assertEquals(3, cluster.getCount("plot"));
 		{
 			Entity plot = (Entity) cluster.getChild("plot", 2);
@@ -81,10 +81,10 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 			EntityDefinition entityDefinition = (EntityDefinition) cluster.getDefinition().getChildDefinition("time_study");
 			int entityDefinitionId = entityDefinition.getId();
 			NodeChangeSet changeSet = recordUpdater.addEntity(cluster, entityDefinition);
-			assertEquals(4, changeSet.size());
+			assertEquals(1, changeSet.size());
 			
 			changeSet = recordUpdater.addEntity(cluster, entityDefinition);
-			assertEquals(5, changeSet.size());
+			assertEquals(2, changeSet.size());
 			{
 				Entity timeStudy = (Entity) cluster.getChild(entityDefinition, 2);
 				NodeChange<?> timeStudyChange = changeSet.getChange(timeStudy); 
