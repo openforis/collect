@@ -284,7 +284,7 @@ class RecordDataTable extends Component {
 			<TableHeaderColumn key="modifiedDate" dataField="modifiedDate" dataFormat={Formatters.dateTimeFormatter}
 				dataAlign="center" width="110" editable={false} dataSort>{L.l('dataManagement.modified')}</TableHeaderColumn>,
 			<TableHeaderColumn key="step" dataField="step" 
-				dataAlign="center" width="80" editable={false} dataSort>{L.l('dataManagement.step')}</TableHeaderColumn>,
+				dataAlign="center" width="80" editable={false} dataSort>{L.l('dataManagement.workflow.step.label')}</TableHeaderColumn>,
 			<TableHeaderColumn key="owner" dataField="owner" dataFormat={ownerFormatter}
 				editable={userCanChangeRecordOwner}
 				filter={ { type: 'CustomFilter', getElement: createOwnerFilter } }

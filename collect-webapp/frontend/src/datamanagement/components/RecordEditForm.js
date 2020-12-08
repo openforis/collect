@@ -17,8 +17,8 @@ const RecordEditForm = (props) => {
   return (
     <>
       <MaxAvailableSpaceContainer className="record-edit-form">
-        <TabSet tabSetDef={tabSetDefinition} record={record} />
         <RecordEditActionBar record={record} />
+        <TabSet tabSetDef={tabSetDefinition} record={record} />
       </MaxAvailableSpaceContainer>
     </>
   )

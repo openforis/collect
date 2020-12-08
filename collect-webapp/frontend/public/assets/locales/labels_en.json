@@ -255,6 +255,12 @@
             "confirmDemoteToEntry": {
                 "title": "Confirm",
                 "message": "Demote all records in Cleansing phase to Entry phase?"
+            },
+            "step": {
+                "label": "Step",
+                "entry": "Entry",
+                "cleansing": "Cleansing",
+                "analysis": "Analysis"
             }
         },
         "onlyMe": "Only me",
@@ -262,7 +268,6 @@
         "warnings": "Warnings",
         "created": "Created",
         "modified": "Modified",
-        "step": "Step",
         "formVersioning": {
             "selectFormVersion": "Select Form Version"
         },
