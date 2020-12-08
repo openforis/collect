@@ -46,17 +46,19 @@ export default class CoordinateField extends AbstractField {
   }
 
   render() {
-    const { inTable, fieldDef } = this.props
+    const { inTable, fieldDef, parentEntity } = this.props
     const { dirty, value } = this.state
+    const { record } = parentEntity
     const { srs = '' } = value || {}
     const { attributeDefinition } = fieldDef
     const { availableFieldNames, calculated } = attributeDefinition
+    const readOnly = record.readOnly || calculated
 
     const numericField = ({ field }) => (
       <InputNumber
         decimalScale={10}
         value={Objects.getProp(field, '')(value)}
-        readOnly={calculated}
+        readOnly={readOnly}
         onChange={(fieldValue) => this.onChangeField({ field, fieldValue })}
         width={COORDINATE_FIELD_WIDTH_PX}
       />
@@ -74,7 +76,7 @@ export default class CoordinateField extends AbstractField {
             key="srs"
             value={srs}
             variant="outlined"
-            disabled={calculated}
+            disabled={readOnly}
             onChange={this.onChangeSrs}
             style={style}
           >

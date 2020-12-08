@@ -17,7 +17,7 @@ class RecordEditPage extends Component {
   }
 
   componentDidMount() {
-    const { match, language } = this.props
+    const { match, language, loggedUser } = this.props
     const { id: idParam } = match.params
 
     const recordId = Number(idParam)
@@ -27,6 +27,7 @@ class RecordEditPage extends Component {
 
       ServiceFactory.surveyService.fetchById(surveyId, language).then((survey) => {
         ServiceFactory.recordService.fetchById(survey, recordId).then((record) => {
+          record.readOnly = !loggedUser.canEditRecord(record)
           this.recordUpdater = new RecordUpdater(record)
           this.setState({ record })
         })
@@ -47,10 +48,11 @@ class RecordEditPage extends Component {
   }
 }
 const mapStateToProps = (state) => {
-  const { activeSurvey } = state
+  const { activeSurvey, session } = state
   const { survey, language } = activeSurvey
+  const { loggedUser } = session
 
-  return { survey, language }
+  return { survey, loggedUser, language }
 }
 
 export default connect(mapStateToProps)(RecordEditPage)

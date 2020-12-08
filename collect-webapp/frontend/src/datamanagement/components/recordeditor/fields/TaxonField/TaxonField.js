@@ -60,10 +60,12 @@ export default class TaxonField extends AbstractField {
 
   render() {
     const { inTable, fieldDef, parentEntity } = this.props
-    const { attributeDefinition } = fieldDef
-    const { availableFieldNames } = attributeDefinition
     const { value = {} } = this.state
+    const { record } = parentEntity
+    const { attributeDefinition } = fieldDef
+    const { availableFieldNames, calculated } = attributeDefinition
     const { code, vernacular_name: vernacularName } = value || {}
+    const readOnly = record.readOnly || calculated
 
     const getLangLabel = (langCode) => Languages.label(langCode, LANG_CODE_STANDARD)
     const langOptions = Languages.items(LANG_CODE_STANDARD)
@@ -80,6 +82,7 @@ export default class TaxonField extends AbstractField {
             onInputChange={this.prepareValueUpdate}
             onDismiss={this.undoValueUpdate}
             onSelect={this.onChangeField(field)}
+            readOnly={readOnly}
           />
         )
       } else {
@@ -91,6 +94,7 @@ export default class TaxonField extends AbstractField {
             className="taxon-autocomplete-language"
             asynchronous={false}
             disabled={!code || code !== 'UNL' || !vernacularName}
+            readOnly={readOnly}
             items={langOptions}
             inputFieldWidth={FieldsSizes.TaxonFieldWidths[field]}
             selectedItems={Arrays.singleton(selectedOption)}

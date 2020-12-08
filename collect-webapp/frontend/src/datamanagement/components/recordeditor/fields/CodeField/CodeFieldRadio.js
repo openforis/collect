@@ -5,8 +5,10 @@ import { CodeAttributeDefinition } from 'model/Survey'
 import CodeFieldRadioItem from './CodeFieldRadioItem'
 
 const CodeFieldRadio = (props) => {
-  const { attributeDefinition, values, items, onChange, onChangeQualifier } = props
-  const { multiple, itemsOrientation } = attributeDefinition
+  const { attributeDefinition, values, items, onChange, onChangeQualifier, parentEntity } = props
+  const { record } = parentEntity
+  const { calculated, multiple, itemsOrientation } = attributeDefinition
+  const readOnly = record.readOnly || calculated
 
   const value = multiple ? null : values[0]
   const selectedCode = value ? value.code : null
@@ -24,6 +26,7 @@ const CodeFieldRadio = (props) => {
       multiple={multiple}
       onChange={onChange}
       onChangeQualifier={onChangeQualifier}
+      readOnly={readOnly}
       value={values?.find((value) => value.code === item.code)}
     />
   ))

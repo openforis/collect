@@ -38,7 +38,16 @@ const fetchTaxa = ({ surveyId, fieldDef, queryField }) => ({ searchString, onCom
 }
 
 const TaxonAutoCompleteField = (props) => {
-  const { parentEntity, fieldDef, field, valueByFields, onInputChange: onInputChangeProps, onSelect, onDismiss } = props
+  const {
+    parentEntity,
+    fieldDef,
+    field,
+    valueByFields,
+    onInputChange: onInputChangeProps,
+    onSelect,
+    onDismiss,
+    readOnly,
+  } = props
 
   const { attributeDefinition } = fieldDef
   const { showFamily } = attributeDefinition
@@ -84,6 +93,7 @@ const TaxonAutoCompleteField = (props) => {
       )}
       onSelect={onTaxonSelected}
       onDismiss={onDismiss}
+      readOnly={readOnly}
     />
   )
 }

@@ -30,12 +30,14 @@ export default class TextField extends AbstractField {
   }
 
   render() {
-    const { fieldDef, inTable } = this.props
+    const { fieldDef, inTable, parentEntity } = this.props
     const { dirty, value: valueState } = this.state
+    const { record } = parentEntity
     const { value } = valueState || {}
     const text = value || ''
     const { attributeDefinition } = fieldDef
     const { textType, calculated } = attributeDefinition
+    const readOnly = record.readOnly || calculated
 
     const inputFieldType = textType === TextAttributeDefinition.TextTypes.MEMO ? 'textarea' : 'text'
 
@@ -46,7 +48,7 @@ export default class TextField extends AbstractField {
           type={inputFieldType}
           onChange={this.onChange}
           variant="outlined"
-          disabled={calculated}
+          disabled={readOnly}
           style={{ width: FieldsSizes.getWidth({ fieldDef, inTable }) }}
         />
         {dirty && <LoadingSpinnerSmall />}

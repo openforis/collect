@@ -140,6 +140,7 @@ public class UserController extends AbstractPersistedObjectEditFormController<In
 		private boolean enabled = true;
 		private String username;
 		private UserRole role;
+		private List<UserRole> roles;
 		private String rawPassword;
 		private String retypedPassword;
 		
@@ -164,6 +165,14 @@ public class UserController extends AbstractPersistedObjectEditFormController<In
 		
 		public void setRole(UserRole role) {
 			this.role = role;
+		}
+		
+		public List<UserRole> getRoles() {
+			return roles;
+		}
+		
+		public void setRoles(List<UserRole> roles) {
+			this.roles = roles;
 		}
 		
 		public String getUsername() {

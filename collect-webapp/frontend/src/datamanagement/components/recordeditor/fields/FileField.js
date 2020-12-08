@@ -80,11 +80,13 @@ export default class FileField extends AbstractField {
   }
 
   render() {
-    const { fieldDef } = this.props
+    const { fieldDef, parentEntity } = this.props
     const { value: valueState = {}, uploading } = this.state
+    const { record } = parentEntity
     const { filename = null } = valueState || {}
     const { attributeDefinition } = fieldDef
     const { fileType } = attributeDefinition
+    const readOnly = record.readOnly
 
     const node = this.getAttribute()
     const extensions = EXTENSIONS_BY_FILE_TYPE[fileType]
@@ -94,10 +96,10 @@ export default class FileField extends AbstractField {
         {filename && (
           <div>
             <FileThumbnail node={node} onClick={this.onDownloadClick} />
-            <DeleteIconButton onClick={this.onDeleteClick} />
+            {!readOnly && <DeleteIconButton onClick={this.onDeleteClick} />}
           </div>
         )}
-        {!uploading && !filename && (
+        {!readOnly && !uploading && !filename && (
           <Dropzone
             className="file-field-dropzone"
             compact

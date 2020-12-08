@@ -6,8 +6,7 @@ import L from 'utils/Labels'
 import CodeFieldItemLabel from './CodeFieldItemLabel'
 
 const CodeFieldRadioItem = (props) => {
-  const { item, attributeDefinition, multiple, onChange, onChangeQualifier, value } = props
-  const { calculated } = attributeDefinition
+  const { item, attributeDefinition, multiple, onChange, onChangeQualifier, readOnly, value } = props
   const { code } = item
   const selected = Boolean(value)
   const qualifier = value?.qualifier || ''
@@ -15,7 +14,7 @@ const CodeFieldRadioItem = (props) => {
   const commonProps = {
     color: 'primary',
     size: 'small',
-    disabled: calculated,
+    disabled: readOnly,
     onChange: () => onChange({ item, selected: !selected }),
   }
   const control = multiple ? <Checkbox checked={selected} {...commonProps} /> : <Radio value={code} {...commonProps} />
@@ -33,7 +32,7 @@ const CodeFieldRadioItem = (props) => {
           value={qualifier}
           variant="outlined"
           placeholder={L.l('common.specify')}
-          disabled={calculated}
+          disabled={readOnly}
           onChange={(event) => onChangeQualifier({ code, qualifier: event.target.value })}
         />
       )}

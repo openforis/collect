@@ -140,11 +140,11 @@ export default class Table extends EntityCollectionComponent {
   componentDidMount() {
     super.componentDidMount()
 
-    const { itemDef } = this.props
+    const { itemDef, parentEntity } = this.props
+    const { record } = parentEntity
+    const { readOnly } = record
 
     this.tableRef = React.createRef(null)
-
-    const readOnly = false
 
     const { headingColumns, showRowNumbers, entityDefinition } = itemDef
     const { enumerate } = entityDefinition
@@ -183,11 +183,12 @@ export default class Table extends EntityCollectionComponent {
   }
 
   headerRowRenderer() {
-    const { itemDef } = this.props
+    const { itemDef, parentEntity } = this.props
     const { gridTemplateColumns, totalWidth } = this.state
+    const { record } = parentEntity
     const { headingRows, totalHeadingColumns, showRowNumbers, entityDefinition } = itemDef
     const { enumerate } = entityDefinition
-    const readOnly = false
+    const { readOnly } = record
 
     return (
       <div className="grid header" style={{ gridTemplateColumns, width: `${totalWidth}px` }}>
@@ -224,12 +225,13 @@ export default class Table extends EntityCollectionComponent {
   }
 
   render() {
-    const { itemDef, fullSize } = this.props
+    const { itemDef, fullSize, parentEntity } = this.props
     const { totalWidth, gridTemplateColumns, entities, addingEntity } = this.state
+    const { record } = parentEntity
 
     const { headingColumns, showRowNumbers, entityDefinition } = itemDef
     const { enumerate } = entityDefinition
-    const readOnly = false
+    const { readOnly } = record
     const canAddOrDeleteRows = !readOnly && !enumerate
 
     const content = (

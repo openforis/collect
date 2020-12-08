@@ -253,9 +253,8 @@ public class RecordController extends BasicController implements Serializable {
 			@PathVariable("recordId") int recordId,
 			@RequestParam(value="step", required=false) Integer stepNumber,
 			@RequestParam(value="lock", required=false, defaultValue="false") boolean lock) throws RecordPersistenceException {
-		stepNumber = getStepNumberOrDefault(stepNumber);
 		CollectSurvey survey = surveyManager.getById(surveyId);
-		Step step = Step.valueOf(stepNumber);
+		Step step = stepNumber == null ? null : Step.valueOf(stepNumber);
 		CollectRecord record = lock 
 				? recordManager.checkout(survey, sessionManager.getLoggedUser(), recordId, step, sessionManager.getSessionState().getSessionId(), true)
 				: recordManager.load(survey, recordId, step);
@@ -311,6 +310,7 @@ public class RecordController extends BasicController implements Serializable {
 				}
 			}
 		});
+		sessionRecordProvider.clearRecords(surveyId);
 		jobManager.startSurveyJob(job);
 		return new JobProxy(job);
 	}

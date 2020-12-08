@@ -12,6 +12,7 @@ export class Record extends Serializable {
   rootEntityKeys = []
   owner
   version
+  readOnly
 
   constructor(survey, jsonData) {
     super()

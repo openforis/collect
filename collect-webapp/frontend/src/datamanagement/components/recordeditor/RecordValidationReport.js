@@ -40,11 +40,12 @@ const RecordValidationReport = (props) => {
     } else {
       const cardinalityErrorsByChildDefName = Validations.getCardinalityErrorsByChildDefName({ entity: node })
       Object.entries(cardinalityErrorsByChildDefName).forEach(([childDefName, message]) => {
+        const nodePathHR = node.pathHR
         const childDef = node.definition.getChildDefinitionByName(childDefName)
         rows.push({
           id: `${node.path}/${childDefName}(min/max count)`,
           path: `${node.path}/${childDefName}`,
-          pathHR: `${node.pathHR} / ${childDef.labelOrName}`,
+          pathHR: `${nodePathHR ? `${nodePathHR} / ` : ''}${childDef.labelOrName}`,
           severity: 'error',
           message,
         })

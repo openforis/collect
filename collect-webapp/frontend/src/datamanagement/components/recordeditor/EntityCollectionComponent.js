@@ -20,7 +20,7 @@ export default class EntityCollectionComponent extends AbstractFormComponent {
 
   componentDidMount() {
     super.componentDidMount()
-    this.setState({ entities: this.determineEntities() })
+    this.setState({ entities: this.determineEntities() }, () => this.onEntitiesUpdated())
   }
 
   determineEntities() {
@@ -36,11 +36,11 @@ export default class EntityCollectionComponent extends AbstractFormComponent {
       (event instanceof EntityCreationCompletedEvent || event instanceof EntityDeletedEvent) &&
       event.isRelativeToNodes({ parentEntity, nodeDefId: itemDef.entityDefinitionId })
     ) {
-      this.setState({ addingEntity: false, entities: this.determineEntities() }, () => this.onEntitiesUpdated())
+      this.setState({ addingEntity: false, entities: this.determineEntities() }, () => this.onEntitiesUpdated(true))
     }
   }
 
-  onEntitiesUpdated() {}
+  onEntitiesUpdated(entityAdded) {}
 
   handleNewButtonClick() {
     const { itemDef, parentEntity } = this.props

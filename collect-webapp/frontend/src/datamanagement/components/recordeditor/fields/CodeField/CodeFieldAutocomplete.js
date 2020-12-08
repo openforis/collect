@@ -28,6 +28,7 @@ const CodeFieldAutocomplete = (props) => {
   const { attributeDefinition } = fieldDef
   const { versionId } = record
   const { calculated, codeListId, multiple } = attributeDefinition
+  const readOnly = record.readOnly || calculated
 
   const fetchCodeItems = useCallback(
     ({ surveyId, codeListId, versionId, language, ancestorCodes }) => ({ searchString, onComplete }) =>
@@ -48,7 +49,7 @@ const CodeFieldAutocomplete = (props) => {
   return (
     <Autocomplete
       asynchronous={asynchronous}
-      readOnly={calculated}
+      readOnly={readOnly}
       multiple={multiple}
       items={items}
       inputFieldWidth={FieldsSizes.getWidth({ fieldDef, inTable })}
@@ -69,6 +70,7 @@ const CodeFieldAutocomplete = (props) => {
               multiple
               onChange={tagProps.onDelete}
               onChangeQualifier={onChangeQualifier}
+              readOnly={readOnly}
               value={values?.find((value) => value.code === item.code)}
             />
           )

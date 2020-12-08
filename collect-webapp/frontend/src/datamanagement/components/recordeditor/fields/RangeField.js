@@ -31,11 +31,13 @@ export default class RangeField extends AbstractNumericField {
   }
 
   render() {
-    const { fieldDef, inTable } = this.props
+    const { fieldDef, inTable, parentEntity } = this.props
     const { dirty, value = {} } = this.state
+    const { record } = parentEntity
     const { unit: unitId } = value || {}
     const { attributeDefinition } = fieldDef
-    const { calculated } = attributeDefinition
+    const readOnly = record.readOnly || attributeDefinition.calculated
+
     const unitVisible = attributeDefinition.isUnitVisible({ inTable })
     const wrapperStyle = {
       display: 'grid',
@@ -47,7 +49,7 @@ export default class RangeField extends AbstractNumericField {
       <InputNumber
         decimalScale={attributeDefinition.isInteger() ? 0 : 10}
         value={Objects.getProp(fieldName, '')(value)}
-        readOnly={calculated}
+        readOnly={readOnly}
         onChange={(fieldValue) => this.onInputValueChange({ fieldName, fieldValue })}
         label={L.l(`dataManagement.dataEntry.attribute.range.${fieldName}`)}
       />
@@ -64,6 +66,7 @@ export default class RangeField extends AbstractNumericField {
               onChange={this.onUnitChange}
               unitId={unitId}
               inTable={inTable}
+              readOnly={readOnly}
             />
           )}
         </div>

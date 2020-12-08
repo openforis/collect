@@ -28,11 +28,13 @@ export default class NumberField extends AbstractNumericField {
   }
 
   render() {
-    const { fieldDef, inTable } = this.props
+    const { fieldDef, inTable, parentEntity } = this.props
     const { dirty, value: valueState } = this.state
+    const { record } = parentEntity
     const { value, unit: unitId } = valueState || {}
     const { attributeDefinition } = fieldDef
-    const { calculated } = attributeDefinition
+    const readOnly = record.readOnly || attributeDefinition.calculated
+
     const unitVisible = attributeDefinition.isUnitVisible({ inTable })
     const wrapperStyle = unitVisible ? { display: 'grid', gridTemplateColumns: '1fr 80px' } : null
 
@@ -43,7 +45,7 @@ export default class NumberField extends AbstractNumericField {
             decimalScale={attributeDefinition.isInteger() ? 0 : 10}
             maxLength={attributeDefinition.isInteger() ? 10 : undefined}
             value={value}
-            readOnly={calculated}
+            readOnly={readOnly}
             onChange={this.onInputValueChange}
           />
 
@@ -53,6 +55,7 @@ export default class NumberField extends AbstractNumericField {
               onChange={this.onUnitChange}
               unitId={unitId}
               inTable={inTable}
+              readOnly={readOnly}
             />
           )}
         </div>

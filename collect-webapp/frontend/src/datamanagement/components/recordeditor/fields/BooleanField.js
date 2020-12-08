@@ -38,22 +38,24 @@ export default class BooleanField extends AbstractField {
   }
 
   render() {
-    const { fieldDef } = this.props
+    const { fieldDef, parentEntity } = this.props
     const { dirty, value: valueState = {} } = this.state
+    const { record } = parentEntity
     const { attributeDefinition } = fieldDef
     const { calculated, layoutType } = attributeDefinition
     const { value: fieldValue } = valueState || {}
     const checked = fieldValue || false
+    const readOnly = record.readOnly || calculated
 
     return (
       <div>
         {layoutType === BooleanAttributeDefinition.LayoutTypes.CHECKBOX ? (
           <Checkbox
             color="primary"
-            className={classNames({ readOnly: calculated })}
+            className={classNames({ readOnly })}
             checked={checked}
             onChange={(event) => {
-              if (calculated) {
+              if (readOnly) {
                 event.preventDefault()
                 event.stopPropagation()
               } else {
@@ -63,9 +65,9 @@ export default class BooleanField extends AbstractField {
           />
         ) : (
           <TextField
-            className={classNames({ readOnly: calculated })}
+            className={classNames({ readOnly })}
             variant="outlined"
-            disabled={calculated}
+            disabled={readOnly}
             inputProps={{
               maxLength: 1,
             }}

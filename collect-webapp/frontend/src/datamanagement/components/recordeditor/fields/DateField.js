@@ -32,10 +32,11 @@ export default class DateField extends AbstractField {
   }
 
   render() {
-    const { fieldDef, inTable } = this.props
+    const { fieldDef, inTable, parentEntity } = this.props
     const { dirty, value: valueState } = this.state
+    const { record } = parentEntity
     const { attributeDefinition } = fieldDef
-    const { calculated } = attributeDefinition
+    const readOnly = record.readOnly || attributeDefinition.calculated
 
     const selectedDate = fromValueToDate(valueState)
 
@@ -48,7 +49,7 @@ export default class DateField extends AbstractField {
             format={Dates.DATE_FORMAT}
             margin="none"
             value={selectedDate}
-            disabled={calculated}
+            disabled={readOnly}
             onChange={this.onChange}
             style={{ width: `${FieldSizes.getWidth({ fieldDef, inTable })}px` }}
           />

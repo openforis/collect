@@ -47,12 +47,6 @@ export default class MultipleFieldset extends EntityCollectionComponent {
     this.handleDeleteButtonClick = this.handleDeleteButtonClick.bind(this)
   }
 
-  componentDidMount() {
-    super.componentDidMount()
-
-    this.updateEntitiesSummary()
-  }
-
   getSelectedEntity() {
     const { entities, selectedEntityIndex } = this.state
     return selectedEntityIndex >= 0 && selectedEntityIndex < entities.length ? entities[selectedEntityIndex] : null
@@ -76,14 +70,16 @@ export default class MultipleFieldset extends EntityCollectionComponent {
     this.setState({ entitiesSummary: entities.map((entity) => entity.summaryLabel) })
   }
 
-  onEntitiesUpdated() {
+  onEntitiesUpdated(entityAdded) {
     super.onEntitiesUpdated()
-
-    const { entities } = this.state
 
     this.updateEntitiesSummary()
 
-    this.onSelectedEntityChange(entities.length - 1)
+    if (entityAdded) {
+      // Select first entity
+      const { entities } = this.state
+      this.onSelectedEntityChange(entities.length - 1)
+    }
   }
 
   onSelectedEntityChange(selectedEntityIndex) {
@@ -99,6 +95,8 @@ export default class MultipleFieldset extends EntityCollectionComponent {
   render() {
     const { parentEntity, itemDef } = this.props
     const { entitiesSummary, selectedEntityIndex } = this.state
+    const { record } = parentEntity
+    const { readOnly } = record
     const { entityDefinition } = itemDef
 
     if (!parentEntity) {
@@ -118,10 +116,12 @@ export default class MultipleFieldset extends EntityCollectionComponent {
               onChange={(event) => this.onSelectedEntityChange(Number(event.target.value))}
             />
           )}
-          <Button color="success" onClick={this.handleNewButtonClick}>
-            {L.l('common.new')}
-          </Button>
-          {selectedEntity && <DeleteIconButton onClick={this.handleDeleteButtonClick} />}
+          {!readOnly && (
+            <Button color="success" onClick={this.handleNewButtonClick}>
+              {L.l('common.new')}
+            </Button>
+          )}
+          {!readOnly && selectedEntity && <DeleteIconButton onClick={this.handleDeleteButtonClick} />}
         </div>
         {selectedEntity && (
           <>

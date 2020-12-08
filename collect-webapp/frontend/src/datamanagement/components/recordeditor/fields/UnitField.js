@@ -6,8 +6,8 @@ const getUnit = ({ attributeDefinition, precision }) =>
   attributeDefinition.survey.units.find((unit) => unit.id === precision.unitId)
 
 const UnitField = (props) => {
-  const { attributeDefinition, onChange, unitId } = props
-  const { calculated, precisions } = attributeDefinition
+  const { attributeDefinition, onChange, readOnly, unitId } = props
+  const { precisions } = attributeDefinition
 
   const selectedUnitId = unitId ? String(unitId) : ''
 
@@ -17,7 +17,7 @@ const UnitField = (props) => {
   }
 
   return (
-    <Select variant="outlined" value={selectedUnitId} disabled={calculated} onChange={onChange}>
+    <Select variant="outlined" value={selectedUnitId} disabled={readOnly} onChange={onChange}>
       <MenuItem key="" value="">
         <em>{L.l('common.selectOne')}</em>
       </MenuItem>
