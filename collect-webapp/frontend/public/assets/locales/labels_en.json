@@ -323,7 +323,13 @@
                 "required": "Required field",
                 "minCount": "At least {0} items required",
                 "maxCount": "Only {0} item(s) allowed"
-            }
+            },
+            "promote": "Promote",
+            "demote": "Demmote",
+            "promoteTo": "Promote to {0}",
+            "demoteTo": "Demote to {0}",
+            "promoteToConfirm": "Promote this record to {0}?",
+            "demoteToConfirm": "Demote this record to {0}? All changes applied in this step will be lost."
         },
         "recordValidationReport": {
             "title": "Record validation report",

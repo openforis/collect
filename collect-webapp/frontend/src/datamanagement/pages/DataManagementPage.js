@@ -283,7 +283,7 @@ class DataManagementPage extends React.Component {
   startRecordsMoveJob(fromStep, promote) {
     const { survey, startJobMonitor } = this.props
     const surveyId = survey.id
-    ServiceFactory.recordService.startRecordMoveJob(surveyId, fromStep.code, promote).then((job) => {
+    ServiceFactory.recordService.startRecordMoveJob(surveyId, fromStep, promote).then((job) => {
       startJobMonitor({
         jobId: job.id,
         title: promote ? 'Promoting records' : 'Demoting records',

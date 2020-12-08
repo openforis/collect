@@ -52,7 +52,7 @@ export default class RecordService extends AbstractService {
     return this.postJson('survey/' + surveyId + '/data/records', {
       rootEntityName,
       versionId,
-      step: step.code,
+      step,
       preview,
     })
   }

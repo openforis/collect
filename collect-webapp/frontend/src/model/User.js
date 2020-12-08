@@ -103,11 +103,11 @@ export default class User extends Serializable {
     const { step } = record
 
     switch (step) {
-      case Workflow.STEPS.entry.code:
+      case Workflow.STEPS.entry:
         return this._hasEffectiveRole(User.ROLE.ENTRY_LIMITED)
-      case Workflow.STEPS.cleansing.code:
+      case Workflow.STEPS.cleansing:
         return this._hasEffectiveRole(User.ROLE.CLEANSING)
-      case Workflow.STEPS.analysis.code:
+      case Workflow.STEPS.analysis:
       default:
         return false
     }
@@ -120,7 +120,7 @@ export default class User extends Serializable {
     }
     switch (this.role) {
       case User.ROLE.ENTRY:
-        return !Arrays.contains(records, (r) => r.step !== Workflow.STEPS.entry.code || r.ownerId !== this.id)
+        return !Arrays.contains(records, (r) => r.step !== Workflow.STEPS.entry || r.ownerId !== this.id)
       default:
         return true
     }
