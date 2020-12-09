@@ -1,5 +1,9 @@
 .record-edit-action-bar {
     position: absolute;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    height: 34px;
     top: 0;
     right: 0;
 }

@@ -240,6 +240,9 @@
             "confirmDeleteMultipleRecordsMessage": "Delete the selected {0} records?"
         },
         "workflow": {
+            "entry": "Data entry",
+            "cleansing": "Data Cleansing",
+            "analysis": "Data Analysis",
             "confirmPromoteToCleansing": {
                 "title": "Confirm",
                 "message": "Promote all records in Entry phase to Cleansing phase?"
@@ -325,11 +328,17 @@
                 "maxCount": "Only {0} item(s) allowed"
             },
             "promote": "Promote",
-            "demote": "Demmote",
             "promoteTo": "Promote to {0}",
-            "demoteTo": "Demote to {0}",
             "promoteToConfirm": "Promote this record to {0}?",
-            "demoteToConfirm": "Demote this record to {0}? All changes applied in this step will be lost."
+            "promoteWithErrorsCannot": "Errors found in the record.\n\nPlease fix them first or contact a survey administrator to force publishing it to next step",
+            "promoteWithErrorsForceConfirm": "Errors found in the record.\n\nPromote it to {0} anyway?",
+            "promoteCompleteTitle": "Record promoted successfully",
+            "promoteCompleteMessage": "Record {0} promoted to {1}",
+            "demote": "Demote",
+            "demoteTo": "Demote to {0}",
+            "demoteToConfirm": "Demote this record to {0}? All changes applied in this step will be lost.",
+            "demoteCompleteTitle": "Record demoted successfully",
+            "demoteCompleteMessage": "Record {0} demoted to {1}"
         },
         "recordValidationReport": {
             "title": "Record validation report",

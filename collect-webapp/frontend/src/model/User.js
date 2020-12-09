@@ -160,12 +160,16 @@ export default class User extends Serializable {
     return this.role === User.ROLE.ADMIN
   }
 
-  canPromoteRecordsInBulk(roleInSurveyGroup) {
+  canPromoteRecordWithErrors(roleInSurveyGroup) {
     return this.canChangeRecordOwner(roleInSurveyGroup)
   }
 
+  canPromoteRecordsInBulk(roleInSurveyGroup) {
+    return this.canPromoteRecordWithErrors(roleInSurveyGroup)
+  }
+
   canDemoteRecordsInBulk(roleInSurveyGroup) {
-    return this.canPromoteRecordsInBulk(roleInSurveyGroup)
+    return this.canPromoteRecordWithErrors(roleInSurveyGroup)
   }
 
   canChangeRecordOwner(roleInSurveyGroup) {

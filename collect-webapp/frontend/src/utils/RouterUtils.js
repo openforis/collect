@@ -1,6 +1,6 @@
 import Constants from 'Constants'
 
-export default class RouterUtils {
+class RouterUtils {
   static navigateToHomePage(history) {
     if (history) {
       RouterUtils._navigateToUrl(history, '')
@@ -69,3 +69,5 @@ export default class RouterUtils {
     history.push(url)
   }
 }
+
+export default RouterUtils

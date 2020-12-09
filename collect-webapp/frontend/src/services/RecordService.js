@@ -154,4 +154,12 @@ export default class RecordService extends AbstractService {
       promote,
     })
   }
+
+  promoteRecord({ surveyId, recordId }) {
+    return this.post(`survey/${surveyId}/data/records/promote/${recordId}`)
+  }
+
+  demoteRecord({ surveyId, recordId }) {
+    return this.post(`survey/${surveyId}/data/records/demote/${recordId}`)
+  }
 }
