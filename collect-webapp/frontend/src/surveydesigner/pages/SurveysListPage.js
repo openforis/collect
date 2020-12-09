@@ -112,11 +112,9 @@ class SurveysListPage extends React.Component {
         const { selectedSurvey: survey } = this.state
         const $this = this
         const confirmMessage = L.l('survey.publish.confirmMessage', survey.name)
-        Dialogs.confirm(L.l('survey.publish.confirmTitle', survey.name), confirmMessage, function () {
-            const loadingDialog = Dialogs.showLoadingDialog()
+        Dialogs.confirm(L.l('survey.publish.confirmTitle', survey.name), confirmMessage, () => {
             publishSurvey(survey, false , () => {
                 $this.resetSelection()
-                loadingDialog.close()
             })
         }, null, { confirmButtonLabel: L.l('survey.publish') })
     }

@@ -55,6 +55,8 @@ export function fetchSurveySummaries() {
 export const publishSurvey = (survey, ignoreWarnings = false, onComplete = null) =>
     dispatch => {
         dispatch(hideSurveyValidation())
+        const loadingDialog = Dialogs.showLoadingDialog()
+
         ServiceFactory.surveyService.publish(survey.id, ignoreWarnings)
             .then(response => {
                 if (response.validationResult) {
@@ -68,6 +70,10 @@ export const publishSurvey = (survey, ignoreWarnings = false, onComplete = null)
                 if (onComplete)
                     onComplete()
             })
+            .catch(() => {
+                Dialogs.alert(L.l('survey.publish.error.title'), L.l('common.systemError.message'))
+            })
+            .finally(() => loadingDialog.close())
     }
 
 export const unpublishSurvey = survey =>

@@ -23,6 +23,8 @@ import javax.validation.Valid;
 import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.io.AbstractSurveyRestoreJob;
 import org.openforis.collect.io.CESurveyRestoreJob;
 import org.openforis.collect.io.SurveyBackupInfo;
@@ -99,6 +101,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
 public class SurveyController extends BasicController {
 
+	private static final Logger LOG = LogManager.getLogger(SurveyController.class);
 	private static final String COLLECT_EARTH_PROJECT_FILE_EXTENSION = "cep";
 
 	@Autowired
@@ -261,10 +264,15 @@ public class SurveyController extends BasicController {
 		if (results.hasErrors() || results.hasWarnings()) {
 			return new SurveyPublishResult(results);
 		} else {
-			User activeUser = sessionManager.getLoggedUser();
-			surveyManager.publish(survey, activeUser);
-			sendSurveysUpdatedMessage();
-			return new SurveyPublishResult(generateView(survey, false, langCode));
+			try {
+				User activeUser = sessionManager.getLoggedUser();
+				surveyManager.publish(survey, activeUser);
+				sendSurveysUpdatedMessage();
+				return new SurveyPublishResult(generateView(survey, false, langCode));
+			} catch(Exception e) {
+				LOG.error("Error publishing survey: " + e.getMessage(), e);
+				throw e;
+			}
 		}
 	}
 

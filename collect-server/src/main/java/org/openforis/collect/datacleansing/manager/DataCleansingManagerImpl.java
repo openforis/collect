@@ -14,10 +14,12 @@ import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.PersistedSurveyObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -25,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  *
  */
-@Component
+@Component("dataCleansingManager")
 @Transactional
 public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 	
@@ -130,6 +132,18 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 			CollectSurvey toSurvey, User activeUser) {
 		DataCleansingMetadata metadata = loadMetadata(fromSurvey);
 		saveMetadata(toSurvey, metadata, false, activeUser);
+	}
+	
+	@Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
+	@Override
+	public boolean isNodeDefinitionInUse(NodeDefinition nodeDef) {
+		List<DataQuery> dataQueries = dataQueryManager.loadBySurvey(nodeDef.getSurvey());
+		for (DataQuery dataQuery : dataQueries) {
+			if (dataQuery.getAttributeDefinitionId() == nodeDef.getId()) {
+				return true;
+			}
+		}		
+		return false;
 	}
 	
 	private <T extends PersistedSurveyObject<Integer>> void saveItems(AbstractSurveyObjectManager<Integer, T, ?> manager, 

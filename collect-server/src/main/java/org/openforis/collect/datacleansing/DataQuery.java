@@ -6,6 +6,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Survey;
 
 /**
  * 
@@ -71,9 +72,10 @@ public class DataQuery extends DataCleansingItem {
 	}
 	
 	public AttributeDefinition getAttributeDefinition() {
-		NodeDefinition def = getSurvey().getSchema().getDefinitionById(attributeDefinitionId);
+		Survey survey = getSurvey();
+		NodeDefinition def = survey.getSchema().getDefinitionById(attributeDefinitionId);
 		if (def == null) {
-			throw new IllegalStateException(String.format("Definition with id %d not found in the schema", attributeDefinitionId));
+			throw new IllegalStateException(String.format("Attribute definition with id %d not found in survey '%s'", attributeDefinitionId, survey.getName()));
 		}
 		return (AttributeDefinition) def;
 	}

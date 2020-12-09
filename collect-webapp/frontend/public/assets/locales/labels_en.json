@@ -20,6 +20,10 @@
         "parameters": "Parameters",
         "selectOne": "Select one",
         "specify": "Specify",
+        "systemError": {
+            "title": "Unexpected error",
+            "message": "Please contact your system administrator."
+        },
         "unit": "Unit"
     },
     "general": {
@@ -408,7 +412,11 @@
             "confirmDialog": {
                 "publishWithWarningsTitle": "Confirm publish survey {0}",
                 "errorsFoundTitle": "Cannot publish survey {0}: errors found"
+            },
+            "error": {
+                "title": "Error publishing survey"
             }
+
         },
         "unpublish": {
             "label": "Unpublish",

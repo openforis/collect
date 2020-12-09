@@ -14,5 +14,5 @@ public interface DataCleansingMetadataManager extends SurveyDataCleansingManager
 	DataCleansingMetadata loadMetadata(CollectSurvey survey);
 
 	void saveMetadata(CollectSurvey survey, DataCleansingMetadata metadata, boolean skipErrors, User activeUser);
-
+	
 }

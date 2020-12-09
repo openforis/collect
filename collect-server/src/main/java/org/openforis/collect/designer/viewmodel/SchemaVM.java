@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.openforis.collect.datacleansing.manager.DataCleansingManagerImpl;
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaNodeData;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaTreeNode;
@@ -159,6 +160,8 @@ public class SchemaVM extends SurveyBaseVM {
 	private SurveyManager surveyManager;
 	@WireVariable
 	private CodeListManager codeListManager;
+	@WireVariable("dataCleansingManager")
+	private DataCleansingManagerImpl dataCleansingManager;
 
 	// transient
 	private Window rootEntityEditPopUp;
@@ -625,15 +628,22 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	private boolean checkCanDeleteSelectedNode() {
-		if (isCollectEarthSurvey()) {
-			if (! selectedTreeNode.isDetached()) {
-				SurveyObject surveyObject = selectedTreeNode.getSurveyObject();
-				if (surveyObject instanceof NodeDefinition) {
-					NodeDefinition nodeDef = (NodeDefinition) surveyObject;
+		if (! selectedTreeNode.isDetached()) {
+			SurveyObject surveyObject = selectedTreeNode.getSurveyObject();
+			if (surveyObject instanceof NodeDefinition) {
+				NodeDefinition nodeDef = (NodeDefinition) surveyObject;
+				if (isCollectEarthSurvey()) {
 					if (isCollectEarthRequiredField(nodeDef)) {
 						MessageUtil.showWarning("survey.schema.cannot_remove_ce_required_field", nodeDef.getName());
 						return false;
 					}
+				} else {
+					boolean usedInDataCleansing = dataCleansingManager.isNodeDefinitionInUse(nodeDef);
+					if (usedInDataCleansing) {
+						MessageUtil.showWarning("survey.schema.cannot_remove_node_def_used_in_data_cleansing", nodeDef.getName());
+						return false;
+					}
+					
 				}
 			}
 		}

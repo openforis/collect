@@ -2,6 +2,7 @@ package org.openforis.collect.datacleansing.manager;
 
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
+import org.openforis.idm.metamodel.NodeDefinition;
 
 /**
  * 
@@ -16,4 +17,5 @@ public interface SurveyDataCleansingManager {
 	
 	void duplicateMetadata(CollectSurvey fromSurvey, CollectSurvey toSurvey, User activeUser);
 
+	boolean isNodeDefinitionInUse(NodeDefinition nodeDef);
 }
