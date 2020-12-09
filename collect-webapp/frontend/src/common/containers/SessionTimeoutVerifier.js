@@ -96,8 +96,8 @@ class SessionTimeoutVerifier extends Component {
             <>
                 {this.props.children}
                 <Dialog open={! this.state.active} 
-                    ignoreBackdropClick
-                    ignoreEscapeKeyUp>
+                    disableBackdropClick
+                    disableEscapeKeyDown>
                     <DialogTitle>{L.l('connection.serverConnectionError.title')}</DialogTitle>
                     <DialogContent style={{width: '400px'}}>
                         <DialogContentText>{errorMessage}</DialogContentText>

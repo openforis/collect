@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.26.34] - NOT RELEASED YET
+### Added
+- Data entry new UI: promote/demote record; support qualifiable code attributes in tables;
+
 ## [3.26.33] - 2020-12-08
 ### Added
 - Data entry new UI: record validation report; show records as read-only if in analysis phase;

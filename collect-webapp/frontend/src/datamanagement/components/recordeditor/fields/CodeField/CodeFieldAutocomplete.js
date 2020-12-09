@@ -22,12 +22,13 @@ const CodeFieldAutocomplete = (props) => {
     itemLabelFunction,
     onSelect,
     onChangeQualifier,
+    width,
   } = props
   const { survey, record } = parentEntity
   const { id: surveyId, preferredLanguage: language } = survey
   const { attributeDefinition } = fieldDef
   const { versionId } = record
-  const { calculated, codeListId, multiple } = attributeDefinition
+  const { calculated, codeListId } = attributeDefinition
   const readOnly = record.readOnly || calculated
 
   const fetchCodeItems = useCallback(
@@ -50,32 +51,13 @@ const CodeFieldAutocomplete = (props) => {
     <Autocomplete
       asynchronous={asynchronous}
       readOnly={readOnly}
-      multiple={multiple}
       items={items}
-      inputFieldWidth={FieldsSizes.getWidth({ fieldDef, inTable })}
+      inputFieldWidth={width || FieldsSizes.getWidth({ fieldDef, inTable })}
       selectedItems={selectedItems}
       fetchFunction={fetchCodeItems({ surveyId, codeListId, versionId, language, ancestorCodes })}
       itemLabelFunction={itemLabelFunction}
       itemSelectedFunction={(item, value) => item.code === value.code}
       itemRenderFunction={(item) => <CodeFieldItemLabel item={item} attributeDefinition={attributeDefinition} />}
-      tagsRenderFunction={(tagValue, getTagProps) =>
-        tagValue.map((item, index) => {
-          const tagProps = getTagProps({ index })
-          return (
-            <CodeFieldRadioItem
-              key={item.code}
-              attributeDefinition={attributeDefinition}
-              item={item}
-              itemLabelFunction={itemLabelFunction}
-              multiple
-              onChange={tagProps.onDelete}
-              onChangeQualifier={onChangeQualifier}
-              readOnly={readOnly}
-              value={values?.find((value) => value.code === item.code)}
-            />
-          )
-        })
-      }
       onSelect={onSelect}
     />
   )

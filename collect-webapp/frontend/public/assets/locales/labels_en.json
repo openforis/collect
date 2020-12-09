@@ -19,6 +19,7 @@
         "node": "Node",
         "parameters": "Parameters",
         "selectOne": "Select one",
+        "search": "Search",
         "specify": "Specify",
         "systemError": {
             "title": "Unexpected error",

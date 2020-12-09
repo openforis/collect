@@ -14,6 +14,7 @@ public class CodeAttributeDefView extends AttributeDefView {
 	private boolean showCode;
 	private CodeAttributeLayoutType layout;
 	private boolean enumerator;
+	private boolean hasQualifiableItems;
 
 	public CodeAttributeDefView(int id, String name, String label, AttributeType type, List<String> fieldNames,
 			boolean key, boolean multiple) {
@@ -66,5 +67,13 @@ public class CodeAttributeDefView extends AttributeDefView {
 	
 	public void setEnumerator(boolean enumerator) {
 		this.enumerator = enumerator;
+	}
+	
+	public boolean isHasQualifiableItems() {
+		return hasQualifiableItems;
+	}
+
+	public void setHasQualifiableItems(boolean hasQualifiableItems) {
+		this.hasQualifiableItems = hasQualifiableItems;
 	}
 }

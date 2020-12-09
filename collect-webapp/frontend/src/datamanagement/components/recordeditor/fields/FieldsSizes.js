@@ -23,17 +23,7 @@ export const TaxonFormFieldLabelWidth = 160
 
 const WIDTH_CALCULATORS_BY_ATTRIBUTE_TYPE = {
   [AttributeDefinition.Types.BOOLEAN]: () => 100,
-  [AttributeDefinition.Types.CODE]: ({ fieldDef }) => {
-    const { layout } = fieldDef
-    switch (layout) {
-      case CodeFieldDefinition.Layouts.RADIO:
-        return 200
-      case CodeFieldDefinition.Layouts.DROPDOWN:
-      case CodeFieldDefinition.Layouts.TEXT:
-      default:
-        return 200
-    }
-  },
+  [AttributeDefinition.Types.CODE]: ({ inTable }) => (inTable ? 200 : 300),
   [AttributeDefinition.Types.COORDINATE]: ({ fieldDef, inTable }) => {
     const { attributeDefinition } = fieldDef
     const { availableFieldNames } = attributeDefinition

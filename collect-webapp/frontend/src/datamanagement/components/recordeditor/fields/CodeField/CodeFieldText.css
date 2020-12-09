@@ -1,0 +1,10 @@
+.code-field-text-wrapper {
+    height: 32px;
+    display: grid;
+    grid-template-columns: 1fr 30px;
+}
+
+.code-field-text-wrapper .MuiIconButton-root {
+    height: 32px;
+    padding: 0;
+}

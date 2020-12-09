@@ -204,7 +204,8 @@ public class SurveyViewGenerator {
 			view = attrDefView;
 		} else if (def instanceof CodeAttributeDefinition) {
 			CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) def;
-			int codeListId = codeAttrDef.getList() == null ? -1 : codeAttrDef.getList().getId();
+			CodeList codeList = codeAttrDef.getList();
+			int codeListId = codeList == null ? -1 : codeList.getId();
 			CodeAttributeDefView attrDefView = new CodeAttributeDefView(id, name, label, attributeType, fieldNames, key,
 					multiple);
 			attrDefView.setCodeListId(codeListId);
@@ -215,6 +216,8 @@ public class SurveyViewGenerator {
 			attrDefView.setShowCode(uiOptions.getShowCode(codeAttrDef));
 			attrDefView.setLayout(uiOptions.getLayoutType(codeAttrDef));
 			attrDefView.setItemsOrientation(uiOptions.getLayoutDirection(codeAttrDef));
+			attrDefView.setHasQualifiableItems(
+					codeList == null ? false : survey.getContext().getCodeListService().hasQualifiableItems(codeList));
 			view = attrDefView;
 		} else if (def instanceof CoordinateAttributeDefinition) {
 			CoordinateAttributeDefinition coordDef = (CoordinateAttributeDefinition) def;

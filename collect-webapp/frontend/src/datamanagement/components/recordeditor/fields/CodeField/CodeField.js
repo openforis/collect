@@ -13,10 +13,12 @@ import Arrays from 'utils/Arrays'
 import Strings from 'utils/Strings'
 
 import AbstractField from '../AbstractField'
+import * as FieldsSizes from '../FieldsSizes'
 import CodeFieldRadio from './CodeFieldRadio'
 import CodeFieldAutocomplete from './CodeFieldAutocomplete'
 import CodeFieldItemLabel, { itemLabelFunction } from './CodeFieldItemLabel'
-import * as FieldsSizes from '../FieldsSizes'
+import CodeFieldText from './CodeFieldText'
+import CodeFieldDialog from './CodeFieldDialog'
 
 const MAX_ITEMS = 100
 
@@ -73,8 +75,30 @@ export default class CodeField extends AbstractField {
     const { parentEntity } = this.props
 
     if (parentEntity) {
-      this.setState({ loading: true, items: [] }, () => this.loadCodeListItems())
+      this.setState({ loading: true, items: [] }, () => this.updateItemsState())
     }
+  }
+
+  async loadAllAvailableItems() {
+    const { parentEntity, fieldDef } = this.props
+    const { survey, record } = parentEntity
+    const { id: surveyId } = survey
+    const { versionId } = record
+    const { attributeDefinition } = fieldDef
+    const { codeListId } = attributeDefinition
+
+    const ancestorCodes = record.getAncestorCodeValues({
+      contextEntity: parentEntity,
+      attributeDefinition,
+    })
+
+    return await ServiceFactory.codeListService.loadAllAvailableItems({
+      surveyId,
+      codeListId,
+      versionId,
+      ancestorCodes,
+      language: survey.preferredLanguage,
+    })
   }
 
   onRecordEvent(event) {
@@ -93,7 +117,7 @@ export default class CodeField extends AbstractField {
     }
   }
 
-  async loadCodeListItems() {
+  async updateItemsState() {
     const { parentEntity, fieldDef } = this.props
     const { survey, record } = parentEntity
     const { id: surveyId } = survey
@@ -115,16 +139,7 @@ export default class CodeField extends AbstractField {
       })
 
       const asynchronous = count > MAX_ITEMS
-      const items = asynchronous
-        ? null
-        : await ServiceFactory.codeListService.loadAllAvailableItems({
-            surveyId,
-            codeListId,
-            versionId,
-            ancestorCodes,
-            language: survey.preferredLanguage,
-          })
-
+      const items = asynchronous ? null : await this.loadAllAvailableItems()
       this.setState({ asynchronous, items, ancestorCodes }, () => this.updateStateFromProps())
     } else {
       this.setState({ asynchronous: false, items: [], loading: false })
@@ -147,17 +162,22 @@ export default class CodeField extends AbstractField {
       const { codeListId } = attributeDefinition
 
       const selectedItemsFetched = await Promise.all(
-        valuesNotEmpty.map((value) =>
-          Strings.isBlank(value.code)
-            ? null
-            : ServiceFactory.codeListService.loadItem({
-                surveyId,
-                codeListId,
-                versionId,
-                ancestorCodes,
-                code: value.code,
-              })
-        )
+        valuesNotEmpty.map(async (value) => {
+          if (Strings.isBlank(value.code)) {
+            return null
+          }
+          try {
+            return await ServiceFactory.codeListService.loadItem({
+              surveyId,
+              codeListId,
+              versionId,
+              ancestorCodes,
+              code: value.code,
+            })
+          } catch (e) {
+            return null
+          }
+        })
       )
       selectedItems = selectedItemsFetched.map((item, index) => (item ? item : valuesNotEmpty[index]))
     } else {
@@ -221,6 +241,7 @@ export default class CodeField extends AbstractField {
     const selectedCodesCurrent = items.map((item) => item.code)
     const selectedCodesAdded = Arrays.difference(selectedCodesCurrent, selectedCodesPrev)
     const selectedCodesRemoved = Arrays.difference(selectedCodesPrev, selectedCodesCurrent)
+
     let valuesUpdated = [...values]
     valuesUpdated = selectedCodesRemoved.reduce(
       (valuesAcc, codeRemoved) => valuesAcc.filter((item) => item.code !== codeRemoved),
@@ -252,7 +273,7 @@ export default class CodeField extends AbstractField {
     }
 
     const { attributeDefinition } = fieldDef
-    const { layout, multiple, enumerator } = attributeDefinition
+    const { layout, multiple, enumerator, hasQualifiableItems } = attributeDefinition
 
     if (enumerator) {
       return (
@@ -262,7 +283,28 @@ export default class CodeField extends AbstractField {
       )
     }
 
-    if (!asynchronous && !inTable && layout === CodeFieldDefinition.Layouts.RADIO) {
+    if (
+      (multiple || hasQualifiableItems) &&
+      (asynchronous || inTable || layout !== CodeFieldDefinition.Layouts.RADIO)
+    ) {
+      return (
+        <CodeFieldText
+          asynchronous={asynchronous}
+          parentEntity={parentEntity}
+          ancestorCodes={ancestorCodes}
+          attributeDefinition={attributeDefinition}
+          fieldDef={fieldDef}
+          itemLabelFunction={itemLabelFunction(attributeDefinition)}
+          items={items}
+          onChange={this.onCodeListItemSelect}
+          onChangeQualifier={this.onChangeQualifier}
+          selectedItems={selectedItems}
+          values={values}
+        />
+      )
+    }
+
+    if (!inTable && !asynchronous && layout === CodeFieldDefinition.Layouts.RADIO) {
       return (
         <CodeFieldRadio
           parentEntity={parentEntity}
@@ -274,21 +316,19 @@ export default class CodeField extends AbstractField {
         />
       )
     }
+
     return (
       <CodeFieldAutocomplete
         parentEntity={parentEntity}
         fieldDef={fieldDef}
         asynchronous={asynchronous}
+        inTable={inTable}
         items={items}
         selectedItems={selectedItems}
         values={values}
         ancestorCodes={ancestorCodes}
         itemLabelFunction={itemLabelFunction(attributeDefinition)}
-        onSelect={(selection) =>
-          multiple
-            ? this.onCodeListItemsSelect(selection)
-            : this.onCodeListItemSelect({ item: selection, selected: Boolean(selection) })
-        }
+        onSelect={(item) => this.onCodeListItemSelect({ item, selected: Boolean(item) })}
         onChangeQualifier={this.onChangeQualifier}
       />
     )

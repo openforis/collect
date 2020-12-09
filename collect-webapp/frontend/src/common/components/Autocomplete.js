@@ -115,6 +115,8 @@ const Autocomplete = (props) => {
 
   const filterOptions = asynchronous ? () => items : createFilterOptions()
 
+  const inputFieldWidthPx = inputFieldWidth instanceof Number ? `${String(inputFieldWidth)}px` : inputFieldWidth
+
   return (
     <MuiAutocomplete
       open={open}
@@ -134,8 +136,8 @@ const Autocomplete = (props) => {
       renderInput={(params) => (
         <TextField
           {...params}
-          fullWidth={false}
-          style={{ width: `${inputFieldWidth}px` }}
+          fullWidth={inputFieldWidth === '100%'}
+          style={{ width: inputFieldWidthPx }}
           variant="outlined"
           InputProps={{
             ...params.InputProps,
@@ -164,7 +166,7 @@ Autocomplete.propTypes = {
   disabled: PropTypes.bool,
   className: PropTypes.string,
   inputValue: PropTypes.string, // text shown in input field
-  inputFieldWidth: PropTypes.number,
+  inputFieldWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   items: PropTypes.array,
   itemRenderFunction: PropTypes.func,
   itemLabelFunction: PropTypes.func,
