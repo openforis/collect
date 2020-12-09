@@ -29,7 +29,8 @@ const _includeLabel = (itemDef) => itemDef instanceof FieldDefinition
 
 const FormItem = (props) => {
   const { itemDef, parentEntity, fullSize } = props
-  const { nodeDefinitionId, nodeDefinition, type } = itemDef
+  const { nodeDefinition, type } = itemDef
+  const { id: nodeDefinitionId } = nodeDefinition
 
   const [cardinalityErrors, setCardinalityErrors] = useState(
     Validations.getCardinalityErrors({ nodeDefinition, parentEntity })

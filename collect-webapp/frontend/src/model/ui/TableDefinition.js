@@ -39,7 +39,7 @@ export class ColumnGroupDefinition extends TableHeadingComponentDefinition {
   }
 
   get nodeDefinition() {
-    return this.attributeDefinition
+    return this.entityDefinition
   }
 
   get descendantColumns() {
