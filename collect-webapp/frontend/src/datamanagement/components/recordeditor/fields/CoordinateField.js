@@ -83,11 +83,14 @@ export default class CoordinateField extends AbstractField {
             <MenuItem key="empty" value="">
               <em>{L.l('common.selectOne')}</em>
             </MenuItem>
-            {srss.map((srs) => (
-              <MenuItem key={srs.id} value={srs.id}>
-                {srs.label}
-              </MenuItem>
-            ))}
+            {srss.map((srs) => {
+              const itemLabel = `${srs.label}${srs.label === srs.id ? '' : ` (${srs.id})`}`
+              return (
+                <MenuItem key={srs.id} value={srs.id}>
+                  {itemLabel}
+                </MenuItem>
+              )
+            })}
           </Select>
         )
       }
