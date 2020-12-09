@@ -10,6 +10,7 @@ import { CodeFieldDefinition } from 'model/ui/CodeFieldDefinition'
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 
 import Arrays from 'utils/Arrays'
+import Strings from 'utils/Strings'
 
 import AbstractField from '../AbstractField'
 import CodeFieldRadio from './CodeFieldRadio'
@@ -126,7 +127,7 @@ export default class CodeField extends AbstractField {
 
       this.setState({ asynchronous, items, ancestorCodes }, () => this.updateStateFromProps())
     } else {
-      this.setState({ loading: false, asynchronous: false, items: [] })
+      this.setState({ asynchronous: false, items: [], loading: false })
     }
   }
 
@@ -135,6 +136,7 @@ export default class CodeField extends AbstractField {
     const { parentEntity, fieldDef } = this.props
 
     const values = this.extractValuesFromProps()
+    const valuesNotEmpty = values.filter((value) => Strings.isNotBlank(value.code))
 
     let selectedItems = null
     if (asynchronous) {
@@ -145,19 +147,21 @@ export default class CodeField extends AbstractField {
       const { codeListId } = attributeDefinition
 
       const selectedItemsFetched = await Promise.all(
-        values.map((value) =>
-          ServiceFactory.codeListService.loadItem({
-            surveyId,
-            codeListId,
-            versionId,
-            ancestorCodes,
-            code: value.code,
-          })
+        valuesNotEmpty.map((value) =>
+          Strings.isBlank(value.code)
+            ? null
+            : ServiceFactory.codeListService.loadItem({
+                surveyId,
+                codeListId,
+                versionId,
+                ancestorCodes,
+                code: value.code,
+              })
         )
       )
-      selectedItems = selectedItemsFetched.map((item, index) => (item ? item : values[index]))
+      selectedItems = selectedItemsFetched.map((item, index) => (item ? item : valuesNotEmpty[index]))
     } else {
-      selectedItems = values.map((value) => {
+      selectedItems = valuesNotEmpty.map((value) => {
         const item = items.find((item) => item.code === value.code)
         return item ? item : value
       })
