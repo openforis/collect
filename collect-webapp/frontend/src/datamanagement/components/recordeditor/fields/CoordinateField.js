@@ -56,6 +56,7 @@ export default class CoordinateField extends AbstractField {
 
     const numericField = ({ field }) => (
       <InputNumber
+        key={field}
         decimalScale={10}
         value={Objects.getProp(field, '')(value)}
         readOnly={readOnly}
