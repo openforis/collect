@@ -7,8 +7,6 @@ import java.util.Map;
 
 import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.metamodel.CollectAnnotations;
-import org.openforis.collect.metamodel.ui.UIConfiguration;
-import org.openforis.collect.metamodel.ui.UIModelObject;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.uiconfiguration.view.Views;
 import org.openforis.collect.metamodel.view.BooleanAttributeDefView.LayoutType;
@@ -69,8 +67,6 @@ public class SurveyViewGenerator {
 	public SurveyView generateView(final CollectSurvey survey, UserGroup userGroup,
 			UserInGroup.UserGroupRole userInSurveyGroupRole) {
 		String defaultLanguage = survey.getDefaultLanguage();
-
-		final UIConfiguration uiConfiguration = survey.getUIConfiguration();
 
 		final SurveyView surveyView = new SurveyView(survey, new ViewContext(languageCode));
 
@@ -143,8 +139,8 @@ public class SurveyViewGenerator {
 				view.setSinceVersionId(def.getSinceVersionId());
 				view.setDeprecatedVersionId(def.getDeprecatedVersionId());
 
-				UIModelObject uiModelObject = uiConfiguration.getModelObjectByNodeDefinitionId(def.getId());
-				view.setHideWhenNotRelevant(uiModelObject != null && uiModelObject.isHideWhenNotRelevant());
+				view.setAlwaysRelevant(def.isAlwaysRelevant());
+				view.setHideWhenNotRelevant(survey.getUIOptions().isHideWhenNotRelevant(def));
 
 				NodeDefinition parentDef = def.getParentDefinition();
 				if (parentDef == null) {

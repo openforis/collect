@@ -3,10 +3,13 @@ import './Table.css'
 import React from 'react'
 import { Column, Table as TableVirtualized } from 'react-virtualized'
 import { Button } from 'reactstrap'
+import classNames from 'classnames'
 
 import { CoordinateAttributeDefinition, NumericAttributeDefinition, TaxonAttributeDefinition } from 'model/Survey'
+import { NodeRelevanceUpdatedEvent } from 'model/event/RecordEvent'
 import { ColumnGroupDefinition } from 'model/ui/TableDefinition'
 import L from 'utils/Labels'
+
 import DeleteIconButton from 'common/components/DeleteIconButton'
 
 import EntityCollectionComponent from './EntityCollectionComponent'
@@ -46,6 +49,7 @@ const calculateWidth = (headingComponent) => {
 }
 
 const HeadingRow = ({
+  columnInfoByDefId,
   headingRow,
   firstRow,
   totalHeadingRows,
@@ -72,11 +76,15 @@ const HeadingRow = ({
   ...headingRow.map((headingComponent) => {
     const { colSpan, col, row, rowSpan } = headingComponent
     const { attributeDefinition } = headingComponent
+    const { id: attributeDefId } = attributeDefinition
+
+    const columnInfo = columnInfoByDefId[attributeDefId]
+    const { relevant } = columnInfo
 
     return (
       <div
-        key={`heading-cell-${row}-${col}`}
-        className="grid-cell"
+        key={`heading-cell-${row}-${attributeDefId}`}
+        className={classNames('grid-cell', { 'not-relevant': !relevant })}
         style={{
           gridRowStart: row,
           gridRowEnd: row + rowSpan,
@@ -121,6 +129,57 @@ const HeadingRow = ({
     : []),
 ]
 
+const determineColumnInfo = ({ headingColumn, entities }) => {
+  const { attributeDefinition } = headingColumn
+  const { alwaysRelevant, hideWhenNotRelevant } = attributeDefinition
+
+  const relevant =
+    alwaysRelevant ||
+    // has some descendant in entities that is relevant
+    entities.some((entity) => {
+      const nodes = entity.getDescendantsByNodeDefinition(attributeDefinition)
+      return nodes.some((node) => node.relevant)
+    })
+
+  const isEmpty = () =>
+    entities.length === 0 ||
+    entities.every((entity) => {
+      const nodes = entity.getDescendantsByNodeDefinition(attributeDefinition)
+      return nodes.some((node) => node.isEmpty())
+    })
+
+  return {
+    relevant,
+    visible: !hideWhenNotRelevant || relevant || !isEmpty(),
+  }
+}
+
+const determineColumnInfoByAttributeDefinitionId = ({ entities, itemDef }) => {
+  const { headingColumns } = itemDef
+
+  return headingColumns.reduce((infoByDefId, headingColumn) => {
+    const { attributeDefinition } = headingColumn
+    infoByDefId[attributeDefinition.id] = determineColumnInfo({ headingColumn, entities })
+    return infoByDefId
+  }, [])
+}
+
+const determineColumnsVisible = ({ itemDef, columnInfoByDefId }) => {
+  const { headingColumns } = itemDef
+  let currentCol = 1
+
+  return headingColumns.reduce((columnsVisible, headingColumn) => {
+    const { attributeDefinition } = headingColumn
+
+    if (columnInfoByDefId[attributeDefinition.id].visible) {
+      headingColumn.col = currentCol
+      columnsVisible.push(headingColumn)
+      currentCol = currentCol + headingColumn.colSpan
+    }
+    return columnsVisible
+  }, [])
+}
+
 export default class Table extends EntityCollectionComponent {
   constructor() {
     super()
@@ -132,6 +191,8 @@ export default class Table extends EntityCollectionComponent {
 
     this.state = {
       ...this.state,
+      headingRows: [],
+      headingColumns: [],
       totalWidth: 0,
       addingRow: false,
     }
@@ -140,15 +201,40 @@ export default class Table extends EntityCollectionComponent {
   componentDidMount() {
     super.componentDidMount()
 
+    this.tableRef = React.createRef(null)
+
+    this.updateLayoutState()
+  }
+
+  updateLayoutState() {
     const { itemDef, parentEntity } = this.props
+    const { columnInfoByDefId: columnInfoByDefIdPrev } = this.state
     const { record } = parentEntity
     const { readOnly } = record
 
-    this.tableRef = React.createRef(null)
-
-    const { headingColumns, showRowNumbers, entityDefinition } = itemDef
+    const { showRowNumbers, entityDefinition, headingRows } = itemDef
     const { enumerate } = entityDefinition
-    const headingColumnWidths = headingColumns.reduce((acc, headingColumn) => {
+
+    const entities = this.determineEntities()
+    const columnInfoByDefId = determineColumnInfoByAttributeDefinitionId({ entities, itemDef })
+    const columnsVisible = determineColumnsVisible({ itemDef, columnInfoByDefId })
+    const attributeDefIdsVisible = columnsVisible.map((headingColumn) => headingColumn.attributeDefinition.id)
+
+    if (JSON.stringify(columnInfoByDefId) === JSON.stringify(columnInfoByDefIdPrev)) {
+      // columns visibility/relevance hasn't change, don't update state/layout
+      return
+    }
+    const headingRowsFiltered = headingRows.map((headingRow) =>
+      headingRow.reduce((headingRowFiltered, headingComponent) => {
+        const headingColIndex = attributeDefIdsVisible.indexOf(headingComponent.attributeDefinition.id)
+        if (headingColIndex >= 0) {
+          headingRowFiltered.push(columnsVisible[headingColIndex])
+        }
+        return headingRowFiltered
+      }, [])
+    )
+
+    const headingColumnWidths = columnsVisible.reduce((acc, headingColumn) => {
       acc.push(calculateWidth(headingColumn))
       return acc
     }, [])
@@ -166,7 +252,10 @@ export default class Table extends EntityCollectionComponent {
 
     this.setState({
       ...this.state,
-      entities: this.determineEntities(),
+      entities,
+      columnInfoByDefId,
+      headingColumns: columnsVisible,
+      headingRows: headingRowsFiltered,
       totalWidth,
       gridTemplateColumns,
     })
@@ -174,8 +263,24 @@ export default class Table extends EntityCollectionComponent {
 
   onEntitiesUpdated() {
     const { entities } = this.state
+
+    this.updateLayoutState()
     // make last row visible
     this.tableRef.current.scrollToRow(entities.length - 1)
+  }
+
+  onRecordEvent(event) {
+    super.onRecordEvent(event)
+
+    const { itemDef, parentEntity } = this.props
+    const { entityDefinition } = itemDef
+
+    if (
+      event instanceof NodeRelevanceUpdatedEvent &&
+      event.isRelativeToDescendantsOf({ parentEntity, entityDefinition })
+    ) {
+      this.updateLayoutState()
+    }
   }
 
   handleDeleteButtonClick(entity) {
@@ -184,9 +289,9 @@ export default class Table extends EntityCollectionComponent {
 
   headerRowRenderer() {
     const { itemDef, parentEntity } = this.props
-    const { gridTemplateColumns, totalWidth } = this.state
+    const { columnInfoByDefId, gridTemplateColumns, headingColumns, headingRows, totalWidth } = this.state
     const { record } = parentEntity
-    const { headingRows, totalHeadingColumns, showRowNumbers, entityDefinition } = itemDef
+    const { showRowNumbers, entityDefinition } = itemDef
     const { enumerate } = entityDefinition
     const { readOnly } = record
 
@@ -195,9 +300,10 @@ export default class Table extends EntityCollectionComponent {
         {headingRows.map((headingRow, index) => (
           <HeadingRow
             key={`heading-row-${index + 1}`}
+            columnInfoByDefId={columnInfoByDefId}
             headingRow={headingRow}
             totalHeadingRows={headingRows.length}
-            totalHeadingColumns={totalHeadingColumns}
+            totalHeadingColumns={headingColumns.length}
             firstRow={index === 0}
             includeRowNumberColumn={showRowNumbers}
             includeDeleteColumn={!readOnly && !enumerate}
@@ -226,10 +332,10 @@ export default class Table extends EntityCollectionComponent {
 
   render() {
     const { itemDef, fullSize, parentEntity } = this.props
-    const { totalWidth, gridTemplateColumns, entities, addingEntity } = this.state
+    const { addingEntity, columnInfoByDefId, entities, gridTemplateColumns, headingColumns, totalWidth } = this.state
     const { record } = parentEntity
 
-    const { headingColumns, showRowNumbers, entityDefinition } = itemDef
+    const { showRowNumbers, entityDefinition } = itemDef
     const { enumerate } = entityDefinition
     const { readOnly } = record
     const canAddOrDeleteRows = !readOnly && !enumerate
@@ -261,16 +367,22 @@ export default class Table extends EntityCollectionComponent {
                     />,
                   ]
                 : []),
-              ...headingColumns.map((headingColumn) => (
-                <Column
-                  key={headingColumn.attributeDefinitionId}
-                  width={FieldsSizes.getWidth({ fieldDef: headingColumn, inTable: true })}
-                  cellRenderer={this.cellRenderer}
-                  dataKey={headingColumn}
-                  headingColumn={headingColumn}
-                  className="grid-cell"
-                />
-              )),
+              ...headingColumns.map((headingColumn) => {
+                const { attributeDefinition } = headingColumn
+                const { id: attributeDefId } = attributeDefinition
+                const columnInfo = columnInfoByDefId[attributeDefId]
+                const { relevant } = columnInfo
+                return (
+                  <Column
+                    key={headingColumn.attributeDefinitionId}
+                    width={FieldsSizes.getWidth({ fieldDef: headingColumn, inTable: true })}
+                    cellRenderer={this.cellRenderer}
+                    dataKey={headingColumn}
+                    headingColumn={headingColumn}
+                    className={classNames('grid-cell', { 'not-relevant': !relevant })}
+                  />
+                )
+              }),
               ...(canAddOrDeleteRows
                 ? [
                     <Column

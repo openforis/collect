@@ -10,6 +10,7 @@ export class RecordEvent extends Event {
   ancestorIds
   nodeId
   nodePath
+  parentEntityPath
   timestamp
   userName
   recordErrorsInvalidValues
@@ -48,6 +49,14 @@ export class RecordEvent extends Event {
       this.isRelativeToRecord(parentEntity.record) &&
       this.parentEntityPath === parentEntity.path &&
       Number(this.definitionId) === nodeDefId
+    )
+  }
+
+  isRelativeToDescendantsOf({ parentEntity, entityDefinition }) {
+    return (
+      this.isRelativeToRecord(parentEntity.record) &&
+      (this.nodePath.startsWith(`${parentEntity.path}/${entityDefinition.name}/`) ||
+        this.nodePath.startsWith(`${parentEntity.path}/${entityDefinition.name}[`))
     )
   }
 }

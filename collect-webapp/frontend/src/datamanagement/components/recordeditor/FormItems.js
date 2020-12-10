@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container, Fade } from 'reactstrap'
+import { Fade } from 'reactstrap'
 import classnames from 'classnames'
 
 import { NodeRelevanceUpdatedEvent } from 'model/event/RecordEvent'

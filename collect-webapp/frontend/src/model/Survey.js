@@ -162,6 +162,8 @@ export class NodeDefinition extends SurveyObject {
   multiple
   sinceVersionId
   deprecatedVersionId
+  alwaysRelevant
+  hideWhenNotRelevant
 
   static Types = {
     ENTITY: 'ENTITY',

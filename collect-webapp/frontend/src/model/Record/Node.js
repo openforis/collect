@@ -53,6 +53,10 @@ export class Node extends Serializable {
     return currentParent.definition.id === defId ? currentParent : null
   }
 
+  isDescendantOf(entity) {
+    return this.path.startsWith(entity.path)
+  }
+
   /**
    * Returns a human readable path (with node definition labels instead of names)
    */
@@ -65,5 +69,13 @@ export class Node extends Serializable {
     const positionSuffix = definition.multiple ? `[${index + 1}]` : ''
 
     return `${parentPath ? `${parentPath} / ` : ''}${definition.labelOrName}${positionSuffix}`
+  }
+
+  isEmpty() {
+    return true
+  }
+
+  get relevant() {
+    return this.parent.childrenRelevanceByDefinitionId[this.definition.id]
   }
 }

@@ -88,7 +88,7 @@ export class Entity extends Node {
     return this.childrenByDefinitionId[childDefId] || []
   }
 
-  getDescendants(descendantDefIds) {
+  getDescendantsByNodeDefHierarchy(descendantDefIds) {
     let currentEntity = this
     let descendants
     const schema = this.record.survey.schema
@@ -106,8 +106,15 @@ export class Entity extends Node {
     const nodeDefAncestorIds = nodeDef.ancestorIds
     const nodeDefAncestorIdsUpToThis = nodeDefAncestorIds.slice(0, nodeDefAncestorIds.indexOf(this.definition.id))
     const descendantDefIds = [...nodeDefAncestorIdsUpToThis].reverse()
-    const descendantEntities = descendantDefIds.length ? this.getDescendants(descendantDefIds) : null
+    const descendantEntities = descendantDefIds.length ? this.getDescendantsByNodeDefHierarchy(descendantDefIds) : null
     return descendantEntities && descendantEntities.length ? descendantEntities[0] : this
+  }
+
+  getDescendantsByNodeDefinition(nodeDef) {
+    const nodeDefAncestorIds = nodeDef.ancestorIds
+    const nodeDefAncestorIdsUpToThis = nodeDefAncestorIds.slice(0, nodeDefAncestorIds.indexOf(this.definition.id))
+    const descendantDefIds = [...[...nodeDefAncestorIdsUpToThis].reverse(), nodeDef.id]
+    return descendantDefIds.length ? this.getDescendantsByNodeDefHierarchy(descendantDefIds) : []
   }
 
   getSingleChild(defId) {
