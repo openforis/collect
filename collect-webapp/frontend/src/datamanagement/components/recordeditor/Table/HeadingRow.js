@@ -2,6 +2,8 @@ import React from 'react'
 import classNames from 'classnames'
 
 import { CoordinateAttributeDefinition, NumericAttributeDefinition, TaxonAttributeDefinition } from 'model/Survey'
+import * as FieldsSizes from '../fields/FieldsSizes'
+import L from 'utils/Labels'
 
 const getHeadingLabel = ({ headingComponent }) => {
   const { nodeDefinition } = headingComponent

@@ -44,7 +44,7 @@ export default class MultipleFieldset extends EntityCollectionComponent {
       selectedEntityIndex: -1,
     }
 
-    this.handleDeleteButtonClick = this.handleDeleteButtonClick.bind(this)
+    this.onDeleteButtonClick = this.onDeleteButtonClick.bind(this)
   }
 
   getSelectedEntity() {
@@ -87,7 +87,7 @@ export default class MultipleFieldset extends EntityCollectionComponent {
     this.setState({ selectedEntityIndex: -1 }, () => this.setState({ selectedEntityIndex }))
   }
 
-  handleDeleteButtonClick() {
+  onDeleteButtonClick() {
     const selectedEntity = this.getSelectedEntity()
     this.commandService.deleteEntity({ entity: selectedEntity })
   }
@@ -117,11 +117,11 @@ export default class MultipleFieldset extends EntityCollectionComponent {
             />
           )}
           {!readOnly && (
-            <Button color="success" onClick={this.handleNewButtonClick}>
+            <Button color="success" onClick={this.onNewButtonClick}>
               {L.l('common.new')}
             </Button>
           )}
-          {!readOnly && selectedEntity && <DeleteIconButton onClick={this.handleDeleteButtonClick} />}
+          {!readOnly && selectedEntity && <DeleteIconButton onClick={this.onDeleteButtonClick} />}
         </div>
         {selectedEntity && (
           <>

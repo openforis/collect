@@ -19,13 +19,7 @@ import HeadingRow from './HeadingRow'
 const ROW_NUMBER_COLUMN_WIDTH = 60
 const DELETE_COLUMN_WIDTH = 60
 
-const calculateWidth = (headingComponent) => {
-  if (headingComponent instanceof ColumnGroupDefinition) {
-    return headingComponent.descendantColumns.reduce((acc, headingColumn) => acc + calculateWidth(headingColumn), 0)
-  } else {
-    return FieldsSizes.getWidth({ fieldDef: headingComponent, inTable: true })
-  }
-}
+const calculateWidth = (headingComponent) => FieldsSizes.getWidth({ fieldDef: headingComponent, inTable: true })
 
 const determineColumnInfo = ({ headingColumn, entities, col }) => {
   const { attributeDefinition, col: colOriginal, colSpan } = headingColumn
@@ -109,7 +103,7 @@ const calculateCol = (columnsInfo) => (headingColumn) => {
 export default class Table extends EntityCollectionComponent {
   constructor() {
     super()
-    this.handleDeleteButtonClick = this.handleDeleteButtonClick.bind(this)
+    this.onDeleteButtonClick = this.onDeleteButtonClick.bind(this)
     this.headerRowRenderer = this.headerRowRenderer.bind(this)
     this.cellRenderer = this.cellRenderer.bind(this)
     this.rowNumberCellRenderer = this.rowNumberCellRenderer.bind(this)
@@ -193,12 +187,15 @@ export default class Table extends EntityCollectionComponent {
     })
   }
 
-  onEntitiesUpdated() {
+  onEntitiesUpdated(entityAdded) {
     const { entities } = this.state
 
     this.updateLayoutState()
-    // make last row visible
-    this.tableRef.current.scrollToRow(entities.length - 1)
+
+    if (entityAdded) {
+      // make last row visible
+      this.tableRef.current.scrollToRow(entities.length - 1)
+    }
   }
 
   onRecordEvent(event) {
@@ -215,7 +212,7 @@ export default class Table extends EntityCollectionComponent {
     }
   }
 
-  handleDeleteButtonClick(entity) {
+  onDeleteButtonClick(entity) {
     this.commandService.deleteEntity({ entity })
   }
 
@@ -260,7 +257,7 @@ export default class Table extends EntityCollectionComponent {
   }
 
   deleteCellRenderer({ rowData: entity }) {
-    return <DeleteIconButton onClick={() => this.handleDeleteButtonClick(entity)} />
+    return <DeleteIconButton onClick={() => this.onDeleteButtonClick(entity)} />
   }
 
   render() {
@@ -285,7 +282,7 @@ export default class Table extends EntityCollectionComponent {
             rowHeight={32}
             rowCount={entities.length}
             rowGetter={({ index }) => entities[index]}
-            onDelete={(entity) => this.handleDeleteButtonClick(entity)}
+            onDelete={(entity) => this.onDeleteButtonClick(entity)}
             ref={this.tableRef}
           >
             {[
@@ -308,7 +305,7 @@ export default class Table extends EntityCollectionComponent {
                 return (
                   <Column
                     key={headingColumn.attributeDefinitionId}
-                    width={FieldsSizes.getWidth({ fieldDef: headingColumn, inTable: true })}
+                    width={calculateWidth(headingColumn)}
                     cellRenderer={this.cellRenderer}
                     dataKey={headingColumn}
                     headingColumn={headingColumn}
@@ -332,7 +329,7 @@ export default class Table extends EntityCollectionComponent {
         </div>
 
         {canAddOrDeleteRows && (
-          <Button variant="outlined" color="primary" disabled={addingEntity} onClick={this.handleNewButtonClick}>
+          <Button variant="outlined" color="primary" disabled={addingEntity} onClick={this.onNewButtonClick}>
             {L.l('common.add')}
           </Button>
         )}

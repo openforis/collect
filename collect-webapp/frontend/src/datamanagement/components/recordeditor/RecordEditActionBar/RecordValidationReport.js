@@ -35,7 +35,9 @@ const RecordValidationReport = (props) => {
         rows.push(row)
       }
     } else {
-      const cardinalityErrorMessageByChildDefName = Validations.getCardinalityErrorMessageByChildDefName({ entity: node })
+      const cardinalityErrorMessageByChildDefName = Validations.getCardinalityErrorMessageByChildDefName({
+        entity: node,
+      })
       Object.entries(cardinalityErrorMessageByChildDefName).forEach(([childDefName, message]) => {
         const nodePathHR = node.pathHR
         const childDef = node.definition.getChildDefinitionByName(childDefName)
@@ -72,7 +74,7 @@ const RecordValidationReport = (props) => {
           <DialogContent className="dialog-content">
             <BootstrapTable
               {...toolkitProps.baseProps}
-              pagination={paginationFactory({ sizePerPage: 10, hideSizePerPage: true })}
+              pagination={paginationFactory({ sizePerPage: 10, hideSizePerPage: true, hidePageListOnlyOnePage: true })}
             />
           </DialogContent>
           <DialogActions>

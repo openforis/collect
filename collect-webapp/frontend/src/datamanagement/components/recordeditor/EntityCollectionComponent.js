@@ -15,7 +15,7 @@ export default class EntityCollectionComponent extends AbstractFormComponent {
 
     this.determineEntities = this.determineEntities.bind(this)
     this.onEntitiesUpdated = this.onEntitiesUpdated.bind(this)
-    this.handleNewButtonClick = this.handleNewButtonClick.bind(this)
+    this.onNewButtonClick = this.onNewButtonClick.bind(this)
   }
 
   componentDidMount() {
@@ -32,17 +32,20 @@ export default class EntityCollectionComponent extends AbstractFormComponent {
     super.onRecordEvent(event)
 
     const { parentEntity, itemDef } = this.props
+    const { addingEntity } = this.state
     if (
       (event instanceof EntityCreationCompletedEvent || event instanceof EntityDeletedEvent) &&
       event.isRelativeToNodes({ parentEntity, nodeDefId: itemDef.entityDefinitionId })
     ) {
-      this.setState({ addingEntity: false, entities: this.determineEntities() }, () => this.onEntitiesUpdated(true))
+      this.setState({ addingEntity: false, entities: this.determineEntities() }, () =>
+        this.onEntitiesUpdated(addingEntity)
+      )
     }
   }
 
-  onEntitiesUpdated(entityAdded) {}
+  onEntitiesUpdated(entityAdded = false) {}
 
-  handleNewButtonClick() {
+  onNewButtonClick() {
     const { itemDef, parentEntity } = this.props
     const { record } = parentEntity
 
