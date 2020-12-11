@@ -32,8 +32,8 @@ const FormItem = (props) => {
   const { nodeDefinition, type } = itemDef
   const { id: nodeDefinitionId } = nodeDefinition
 
-  const [cardinalityErrors, setCardinalityErrors] = useState(
-    Validations.getCardinalityErrors({ nodeDefinition, parentEntity })
+  const [cardinalityValidation, setCardinalityValidation] = useState(
+    Validations.getCardinalityValidation({ nodeDefinition, parentEntity })
   )
 
   useRecordEvent({
@@ -43,7 +43,7 @@ const FormItem = (props) => {
         (event instanceof NodeCountValidationUpdatedEvent || event instanceof NodeCountUpdatedEvent) &&
         event.isRelativeToNodes({ parentEntity, nodeDefId: nodeDefinitionId })
       ) {
-        setCardinalityErrors(Validations.getCardinalityErrors({ nodeDefinition, parentEntity }))
+        setCardinalityValidation(Validations.getCardinalityValidation({ nodeDefinition, parentEntity }))
       }
     },
   })
@@ -66,10 +66,10 @@ const FormItem = (props) => {
       )}
       <Col>
         <>
-          <div id={wrapperId} className={classNames('form-item-wrapper', { error: Boolean(cardinalityErrors) })}>
+          <div id={wrapperId} className={classNames('form-item-wrapper', { error: cardinalityValidation.hasErrors() })}>
             {internalComponent}
           </div>
-          <ValidationTooltip target={wrapperId} errors={cardinalityErrors} />
+          <ValidationTooltip target={wrapperId} validation={cardinalityValidation} />
         </>
       </Col>
     </Row>

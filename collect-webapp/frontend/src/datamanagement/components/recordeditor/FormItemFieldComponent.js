@@ -6,7 +6,7 @@ import { AttributeDefinition } from 'model/Survey'
 import { useRecordEvent } from 'common/hooks'
 import ValidationTooltip from 'common/components/ValidationTooltip'
 
-import { AttributeValueUpdatedEvent } from 'model/event/RecordEvent'
+import { AttributeValueUpdatedEvent, NodeRelevanceUpdatedEvent } from 'model/event/RecordEvent'
 
 import BooleanField from './fields/BooleanField'
 import CodeField from './fields/CodeField'
@@ -18,6 +18,7 @@ import RangeField from './fields/RangeField'
 import TaxonField from './fields/TaxonField'
 import TextField from './fields/TextField'
 import TimeField from './fields/TimeField'
+import * as Validations from 'model/Validations'
 
 const FIELD_COMPONENTS_BY_TYPE = {
   [AttributeDefinition.Types.BOOLEAN]: BooleanField,
@@ -33,71 +34,70 @@ const FIELD_COMPONENTS_BY_TYPE = {
 }
 
 const extractValidation = (props) => {
-  const { parentEntity, itemDef, attribute: attributeParam } = props
-  let errors = null,
-    warnings = null
-  if (parentEntity) {
-    const attrDef = itemDef.attributeDefinition
-    let attr = null
-    if (!attrDef.multiple) {
-      attr = parentEntity.getSingleChild(attrDef.id)
-    } else if (attributeParam) {
-      attr = attributeParam
-    }
-    if (attr) {
-      const { errors: errorsArray, warnings: warningsArray } = attr.validationResults
-      errors = errorsArray ? errorsArray.join('; ') : null
-      warnings = warningsArray ? warningsArray.join('; ') : null
-      return { errors, warnings }
-    }
-  }
-  return { errors, warnings }
+  const { parentEntity, itemDef, attribute } = props
+  return Validations.getAttributeValidation({
+    parentEntity,
+    attributeDefinition: itemDef.attributeDefinition,
+    attribute,
+  })
 }
 
 const FormItemFieldComponent = (props) => {
   const { itemDef, parentEntity, attribute, inTable } = props
+  const { attributeDefinition } = itemDef
+  const { attributeType, id: attributeDefinitionId } = attributeDefinition
 
   const wrapperIdRef = useRef(`form-item-field-${new Date().getTime()}`)
   const wrapperId = wrapperIdRef.current
 
-  const [validation, setValidation] = useState({ errors: null, warnings: null })
+  const calculateIsRelevant = () => parentEntity.childrenRelevanceByDefinitionId[attributeDefinitionId]
+
+  const [validation, setValidation] = useState(extractValidation(props))
+  const [relevant, setRelevant] = useState(calculateIsRelevant())
 
   useRecordEvent({
     parentEntity,
     onEvent: (event) => {
       if (
         event instanceof AttributeValueUpdatedEvent &&
-        event.isRelativeToNodes({ parentEntity, nodeDefId: itemDef.attributeDefinitionId })
+        event.isRelativeToNodes({ parentEntity, nodeDefId: attributeDefinitionId })
       ) {
         setValidation(extractValidation(props))
+      } else if (
+        event instanceof NodeRelevanceUpdatedEvent &&
+        event.isRelativeToNodes({ parentEntity, nodeDefId: attributeDefinitionId })
+      ) {
+        setRelevant(calculateIsRelevant())
       }
     },
   })
 
-  const { attributeDefinition } = itemDef
-  const { attributeType } = attributeDefinition
-  const { errors, warnings } = validation
   const Component = FIELD_COMPONENTS_BY_TYPE[attributeType]
 
-  return Component ? (
+  if (!Component) {
+    return <div>Field type {attributeType} not supported yet</div>
+  }
+  return (
     <>
       <div
         id={wrapperId}
-        className={classNames('form-item-field-wrapper', { error: Boolean(errors), warning: Boolean(warnings) })}
+        className={classNames('form-item-field-wrapper', {
+          error: validation.hasErrors(),
+          warning: validation.hasWarnings(),
+          'not-relevant': !relevant,
+        })}
       >
         <Component
           fieldDef={itemDef}
           parentEntity={parentEntity}
           attribute={attribute}
           inTable={inTable}
-          error={Boolean(errors)}
-          warning={Boolean(warnings)}
+          error={validation.hasErrors()}
+          warning={validation.hasWarnings()}
         />
       </div>
-      <ValidationTooltip target={wrapperId} errors={errors} warnings={warnings} />
+      <ValidationTooltip target={wrapperId} validation={validation} />
     </>
-  ) : (
-    <div>Field type {attributeType} not supported yet</div>
   )
 }
 

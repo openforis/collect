@@ -2,6 +2,7 @@ import Serializable from '../Serializable'
 import { Node } from './Node'
 
 import Objects from 'utils/Objects'
+import Validation from 'model/Validation'
 
 class Field extends Serializable {
   value = null
@@ -14,6 +15,7 @@ class Field extends Serializable {
 
 export class Attribute extends Node {
   fields = []
+  validationResults
 
   fillFromJSON(jsonObj) {
     super.fillFromJSON(jsonObj)
@@ -75,5 +77,10 @@ export class Attribute extends Node {
       }
       field.value = Objects.isNullOrUndefined(value) ? null : value[fieldName]
     })
+  }
+
+  get validation() {
+    const { errors, warnings } = this.validationResults
+    return new Validation({ errors, warnings })
   }
 }

@@ -25,21 +25,18 @@ const RecordValidationReport = (props) => {
 
   record.traverse((node) => {
     if (node instanceof Attribute) {
-      const { errors: errorsArray, warnings: warningsArray } = node.validationResults
+      const { errorMessage, warningMessage } = node.validation
 
-      const errors = errorsArray?.join('; ')
-      const warnings = warningsArray?.join('; ')
-
-      if (errors || warnings) {
+      if (errorMessage || warningMessage) {
         const row = { path: node.path, pathHR: node.pathHR }
-        row['id'] = node.path + (errors ? '(err)' : '(warn)')
-        row['severity'] = errors ? 'error' : 'warning'
-        row['message'] = errors ? errors : warnings
+        row['id'] = node.path + (errorMessage ? '(err)' : '(warn)')
+        row['severity'] = errorMessage ? 'error' : 'warning'
+        row['message'] = errorMessage ? errorMessage : warningMessage
         rows.push(row)
       }
     } else {
-      const cardinalityErrorsByChildDefName = Validations.getCardinalityErrorsByChildDefName({ entity: node })
-      Object.entries(cardinalityErrorsByChildDefName).forEach(([childDefName, message]) => {
+      const cardinalityErrorMessageByChildDefName = Validations.getCardinalityErrorMessageByChildDefName({ entity: node })
+      Object.entries(cardinalityErrorMessageByChildDefName).forEach(([childDefName, message]) => {
         const nodePathHR = node.pathHR
         const childDef = node.definition.getChildDefinitionByName(childDefName)
         rows.push({

@@ -3,27 +3,29 @@ import { UncontrolledTooltip } from 'reactstrap'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 
+import Validation from 'model/Validation'
+
 const ValidationTooltip = (props) => {
-  const { errors, warnings, target } = props
-  const visible = Boolean(errors || warnings)
+  const { validation, target } = props
+  const { errorMessage, warningMessage } = validation
 
-  const className = classnames({ warning: Boolean(warnings), error: Boolean(errors) })
+  const className = classnames({ error: validation.hasErrors(), warning: validation.hasWarnings() })
 
-  return visible ? (
+  if (validation.isEmpty()) return null
+
+  return (
     <UncontrolledTooltip target={target} placement="top-start" popperClassName={className}>
-      {errors || warnings}
+      {errorMessage || warningMessage}
     </UncontrolledTooltip>
-  ) : null
+  )
 }
 
 ValidationTooltip.propTypes = {
-  errors: PropTypes.string,
-  warnings: PropTypes.string,
+  validation: PropTypes.instanceOf(Validation),
 }
 
 ValidationTooltip.defaultProps = {
-  errors: null,
-  warnings: null,
+  validation: new Validation(),
 }
 
 export default ValidationTooltip
