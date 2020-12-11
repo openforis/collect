@@ -103,10 +103,10 @@ export class Entity extends Node {
   }
 
   getDescendantEntityClosestToNode(nodeDef) {
-    const nodeDefAncestorIds = nodeDef.ancestorIds
-    const nodeDefAncestorIdsUpToThis = nodeDefAncestorIds.slice(0, nodeDefAncestorIds.indexOf(this.definition.id))
-    const descendantDefIds = [...nodeDefAncestorIdsUpToThis].reverse()
-    const descendantEntities = descendantDefIds.length ? this.getDescendantsByNodeDefHierarchy(descendantDefIds) : null
+    if (nodeDef.parent.id === this.definition.id) {
+      return this
+    }
+    const descendantEntities = this.getDescendantsByNodeDefinition(nodeDef.parent)
     return descendantEntities && descendantEntities.length ? descendantEntities[0] : this
   }
 
@@ -165,5 +165,24 @@ export class Entity extends Node {
         }
       })
     })
+  }
+
+  hasDescendant(predicate) {
+    return this.definition.children.some((childDef) => {
+      const children = this.getChildrenByDefinitionId(childDef.id)
+      return children.some((child) => {
+        if (predicate(child)) {
+          return true
+        }
+        if (child instanceof Entity) {
+          return child.hasDescendant(predicate)
+        }
+        return false
+      })
+    })
+  }
+
+  isEmpty() {
+    return this.hasDescendant((descendant) => descendant.isEmpty())
   }
 }

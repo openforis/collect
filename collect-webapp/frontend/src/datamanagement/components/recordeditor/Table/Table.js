@@ -5,40 +5,19 @@ import { Column, Table as TableVirtualized } from 'react-virtualized'
 import { Button } from 'reactstrap'
 import classNames from 'classnames'
 
-import { CoordinateAttributeDefinition, NumericAttributeDefinition, TaxonAttributeDefinition } from 'model/Survey'
 import { NodeRelevanceUpdatedEvent } from 'model/event/RecordEvent'
-import { ColumnGroupDefinition } from 'model/ui/TableDefinition'
+import { ColumnDefinition, ColumnGroupDefinition } from 'model/ui/TableDefinition'
 import L from 'utils/Labels'
 
 import DeleteIconButton from 'common/components/DeleteIconButton'
 
-import EntityCollectionComponent from './EntityCollectionComponent'
-import FormItemFieldComponent from './FormItemFieldComponent'
-import * as FieldsSizes from './fields/FieldsSizes'
+import EntityCollectionComponent from '../EntityCollectionComponent'
+import FormItemFieldComponent from '../FormItemFieldComponent'
+import * as FieldsSizes from '../fields/FieldsSizes'
+import HeadingRow from './HeadingRow'
 
 const ROW_NUMBER_COLUMN_WIDTH = 60
 const DELETE_COLUMN_WIDTH = 60
-
-const getHeadingLabel = ({ headingComponent }) => {
-  const { nodeDefinition } = headingComponent
-  const { labelOrName } = nodeDefinition
-
-  if (nodeDefinition instanceof NumericAttributeDefinition) {
-    const { precisions } = nodeDefinition
-    if (precisions && precisions.length === 1) {
-      const precision = precisions[0]
-      const unit = nodeDefinition.survey.units.find((unit) => unit.id === precision.unitId)
-      const suffix = ` (${unit.abbreviation})`
-      if (!labelOrName.endsWith(suffix)) {
-        return labelOrName + suffix
-      }
-    }
-  }
-  return labelOrName
-}
-
-const isCompositeAttribute = (attrDef) =>
-  attrDef instanceof CoordinateAttributeDefinition || attrDef instanceof TaxonAttributeDefinition
 
 const calculateWidth = (headingComponent) => {
   if (headingComponent instanceof ColumnGroupDefinition) {
@@ -48,136 +27,83 @@ const calculateWidth = (headingComponent) => {
   }
 }
 
-const HeadingRow = ({
-  columnInfoByDefId,
-  headingRow,
-  firstRow,
-  totalHeadingRows,
-  totalHeadingColumns,
-  includeRowNumberColumn,
-  includeDeleteColumn,
-}) => [
-  ...(firstRow && includeRowNumberColumn
-    ? [
-        <div
-          key="heading-cell-row-number"
-          className="grid-cell"
-          style={{
-            gridRowStart: 1,
-            gridRowEnd: totalHeadingRows + 1,
-            gridColumnStart: 1,
-            gridColumnEnd: 2,
-          }}
-        >
-          #
-        </div>,
-      ]
-    : []),
-  ...headingRow.map((headingComponent) => {
-    const { colSpan, col, row, rowSpan } = headingComponent
-    const { attributeDefinition } = headingComponent
-    const { id: attributeDefId } = attributeDefinition
-
-    const columnInfo = columnInfoByDefId[attributeDefId]
-    const { relevant } = columnInfo
-
-    return (
-      <div
-        key={`heading-cell-${row}-${attributeDefId}`}
-        className={classNames('grid-cell', { 'not-relevant': !relevant })}
-        style={{
-          gridRowStart: row,
-          gridRowEnd: row + rowSpan,
-          gridColumnStart: col + (includeRowNumberColumn ? 1 : 0),
-          gridColumnEnd: col + colSpan + (includeRowNumberColumn ? 1 : 0),
-        }}
-      >
-        <div style={{ width: '100%' }}>
-          <div style={{ textAlign: 'center' }}>{getHeadingLabel({ headingComponent })}</div>
-          {isCompositeAttribute(attributeDefinition) && (
-            <div style={{ display: 'flex' }}>
-              {attributeDefinition.availableFieldNames.map((fieldName) => (
-                <div
-                  key={fieldName}
-                  style={{ width: FieldsSizes.getFieldWidthPx({ fieldDef: headingComponent, fieldName }) }}
-                >
-                  {attributeDefinition.getFieldLabel(fieldName) ||
-                    L.l(
-                      `dataManagement.dataEntry.attribute.${attributeDefinition.attributeType.toLocaleLowerCase()}.${fieldName.toLocaleLowerCase()}`
-                    )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    )
-  }),
-  ...(firstRow && includeDeleteColumn
-    ? [
-        <div
-          key="heading-cell-delete"
-          className="grid-cell"
-          style={{
-            gridRowStart: 1,
-            gridRowEnd: totalHeadingRows + 1,
-            gridColumnStart: totalHeadingColumns + 1 + (includeRowNumberColumn ? 1 : 0),
-            gridColumnEnd: totalHeadingColumns + 1 + (includeRowNumberColumn ? 1 : 0),
-          }}
-        />,
-      ]
-    : []),
-]
-
-const determineColumnInfo = ({ headingColumn, entities }) => {
-  const { attributeDefinition } = headingColumn
-  const { alwaysRelevant, hideWhenNotRelevant } = attributeDefinition
+const determineColumnInfo = ({ headingColumn, entities, col }) => {
+  const { attributeDefinition, col: colOriginal, colSpan } = headingColumn
+  const { alwaysRelevant, hideWhenNotRelevant, id: attributeDefinitionId } = attributeDefinition
 
   const relevant =
     alwaysRelevant ||
     // has some descendant in entities that is relevant
-    entities.some((entity) => {
-      const nodes = entity.getDescendantsByNodeDefinition(attributeDefinition)
-      return nodes.some((node) => node.relevant)
-    })
+    entities.some((entity) => entity.getDescendantsByNodeDefinition(attributeDefinition).some((node) => node.relevant))
 
-  const isEmpty = () =>
-    entities.length === 0 ||
-    entities.every((entity) => {
-      const nodes = entity.getDescendantsByNodeDefinition(attributeDefinition)
-      return nodes.some((node) => node.isEmpty())
-    })
+  const isNotEmpty = () =>
+    entities.length > 0 &&
+    entities.some((entity) =>
+      entity.getDescendantsByNodeDefinition(attributeDefinition).some((node) => !node.isEmpty())
+    )
+
+  const visible = !hideWhenNotRelevant || relevant || isNotEmpty()
 
   return {
+    colOriginal,
+    col: visible ? col : -1,
+    colSpan,
+    attributeDefinitionId,
     relevant,
-    visible: !hideWhenNotRelevant || relevant || !isEmpty(),
+    visible,
   }
 }
 
 const determineColumnInfoByAttributeDefinitionId = ({ entities, itemDef }) => {
   const { headingColumns } = itemDef
 
+  let currentCol = 1
   return headingColumns.reduce((infoByDefId, headingColumn) => {
     const { attributeDefinition } = headingColumn
-    infoByDefId[attributeDefinition.id] = determineColumnInfo({ headingColumn, entities })
+    const info = determineColumnInfo({ headingColumn, entities, col: currentCol })
+    infoByDefId[attributeDefinition.id] = info
+    if (info.visible) {
+      currentCol = info.col + headingColumn.colSpan
+    }
     return infoByDefId
   }, [])
 }
 
 const determineColumnsVisible = ({ itemDef, columnInfoByDefId }) => {
   const { headingColumns } = itemDef
-  let currentCol = 1
 
   return headingColumns.reduce((columnsVisible, headingColumn) => {
     const { attributeDefinition } = headingColumn
 
     if (columnInfoByDefId[attributeDefinition.id].visible) {
-      headingColumn.col = currentCol
       columnsVisible.push(headingColumn)
-      currentCol = currentCol + headingColumn.colSpan
     }
     return columnsVisible
   }, [])
+}
+
+const calculateCol = (columnsInfo) => (headingColumn) => {
+  const columnsInfoArr = Object.values(columnsInfo).sort((infoA, infoB) => infoA.colOriginal - infoB.colOriginal)
+
+  const firstVisibleColumn =
+    headingColumn instanceof ColumnDefinition
+      ? headingColumn
+      : // if headingColumn is a group, find the first visible descendant (attribute) column
+        headingColumn.descendantColumns.find(
+          (descendantColumn) => columnsInfo[descendantColumn.attributeDefinitionId].visible
+        )
+
+  let col = 1
+  columnsInfoArr.some((info) => {
+    if (info.attributeDefinitionId === firstVisibleColumn.attributeDefinitionId) {
+      return true
+    }
+    if (info.visible) {
+      col += info.colSpan
+    }
+    return false
+  })
+  return col
 }
 
 export default class Table extends EntityCollectionComponent {
@@ -226,9 +152,15 @@ export default class Table extends EntityCollectionComponent {
     }
     const headingRowsFiltered = headingRows.map((headingRow) =>
       headingRow.reduce((headingRowFiltered, headingComponent) => {
-        const headingColIndex = attributeDefIdsVisible.indexOf(headingComponent.attributeDefinition.id)
-        if (headingColIndex >= 0) {
-          headingRowFiltered.push(columnsVisible[headingColIndex])
+        if (
+          (headingComponent instanceof ColumnGroupDefinition &&
+            headingComponent.descendantColumns.some((descendantCol) =>
+              attributeDefIdsVisible.includes(descendantCol.attributeDefinition.id)
+            )) ||
+          (headingComponent instanceof ColumnDefinition &&
+            attributeDefIdsVisible.includes(headingComponent.attributeDefinition.id))
+        ) {
+          headingRowFiltered.push(headingComponent)
         }
         return headingRowFiltered
       }, [])
@@ -301,6 +233,7 @@ export default class Table extends EntityCollectionComponent {
           <HeadingRow
             key={`heading-row-${index + 1}`}
             columnInfoByDefId={columnInfoByDefId}
+            columnCalculator={calculateCol(columnInfoByDefId)}
             headingRow={headingRow}
             totalHeadingRows={headingRows.length}
             totalHeadingColumns={headingColumns.length}
