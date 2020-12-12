@@ -25,6 +25,19 @@ export default class AbstractField extends AbstractFormComponent {
     this.updateStateFromProps()
   }
 
+  componentDidUpdate(prevProps) {
+    const { parentEntity } = this.props
+    const { parentEntity: prevParentEntity } = prevProps
+
+    if (prevParentEntity !== parentEntity) {
+      this.onParentEntityChange()
+    }
+  }
+
+  onParentEntityChange() {
+    this.updateStateFromProps()
+  }
+
   updateStateFromProps() {
     const value = this.extractValueFromProps()
     this.setState({ dirty: false, value })

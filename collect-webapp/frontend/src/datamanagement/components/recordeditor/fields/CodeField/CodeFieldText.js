@@ -38,6 +38,7 @@ const CodeFieldText = (props) => {
           disabled
           value={valuesString}
           title={selectedItems.map(itemLabelFunction).join('; ')}
+          onClick={() => setDialogOpen(true)}
         />
         <IconButton onClick={() => setDialogOpen(true)}>
           <ListIcon />

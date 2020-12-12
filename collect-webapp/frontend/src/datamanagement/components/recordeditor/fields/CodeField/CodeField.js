@@ -18,7 +18,6 @@ import CodeFieldRadio from './CodeFieldRadio'
 import CodeFieldAutocomplete from './CodeFieldAutocomplete'
 import CodeFieldItemLabel, { itemLabelFunction } from './CodeFieldItemLabel'
 import CodeFieldText from './CodeFieldText'
-import CodeFieldDialog from './CodeFieldDialog'
 
 const MAX_ITEMS = 100
 
@@ -40,6 +39,7 @@ export default class CodeField extends AbstractField {
       loading: true,
       asynchronous: false,
       ancestorCodes: null,
+      parentCodeMissing: false,
     }
 
     this.onCodeListItemSelect = this.onCodeListItemSelect.bind(this)
@@ -51,99 +51,9 @@ export default class CodeField extends AbstractField {
     this.onParentEntityChange()
   }
 
-  componentDidUpdate(prevProps) {
-    const { parentEntity } = this.props
-    const { parentEntity: prevParentEntity } = prevProps
-
-    if (prevParentEntity !== parentEntity) {
-      this.onParentEntityChange()
-    }
-  }
-
-  fromCodeToValue(code) {
-    const { fieldDef } = this.props
-    const { attributeDefinition } = fieldDef
-    const { layout } = attributeDefinition
-
-    const nullCode = [CodeFieldDefinition.Layouts.DROPDOWN].includes(layout) ? EMPTY_OPTION.value : ''
-    const codeUpdated = code === null ? nullCode : code
-
-    return { code: codeUpdated }
-  }
-
   onParentEntityChange() {
-    const { parentEntity } = this.props
-
-    if (parentEntity) {
-      this.setState({ loading: true, items: [] }, () => this.updateItemsState())
-    }
-  }
-
-  async loadAllAvailableItems() {
-    const { parentEntity, fieldDef } = this.props
-    const { survey, record } = parentEntity
-    const { id: surveyId } = survey
-    const { versionId } = record
-    const { attributeDefinition } = fieldDef
-    const { codeListId } = attributeDefinition
-
-    const ancestorCodes = record.getAncestorCodeValues({
-      contextEntity: parentEntity,
-      attributeDefinition,
-    })
-
-    return await ServiceFactory.codeListService.loadAllAvailableItems({
-      surveyId,
-      codeListId,
-      versionId,
-      ancestorCodes,
-      language: survey.preferredLanguage,
-    })
-  }
-
-  onRecordEvent(event) {
-    super.onRecordEvent(event)
-
-    const { fieldDef } = this.props
-    const { attributeDefinition } = fieldDef
-    const { ancestorCodeAttributeDefinitionIds } = attributeDefinition
-
-    if (
-      ancestorCodeAttributeDefinitionIds.length > 0 &&
-      event instanceof CodeAttributeUpdatedEvent &&
-      ancestorCodeAttributeDefinitionIds.includes(Number(event.definitionId))
-    ) {
-      this.onParentEntityChange()
-    }
-  }
-
-  async updateItemsState() {
-    const { parentEntity, fieldDef } = this.props
-    const { survey, record } = parentEntity
-    const { id: surveyId } = survey
-    const { versionId } = record
-    const { attributeDefinition } = fieldDef
-    const { codeListId, levelIndex } = attributeDefinition
-
-    const ancestorCodes = record.getAncestorCodeValues({
-      contextEntity: parentEntity,
-      attributeDefinition,
-    })
-
-    if (levelIndex === 0 || (ancestorCodes && ancestorCodes.length === levelIndex)) {
-      const count = await ServiceFactory.codeListService.countAvailableItems({
-        surveyId,
-        codeListId,
-        versionId,
-        ancestorCodes,
-      })
-
-      const asynchronous = count > MAX_ITEMS
-      const items = asynchronous ? null : await this.loadAllAvailableItems()
-      this.setState({ asynchronous, items, ancestorCodes }, () => this.updateStateFromProps())
-    } else {
-      this.setState({ asynchronous: false, items: [], loading: false })
-    }
+    super.onParentEntityChange()
+    this.updateItemsState()
   }
 
   async updateStateFromProps() {
@@ -187,6 +97,88 @@ export default class CodeField extends AbstractField {
       })
     }
     this.setState({ loading: false, selectedItems, values })
+  }
+
+  onRecordEvent(event) {
+    super.onRecordEvent(event)
+
+    const { fieldDef } = this.props
+    const { attributeDefinition } = fieldDef
+    const { ancestorCodeAttributeDefinitionIds } = attributeDefinition
+
+    if (
+      ancestorCodeAttributeDefinitionIds.length > 0 &&
+      event instanceof CodeAttributeUpdatedEvent &&
+      ancestorCodeAttributeDefinitionIds.includes(Number(event.definitionId))
+    ) {
+      this.updateItemsState()
+    }
+  }
+
+  async loadAllAvailableItems() {
+    const { parentEntity, fieldDef } = this.props
+    const { survey, record } = parentEntity
+    const { id: surveyId } = survey
+    const { versionId } = record
+    const { attributeDefinition } = fieldDef
+    const { codeListId } = attributeDefinition
+
+    const ancestorCodes = record.getAncestorCodeValues({
+      contextEntity: parentEntity,
+      attributeDefinition,
+    })
+
+    return await ServiceFactory.codeListService.loadAllAvailableItems({
+      surveyId,
+      codeListId,
+      versionId,
+      ancestorCodes,
+      language: survey.preferredLanguage,
+    })
+  }
+
+  fromCodeToValue(code) {
+    const { fieldDef } = this.props
+    const { attributeDefinition } = fieldDef
+    const { layout } = attributeDefinition
+
+    const nullCode = [CodeFieldDefinition.Layouts.DROPDOWN].includes(layout) ? EMPTY_OPTION.value : ''
+    const codeUpdated = code === null ? nullCode : code
+
+    return { code: codeUpdated }
+  }
+
+  updateItemsState() {
+    this.setState({ loading: true, items: [] }, async () => {
+      const { parentEntity, fieldDef } = this.props
+      const { survey, record } = parentEntity
+      const { id: surveyId } = survey
+      const { versionId } = record
+      const { attributeDefinition } = fieldDef
+      const { codeListId, levelIndex } = attributeDefinition
+
+      const ancestorCodes = record.getAncestorCodeValues({
+        contextEntity: parentEntity,
+        attributeDefinition,
+      })
+
+      if (levelIndex === 0 || (ancestorCodes && ancestorCodes.length === levelIndex)) {
+        const count = await ServiceFactory.codeListService.countAvailableItems({
+          surveyId,
+          codeListId,
+          versionId,
+          ancestorCodes,
+        })
+
+        const asynchronous = count > MAX_ITEMS
+        const items = asynchronous ? null : await this.loadAllAvailableItems()
+        this.setState({ asynchronous, ancestorCodes, parentCodeMissing: false, items }, () =>
+          this.updateStateFromProps()
+        )
+      } else {
+        this.setState({ asynchronous: false, ancestorCodes, parentCodeMissing: true, items: [], loading: false })
+      }
+    })
   }
 
   onChangeQualifier({ code, qualifier }) {
@@ -273,7 +265,7 @@ export default class CodeField extends AbstractField {
     }
 
     const { attributeDefinition } = fieldDef
-    const { layout, multiple, enumerator, hasQualifiableItems } = attributeDefinition
+    const { layout, multiple, enumerator } = attributeDefinition
 
     if (enumerator) {
       return (
@@ -283,10 +275,7 @@ export default class CodeField extends AbstractField {
       )
     }
 
-    if (
-      (multiple || hasQualifiableItems) &&
-      (asynchronous || inTable || layout !== CodeFieldDefinition.Layouts.RADIO)
-    ) {
+    if (multiple && (asynchronous || inTable || layout !== CodeFieldDefinition.Layouts.RADIO)) {
       return (
         <CodeFieldText
           asynchronous={asynchronous}

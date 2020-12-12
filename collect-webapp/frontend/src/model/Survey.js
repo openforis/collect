@@ -395,13 +395,12 @@ export class CodeAttributeDefinition extends AttributeDefinition {
 
   get ancestorCodeAttributeDefinitionIds() {
     const ancestorIds = []
-    const visitedIds = []
+    const visitedIds = {}
     let currentParentAttrDef = this.parentCodeAttributeDefinition
-    while (currentParentAttrDef && !visitedIds.includes(currentParentAttrDef.id)) {
+    while (currentParentAttrDef && !visitedIds[currentParentAttrDef.id]) {
       ancestorIds.push(currentParentAttrDef.id)
-      visitedIds.push(currentParentAttrDef.id)
-      const nextParentAttrDef = currentParentAttrDef.parentCodeAttributeDefinition
-      currentParentAttrDef = nextParentAttrDef
+      visitedIds[currentParentAttrDef.id] = true
+      currentParentAttrDef = currentParentAttrDef.parentCodeAttributeDefinition
     }
     return ancestorIds
   }

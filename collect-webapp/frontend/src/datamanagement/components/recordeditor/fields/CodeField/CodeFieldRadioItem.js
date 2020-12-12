@@ -1,9 +1,8 @@
 import React from 'react'
-import { Checkbox, FormControlLabel, Radio, TextField } from '@material-ui/core'
-
-import L from 'utils/Labels'
+import { Checkbox, FormControlLabel, Radio } from '@material-ui/core'
 
 import CodeFieldItemLabel from './CodeFieldItemLabel'
+import CodeFieldQualifier from './CodeFieldQualifier'
 
 const CodeFieldRadioItem = (props) => {
   const { item, attributeDefinition, multiple, onChange, onChangeQualifier, readOnly, value } = props
@@ -28,12 +27,11 @@ const CodeFieldRadioItem = (props) => {
         title={item.description}
       />
       {item.qualifiable && selected && (
-        <TextField
-          value={qualifier}
-          variant="outlined"
-          placeholder={L.l('common.specify')}
-          disabled={readOnly}
-          onChange={(event) => onChangeQualifier({ code, qualifier: event.target.value })}
+        <CodeFieldQualifier
+          code={code}
+          qualifier={qualifier}
+          readOnly={readOnly}
+          onChangeQualifier={onChangeQualifier}
         />
       )}
     </div>

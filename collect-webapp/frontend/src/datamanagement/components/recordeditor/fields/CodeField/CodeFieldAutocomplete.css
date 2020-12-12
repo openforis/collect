@@ -1,0 +1,5 @@
+.code-field-autocomplete-wrapper.qualifiable {
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    align-items: center;
+}

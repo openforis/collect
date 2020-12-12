@@ -1,4 +1,7 @@
+import './CodeFieldAutocomplete.css'
+
 import React, { useCallback } from 'react'
+import classNames from 'classnames'
 import { debounce } from 'throttle-debounce'
 
 import ServiceFactory from 'services/ServiceFactory'
@@ -6,8 +9,8 @@ import Autocomplete from 'common/components/Autocomplete'
 import Strings from 'utils/Strings'
 
 import * as FieldsSizes from '../FieldsSizes'
-import CodeFieldRadioItem from './CodeFieldRadioItem'
 import CodeFieldItemLabel from './CodeFieldItemLabel'
+import CodeFieldQualifier from './CodeFieldQualifier'
 
 const CodeFieldAutocomplete = (props) => {
   const {
@@ -34,7 +37,7 @@ const CodeFieldAutocomplete = (props) => {
   const fetchCodeItems = useCallback(
     ({ surveyId, codeListId, versionId, language, ancestorCodes }) => ({ searchString, onComplete }) =>
       debounce(Strings.isBlank(searchString) ? 0 : 1000, false, async () => {
-        const items = await ServiceFactory.codeListService.findAvailableItems({
+        const availableItems = await ServiceFactory.codeListService.findAvailableItems({
           surveyId,
           codeListId,
           versionId,
@@ -42,24 +45,36 @@ const CodeFieldAutocomplete = (props) => {
           ancestorCodes,
           searchString,
         })
-        onComplete(items)
+        onComplete(availableItems)
       }),
     [surveyId, codeListId, versionId, language, ancestorCodes]
   )
 
+  const qualifiableItemSelected = selectedItems.length === 1 && selectedItems[0].qualifiable
+
   return (
-    <Autocomplete
-      asynchronous={asynchronous}
-      readOnly={readOnly}
-      items={items}
-      inputFieldWidth={width || FieldsSizes.getWidth({ fieldDef, inTable })}
-      selectedItems={selectedItems}
-      fetchFunction={fetchCodeItems({ surveyId, codeListId, versionId, language, ancestorCodes })}
-      itemLabelFunction={itemLabelFunction}
-      itemSelectedFunction={(item, value) => item.code === value.code}
-      itemRenderFunction={(item) => <CodeFieldItemLabel item={item} attributeDefinition={attributeDefinition} />}
-      onSelect={onSelect}
-    />
+    <div className={classNames('code-field-autocomplete-wrapper', { qualifiable: qualifiableItemSelected })}>
+      <Autocomplete
+        asynchronous={asynchronous}
+        readOnly={readOnly}
+        items={items}
+        inputFieldWidth={width || FieldsSizes.getWidth({ fieldDef, inTable })}
+        selectedItems={selectedItems}
+        fetchFunction={fetchCodeItems({ surveyId, codeListId, versionId, language, ancestorCodes })}
+        itemLabelFunction={itemLabelFunction}
+        itemSelectedFunction={(item, value) => item.code === value.code}
+        itemRenderFunction={(item) => <CodeFieldItemLabel item={item} attributeDefinition={attributeDefinition} />}
+        onSelect={onSelect}
+      />
+      {!inTable && qualifiableItemSelected && (
+        <CodeFieldQualifier
+          code={selectedItems[0].code}
+          qualifier={values[0].qualifier}
+          onChangeQualifier={onChangeQualifier}
+          readOnly={readOnly}
+        />
+      )}
+    </div>
   )
 }
 

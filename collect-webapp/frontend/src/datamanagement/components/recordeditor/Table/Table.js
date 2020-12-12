@@ -19,7 +19,7 @@ import HeadingRow from './HeadingRow'
 const ROW_NUMBER_COLUMN_WIDTH = 60
 const DELETE_COLUMN_WIDTH = 60
 
-const calculateWidth = (headingComponent) => FieldsSizes.getWidth({ fieldDef: headingComponent, inTable: true })
+const calculateWidth = (headingColumn) => FieldsSizes.getWidth({ fieldDef: headingColumn, inTable: true })
 
 const determineColumnInfo = ({ headingColumn, entities, col }) => {
   const { attributeDefinition, col: colOriginal, colSpan } = headingColumn
