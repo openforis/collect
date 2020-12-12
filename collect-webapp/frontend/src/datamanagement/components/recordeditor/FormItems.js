@@ -14,7 +14,7 @@ const FormItemsItem = (props) => {
   const { nodeDefinition } = itemDef
   const { id: nodeDefId, hideWhenNotRelevant } = nodeDefinition
   const relevant = parentEntity.childrenRelevanceByDefinitionId[nodeDefId]
-  const visible = relevant || !hideWhenNotRelevant
+  const visible = relevant || !hideWhenNotRelevant || parentEntity.hasSomeDescendantNotEmpty({ nodeDefinition })
 
   const className = classnames('form-item-external-wrapper', { 'full-height': fullSize, 'not-relevant': !relevant })
 

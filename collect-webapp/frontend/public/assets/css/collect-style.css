@@ -443,7 +443,8 @@ input.is-invalid.warning:focus {
 
 .form-item-external-wrapper.not-relevant input,
 .form-item-external-wrapper.not-relevant .form-item-table,
-.form-item-external-wrapper.not-relevant .MuiFormControl-root.MuiTextField-root {
+.form-item-external-wrapper.not-relevant .MuiFormControl-root.MuiTextField-root,
+.form-item-field-wrapper.not-relevant {
   background-color: #d4d4d4;
 }
 

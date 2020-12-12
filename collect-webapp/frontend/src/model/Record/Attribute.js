@@ -40,13 +40,11 @@ export class Attribute extends Node {
       return true
     }
     const fields = this.fields
-    const mandatoryFieldNames = this.definition.mandatoryFieldNames
-    if (!mandatoryFieldNames) {
-      return false
-    }
-    return this.definition.fieldNames.some((fieldName, index) => {
+    const { fieldNames, mandatoryFieldNames } = this.definition
+
+    return fieldNames.some((fieldName, index) => {
       const value = fields[index].value
-      return mandatoryFieldNames.includes(fieldName) && (value === null || value === '')
+      return (!mandatoryFieldNames || mandatoryFieldNames.includes(fieldName)) && (value === null || value === '')
     })
   }
 

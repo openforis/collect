@@ -27,14 +27,11 @@ const determineColumnInfo = ({ headingColumn, entities, col }) => {
 
   const relevant =
     alwaysRelevant ||
-    // has some descendant in entities that is relevant
-    entities.some((entity) => entity.getDescendantsByNodeDefinition(attributeDefinition).some((node) => node.relevant))
+    entities.some((entity) => entity.hasSomeDescendantRelevant({ nodeDefinition: attributeDefinition }))
 
   const isNotEmpty = () =>
     entities.length > 0 &&
-    entities.some((entity) =>
-      entity.getDescendantsByNodeDefinition(attributeDefinition).some((node) => !node.isEmpty())
-    )
+    entities.some((entity) => entity.hasSomeDescendantNotEmpty({ nodeDefinition: attributeDefinition }))
 
   const visible = !hideWhenNotRelevant || relevant || isNotEmpty()
 

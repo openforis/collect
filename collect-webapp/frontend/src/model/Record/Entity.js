@@ -182,6 +182,14 @@ export class Entity extends Node {
     })
   }
 
+  hasSomeDescendantNotEmpty({ nodeDefinition }) {
+    return this.getDescendantsByNodeDefinition(nodeDefinition).some((node) => !node.isEmpty())
+  }
+
+  hasSomeDescendantRelevant({ nodeDefinition }) {
+    return this.getDescendantsByNodeDefinition(nodeDefinition).some((node) => node.relevant)
+  }
+
   isEmpty() {
     return this.hasDescendant((descendant) => descendant.isEmpty())
   }

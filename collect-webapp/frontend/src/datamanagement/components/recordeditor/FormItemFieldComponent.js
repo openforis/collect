@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import classNames from 'classnames'
 
 import { AttributeDefinition } from 'model/Survey'
@@ -50,7 +50,9 @@ const FormItemFieldComponent = (props) => {
   const wrapperIdRef = useRef(`form-item-field-${new Date().getTime()}`)
   const wrapperId = wrapperIdRef.current
 
-  const calculateIsRelevant = () => parentEntity.childrenRelevanceByDefinitionId[attributeDefinitionId]
+  const calculateIsRelevant = useCallback(() => parentEntity.childrenRelevanceByDefinitionId[attributeDefinitionId], [
+    parentEntity,
+  ])
 
   const [validation, setValidation] = useState(extractValidation(props))
   const [relevant, setRelevant] = useState(calculateIsRelevant())
