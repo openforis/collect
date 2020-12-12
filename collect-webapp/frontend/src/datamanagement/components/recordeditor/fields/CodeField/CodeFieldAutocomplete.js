@@ -7,6 +7,7 @@ import { debounce } from 'throttle-debounce'
 import ServiceFactory from 'services/ServiceFactory'
 import Autocomplete from 'common/components/Autocomplete'
 import Strings from 'utils/Strings'
+import Arrays from 'utils/Arrays'
 
 import * as FieldsSizes from '../FieldsSizes'
 import CodeFieldItemLabel from './CodeFieldItemLabel'
@@ -50,7 +51,8 @@ const CodeFieldAutocomplete = (props) => {
     [surveyId, codeListId, versionId, language, ancestorCodes]
   )
 
-  const qualifiableItemSelected = selectedItems.length === 1 && selectedItems[0].qualifiable
+  const selectedItem = Arrays.head(selectedItems)
+  const qualifiableItemSelected = selectedItem && selectedItem.qualifiable
 
   return (
     <div className={classNames('code-field-autocomplete-wrapper', { qualifiable: qualifiableItemSelected })}>
@@ -68,7 +70,7 @@ const CodeFieldAutocomplete = (props) => {
       />
       {!inTable && qualifiableItemSelected && (
         <CodeFieldQualifier
-          code={selectedItems[0].code}
+          code={selectedItem.code}
           qualifier={values[0].qualifier}
           onChangeQualifier={onChangeQualifier}
           readOnly={readOnly}
