@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.26.34] - NOT RELEASED YET
 ### Added
-- Data entry new UI: promote/demote record; support qualifiable code attributes in tables;
+- Data entry new UI: promote/demote record; support qualifiable code attributes in tables; hide non-relevant tabs;
 
 ## [3.26.33] - 2020-12-08
 ### Added

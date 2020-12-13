@@ -986,8 +986,14 @@ public class RecordUpdater {
 	private Value applyInitialValue(Attribute<?, ?> attr) {
 		if (!attr.getDefinition().isCalculated() && attr.isRelevant() && (attr.isEmpty() || isDefaultValueApplied(attr))) {
 			if (canApplyDefaultValueInCurrentPhase(attr)) {
-				return performDefaultValueApply(attr);
-			} else if(attr instanceof BooleanAttribute && ((BooleanAttributeDefinition) attr.getDefinition()).isAffirmativeOnly()) {
+				// check if default value can be applied
+				Value value = performDefaultValueApply(attr);
+				if (value != null) {
+					return value;
+				}
+			}
+			if (attr instanceof BooleanAttribute && ((BooleanAttributeDefinition) attr.getDefinition()).isAffirmativeOnly()) {
+				// apply value "false" to boolean attributes with "checkbox" layout
 				Value value = new BooleanValue(false);
 				BooleanAttribute boolAttr = (BooleanAttribute) attr;
 				boolAttr.setValue((BooleanValue) value);

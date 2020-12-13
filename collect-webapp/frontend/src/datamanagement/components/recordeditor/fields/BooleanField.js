@@ -59,7 +59,7 @@ export default class BooleanField extends AbstractField {
                 event.preventDefault()
                 event.stopPropagation()
               } else {
-                this.onChange(checked ? null : true)
+                this.onChange(!checked)
               }
             }}
           />
