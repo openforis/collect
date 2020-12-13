@@ -1,6 +1,6 @@
 import Objects from './Objects'
 
-export default class Arrays {
+class Arrays {
   static isEmpty(array) {
     return Objects.isNullOrUndefined(array) || array.length === 0
   }
@@ -147,3 +147,5 @@ export default class Arrays {
     return item ? [item] : []
   }
 }
+
+export default Arrays
