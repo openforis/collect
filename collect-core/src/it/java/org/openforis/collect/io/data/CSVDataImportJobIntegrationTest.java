@@ -127,7 +127,7 @@ public class CSVDataImportJobIntegrationTest extends CollectIntegrationTest {
 		{
 			CollectRecord record = createTestRecord(survey, "10_111");
 			recordDao.insert(record);
-			assertEquals(Integer.valueOf(0), record.getErrors());
+			assertEquals(0, record.getErrors());
 		}
 		{
 			CollectRecord record = createTestRecord(survey, "10_114");
@@ -140,7 +140,7 @@ public class CSVDataImportJobIntegrationTest extends CollectIntegrationTest {
 		assertTrue(process.getParsingErrors().isEmpty());
 		{
 			CollectRecord reloadedRecord = loadRecord("10_111");
-			assertEquals(Integer.valueOf(1), reloadedRecord.getErrors());
+			assertEquals(1, reloadedRecord.getErrors());
 			Entity cluster = reloadedRecord.getRootEntity();
 			RealAttribute plotDirection = (RealAttribute) cluster.getChild("plot_direction");
 			RealValue plotDirectionVal = plotDirection.getValue();

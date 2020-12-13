@@ -243,8 +243,8 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 	@Test
 	public void testMultipleCodeListLevelValidation() {
 		CollectRecord record = createTestMultipleCodeListLevelRecord();
-		assertEquals(Integer.valueOf(0), record.getErrors());
-		assertEquals(Integer.valueOf(0), record.getWarnings());
+		assertEquals(0, record.getErrors());
+		assertEquals(0, record.getWarnings());
 		
 		Entity rootEntity = record.getRootEntity();
 		
@@ -254,8 +254,8 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		
 		recordUpdater.updateAttribute(code1, new Code("WRONG"));
 		
-		assertEquals(Integer.valueOf(1), record.getErrors());
-		assertEquals(Integer.valueOf(2), record.getWarnings());
+		assertEquals(1, record.getErrors());
+		assertEquals(2, record.getWarnings());
 		
 		checkHasError(record, code1.getInternalId(), CodeValidator.class);
 		checkHasWarning(record, code2.getInternalId(), CodeParentValidator.class);
@@ -263,13 +263,13 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		
 		recordUpdater.updateAttribute(code1, new Code("A"));
 		
-		assertEquals(Integer.valueOf(0), record.getErrors());
-		assertEquals(Integer.valueOf(0), record.getWarnings());
+		assertEquals(0, record.getErrors());
+		assertEquals(0, record.getWarnings());
 		
 		recordUpdater.updateAttribute(code2, new Code("WRONG"));
 		
-		assertEquals(Integer.valueOf(1), record.getErrors());
-		assertEquals(Integer.valueOf(1), record.getWarnings());
+		assertEquals(1, record.getErrors());
+		assertEquals(1, record.getWarnings());
 			
 		checkHasError(record, code2.getInternalId(), CodeValidator.class);
 		checkHasWarning(record, code3.getInternalId(), CodeParentValidator.class);
