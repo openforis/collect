@@ -1,0 +1,121 @@
+/**
+* ==== FORM ITEMS
+**/
+.form-items {
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-item-composite-wrapper {
+  display: flex;
+  gap: 6px;
+}
+
+.multiple-fieldset-header {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.icon-info {
+  color: #1976d2;
+  padding-left: 5px;
+}
+
+/**
+* === RELEVANCY FEEDBACK
+**/
+.form-item-external-wrapper.not-relevant,
+.form-item-field-wrapper.not-relevant {
+  input,
+  .form-item-table,
+  .MuiFormControl-root.MuiTextField-root {
+    background-color: #d4d4d4;
+  }
+
+  label {
+    font-style: italic;
+  }
+}
+
+/**
+* === VALIDATION FEEDBACK
+**/
+.form-item-wrapper,
+.form-item-field-wrapper {
+  width: fit-content;
+
+  .MuiFormControl-root.MuiTextField-root,
+  .MuiInputBase-root.MuiOutlinedInput-root {
+    fieldset {
+      border-width: 2px;
+      border-style: solid;
+      border-radius: 4px;
+    }
+  }
+
+  &.error {
+    .MuiFormControl-root.MuiTextField-root,
+    .MuiInputBase-root.MuiOutlinedInput-root {
+      fieldset {
+        border-color: red;
+      }
+    }
+  }
+
+  &.warning {
+    .MuiFormControl-root.MuiTextField-root fieldset {
+      border-color: orange;
+    }
+  }
+}
+
+.record-edit-form fieldset {
+  padding: 0 0.5rem 0.5rem 0.5rem !important;
+}
+
+/**
+* === Material UI components
+**/
+.MuiInputLabel-root.MuiInputLabel-animated {
+  top: 0;
+  left: 0;
+  position: absolute;
+  transform: translate(6px, 10px) scale(1);
+}
+
+.MuiInputLabel-root.MuiInputLabel-animated.MuiInputLabel-shrink {
+  transform: translate(0, 1.5px) scale(0.75);
+  transform-origin: top left;
+}
+
+.MuiOutlinedInput-input,
+.MuiInputBase-input.MuiOutlinedInput-input,
+.MuiSelect-outlined,
+.MuiAutocomplete-inputRoot[class*='MuiOutlinedInput-root'] .MuiAutocomplete-input:first-child,
+.MuiInputBase-formControl.MuiInputBase-multiline.MuiOutlinedInput-multiline {
+  padding: 6px;
+}
+
+.MuiAutocomplete-root {
+  padding: 0;
+}
+
+label.MuiFormControlLabel-root {
+  margin-left: 0px;
+}
+
+.MuiInputBase-root.MuiOutlinedInput-root.MuiAutocomplete-inputRoot {
+  padding: 1px;
+}
+
+.MuiInputBase-input.MuiOutlinedInput-input.MuiAutocomplete-input {
+  padding: 0;
+}
+
+.MuiButtonBase-root.MuiIconButton-root.MuiCheckbox-root,
+.MuiButtonBase-root.MuiIconButton-root.MuiRadio-root {
+  padding: 2px;
+}
