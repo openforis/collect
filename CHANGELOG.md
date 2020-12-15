@@ -4,7 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.26.34] - NOT RELEASED YET
+## [3.26.35] - 2020-12-15
+### Added
+- Data entry new UI: layout adjustments; fixed hierarchical code list items loading;
+
+## [3.26.34] - 2020-12-14
 ### Added
 - Data entry new UI: promote/demote record; support qualifiable code attributes in tables; hide non-relevant tabs;
 

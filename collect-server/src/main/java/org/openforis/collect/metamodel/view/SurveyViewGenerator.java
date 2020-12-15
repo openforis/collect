@@ -14,6 +14,8 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.utils.Dates;
+import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.AttributeDefinition.FieldLabel;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
@@ -238,7 +240,13 @@ public class SurveyViewGenerator {
 					? new NumberAttributeDefView(id, name, label, attributeType, fieldNames, key, multiple)
 					: new RangeAttributeDefView(id, name, label, attributeType, fieldNames, key, multiple);
 			attrDefView.setNumericType(numericDef.getType());
-			List<Precision> precisions = numericDef.getPrecisionDefinitions();
+			List<Precision> precisions = new ArrayList<Precision>(numericDef.getPrecisionDefinitions());
+			// exclude precisions with null unit (it could happen in older versions of Collect)
+			CollectionUtils.filter(precisions, new Predicate<Precision>() {
+				public boolean evaluate(Precision item) {
+					return item.getUnit() != null;
+				}
+			});
 			List<PrecisionView> precisionViews = Views.fromObjects(precisions, PrecisionView.class);
 			attrDefView.setPrecisions(precisionViews);
 			view = attrDefView;
