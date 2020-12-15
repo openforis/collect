@@ -357,7 +357,7 @@ export default class Table extends EntityCollectionComponent {
     return fullSize ? (
       content
     ) : (
-      <fieldset>
+      <fieldset className="form-item-fieldset">
         <legend>{itemDef.entityDefinition.label}</legend>
         {content}
       </fieldset>

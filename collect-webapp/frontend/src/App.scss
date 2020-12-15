@@ -1,79 +1,101 @@
-/**
-* ==== FORM ITEMS
-**/
-.form-items {
-  padding: 5px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+.record-edit-form {
+  /**
+  * ==== TABS
+  **/
+  .tabset-wrapper {
+    height: 100%;
 
-.form-item-composite-wrapper {
-  display: flex;
-  gap: 6px;
-}
-
-.multiple-fieldset-header {
-  display: flex;
-  gap: 10px;
-  align-items: baseline;
-}
-
-.icon-info {
-  color: #1976d2;
-  padding-left: 5px;
-}
-
-/**
-* === RELEVANCY FEEDBACK
-**/
-.form-item-external-wrapper.not-relevant,
-.form-item-field-wrapper.not-relevant {
-  input,
-  .form-item-table,
-  .MuiFormControl-root.MuiTextField-root {
-    background-color: #d4d4d4;
-  }
-
-  label {
-    font-style: italic;
-  }
-}
-
-/**
-* === VALIDATION FEEDBACK
-**/
-.form-item-wrapper,
-.form-item-field-wrapper {
-  width: fit-content;
-
-  .MuiFormControl-root.MuiTextField-root,
-  .MuiInputBase-root.MuiOutlinedInput-root {
-    fieldset {
-      border-width: 2px;
-      border-style: solid;
-      border-radius: 4px;
+    .tab-content {
+      height: 100%;
     }
   }
 
-  &.error {
-    .MuiFormControl-root.MuiTextField-root,
-    .MuiInputBase-root.MuiOutlinedInput-root {
-      fieldset {
-        border-color: red;
+  /**
+  * ==== FORM ITEMS
+  **/
+  fieldset {
+    padding: 0 0.5rem 0.5rem 0.5rem !important;
+
+    &.form-item-fieldset {
+      border: 1px solid #949494;
+
+      > legend {
+        padding: 0px 4px 0px 4px;
+        line-height: 1.5rem;
       }
     }
   }
 
-  &.warning {
-    .MuiFormControl-root.MuiTextField-root fieldset {
-      border-color: orange;
+  .form-items {
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .form-item-composite-wrapper {
+    display: flex;
+    gap: 6px;
+  }
+
+  .multiple-fieldset-header {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+  }
+
+  .icon-info {
+    color: #1976d2;
+    padding-left: 5px;
+  }
+
+  /**
+  * === RELEVANCY FEEDBACK
+  **/
+  .form-item-external-wrapper.not-relevant,
+  .form-item-field-wrapper.not-relevant {
+    input,
+    .form-item-table,
+    .MuiFormControl-root.MuiTextField-root {
+      background-color: #d4d4d4;
+    }
+
+    label {
+      font-style: italic;
     }
   }
-}
 
-.record-edit-form fieldset {
-  padding: 0 0.5rem 0.5rem 0.5rem !important;
+  /**
+  * === VALIDATION FEEDBACK
+  **/
+  .form-item-wrapper,
+  .form-item-field-wrapper {
+    width: fit-content;
+
+    .MuiFormControl-root.MuiTextField-root,
+    .MuiInputBase-root.MuiOutlinedInput-root {
+      fieldset {
+        border-width: 2px;
+        border-style: solid;
+        border-radius: 4px;
+      }
+    }
+
+    &.error {
+      .MuiFormControl-root.MuiTextField-root,
+      .MuiInputBase-root.MuiOutlinedInput-root {
+        fieldset {
+          border-color: red;
+        }
+      }
+    }
+
+    &.warning {
+      .MuiFormControl-root.MuiTextField-root fieldset {
+        border-color: orange;
+      }
+    }
+  }
 }
 
 /**
@@ -96,7 +118,7 @@
 .MuiSelect-outlined,
 .MuiAutocomplete-inputRoot[class*='MuiOutlinedInput-root'] .MuiAutocomplete-input:first-child,
 .MuiInputBase-formControl.MuiInputBase-multiline.MuiOutlinedInput-multiline {
-  padding: 6px;
+  padding: 10px;
 }
 
 .MuiAutocomplete-root {

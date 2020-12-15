@@ -60,7 +60,7 @@ const FormItem = (props) => {
   ) : (
     <Row>
       {_includeLabel(itemDef) && (
-        <Col style={{ maxWidth: '150px' }}>
+        <Col style={{ width: '200px', maxWidth: '200px' }}>
           <NodeDefLabel nodeDefinition={nodeDefinition} />
         </Col>
       )}

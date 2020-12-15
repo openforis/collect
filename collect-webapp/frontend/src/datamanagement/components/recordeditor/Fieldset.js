@@ -14,7 +14,7 @@ const Fieldset = (props) => {
   const entity = parentEntity.getSingleChild(entityDefinition.id)
 
   return (
-    <fieldset>
+    <fieldset className="form-item-fieldset">
       <legend>
         <NodeDefLabel nodeDefinition={entityDefinition} />
       </legend>
