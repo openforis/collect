@@ -37,6 +37,7 @@ import org.openforis.idm.model.NumericRangeAttribute;
 import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TextAttribute;
 import org.openforis.idm.model.TimeAttribute;
+import org.openforis.idm.path.Path;
 
 /**
  * 
@@ -334,6 +335,10 @@ public class EventProducer {
 		void nodeDeleted() {
 			RecordEvent event = node instanceof Entity ? new EntityDeletedEvent() : new AttributeDeletedEvent();
 			fillRecordEvent(event);
+			NodeDefinition nodeDef = node.getDefinition();
+			String nodePath = parentEntityPath + Path.SEPARATOR + nodeDef.getName()
+					+ (nodeDef.isMultiple() ? "[" + (node.getIndex() + 1) + "]" : "");
+			event.setNodePath(nodePath);
 			consumer.onEvent(event);
 		}
 

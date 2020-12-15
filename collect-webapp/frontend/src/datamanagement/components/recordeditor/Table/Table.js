@@ -111,7 +111,6 @@ export default class Table extends EntityCollectionComponent {
       headingRows: [],
       headingColumns: [],
       totalWidth: 0,
-      addingRow: false,
     }
   }
 
@@ -119,11 +118,12 @@ export default class Table extends EntityCollectionComponent {
     super.componentDidMount()
 
     this.tableRef = React.createRef(null)
-
-    this.updateLayoutState()
   }
 
-  updateLayoutState() {
+  determineNewState() {
+    const newState = super.determineNewState()
+    const { entities } = newState
+
     const { itemDef, parentEntity } = this.props
     const { columnInfoByDefId: columnInfoByDefIdPrev } = this.state
     const { record } = parentEntity
@@ -132,15 +132,15 @@ export default class Table extends EntityCollectionComponent {
     const { showRowNumbers, entityDefinition, headingRows } = itemDef
     const { enumerate } = entityDefinition
 
-    const entities = this.determineEntities()
     const columnInfoByDefId = determineColumnInfoByAttributeDefinitionId({ entities, itemDef })
     const columnsVisible = determineColumnsVisible({ itemDef, columnInfoByDefId })
     const attributeDefIdsVisible = columnsVisible.map((headingColumn) => headingColumn.attributeDefinition.id)
 
     if (JSON.stringify(columnInfoByDefId) === JSON.stringify(columnInfoByDefIdPrev)) {
       // columns visibility/relevance hasn't change, don't update state/layout
-      return
+      return newState
     }
+
     const headingRowsFiltered = headingRows.map((headingRow) =>
       headingRow.reduce((headingRowFiltered, headingComponent) => {
         if (
@@ -173,21 +173,21 @@ export default class Table extends EntityCollectionComponent {
     const totalWidth = columnWidths.reduce((acc, width) => acc + width, 0)
     const gridTemplateColumns = columnWidths.map((width) => `${width}px`).join(' ')
 
-    this.setState({
-      ...this.state,
+    return {
+      ...newState,
       entities,
       columnInfoByDefId,
       headingColumns: columnsVisible,
       headingRows: headingRowsFiltered,
       totalWidth,
       gridTemplateColumns,
-    })
+    }
   }
 
-  onEntitiesUpdated(entityAdded) {
-    const { entities } = this.state
+  onStateUpdate(entityAdded) {
+    super.onStateUpdate(entityAdded)
 
-    this.updateLayoutState()
+    const { entities } = this.state
 
     if (entityAdded) {
       // make last row visible
@@ -205,7 +205,7 @@ export default class Table extends EntityCollectionComponent {
       event instanceof NodeRelevanceUpdatedEvent &&
       event.isRelativeToDescendantsOf({ parentEntity, entityDefinition })
     ) {
-      this.updateLayoutState()
+      this.updateState()
     }
   }
 
@@ -259,13 +259,22 @@ export default class Table extends EntityCollectionComponent {
 
   render() {
     const { itemDef, fullSize, parentEntity } = this.props
-    const { addingEntity, columnInfoByDefId, entities, gridTemplateColumns, headingColumns, totalWidth } = this.state
+    const {
+      addingEntity,
+      columnInfoByDefId,
+      entities,
+      gridTemplateColumns,
+      headingColumns,
+      maxCount,
+      totalWidth,
+    } = this.state
     const { record } = parentEntity
 
     const { showRowNumbers, entityDefinition } = itemDef
-    const { enumerate } = entityDefinition
+    const { enumerate, labelOrName } = entityDefinition
     const { readOnly } = record
     const canAddOrDeleteRows = !readOnly && !enumerate
+    const maxCountReached = maxCount && entities.length >= maxCount
 
     const content = (
       <>
@@ -326,7 +335,20 @@ export default class Table extends EntityCollectionComponent {
         </div>
 
         {canAddOrDeleteRows && (
-          <Button variant="outlined" color="primary" disabled={addingEntity} onClick={this.onNewButtonClick}>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={this.onNewButtonClick}
+            disabled={addingEntity || maxCountReached}
+            title={
+              maxCountReached
+                ? L.l('dataManagement.dataEntry.multipleNodesComponent.cannotAddNewNodes.maxCountReached', [
+                    maxCount,
+                    labelOrName,
+                  ])
+                : ''
+            }
+          >
             {L.l('common.add')}
           </Button>
         )}

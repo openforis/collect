@@ -15,12 +15,7 @@ const EntitySelect = (props) => {
   const { entitiesSummary, selectedEntityIndex, onChange } = props
 
   return (
-    <Select
-      value={selectedEntityIndex}
-      variant="outlined"
-      onChange={onChange}
-      style={{ display: 'inline-block', width: '200px' }}
-    >
+    <Select value={selectedEntityIndex} variant="outlined" onChange={onChange} style={{ width: '200px' }}>
       {[
         <MenuItem key="-1" value="-1">
           <em>{L.l('common.selectOne')}</em>
@@ -52,6 +47,12 @@ export default class MultipleFieldset extends EntityCollectionComponent {
     return selectedEntityIndex >= 0 && selectedEntityIndex < entities.length ? entities[selectedEntityIndex] : null
   }
 
+  determineNewState() {
+    const newState = super.determineNewState()
+    const { entities } = newState
+    return { ...newState, selectedEntityIndex: -1, entitiesSummary: this.extractEntitiesSummary(entities) }
+  }
+
   onRecordEvent(event) {
     super.onRecordEvent(event)
 
@@ -65,15 +66,17 @@ export default class MultipleFieldset extends EntityCollectionComponent {
     }
   }
 
-  updateEntitiesSummary() {
-    const { entities } = this.state
-    this.setState({ entitiesSummary: entities.map((entity) => entity.summaryLabel) })
+  extractEntitiesSummary(entities) {
+    return entities.map((entity) => entity.summaryLabel)
   }
 
-  onEntitiesUpdated(entityAdded) {
-    super.onEntitiesUpdated()
+  updateEntitiesSummary() {
+    const { entities } = this.state
+    this.setState({ entitiesSummary: this.extractEntitiesSummary(entities) })
+  }
 
-    this.updateEntitiesSummary()
+  onStateUpdate(entityAdded) {
+    super.onStateUpdate(entityAdded)
 
     if (entityAdded) {
       // Select first entity
@@ -94,7 +97,7 @@ export default class MultipleFieldset extends EntityCollectionComponent {
 
   render() {
     const { parentEntity, itemDef } = this.props
-    const { entitiesSummary, selectedEntityIndex } = this.state
+    const { entitiesSummary, selectedEntityIndex, maxCount } = this.state
     const { record } = parentEntity
     const { readOnly } = record
     const { entityDefinition } = itemDef
@@ -104,6 +107,8 @@ export default class MultipleFieldset extends EntityCollectionComponent {
     }
 
     const selectedEntity = this.getSelectedEntity()
+
+    const maxCountReached = maxCount && entitiesSummary.length >= maxCount
 
     return (
       <>
@@ -117,7 +122,19 @@ export default class MultipleFieldset extends EntityCollectionComponent {
             />
           )}
           {!readOnly && (
-            <Button color="success" onClick={this.onNewButtonClick}>
+            <Button
+              color="success"
+              onClick={this.onNewButtonClick}
+              disabled={maxCountReached}
+              title={
+                maxCountReached
+                  ? L.l('dataManagement.dataEntry.multipleNodesComponent.cannotAddNewNodes.maxCountReached', [
+                      maxCount,
+                      entityDefinition.labelOrName,
+                    ])
+                  : ''
+              }
+            >
               {L.l('common.new')}
             </Button>
           )}

@@ -11,16 +11,30 @@ export default class EntityCollectionComponent extends AbstractFormComponent {
     this.state = {
       entities: [],
       addingEntity: false,
+      maxCount: null,
     }
 
     this.determineEntities = this.determineEntities.bind(this)
-    this.onEntitiesUpdated = this.onEntitiesUpdated.bind(this)
+    this.onStateUpdate = this.onStateUpdate.bind(this)
     this.onNewButtonClick = this.onNewButtonClick.bind(this)
   }
 
   componentDidMount() {
     super.componentDidMount()
-    this.setState({ entities: this.determineEntities() }, () => this.onEntitiesUpdated())
+    this.updateState()
+  }
+
+  updateState() {
+    const { addingEntity } = this.state
+    this.setState(this.determineNewState(), () => this.onStateUpdate(addingEntity))
+  }
+
+  determineNewState() {
+    const { itemDef, parentEntity } = this.props
+    const { entityDefinitionId } = itemDef
+    const maxCount = parentEntity.childrenMaxCountByDefinitionId[entityDefinitionId]
+
+    return { addingEntity: false, entities: this.determineEntities(), maxCount }
   }
 
   determineEntities() {
@@ -32,18 +46,15 @@ export default class EntityCollectionComponent extends AbstractFormComponent {
     super.onRecordEvent(event)
 
     const { parentEntity, itemDef } = this.props
-    const { addingEntity } = this.state
     if (
       (event instanceof EntityCreationCompletedEvent || event instanceof EntityDeletedEvent) &&
       event.isRelativeToNodes({ parentEntity, nodeDefId: itemDef.entityDefinitionId })
     ) {
-      this.setState({ addingEntity: false, entities: this.determineEntities() }, () =>
-        this.onEntitiesUpdated(addingEntity)
-      )
+      this.updateState()
     }
   }
 
-  onEntitiesUpdated(entityAdded = false) {}
+  onStateUpdate(entityAdded = false) {}
 
   onNewButtonClick() {
     const { itemDef, parentEntity } = this.props
