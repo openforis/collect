@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>3.26.34-SNAPSHOT</version>
+	<version>3.26.35-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Open Foris Collect</name>

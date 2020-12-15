@@ -33,15 +33,6 @@ const FIELD_COMPONENTS_BY_TYPE = {
   [AttributeDefinition.Types.TIME]: TimeField,
 }
 
-const extractValidation = (props) => {
-  const { parentEntity, itemDef, attribute } = props
-  return Validations.getAttributeValidation({
-    parentEntity,
-    attributeDefinition: itemDef.attributeDefinition,
-    attribute,
-  })
-}
-
 const FormItemFieldComponent = (props) => {
   const { itemDef, parentEntity, attribute, inTable } = props
   const { attributeDefinition } = itemDef
@@ -54,7 +45,17 @@ const FormItemFieldComponent = (props) => {
     parentEntity,
   ])
 
-  const [validation, setValidation] = useState(extractValidation(props))
+  const calculateValidation = useCallback(
+    () =>
+      Validations.getAttributeValidation({
+        parentEntity,
+        attributeDefinition,
+        attribute,
+      }),
+    [parentEntity, attributeDefinition, attribute]
+  )
+
+  const [validation, setValidation] = useState(calculateValidation())
   const [relevant, setRelevant] = useState(calculateIsRelevant())
 
   useRecordEvent({
@@ -64,7 +65,7 @@ const FormItemFieldComponent = (props) => {
         event instanceof AttributeValueUpdatedEvent &&
         event.isRelativeToNodes({ parentEntity, nodeDefId: attributeDefinitionId })
       ) {
-        setValidation(extractValidation(props))
+        setValidation(calculateValidation())
       } else if (
         event instanceof NodeRelevanceUpdatedEvent &&
         event.isRelativeToNodes({ parentEntity, nodeDefId: attributeDefinitionId })
@@ -89,14 +90,7 @@ const FormItemFieldComponent = (props) => {
           'not-relevant': !relevant,
         })}
       >
-        <Component
-          fieldDef={itemDef}
-          parentEntity={parentEntity}
-          attribute={attribute}
-          inTable={inTable}
-          error={validation.hasErrors()}
-          warning={validation.hasWarnings()}
-        />
+        <Component fieldDef={itemDef} parentEntity={parentEntity} attribute={attribute} inTable={inTable} />
       </div>
       <ValidationTooltip target={wrapperId} validation={validation} />
     </>

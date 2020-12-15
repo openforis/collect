@@ -382,6 +382,7 @@ export class CodeAttributeDefinition extends AttributeDefinition {
   mandatoryFieldNames = ['code']
   itemsOrientation
   enumerator
+  hasQualifiableItems
 
   static ItemsOrientations = {
     VERTICAL: 'VERTICAL',

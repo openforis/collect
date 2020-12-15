@@ -265,7 +265,7 @@ export default class CodeField extends AbstractField {
     }
 
     const { attributeDefinition } = fieldDef
-    const { layout, multiple, enumerator } = attributeDefinition
+    const { layout, multiple, enumerator, hasQualifiableItems } = attributeDefinition
 
     if (enumerator) {
       return (
@@ -275,7 +275,10 @@ export default class CodeField extends AbstractField {
       )
     }
 
-    if (multiple && (asynchronous || inTable || layout !== CodeFieldDefinition.Layouts.RADIO)) {
+    if (
+      (multiple && (asynchronous || inTable || layout !== CodeFieldDefinition.Layouts.RADIO)) ||
+      (inTable && hasQualifiableItems)
+    ) {
       return (
         <CodeFieldText
           asynchronous={asynchronous}

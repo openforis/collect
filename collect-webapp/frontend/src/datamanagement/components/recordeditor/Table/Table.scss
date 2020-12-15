@@ -40,4 +40,16 @@
 
 .table-wrapper {
   border: 1px solid gray;
+
+  .MuiAutocomplete-inputRoot.MuiOutlinedInput-root.MuiOutlinedInput-marginDense {
+    padding: 2px;
+  }
+
+  .MuiOutlinedInput-input,
+  .MuiInputBase-input.MuiOutlinedInput-input,
+  .MuiSelect-outlined,
+  .MuiAutocomplete-inputRoot[class*='MuiOutlinedInput-root'] .MuiAutocomplete-input:first-child,
+  .MuiInputBase-formControl.MuiInputBase-multiline.MuiOutlinedInput-multiline {
+    padding: 6px;
+  }
 }

@@ -48,10 +48,15 @@ const WIDTH_CALCULATORS_BY_ATTRIBUTE_TYPE = {
       ? availableFieldNames.reduce((widthAcc, field) => widthAcc + TaxonFieldWidths[field], 0)
       : TaxonFieldWidths[TaxonAttributeDefinition.Fields.SCIENTIFIC_NAME] + TaxonFormFieldLabelWidth
   },
-  [AttributeDefinition.Types.TEXT]: ({ fieldDef }) => {
+  [AttributeDefinition.Types.TEXT]: ({ fieldDef, inTable }) => {
     const { attributeDefinition: attrDef } = fieldDef
     const { textType } = attrDef
-    return textType === TextAttributeDefinition.Types.SHORT ? 200 : 300
+    switch (textType) {
+      case TextAttributeDefinition.TextTypes.MEMO:
+        return inTable ? 300 : 500
+      default:
+        return inTable ? 200 : 300
+    }
   },
   [AttributeDefinition.Types.TIME]: () => 130,
 }

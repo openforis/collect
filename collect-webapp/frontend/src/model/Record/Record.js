@@ -115,7 +115,7 @@ export class Record extends Serializable {
       })
       const ancestorCodeParentEntity = commonParent && commonParent.getDescendantEntityClosestToNode(currentAttrDef)
       if (ancestorCodeParentEntity) {
-        ancestorCodePaths.push(`${ancestorCodeParentEntity.path}/${currentAttrDef.name}`)
+        ancestorCodePaths.unshift(`${ancestorCodeParentEntity.path}/${currentAttrDef.name}`)
       }
       currentAttrDef = currentAttrDef.parentCodeAttributeDefinition
       currentContextEntity = ancestorCodeParentEntity

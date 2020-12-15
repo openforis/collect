@@ -26,10 +26,10 @@ export default class AbstractField extends AbstractFormComponent {
   }
 
   componentDidUpdate(prevProps) {
-    const { parentEntity } = this.props
-    const { parentEntity: prevParentEntity } = prevProps
+    const { parentEntity, attribute } = this.props
+    const { parentEntity: prevParentEntity, attribute: prevAttribute } = prevProps
 
-    if (prevParentEntity !== parentEntity) {
+    if (parentEntity !== prevParentEntity || attribute !== prevAttribute) {
       this.onParentEntityChange()
     }
   }

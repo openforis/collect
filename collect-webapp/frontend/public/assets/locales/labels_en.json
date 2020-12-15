@@ -1,654 +1,658 @@
 {
-    "common": {
-        "add": "Add",
-        "close": "Close",
-        "date": "Date",
-        "delete": {
-            "label": "Delete",
-            "confirm": {
-                "title": "Confirm delete",
-                "message": "Do you want to delete this item?"
-            }
-        },
-        "download": "Download",
-        "exportToCsv": "Export to CSV",
-        "label": "Label",
-        "message": "Message",
-        "name": "Name",
-        "new": "New",
-        "node": "Node",
-        "parameters": "Parameters",
-        "selectOne": "Select one",
-        "search": "Search",
-        "specify": "Specify",
-        "systemError": {
-            "title": "Unexpected error",
-            "message": "Please contact your system administrator."
-        },
-        "unit": "Unit"
+  "common": {
+    "add": "Add",
+    "close": "Close",
+    "date": "Date",
+    "delete": {
+      "label": "Delete",
+      "confirm": {
+        "title": "Confirm delete",
+        "message": "Do you want to delete this item?"
+      }
     },
-    "general": {
-        "account": "Account",
-        "cancel": "Cancel",
-        "close": "Close",
-        "additionalOptions": "Additional Options",
-        "import": "Import",
-        "ok": "Ok",
-        "warning": "Warning"
+    "download": "Download",
+    "exportToCsv": "Export to CSV",
+    "label": "Label",
+    "message": "Message",
+    "name": "Name",
+    "new": "New",
+    "node": "Node",
+    "parameters": "Parameters",
+    "selectOne": "Select one",
+    "search": "Search",
+    "specify": "Specify",
+    "systemError": {
+      "title": "Unexpected error",
+      "message": "Please contact your system administrator."
     },
-    "generic": {
-        "validation": {
-            "invalid_internal_name": "Invalid identifier: the first character must be a letter"
-        }
-    },
-    "global": {
-        "advancedFunctions": "Advanced Functions",
-        "all": {
-            "label": "All",
-            "menuitem": {
-                "label": "--- All ---"
-            }
-        },
-        "cancel": "Cancel",
-        "close": "Close",
-        "confirm": "Confirm",
-        "done": "Done",
-        "edit": "Edit",
-        "error": "Error",
-        "export": {
-            "label": "Export"
-        },
-        "import": {
-            "label": "Import"
-        },
-        "info": "Info",
-        "loading": "Loading...",
-        "ok": "Ok",
-        "onlyme": {
-            "menuitem": {
-                "label": "--- Only me ---"
-            }
-        },
-        "parameters": "Parameters",
-        "refresh": "Refresh",
-        "save": {
-            "label": "Save",
-            "success": "Saved successfully"
-        },
-        "selectOne": "--- Select one ---",
-        "upload": "Upload",
-        "uploadingFile": {
-            "default": "Uploading file",
-            "error": "Error uploading file"
-        }
-    },
-    "forms": {
-        "dropzone": {
-            "selectFile": "Click to select a file or drop it here.",
-            "supportedFileTypes": "Supported file types: {0}"
-        },
-        "selectOne": "--- Please select one ---"
-    },
-    "header": {
-        "select-survey": "Select survey: "
-    },
-    "account": {
-        "change-password": "Change password",
-        "logout": "Logout"
-    },
-    "home-page": {
-        "welcome-message": "Welcome to Open Foris Collect!",
-        "introduction": "Open Foris Collect is the main entry point for data collected in field-based inventories. It provides a fast, easy, flexible way to set up a survey with a user-friendly interface. Collect handles multiple data types and complex validation rules, all in a multilanguage environment.",
-        "survey-not-selected-message": "Please select a survey or create a new one from the Survey Designer"
-    },
-    "job": {
-        "remainingMinutes": "Remaining minutes",
-        "lessThanOneMinuteRemaining": "less than one minute"
-    },
-    "dataManagement": {
-        "formLanguage": "Form language",
-        "csvDataImport": {
-            "filename": "File Name",
-            "row": "Row",
-            "columns": "Columns",
-            "entity": "Entity",
-            "error-type": "Error Type",
-            "error-message": "Error Message",
-            "error": {
-                "missingRequiredColumns": "Required columns are: {0}",
-                "noRecordFound": "Record not found: {0}",
-                "onlyNewRecordsAllowed": "New record insert selected but existing record found",
-                "noParentEntityFound": "Entity \"{0}\" with keys {1} not found in record {2}",
-                "multipleRecordsFound": "Multiple records found for key: {0}",
-                "multipleParentEntityFound": "Multiple parent entity found for entity \"{0}\" with keys {1} in record {2}",
-                "unitNotFound": "Unit {0} not found in the survey or not valid for this numeric attribute",
-                "srsNotFound": "Spatial reference system {0} not found in the survey",
-                "recordNotInSelectedStep": "Record is not in the selected step",
-                "noModelVersionFound": "Model version with name {0} not found in survey",
-                "fieldDefinitionNotFound": "Attribute definition not found or sub-field not specified",
-                "rowIdentifierNotSpecified": "Row identifier not specified",
-                "nodePositionNotSpecified": "Node position not specified for a multiple attribute",
-                "invalidNodePosition": "Invalid node position: it must be a positive integer number",
-                "fieldNameNotSpecified": "Field name not specified",
-                "type": {
-                    "DUPLICATE_VALUE": "Duplicate value",
-                    "EMPTY": "Empty value",
-                    "INVALID_VALUE": "Invalid Value",
-                    "IOERROR": "Internal error",
-                    "MISSING_REQUIRED_COLUMNS": "Missing required columns",
-                    "WRONG_COLUMN_NAME": "Wrong column name"
-                }
-            },
-            "errorsInUploadedFile": "Errors in uploaded file",
-            "importType": {
-                "label": "Import type",
-                "update": "Update existing records",
-                "newRecords": "Insert new records",
-                "multipleFiles": "Import multiple CSV/Excel files in a single ZIP file"
-            },
-            "applyToSteps": "Apply to step(s)",
-            "selectAnEntity": "Please select an entity",
-            "validateRecords": "Validate records after import",
-            "deleteEntities": "Delete entities before import",
-            "validation": {
-                "fileNotSelected": "Please select a file to import",
-                "entityNotSelected": "Please select an entity to import data into"
-            }
-        },
-        "backupDataImport": {
-            "keys": "Keys",
-            "steps": "Steps",
-            "createdOn": "Created",
-            "modifiedOn": "Modified",
-            "newRecord": "New Record",
-            "oldRecord": "Old Record",
-            "dataImportSummary": "Data Import Summary",
-            "importability": "Importability",
-            "acceptedFileTypesDescription": "Collect Backup (.collect-backup), Collect Data (.collect-data), Collect Earth XML data (.zip)",
-            "generateImportSummary": "Generate Import Summary",
-            "generatingDataImportSummary": "Generating data import summary",
-            "importingData": "Importing data",
-            "newRecordsToBeImported": "New records to be imported: {0}/{1}",
-            "conflictingRecordsToBeImported": "Conflicting records to be imported: {0}/{1}",
-            "errorsFound": "Errors found: {0}",
-            "errors": {
-                "label": "Errors",
-                "fileName": "File Name",
-                "path": "Path",
-                "messages": "Error Messages"
-            }
-        },
-        "export": {
-            "label": "Export",
-            "additionalOptions": {
-                "label": "Additional options",
-                "includeKMLColumnForCoordinates": "Include KML column for coordinate attributes (for Fusion Tables)*",
-                "includeAllAncestorAttributes": "Include all ancestor attributes*",
-                "includeCompositeAttributeMergedColumn": "Include composite attributes merged column (e.g. date, time, coordinate)*",
-                "codeAttributeExpanded": "Expand code attributes (add boolean columns for each code value)*",
-                "includeCodeItemLabelColumn": "Include code item label column*",
-                "includeCreatedByUserColumn": "Include 'created by user' column*",
-                "includeEnumeratedEntities": "Include enumerated multiple entities as additional columns",
-                "includeGroupingLabels": "Prepend grouping (single entity) name to column name"
-            },
-            "exportDialog": {
-                "title": "Exporting data",
-                "downloadExportedFile": "Download exported file"
-            },
-            "filter": "Filter",
-            "mode": {
-                "label": "Export mode",
-                "allEntities": "All entities",
-                "onlySelectedEntities": "Only selected entities"
-            },
-            "modifiedSince": "Modified since",
-            "modifiedUntil": "until",
-            "onlyOwnedRecords": "Export only owned records",
-            "outputFormat": {
-                "label": "Output format",
-                "csv": "CSV",
-                "xlsx": "Excel (.xlsx)"
-            },
-            "notCompatibleWithCSVDataImportNote": "Not compatible with CSV data import",
-            "selectEntities": "Select entities to export",
-            "sourceForFileHeadings": {
-                "label": "Source for headings",
-                "attributeName": "Attribute name",
-                "instanceLabel": "Attribute label",
-                "reportingLabel": "Reporting label (Saiku)"
-            },
-            "fileHeadingsLanguage": "Headings language",
-            "step": "Step",
-            "toCsv": "to CSV/Excel",
-            "toCollectFormat": "to Collect/Calc format"
-        },
-        "import": {
-            "label": "Import",
-            "fromCsv": "from CSV/Excel",
-            "fromCollectFormat": "from Collect format"
-        },
-        "backupDataExport": {
-            "exportOnlyOwnedRecords": "Export only owned records",
-            "includeUploadedFiles": "Include uploaded files (images, documents, etc.)",
-            "exportingDataJobTitle": "Exporting data",
-            "errorsDuringExport": "Errors during data export",
-            "downloadAnyway": "Download anyway",
-            "errors": {
-                "recordKey": "Key",
-                "recordStep": "Step",
-                "errorMessage": "Error"
-            }
-        },
-        "deleteRecords": {
-            "confirmDeleteTitle": "Delete record",
-            "confirmDeleteSingleRecordMessage": "Delete the selected record?",
-            "confirmDeleteMultipleRecordsMessage": "Delete the selected {0} records?"
-        },
-        "workflow": {
-            "entry": "Data entry",
-            "cleansing": "Data Cleansing",
-            "analysis": "Data Analysis",
-            "confirmPromoteToCleansing": {
-                "title": "Confirm",
-                "message": "Promote all records in Entry phase to Cleansing phase?"
-            },
-            "confirmPromoteToAnalysis": {
-                "title": "Confirm",
-                "message": "Promote all records in Cleansing phase to Analysis phase?"
-            },
-            "confirmDemoteToCleansing": {
-                "title": "Confirm",
-                "message": "Demote all records in Analysis phase to Cleansing phase?"
-            },
-            "confirmDemoteToEntry": {
-                "title": "Confirm",
-                "message": "Demote all records in Cleansing phase to Entry phase?"
-            },
-            "step": {
-                "label": "Step",
-                "entry": "Entry",
-                "cleansing": "Cleansing",
-                "analysis": "Analysis"
-            }
-        },
-        "onlyMe": "Only me",
-        "errors": "Errors",
-        "warnings": "Warnings",
-        "created": "Created",
-        "modified": "Modified",
-        "formVersioning": {
-            "selectFormVersion": "Select Form Version"
-        },
-        "recordLocked": "Locked",
-        "recordLockedBy": "Record locked by {0}",
-        "recordLockedAlert": {
-            "title": "Record is being edited",
-            "message": "Record is already being edited by '{0}'"
-        },
-        "recordOwnedByAnotherUserAlert": {
-            "title": "Record owned by another user",
-            "message": "Record is owned by another user ({0}) and cannot be edited"
-        },
-        "dataEntry": {
-            "attribute": {
-                "boolean": {
-                    "textValue": {
-                        "yes": "Y",
-                        "no": "N"
-                    }
-                },
-                "coordinate": {
-                    "x": "X",
-                    "y": "Y",
-                    "srs": "SRS",
-                    "altitude": "Altitude",
-                    "accuracy": "Accuracy"
-                },
-                "file": {
-                    "fileType": {
-                        "audio": "Audio",
-                        "document": "document",
-                        "image": "Image",
-                        "video": "Video"
-                    },
-                    "acceptedFileDescription": "{0} file types ({1})"
-                },
-                "range": { 
-                    "from": "From",
-                    "to": "To"
-                },
-                "taxon": {
-                    "code": "Code",
-                    "scientific_name": "Scientific name",
-                    "vernacular_name": "Vernacular name",
-                    "language_code": "Lang.",
-                    "language_variety": "Lang. variety",
-                    "family_code": "Family code",
-                    "family_scientific_name": "Family name"
-                }
-            },
-            "validation": {
-                "required": "Required field",
-                "minCount": "At least {0} items required",
-                "maxCount": "Only {0} item(s) allowed"
-            },
-            "promote": "Promote",
-            "promoteTo": "Promote to {0}",
-            "promoteToConfirm": "Promote this record to {0}?",
-            "promoteWithErrorsCannot": "Errors found in the record.\n\nPlease fix them first or contact a survey administrator to force publishing it to next step",
-            "promoteWithErrorsForceConfirm": "Errors found in the record.\n\nPromote it to {0} anyway?",
-            "promoteCompleteTitle": "Record promoted successfully",
-            "promoteCompleteMessage": "Record {0} promoted to {1}",
-            "demote": "Demote",
-            "demoteTo": "Demote to {0}",
-            "demoteToConfirm": "Demote this record to {0}? All changes applied in this step will be lost.",
-            "demoteCompleteTitle": "Record demoted successfully",
-            "demoteCompleteMessage": "Record {0} demoted to {1}"
-        },
-        "recordValidationReport": {
-            "title": "Record validation report",
-            "tooltipErrors": "Record Validation Report - Errors: {0} - Warnings: {1}",
-            "tooltipOk": "Record Validation Report - No errors found"
-        }
-    },
-    "survey": {
-        "name": "Name",
-        "identifier": "Identifier",
-        "templateType": {
-            "label": "Template",
-            "BLANK": "Blank",
-            "BIOPHYSICAL": "Biophysical",
-            "COLLECT_EARTH": "Collect Earth",
-            "COLLECT_EARTH_IPCC": "Collect Earth + IPCC"
-        },
-        "projectName": "Title",
-        "language": "Language",
-        "defaultLanguage": "Default Language",
-        "lastModified": "Last Modified",
-        "unpublishedChanges": "Unpublished changes",
-        "published": "Published",
-        "userGroup": "User Group",
-        "target": "Target",
-        "surveyType": {
-            "label": "Type",
-            "temporary": "Unpublished changes",
-            "published": "Published"
-        },
-        "export": {
-            "mode": {
-                "label": "Export mode",
-                "desktop": "Collect Desktop (backup)",
-                "earth": "Collect Earth",
-                "mobile": "Collect Mobile",
-                "rdb": {
-                	"label": "Relational DB (SQL)",
-	                "dialect": {
-	            		"label": "Dialect",
-	            		"standard": "Standard (PostgreSQL/MySQL)",
-	            		"sqlite": "SQLite"
-                	},
-                	"includeData": "Include data",
-	            	"targetSchemaName": "Target schema",
-                	"dateTimeFormat": "Date-time format"
-            	}
-            }
-        },
-        "import": {
-            "file": "File",
-            "acceptedFileTypesDescription": "Collect Survey (.collect) Collect Backup (.collect-backup), Collect Earth (.cep) or Collect Survey XML (.xml)",
-            "importingIntoExistingSurveyWarning": "Survey already existing! Applied changes will be overridden."
-        },
-        "publishedSurvey": "Published survey",
-        "selectPublishedSurveyDropdownHeading": "--- Published survey ---",
-        "selectPublishedSurveyFirst": "Select a published survey first",
-        "publish": {
-            "label": "Publish",
-            "confirmTitle": "Confirm publish \"{0}\"",
-            "confirmMessage": "Publish the survey \"{0}\"?\n - data collection could start\n - only few changes to the survey will be allowed in the future.",
-            "publishLatestChanges": "Publish latest changes",
-            "successDialog": {
-                "title": "Survey published",
-                "message": "Survey \"{0}\" successfully published"
-            },
-            "confirmDialog": {
-                "publishWithWarningsTitle": "Confirm publish survey {0}",
-                "errorsFoundTitle": "Cannot publish survey {0}: errors found"
-            },
-            "error": {
-                "title": "Error publishing survey"
-            }
-
-        },
-        "unpublish": {
-            "label": "Unpublish",
-            "confirmTitle": "Confirm unpublish \"{0}\"",
-            "confirmMessage": "Unpublish the survey \"{0}\"?\n All the collected records will be deleted.",
-            "successDialog": {
-                "title": "Survey unpublished",
-                "message": "Survey \"{0}\" successfully unpublished"
-            }
-        },
-        "clone": {
-            "label": "Clone",
-            "title": "Clone survey",
-            "originalSurvey": {
-                "name": "Original survey name",
-                "type": "Original survey type"
-            },
-            "newSurveyName": "New survey name",
-            "cloningSurvey": "Cloning survey",
-            "validation": {
-                "originalSurveyNotFound": "Original survey with name \"{0}\" not found"
-            }
-        },
-        "delete": {
-            "confirm": {
-                "title": "Confirm delete",
-                "message": "Delete survey \"{0}\"?"
-            },
-            "published": {
-                "confirm": {
-                    "title": "Delete published survey",
-                    "message": "The survey \"{0}\" has been published.\n\nIf you delete it, all the records collected with this survey will be deleted.\n\nDo you want to continue?"
-                }
-            },
-            "success": {
-                "title": "Survey deleted",
-                "message": "Survey \"{0}\" deleted successfully"
-            }
-        },
-        "noPublishedSurveysFound": "No published surveys found",
-        "validation": {
-            "nameAlreadyInUse": "Identifier already in use",
-            "error": {
-                "duplicate_name": "Another survey with the same name already exists",
-                "duplicate_uri": "Another survey with the same URI already exists",
-                "key_attribute_not_specified": "Key attribute(s) not specified",
-                "maximum_key_attribute_definitions_exceeded": "Only a maximum of 3 Key Attribute Definitions are allowed for each sampling unit",
-                "maximum_count_in_record_list_entity_definitions_exceeded": "Only a maximum of 5 entities can be configured to be counted in record summary list",
-                "empty_entity": "Empty entity",
-                "nested_tables": "Nested multiple entities with table layout are not supported",
-                "invalid_expression": "Invalid expression: {0}",
-                "circular_reference": "The expression generates a circular reference",
-                "parent_changed": "Parent changed",
-                "data_type_changed": "Data type changed",
-                "cardinality_changed_from_multiple_to_single": "Cardinality changed from multiple to single",
-                "enumerating_code_list_changed": {
-                    "code_removed": "Code removed in fixed-rows table generating code list"
-                },
-                "reserved_name": "Cannot use a reserved name",
-                "empty_code_list": "Empty code list",
-                "unused_code_list": "Unused code list"
-            },
-            "node": {
-                "name": {
-                    "error": {
-                        "max_length_exceeded": "Max length exceeded. The length of the name, including the sum of the lengths of every ancestor single entity, is {0} but it must not exceed {1} characters."
-                    }
-                },
-                "requireness": {
-                    "key_attribute_always_required": "A key attribute has to be 'Always required'"
-                },
-                "error": {
-                    "invalid_min_count_expression": "''Min Count'' expression is invalid ({0})",
-                    "invalid_max_count_expression": "''Max Count'' expression is invalid ({0})",
-                    "invalid_relevant_expression": "''Relevant when'' expression is invalid ({0})"
-                }
-            },
-            "entity": {
-                "error": {
-                    "generator_expression": "Invalid generator expression ({0})",
-                    "virtual_node_not_found_in_source_entity": "Virtual node '{0}' not found in source entity '{1}'",
-                    "missing_virtual_node": "Missing node '{0}' in virtual entity",
-                    "invalid_virtual_node_type": "Invalid type for virtual node '{0}'",
-                    "source_node_not_found_for_virtual_node": "Source node '{0}' for virtual entity not found in source entity '{1}'"
-                }
-            },
-            "attribute": {
-                "cannot_specify_checks_for_calculated_attribute": "Cannot specify checks for calculated attribute",
-                "code": {
-                    "invalid_parent_expression": "Invalid parent expression ({0})",
-                    "invalid_parent_attribute_relation": "Invalid parent code attribute specified; please check that the code list hierarchy is respected.",
-                    "invalid_parent_attribute_relation_in_referenced_parent_attribute": "Parent code attribute has a wrong code list hierarchical level; please check that the code list hierarchy is respected.",
-                    "parent_attribute_specified_for_a_flat_list": "Parent code attribute specified but code list is not hierarchical; please delete this releationship."
-                },
-                "coordinate": {
-                	"incompatibility_with_calc": "Coordinate altitude and accuracy are not supported by Open Foris Calc: collected records won't be imported there"
-                },
-                "taxon": {
-                    "error": {
-                        "invalid_qualifier_expression": "Invalid qualifier expression specified ({0})"
-                    },
-                    "invalid_taxonomy": "Invalid species list specified: {0}"
-                },
-                "default_value": {
-                    "error": {
-                        "invalid_condition_expression": "''Apply when'' condition in attribute default is invalid ({0})",
-                        "invalid_value": "Invalid value in attribute default",
-                        "invalid_expression": "''Expression'' in attribute default is invalid ({0})"
-                    }
-                },
-                "key_attribute_cannot_be_multiple": "Cannot have multiple values when 'is key' has been specified",
-                "invalid_referenced_key_attribute": "Invalid referenced key attribute: it must be the unique key attribute of an entity and have the same type of the current attribute",
-                "referenced_attribute_deleted": "Referenced attribute has been deleted"
-            },
-            "check": {
-                "error": {
-                    "invalid_condition_expression": "Apply when' condition in check is invalid ({0})"
-                },
-                "comparison": {
-                    "error": {
-                        "invalid_comparison_expression": "'Expression' in Comparison check is invalid ({0})"
-                    }
-                },
-                "custom": {
-                    "error": {
-                        "invalid_custom_expression": "'Expression' in Custom check is invalid ({0})"
-                    }
-                },
-                "distance": {
-                    "error": {
-                        "invalid_min_distance_expression": "'Min distance' expression in Distance check is invalid ({0})",
-                        "invalid_max_distance_expression": "'Max distance' expression in Distance check is invalid ({0})",
-                        "invalid_source_point_expression": "'Source' expression in Distance check is invalid ({0})",
-                        "invalid_destination_point_expression": "'Destination' expression in Distance check is invalid ({0})"
-                    }
-                },
-                "pattern": {
-                    "error": {
-                        "invalid_pattern_expression": "Invalid regular expression in Pattern check ({0})"
-                    }
-                },
-                "uniqueness": {
-                    "error": {
-                        "invalid_uniqueness_expression": "Invalid expression in Uniqueness check ({0})"
-                    }
-                }
-            }
-        }
-    },
-    "backupRestore": {
-        "label": "Backup/Restore"
-    },
-    "backup": {
-        "label": "Backup",
-        "lastBackup": {
-            "title": "Last Backup",
-            "date": "Date",
-            "updatedRecordsSinceLastBackup": "Updated records since last backup",
-            "download": "Download last backup"
-        },
-        "generateNewBackup": "Generate new backup",
-        "backingUpData": "Backing up data"
-    },
-    "restore": {
-        "label": "Restore",
-        "acceptedFileTypesDescription": "Collect Backup (.collect-backup)",
-        "restoreMode": {
-            "label": "Restore into",
-            "selectedSurvey": "Selected survey",
-            "newSurvey": "New survey"
-        },
-        "validateRecords": "Validate records (slower)",
-        "deleteRecordsBeforeRestore": "Delete ALL existing records before restore",
-        "restoringData": "Restoring data",
-        "errorRestoringData": "Error restoring data"
-    },
-    "user": {
-        "username": "Username",
-        "enabled": "Enabled",
-        "role": "Role",
-        "rawPassword": "Password",
-        "oldPassword": "Old password",
-        "newPassword": "New password",
-        "retypedPassword": "Retype-password",
-        "validation": {
-            "invalid_username": "The username's first character must be a letter, it must contain at least 4 characters and no more than 15 characters and no characters other than letters, numbers, underscore (_), hyphen (-) and dot (.) may be used.",
-            "wrong_password_pattern": "The password's first character must be a letter, it must contain at least 4 characters and no more than 15 characters and no characters other than letters, numbers and the underscore may be used.",
-            "wrong_retyped_password": "Password and Retyped-Password do not match",
-            "wrongPasswordSpecified": "Wrong password specified"
-        },
-        "changePassword": {
-            "change": "Change",
-            "passwordChanged": "Password changed!"
-        },
-        "delete": {
-            "confirmTitle": "Delete user",
-            "confirmDeleteOneUserMessage": "Do you want to delete the selected user?",
-            "confirmDeleteMultipleUsersMessage": "Do you want to delete the selected {0} users?",
-            "cannotDeleteCurrentUser": "Cannot delete the current logged user",
-            "cannotDeleteDefaultAdminUser": "Cannot delete the default 'admin' user"
-        }
-    },
-    "userGroup": {
-        "delete": {
-            "confirmTitle": "Delete user group",
-            "confirmDeleteSingleMessage": "Do you want to delete the selected user group?",
-            "confirmDeleteMultipleMessage": "Do you want to delete the selected {0} user groups?"
-        },
-        "qualifiers": {
-            "heading": "Record attribute / Code list filter",
-            "info": "If specified, users with Data Entry role in the group will be able to insert and see only records having the specified attribute equal to the specified value."
-        },
-        "qualifier": {
-            "name": "Attribute/Code list name",
-            "value": "Attribute/Code value"
-        }
-    },
+    "unit": "Unit"
+  },
+  "general": {
+    "account": "Account",
+    "cancel": "Cancel",
+    "close": "Close",
+    "additionalOptions": "Additional Options",
+    "import": "Import",
+    "ok": "Ok",
+    "warning": "Warning"
+  },
+  "generic": {
     "validation": {
-        "errorsInTheForm": "Errors in the form",
-        "minLength": "It must be at least {0} characters",
-        "required_field": "Required field",
-        "duplicate_value": "Duplicate value",
-        "severity": "Severity",
-        "path": "Path",
-        "message": "Message"
-    },
-    "connection": {
-        "serverConnectionError": {
-            "title": "Server connection error",
-            "message": "Error connecting to the server; trying to establish the connection again..."
-        },
-        "sessionExpired": "Session expired. Refresh the web browser page."
+      "invalid_internal_name": "Invalid identifier: the first character must be a letter"
     }
+  },
+  "global": {
+    "advancedFunctions": "Advanced Functions",
+    "all": {
+      "label": "All",
+      "menuitem": {
+        "label": "--- All ---"
+      }
+    },
+    "cancel": "Cancel",
+    "close": "Close",
+    "confirm": "Confirm",
+    "done": "Done",
+    "edit": "Edit",
+    "error": "Error",
+    "export": {
+      "label": "Export"
+    },
+    "import": {
+      "label": "Import"
+    },
+    "info": "Info",
+    "loading": "Loading...",
+    "ok": "Ok",
+    "onlyme": {
+      "menuitem": {
+        "label": "--- Only me ---"
+      }
+    },
+    "parameters": "Parameters",
+    "refresh": "Refresh",
+    "save": {
+      "label": "Save",
+      "success": "Saved successfully"
+    },
+    "selectOne": "--- Select one ---",
+    "upload": "Upload",
+    "uploadingFile": {
+      "default": "Uploading file",
+      "error": "Error uploading file"
+    }
+  },
+  "forms": {
+    "dropzone": {
+      "selectFile": "Click to select a file or drop it here.",
+      "supportedFileTypes": "Supported file types: {0}"
+    },
+    "selectOne": "--- Please select one ---"
+  },
+  "header": {
+    "select-survey": "Select survey: "
+  },
+  "account": {
+    "change-password": "Change password",
+    "logout": "Logout"
+  },
+  "home-page": {
+    "welcome-message": "Welcome to Open Foris Collect!",
+    "introduction": "Open Foris Collect is the main entry point for data collected in field-based inventories. It provides a fast, easy, flexible way to set up a survey with a user-friendly interface. Collect handles multiple data types and complex validation rules, all in a multilanguage environment.",
+    "survey-not-selected-message": "Please select a survey or create a new one from the Survey Designer"
+  },
+  "job": {
+    "remainingMinutes": "Remaining minutes",
+    "lessThanOneMinuteRemaining": "less than one minute"
+  },
+  "dataManagement": {
+    "formLanguage": "Form language",
+    "csvDataImport": {
+      "filename": "File Name",
+      "row": "Row",
+      "columns": "Columns",
+      "entity": "Entity",
+      "error-type": "Error Type",
+      "error-message": "Error Message",
+      "error": {
+        "missingRequiredColumns": "Required columns are: {0}",
+        "noRecordFound": "Record not found: {0}",
+        "onlyNewRecordsAllowed": "New record insert selected but existing record found",
+        "noParentEntityFound": "Entity \"{0}\" with keys {1} not found in record {2}",
+        "multipleRecordsFound": "Multiple records found for key: {0}",
+        "multipleParentEntityFound": "Multiple parent entity found for entity \"{0}\" with keys {1} in record {2}",
+        "unitNotFound": "Unit {0} not found in the survey or not valid for this numeric attribute",
+        "srsNotFound": "Spatial reference system {0} not found in the survey",
+        "recordNotInSelectedStep": "Record is not in the selected step",
+        "noModelVersionFound": "Model version with name {0} not found in survey",
+        "fieldDefinitionNotFound": "Attribute definition not found or sub-field not specified",
+        "rowIdentifierNotSpecified": "Row identifier not specified",
+        "nodePositionNotSpecified": "Node position not specified for a multiple attribute",
+        "invalidNodePosition": "Invalid node position: it must be a positive integer number",
+        "fieldNameNotSpecified": "Field name not specified",
+        "type": {
+          "DUPLICATE_VALUE": "Duplicate value",
+          "EMPTY": "Empty value",
+          "INVALID_VALUE": "Invalid Value",
+          "IOERROR": "Internal error",
+          "MISSING_REQUIRED_COLUMNS": "Missing required columns",
+          "WRONG_COLUMN_NAME": "Wrong column name"
+        }
+      },
+      "errorsInUploadedFile": "Errors in uploaded file",
+      "importType": {
+        "label": "Import type",
+        "update": "Update existing records",
+        "newRecords": "Insert new records",
+        "multipleFiles": "Import multiple CSV/Excel files in a single ZIP file"
+      },
+      "applyToSteps": "Apply to step(s)",
+      "selectAnEntity": "Please select an entity",
+      "validateRecords": "Validate records after import",
+      "deleteEntities": "Delete entities before import",
+      "validation": {
+        "fileNotSelected": "Please select a file to import",
+        "entityNotSelected": "Please select an entity to import data into"
+      }
+    },
+    "backupDataImport": {
+      "keys": "Keys",
+      "steps": "Steps",
+      "createdOn": "Created",
+      "modifiedOn": "Modified",
+      "newRecord": "New Record",
+      "oldRecord": "Old Record",
+      "dataImportSummary": "Data Import Summary",
+      "importability": "Importability",
+      "acceptedFileTypesDescription": "Collect Backup (.collect-backup), Collect Data (.collect-data), Collect Earth XML data (.zip)",
+      "generateImportSummary": "Generate Import Summary",
+      "generatingDataImportSummary": "Generating data import summary",
+      "importingData": "Importing data",
+      "newRecordsToBeImported": "New records to be imported: {0}/{1}",
+      "conflictingRecordsToBeImported": "Conflicting records to be imported: {0}/{1}",
+      "errorsFound": "Errors found: {0}",
+      "errors": {
+        "label": "Errors",
+        "fileName": "File Name",
+        "path": "Path",
+        "messages": "Error Messages"
+      }
+    },
+    "export": {
+      "label": "Export",
+      "additionalOptions": {
+        "label": "Additional options",
+        "includeKMLColumnForCoordinates": "Include KML column for coordinate attributes (for Fusion Tables)*",
+        "includeAllAncestorAttributes": "Include all ancestor attributes*",
+        "includeCompositeAttributeMergedColumn": "Include composite attributes merged column (e.g. date, time, coordinate)*",
+        "codeAttributeExpanded": "Expand code attributes (add boolean columns for each code value)*",
+        "includeCodeItemLabelColumn": "Include code item label column*",
+        "includeCreatedByUserColumn": "Include 'created by user' column*",
+        "includeEnumeratedEntities": "Include enumerated multiple entities as additional columns",
+        "includeGroupingLabels": "Prepend grouping (single entity) name to column name"
+      },
+      "exportDialog": {
+        "title": "Exporting data",
+        "downloadExportedFile": "Download exported file"
+      },
+      "filter": "Filter",
+      "mode": {
+        "label": "Export mode",
+        "allEntities": "All entities",
+        "onlySelectedEntities": "Only selected entities"
+      },
+      "modifiedSince": "Modified since",
+      "modifiedUntil": "until",
+      "onlyOwnedRecords": "Export only owned records",
+      "outputFormat": {
+        "label": "Output format",
+        "csv": "CSV",
+        "xlsx": "Excel (.xlsx)"
+      },
+      "notCompatibleWithCSVDataImportNote": "Not compatible with CSV data import",
+      "selectEntities": "Select entities to export",
+      "sourceForFileHeadings": {
+        "label": "Source for headings",
+        "attributeName": "Attribute name",
+        "instanceLabel": "Attribute label",
+        "reportingLabel": "Reporting label (Saiku)"
+      },
+      "fileHeadingsLanguage": "Headings language",
+      "step": "Step",
+      "toCsv": "to CSV/Excel",
+      "toCollectFormat": "to Collect/Calc format"
+    },
+    "import": {
+      "label": "Import",
+      "fromCsv": "from CSV/Excel",
+      "fromCollectFormat": "from Collect format"
+    },
+    "backupDataExport": {
+      "exportOnlyOwnedRecords": "Export only owned records",
+      "includeUploadedFiles": "Include uploaded files (images, documents, etc.)",
+      "exportingDataJobTitle": "Exporting data",
+      "errorsDuringExport": "Errors during data export",
+      "downloadAnyway": "Download anyway",
+      "errors": {
+        "recordKey": "Key",
+        "recordStep": "Step",
+        "errorMessage": "Error"
+      }
+    },
+    "deleteRecords": {
+      "confirmDeleteTitle": "Delete record",
+      "confirmDeleteSingleRecordMessage": "Delete the selected record?",
+      "confirmDeleteMultipleRecordsMessage": "Delete the selected {0} records?"
+    },
+    "workflow": {
+      "entry": "Data entry",
+      "cleansing": "Data Cleansing",
+      "analysis": "Data Analysis",
+      "confirmPromoteToCleansing": {
+        "title": "Confirm",
+        "message": "Promote all records in Entry phase to Cleansing phase?"
+      },
+      "confirmPromoteToAnalysis": {
+        "title": "Confirm",
+        "message": "Promote all records in Cleansing phase to Analysis phase?"
+      },
+      "confirmDemoteToCleansing": {
+        "title": "Confirm",
+        "message": "Demote all records in Analysis phase to Cleansing phase?"
+      },
+      "confirmDemoteToEntry": {
+        "title": "Confirm",
+        "message": "Demote all records in Cleansing phase to Entry phase?"
+      },
+      "step": {
+        "label": "Step",
+        "entry": "Entry",
+        "cleansing": "Cleansing",
+        "analysis": "Analysis"
+      }
+    },
+    "onlyMe": "Only me",
+    "errors": "Errors",
+    "warnings": "Warnings",
+    "created": "Created",
+    "modified": "Modified",
+    "formVersioning": {
+      "selectFormVersion": "Select Form Version"
+    },
+    "recordLocked": "Locked",
+    "recordLockedBy": "Record locked by {0}",
+    "recordLockedAlert": {
+      "title": "Record is being edited",
+      "message": "Record is already being edited by '{0}'"
+    },
+    "recordOwnedByAnotherUserAlert": {
+      "title": "Record owned by another user",
+      "message": "Record is owned by another user ({0}) and cannot be edited"
+    },
+    "dataEntry": {
+      "attribute": {
+        "boolean": {
+          "textValue": {
+            "yes": "Y",
+            "no": "N"
+          }
+        },
+        "coordinate": {
+          "x": "X",
+          "y": "Y",
+          "srs": "SRS",
+          "altitude": "Altitude",
+          "accuracy": "Accuracy"
+        },
+        "file": {
+          "fileType": {
+            "audio": "Audio",
+            "document": "document",
+            "image": "Image",
+            "video": "Video"
+          },
+          "acceptedFileDescription": "{0} file types ({1})"
+        },
+        "range": {
+          "from": "From",
+          "to": "To"
+        },
+        "taxon": {
+          "code": "Code",
+          "scientific_name": "Scientific name",
+          "vernacular_name": "Vernacular name",
+          "language_code": "Lang.",
+          "language_variety": "Lang. variety",
+          "family_code": "Family code",
+          "family_scientific_name": "Family name"
+        }
+      },
+      "multipleNodesComponent": {
+        "cannotAddNewNodes": {
+          "maxCountReached": "Only a maximum of {0} {1} can be added"
+        }
+      },
+      "validation": {
+        "required": "Required field",
+        "minCount": "At least {0} items required",
+        "maxCount": "Only {0} item(s) allowed"
+      },
+      "promote": "Promote",
+      "promoteTo": "Promote to {0}",
+      "promoteToConfirm": "Promote this record to {0}?",
+      "promoteWithErrorsCannot": "Errors found in the record.\n\nPlease fix them first or contact a survey administrator to force publishing it to next step",
+      "promoteWithErrorsForceConfirm": "Errors found in the record.\n\nPromote it to {0} anyway?",
+      "promoteCompleteTitle": "Record promoted successfully",
+      "promoteCompleteMessage": "Record {0} promoted to {1}",
+      "demote": "Demote",
+      "demoteTo": "Demote to {0}",
+      "demoteToConfirm": "Demote this record to {0}? All changes applied in this step will be lost.",
+      "demoteCompleteTitle": "Record demoted successfully",
+      "demoteCompleteMessage": "Record {0} demoted to {1}"
+    },
+    "recordValidationReport": {
+      "title": "Record validation report",
+      "tooltipErrors": "Record Validation Report - Errors: {0} - Warnings: {1}",
+      "tooltipOk": "Record Validation Report - No errors found"
+    }
+  },
+  "survey": {
+    "name": "Name",
+    "identifier": "Identifier",
+    "templateType": {
+      "label": "Template",
+      "BLANK": "Blank",
+      "BIOPHYSICAL": "Biophysical",
+      "COLLECT_EARTH": "Collect Earth",
+      "COLLECT_EARTH_IPCC": "Collect Earth + IPCC"
+    },
+    "projectName": "Title",
+    "language": "Language",
+    "defaultLanguage": "Default Language",
+    "lastModified": "Last Modified",
+    "unpublishedChanges": "Unpublished changes",
+    "published": "Published",
+    "userGroup": "User Group",
+    "target": "Target",
+    "surveyType": {
+      "label": "Type",
+      "temporary": "Unpublished changes",
+      "published": "Published"
+    },
+    "export": {
+      "mode": {
+        "label": "Export mode",
+        "desktop": "Collect Desktop (backup)",
+        "earth": "Collect Earth",
+        "mobile": "Collect Mobile",
+        "rdb": {
+          "label": "Relational DB (SQL)",
+          "dialect": {
+            "label": "Dialect",
+            "standard": "Standard (PostgreSQL/MySQL)",
+            "sqlite": "SQLite"
+          },
+          "includeData": "Include data",
+          "targetSchemaName": "Target schema",
+          "dateTimeFormat": "Date-time format"
+        }
+      }
+    },
+    "import": {
+      "file": "File",
+      "acceptedFileTypesDescription": "Collect Survey (.collect) Collect Backup (.collect-backup), Collect Earth (.cep) or Collect Survey XML (.xml)",
+      "importingIntoExistingSurveyWarning": "Survey already existing! Applied changes will be overridden."
+    },
+    "publishedSurvey": "Published survey",
+    "selectPublishedSurveyDropdownHeading": "--- Published survey ---",
+    "selectPublishedSurveyFirst": "Select a published survey first",
+    "publish": {
+      "label": "Publish",
+      "confirmTitle": "Confirm publish \"{0}\"",
+      "confirmMessage": "Publish the survey \"{0}\"?\n - data collection could start\n - only few changes to the survey will be allowed in the future.",
+      "publishLatestChanges": "Publish latest changes",
+      "successDialog": {
+        "title": "Survey published",
+        "message": "Survey \"{0}\" successfully published"
+      },
+      "confirmDialog": {
+        "publishWithWarningsTitle": "Confirm publish survey {0}",
+        "errorsFoundTitle": "Cannot publish survey {0}: errors found"
+      },
+      "error": {
+        "title": "Error publishing survey"
+      }
+    },
+    "unpublish": {
+      "label": "Unpublish",
+      "confirmTitle": "Confirm unpublish \"{0}\"",
+      "confirmMessage": "Unpublish the survey \"{0}\"?\n All the collected records will be deleted.",
+      "successDialog": {
+        "title": "Survey unpublished",
+        "message": "Survey \"{0}\" successfully unpublished"
+      }
+    },
+    "clone": {
+      "label": "Clone",
+      "title": "Clone survey",
+      "originalSurvey": {
+        "name": "Original survey name",
+        "type": "Original survey type"
+      },
+      "newSurveyName": "New survey name",
+      "cloningSurvey": "Cloning survey",
+      "validation": {
+        "originalSurveyNotFound": "Original survey with name \"{0}\" not found"
+      }
+    },
+    "delete": {
+      "confirm": {
+        "title": "Confirm delete",
+        "message": "Delete survey \"{0}\"?"
+      },
+      "published": {
+        "confirm": {
+          "title": "Delete published survey",
+          "message": "The survey \"{0}\" has been published.\n\nIf you delete it, all the records collected with this survey will be deleted.\n\nDo you want to continue?"
+        }
+      },
+      "success": {
+        "title": "Survey deleted",
+        "message": "Survey \"{0}\" deleted successfully"
+      }
+    },
+    "noPublishedSurveysFound": "No published surveys found",
+    "validation": {
+      "nameAlreadyInUse": "Identifier already in use",
+      "error": {
+        "duplicate_name": "Another survey with the same name already exists",
+        "duplicate_uri": "Another survey with the same URI already exists",
+        "key_attribute_not_specified": "Key attribute(s) not specified",
+        "maximum_key_attribute_definitions_exceeded": "Only a maximum of 3 Key Attribute Definitions are allowed for each sampling unit",
+        "maximum_count_in_record_list_entity_definitions_exceeded": "Only a maximum of 5 entities can be configured to be counted in record summary list",
+        "empty_entity": "Empty entity",
+        "nested_tables": "Nested multiple entities with table layout are not supported",
+        "invalid_expression": "Invalid expression: {0}",
+        "circular_reference": "The expression generates a circular reference",
+        "parent_changed": "Parent changed",
+        "data_type_changed": "Data type changed",
+        "cardinality_changed_from_multiple_to_single": "Cardinality changed from multiple to single",
+        "enumerating_code_list_changed": {
+          "code_removed": "Code removed in fixed-rows table generating code list"
+        },
+        "reserved_name": "Cannot use a reserved name",
+        "empty_code_list": "Empty code list",
+        "unused_code_list": "Unused code list"
+      },
+      "node": {
+        "name": {
+          "error": {
+            "max_length_exceeded": "Max length exceeded. The length of the name, including the sum of the lengths of every ancestor single entity, is {0} but it must not exceed {1} characters."
+          }
+        },
+        "requireness": {
+          "key_attribute_always_required": "A key attribute has to be 'Always required'"
+        },
+        "error": {
+          "invalid_min_count_expression": "''Min Count'' expression is invalid ({0})",
+          "invalid_max_count_expression": "''Max Count'' expression is invalid ({0})",
+          "invalid_relevant_expression": "''Relevant when'' expression is invalid ({0})"
+        }
+      },
+      "entity": {
+        "error": {
+          "generator_expression": "Invalid generator expression ({0})",
+          "virtual_node_not_found_in_source_entity": "Virtual node '{0}' not found in source entity '{1}'",
+          "missing_virtual_node": "Missing node '{0}' in virtual entity",
+          "invalid_virtual_node_type": "Invalid type for virtual node '{0}'",
+          "source_node_not_found_for_virtual_node": "Source node '{0}' for virtual entity not found in source entity '{1}'"
+        }
+      },
+      "attribute": {
+        "cannot_specify_checks_for_calculated_attribute": "Cannot specify checks for calculated attribute",
+        "code": {
+          "invalid_parent_expression": "Invalid parent expression ({0})",
+          "invalid_parent_attribute_relation": "Invalid parent code attribute specified; please check that the code list hierarchy is respected.",
+          "invalid_parent_attribute_relation_in_referenced_parent_attribute": "Parent code attribute has a wrong code list hierarchical level; please check that the code list hierarchy is respected.",
+          "parent_attribute_specified_for_a_flat_list": "Parent code attribute specified but code list is not hierarchical; please delete this releationship."
+        },
+        "coordinate": {
+          "incompatibility_with_calc": "Coordinate altitude and accuracy are not supported by Open Foris Calc: collected records won't be imported there"
+        },
+        "taxon": {
+          "error": {
+            "invalid_qualifier_expression": "Invalid qualifier expression specified ({0})"
+          },
+          "invalid_taxonomy": "Invalid species list specified: {0}"
+        },
+        "default_value": {
+          "error": {
+            "invalid_condition_expression": "''Apply when'' condition in attribute default is invalid ({0})",
+            "invalid_value": "Invalid value in attribute default",
+            "invalid_expression": "''Expression'' in attribute default is invalid ({0})"
+          }
+        },
+        "key_attribute_cannot_be_multiple": "Cannot have multiple values when 'is key' has been specified",
+        "invalid_referenced_key_attribute": "Invalid referenced key attribute: it must be the unique key attribute of an entity and have the same type of the current attribute",
+        "referenced_attribute_deleted": "Referenced attribute has been deleted"
+      },
+      "check": {
+        "error": {
+          "invalid_condition_expression": "Apply when' condition in check is invalid ({0})"
+        },
+        "comparison": {
+          "error": {
+            "invalid_comparison_expression": "'Expression' in Comparison check is invalid ({0})"
+          }
+        },
+        "custom": {
+          "error": {
+            "invalid_custom_expression": "'Expression' in Custom check is invalid ({0})"
+          }
+        },
+        "distance": {
+          "error": {
+            "invalid_min_distance_expression": "'Min distance' expression in Distance check is invalid ({0})",
+            "invalid_max_distance_expression": "'Max distance' expression in Distance check is invalid ({0})",
+            "invalid_source_point_expression": "'Source' expression in Distance check is invalid ({0})",
+            "invalid_destination_point_expression": "'Destination' expression in Distance check is invalid ({0})"
+          }
+        },
+        "pattern": {
+          "error": {
+            "invalid_pattern_expression": "Invalid regular expression in Pattern check ({0})"
+          }
+        },
+        "uniqueness": {
+          "error": {
+            "invalid_uniqueness_expression": "Invalid expression in Uniqueness check ({0})"
+          }
+        }
+      }
+    }
+  },
+  "backupRestore": {
+    "label": "Backup/Restore"
+  },
+  "backup": {
+    "label": "Backup",
+    "lastBackup": {
+      "title": "Last Backup",
+      "date": "Date",
+      "updatedRecordsSinceLastBackup": "Updated records since last backup",
+      "download": "Download last backup"
+    },
+    "generateNewBackup": "Generate new backup",
+    "backingUpData": "Backing up data"
+  },
+  "restore": {
+    "label": "Restore",
+    "acceptedFileTypesDescription": "Collect Backup (.collect-backup)",
+    "restoreMode": {
+      "label": "Restore into",
+      "selectedSurvey": "Selected survey",
+      "newSurvey": "New survey"
+    },
+    "validateRecords": "Validate records (slower)",
+    "deleteRecordsBeforeRestore": "Delete ALL existing records before restore",
+    "restoringData": "Restoring data",
+    "errorRestoringData": "Error restoring data"
+  },
+  "user": {
+    "username": "Username",
+    "enabled": "Enabled",
+    "role": "Role",
+    "rawPassword": "Password",
+    "oldPassword": "Old password",
+    "newPassword": "New password",
+    "retypedPassword": "Retype-password",
+    "validation": {
+      "invalid_username": "The username's first character must be a letter, it must contain at least 4 characters and no more than 15 characters and no characters other than letters, numbers, underscore (_), hyphen (-) and dot (.) may be used.",
+      "wrong_password_pattern": "The password's first character must be a letter, it must contain at least 4 characters and no more than 15 characters and no characters other than letters, numbers and the underscore may be used.",
+      "wrong_retyped_password": "Password and Retyped-Password do not match",
+      "wrongPasswordSpecified": "Wrong password specified"
+    },
+    "changePassword": {
+      "change": "Change",
+      "passwordChanged": "Password changed!"
+    },
+    "delete": {
+      "confirmTitle": "Delete user",
+      "confirmDeleteOneUserMessage": "Do you want to delete the selected user?",
+      "confirmDeleteMultipleUsersMessage": "Do you want to delete the selected {0} users?",
+      "cannotDeleteCurrentUser": "Cannot delete the current logged user",
+      "cannotDeleteDefaultAdminUser": "Cannot delete the default 'admin' user"
+    }
+  },
+  "userGroup": {
+    "delete": {
+      "confirmTitle": "Delete user group",
+      "confirmDeleteSingleMessage": "Do you want to delete the selected user group?",
+      "confirmDeleteMultipleMessage": "Do you want to delete the selected {0} user groups?"
+    },
+    "qualifiers": {
+      "heading": "Record attribute / Code list filter",
+      "info": "If specified, users with Data Entry role in the group will be able to insert and see only records having the specified attribute equal to the specified value."
+    },
+    "qualifier": {
+      "name": "Attribute/Code list name",
+      "value": "Attribute/Code value"
+    }
+  },
+  "validation": {
+    "errorsInTheForm": "Errors in the form",
+    "minLength": "It must be at least {0} characters",
+    "required_field": "Required field",
+    "duplicate_value": "Duplicate value",
+    "severity": "Severity",
+    "path": "Path",
+    "message": "Message"
+  },
+  "connection": {
+    "serverConnectionError": {
+      "title": "Server connection error",
+      "message": "Error connecting to the server; trying to establish the connection again..."
+    },
+    "sessionExpired": "Session expired. Refresh the web browser page."
+  }
 }
