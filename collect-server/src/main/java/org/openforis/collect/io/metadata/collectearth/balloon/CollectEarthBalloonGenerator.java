@@ -29,6 +29,7 @@ import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.CodeAttributeLayoutType;
 import org.openforis.collect.metamodel.ui.UITable;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.utils.Numbers;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
@@ -75,6 +76,7 @@ public class CollectEarthBalloonGenerator {
 	private static final String PLACEHOLDER_UI_LANGUAGE = "PLACEHOLDER_UI_LANGUAGE";
 	private static final String PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST = "PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST";
 	private static final String PLACEHOLDER_PREVIEW = "PLACEHOLDER_PREVIEW";
+	private static final String PLACEHOLDER_RANDOM_NUMBER = "$[randomNumber]";
 
 	private CollectSurvey survey;
 	private String language;
@@ -129,6 +131,8 @@ public class CollectEarthBalloonGenerator {
 
 		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_PREVIEW, String.valueOf(preview).toLowerCase(Locale.ENGLISH));
 		
+		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_RANDOM_NUMBER, String.valueOf(Numbers.randomInt(10000, 5000000)));
+
 		return htmlForBalloon;
 	}
 
