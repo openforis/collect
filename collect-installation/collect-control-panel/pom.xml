@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect-installation</artifactId>
-		<version>3.26.35-SNAPSHOT</version>
+		<version>3.26.35</version>
 	</parent>
 	<artifactId>collect-control-panel</artifactId>
 	<name>Open Foris Collect Control Panel</name>
