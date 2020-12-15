@@ -1,4 +1,4 @@
-import './Table.css'
+import './Table.scss'
 
 import React from 'react'
 import { Column, Table as TableVirtualized } from 'react-virtualized'
@@ -285,7 +285,7 @@ export default class Table extends EntityCollectionComponent {
             rowStyle={{ display: 'grid', gridTemplateColumns }}
             width={totalWidth}
             height={300}
-            rowHeight={32}
+            rowHeight={34}
             rowCount={entities.length}
             rowGetter={({ index }) => entities[index]}
             onDelete={(entity) => this.onDeleteButtonClick(entity)}

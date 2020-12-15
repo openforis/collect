@@ -40,4 +40,8 @@
 
 .table-wrapper {
   border: 1px solid gray;
+
+  .MuiAutocomplete-inputRoot.MuiOutlinedInput-root.MuiOutlinedInput-marginDense {
+    padding: 2px;
+  }
 }
