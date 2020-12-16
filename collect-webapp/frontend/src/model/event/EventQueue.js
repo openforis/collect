@@ -1,22 +1,24 @@
+import { showSystemError } from 'actions/systemError'
 import Queue from 'utils/Queue'
 
 class EventQueueInternal {
-  queuesByEvent = {}
+  queuesByEventType = {}
   subscribersByEvent = {}
   processing = false
   size = 0
+  dispatch = null // to be set on app initialization
 
-  _getQueue(event) {
-    let queue = this.queuesByEvent[event]
+  _getQueue(eventType) {
+    let queue = this.queuesByEventType[eventType]
     if (!queue) {
       queue = new Queue()
-      this.queuesByEvent[event] = queue
+      this.queuesByEventType[eventType] = queue
     }
     return queue
   }
 
-  publish(event, data) {
-    const queue = this._getQueue(event)
+  publish(eventType, data) {
+    const queue = this._getQueue(eventType)
     queue.enqueue(data)
     this.size = this.size + 1
 
@@ -29,18 +31,27 @@ class EventQueueInternal {
     this.processing = true
 
     const $this = this
-    Object.entries(this.queuesByEvent).forEach(([event, queue]) => {
+    Object.entries(this.queuesByEventType).forEach(([eventType, queue]) => {
       const data = queue.dequeue()
-      const subscribers = $this.subscribersByEvent[event]
-      if (subscribers) {
-        subscribers.forEach((s) => s(data))
-      }
-      $this.size = $this.size - 1
+      $this.processItem({ eventType, data })
     })
     this.processing = false
 
     if (!this.isEmpty()) {
       this.startProcessing()
+    }
+  }
+
+  processItem({ eventType, data }) {
+    try {
+      const subscribers = this.subscribersByEvent[eventType]
+      if (subscribers) {
+        subscribers.forEach((s) => s(data))
+      }
+      this.size -= 1
+    } catch (error) {
+      const { message, stack: stackTrace } = error
+      this.dispatch(showSystemError({ message, stackTrace }))
     }
   }
 
@@ -67,15 +78,19 @@ class EventQueueInternal {
 export default class EventQueue {
   static internalQueue = new EventQueueInternal()
 
-  static publish(event, data) {
-    EventQueue.internalQueue.publish(event, data)
+  static publish(eventType, data) {
+    EventQueue.internalQueue.publish(eventType, data)
   }
 
-  static subscribe(event, callback) {
-    EventQueue.internalQueue.subscribe(event, callback)
+  static subscribe(eventType, callback) {
+    EventQueue.internalQueue.subscribe(eventType, callback)
   }
 
-  static unsubscribe(event, callback) {
-    EventQueue.internalQueue.unsubscribe(event, callback)
+  static unsubscribe(eventType, callback) {
+    EventQueue.internalQueue.unsubscribe(eventType, callback)
+  }
+
+  static set dispatch(dispatch) {
+    EventQueue.internalQueue.dispatch = dispatch
   }
 }

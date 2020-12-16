@@ -658,6 +658,7 @@
     "title": "System Error",
     "details": "Details",
     "unexpectedErrorMessage": "Unexpected error occurred",
-    "reloadPage": "Reload Page"
+    "reloadPage": "Reload Page",
+    "reportToOpenForisTeam": "Please report this error to the Open Foris team"
   }
 }

@@ -27,7 +27,11 @@ const SystemErrorDialog = (props) => {
     <Dialog open disableBackdropClick disableEscapeKeyDown maxWidth={false} className="system-error-dialog">
       <DialogTitle>{L.l(title)}</DialogTitle>
       <DialogContent style={{ width: `${width}px` }}>
-        <DialogContentText>{message}</DialogContentText>
+        <DialogContentText>
+          {L.l('systemError.reportToOpenForisTeam')}:
+          <br />
+          {message}
+        </DialogContentText>
         {showProgressBar && <LinearProgress />}
         {details && (
           <Accordion>

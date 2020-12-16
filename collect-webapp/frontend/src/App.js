@@ -1,14 +1,16 @@
 import './App.scss'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Switch, Route } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import AppWebSocket from 'ws/appWebSocket'
 import Header from 'common/components/Header'
 import Sidebar from 'common/components/Sidebar'
 import CurrentJobMonitorDialog from 'common/containers/CurrentJobMonitorDialog'
 import SystemErrorDialog from 'common/containers/SystemErrorDialog'
+
+import EventQueue from 'model/event/EventQueue'
 
 import HomePage from 'scenes/HomePage'
 import BackupDataExportPage from 'datamanagement/pages/BackupDataExportPage'
@@ -63,6 +65,13 @@ const App = () => {
   const { show: systemErrorShown, message: systemErrorMessage, stackTrace: systemErrorStackTrace } = useSelector(
     (state) => state.systemError
   )
+
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    // init EventQueue
+    EventQueue.dispatch = dispatch
+  }, [])
 
   return (
     <>

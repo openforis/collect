@@ -113,7 +113,7 @@ export default class MultipleFieldset extends EntityCollectionComponent {
     return (
       <>
         <div className="multiple-fieldset-header">
-          <NodeDefLabel nodeDefinition={entityDefinition} />:
+          <NodeDefLabel nodeDefinition={entityDefinition} limitWidth={false} />:
           {entitiesSummary.length > 0 && (
             <EntitySelect
               selectedEntityIndex={selectedEntityIndex}
