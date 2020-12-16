@@ -44,6 +44,17 @@
     align-items: baseline;
   }
 
+  .node-def-label-wrapper {
+    &.with-number {
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      grid-gap: 4px;
+    }
+    .number-label {
+      text-align: right;
+    }
+  }
+
   .icon-info {
     color: #1976d2;
     padding-left: 5px;

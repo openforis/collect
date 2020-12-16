@@ -1,6 +1,5 @@
 import React from 'react'
 
-import InfoIcon from 'common/components/InfoIcon'
 import FormItems from './FormItems'
 import TabSetContent from './TabSetContent'
 import NodeDefLabel from './NodeDefLabel'
@@ -16,7 +15,7 @@ const Fieldset = (props) => {
   return (
     <fieldset className="form-item-fieldset">
       <legend>
-        <NodeDefLabel nodeDefinition={entityDefinition} />
+        <NodeDefLabel nodeDefinition={entityDefinition} limitWidth={false} />
       </legend>
       <FormItems itemDefs={itemDef.items} parentEntity={entity} />
       <TabSetContent tabSetDef={itemDef} parentEntity={entity} />

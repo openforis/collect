@@ -69,6 +69,7 @@ public class SurveyViewGenerator {
 	public SurveyView generateView(final CollectSurvey survey, UserGroup userGroup,
 			UserInGroup.UserGroupRole userInSurveyGroupRole) {
 		String defaultLanguage = survey.getDefaultLanguage();
+		UIOptions uiOptions = survey.getUIOptions();
 
 		final SurveyView surveyView = new SurveyView(survey, new ViewContext(languageCode));
 
@@ -138,11 +139,15 @@ public class SurveyViewGenerator {
 					view = createAttributeDefView((AttributeDefinition) def);
 				}
 				view.setDescription(def.getDescription(languageCode));
+				view.setNumberLabel(def.getLabel(Type.NUMBER, languageCode));
+				view.setHeadingLabel(def.getLabel(Type.HEADING, languageCode));
 				view.setSinceVersionId(def.getSinceVersionId());
 				view.setDeprecatedVersionId(def.getDeprecatedVersionId());
 
 				view.setAlwaysRelevant(def.isAlwaysRelevant());
-				view.setHideWhenNotRelevant(survey.getUIOptions().isHideWhenNotRelevant(def));
+				view.setHideWhenNotRelevant(uiOptions.isHideWhenNotRelevant(def));
+				view.setLabelWidth(uiOptions.getLabelWidth(def));
+				view.setWidth(uiOptions.getWidth(def));
 
 				NodeDefinition parentDef = def.getParentDefinition();
 				if (parentDef == null) {
@@ -187,12 +192,12 @@ public class SurveyViewGenerator {
 		String name = def.getName();
 		String label = def.getLabel(Type.INSTANCE, languageCode);
 		boolean multiple = def.isMultiple();
-		AttributeDefView view;
 		boolean qualifier = annotations.isQualifier(def);
 		boolean showInSummary = annotations.isShowInSummary(def);
 		AttributeType attributeType = AttributeType.valueOf(def);
 		List<String> fieldNames = def.getFieldNames();
 		boolean key = def.isKey();
+		AttributeDefView view;
 
 		if (def instanceof BooleanAttributeDefinition) {
 			BooleanAttributeDefinition booleanAttrDef = (BooleanAttributeDefinition) def;
@@ -241,7 +246,8 @@ public class SurveyViewGenerator {
 					: new RangeAttributeDefView(id, name, label, attributeType, fieldNames, key, multiple);
 			attrDefView.setNumericType(numericDef.getType());
 			List<Precision> precisions = new ArrayList<Precision>(numericDef.getPrecisionDefinitions());
-			// exclude precisions with null unit (it could happen in older versions of Collect)
+			// exclude precisions with null unit (it could happen in older versions of
+			// Collect)
 			CollectionUtils.filter(precisions, new Predicate<Precision>() {
 				public boolean evaluate(Precision item) {
 					return item.getUnit() != null;

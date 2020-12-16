@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.26.36] - NOT RELEASED YET
+### Added
+- Data entry new UI: show number label (if any); use label width specified in survey designer;
+
 ## [3.26.35] - 2020-12-15
 ### Added
 - Data entry new UI: layout adjustments; fixed hierarchical code list items loading;

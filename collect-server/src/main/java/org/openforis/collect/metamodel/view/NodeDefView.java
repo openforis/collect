@@ -6,6 +6,8 @@ public abstract class NodeDefView extends SurveyObjectView {
 
 	private String name;
 	private String label;
+	private String numberLabel;
+	private String headingLabel;
 	private String description;
 	private NodeType type;
 	private boolean key;
@@ -14,6 +16,8 @@ public abstract class NodeDefView extends SurveyObjectView {
 	private Integer sinceVersionId;
 	private Integer deprecatedVersionId;
 	private boolean alwaysRelevant;
+	private Integer width;
+	private Integer labelWidth;
 
 	public NodeDefView(int id, String name, String label, NodeType type, boolean key, boolean multiple) {
 		super();
@@ -32,7 +36,7 @@ public abstract class NodeDefView extends SurveyObjectView {
 	public String getLabel() {
 		return label;
 	}
-
+	
 	public NodeType getType() {
 		return type;
 	}
@@ -51,6 +55,22 @@ public abstract class NodeDefView extends SurveyObjectView {
 	
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public String getNumberLabel() {
+		return numberLabel;
+	}
+	
+	public void setNumberLabel(String numberLabel) {
+		this.numberLabel = numberLabel;
+	}
+	
+	public String getHeadingLabel() {
+		return headingLabel;
+	}
+	
+	public void setHeadingLabel(String headingLabel) {
+		this.headingLabel = headingLabel;
 	}
 	
 	public boolean isHideWhenNotRelevant() {
@@ -85,4 +105,20 @@ public abstract class NodeDefView extends SurveyObjectView {
 		this.alwaysRelevant = alwaysRelevant;
 	}
 
+	public Integer getWidth() {
+		return width;
+	}
+
+	public void setWidth(Integer width) {
+		this.width = width;
+	}
+
+	public Integer getLabelWidth() {
+		return labelWidth;
+	}
+	
+	public void setLabelWidth(Integer labelWidth) {
+		this.labelWidth = labelWidth;
+	}
+	
 }

@@ -55,22 +55,22 @@ const FormItem = (props) => {
 
   const internalComponent = <InternalComponentClass itemDef={itemDef} parentEntity={parentEntity} fullSize={fullSize} />
 
-  return fullSize ? (
-    internalComponent
-  ) : (
+  if (fullSize) {
+    return internalComponent
+  }
+
+  return (
     <Row>
       {_includeLabel(itemDef) && (
-        <Col style={{ width: '200px', maxWidth: '200px' }}>
+        <Col style={{ flexGrow: 0 }}>
           <NodeDefLabel nodeDefinition={nodeDefinition} />
         </Col>
       )}
       <Col>
-        <>
-          <div id={wrapperId} className={classNames('form-item-wrapper', { error: cardinalityValidation.hasErrors() })}>
-            {internalComponent}
-          </div>
-          <ValidationTooltip target={wrapperId} validation={cardinalityValidation} />
-        </>
+        <div id={wrapperId} className={classNames('form-item-wrapper', { error: cardinalityValidation.hasErrors() })}>
+          {internalComponent}
+        </div>
+        <ValidationTooltip target={wrapperId} validation={cardinalityValidation} />
       </Col>
     </Row>
   )
