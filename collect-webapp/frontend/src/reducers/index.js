@@ -12,6 +12,7 @@ import activeSurvey from './activeSurvey'
 import recordDataTable from 'datamanagement/recordDataTable/reducer'
 import users from './users'
 import userGroups from './userGroups'
+import systemError from './systemError'
 
 const rootReducer = combineReducers({
   currentJob,
@@ -30,6 +31,7 @@ const rootReducer = combineReducers({
   }),
   users,
   userGroups,
+  systemError,
 })
 
 export default rootReducer

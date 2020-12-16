@@ -30,7 +30,8 @@ const NodeDefLabel = (props) => {
   )
 }
 
-NodeDefLabel.PropTypes = {
+NodeDefLabel.propTypes = {
+  nodeDefinition: PropTypes.instanceOf(NodeDefinition).isRequired,
   limitWidth: PropTypes.bool,
 }
 

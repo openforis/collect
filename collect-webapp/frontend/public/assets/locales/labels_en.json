@@ -70,7 +70,6 @@
       }
     },
     "parameters": "Parameters",
-    "refresh": "Refresh",
     "save": {
       "label": "Save",
       "success": "Saved successfully"
@@ -654,5 +653,11 @@
       "message": "Error connecting to the server; trying to establish the connection again..."
     },
     "sessionExpired": "Session expired. Refresh the web browser page."
+  },
+  "systemError": {
+    "title": "System Error",
+    "details": "Details",
+    "unexpectedErrorMessage": "Unexpected error occurred",
+    "reloadPage": "Reload Page"
   }
 }

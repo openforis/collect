@@ -68,6 +68,10 @@ class RouterUtils {
   static _navigateToUrl(history, url) {
     history.push(url)
   }
+
+  static reloadPage() {
+    window.location.reload()
+  }
 }
 
 export default RouterUtils

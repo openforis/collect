@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.openforis.collect.command.AddAttributeCommand;
 import org.openforis.collect.command.AddEntityCommand;
 import org.openforis.collect.command.CommandDispatcher;
@@ -44,10 +45,12 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.utils.ExceptionHandler;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.web.manager.SessionRecordProvider;
 import org.openforis.collect.web.ws.AppWS;
 import org.openforis.collect.web.ws.AppWS.RecordEventMessage;
+import org.openforis.collect.web.ws.AppWS.RecordUpdateErrorMessage;
 import org.openforis.commons.web.Response;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -115,7 +118,8 @@ public class CommandController {
 	}
 
 	@RequestMapping(value = "record_preview", method = POST, consumes = APPLICATION_JSON_VALUE)
-	public @ResponseBody List<RecordEventView> createRecordPreview(@RequestBody CreateRecordPreviewCommand command) {
+	public @ResponseBody List<RecordEventView> createRecordPreview(@RequestBody CreateRecordPreviewCommand command)
+			throws Exception {
 		return submitCommandSync(command);
 	}
 
@@ -217,11 +221,15 @@ public class CommandController {
 			public void onEvent(RecordEvent event) {
 				appWS.sendMessage(new RecordEventMessage(new RecordEventView(event, record)));
 			}
+		}, new ExceptionHandler() {
+			public void onException(Exception e) {
+				appWS.sendMessage(new RecordUpdateErrorMessage(e.getMessage(), ExceptionUtils.getStackTrace(e)));
+			}
 		});
 		return new Response();
 	}
 
-	private List<RecordEventView> submitCommandSync(RecordCommand command) {
+	private List<RecordEventView> submitCommandSync(RecordCommand command) throws Exception {
 		command.setUsername(sessionManager.getLoggedUsername());
 		List<RecordEvent> events = commandDispatcher.submitSync(command);
 		CollectRecord record = provideRecord(command);

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.openforis.collect.command.handler.CommandHandler;
 import org.openforis.collect.event.EventListener;
 import org.openforis.collect.event.RecordEvent;
+import org.openforis.collect.utils.ExceptionHandler;
 
 public class RegistryCommandDispatcher implements CommandDispatcher {
 
@@ -18,15 +19,15 @@ public class RegistryCommandDispatcher implements CommandDispatcher {
 	}
 
 	@Override
-	public <C extends Command> void submit(C command, EventListener eventListener) {
+	public <C extends Command> void submit(C command, EventListener eventListener, ExceptionHandler exceptionHandler) {
 		@SuppressWarnings("unchecked")
 		CommandHandler<C> handler = (CommandHandler<C>) handlers.get(command.getClass());
 		// Error handling if missing
-		handler.execute(command, eventListener);
+		handler.execute(command, eventListener, exceptionHandler);
 	}
 
 	@Override
-	public <C extends Command> List<RecordEvent> submitSync(C command) {
+	public <C extends Command> List<RecordEvent> submitSync(C command) throws Exception {
 		@SuppressWarnings("unchecked")
 		CommandHandler<C> handler = (CommandHandler<C>) handlers.get(command.getClass());
 		return handler.executeSync(command);

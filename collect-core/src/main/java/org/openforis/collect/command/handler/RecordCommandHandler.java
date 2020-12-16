@@ -18,6 +18,7 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.NodeChangeSet;
+import org.openforis.collect.utils.ExceptionHandler;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.JobConfig;
 import org.openforis.concurrency.JobManager;
@@ -60,7 +61,8 @@ public abstract class RecordCommandHandler<C extends RecordCommand> implements C
 	}
 
 	@Override
-	public final void execute(final C command, final EventListener eventListener) {
+	public final void execute(final C command, final EventListener eventListener,
+			final ExceptionHandler exceptionHandler) {
 		jobManager.start(new Job() {
 			private RecordCommandResult result;
 
@@ -77,6 +79,14 @@ public abstract class RecordCommandHandler<C extends RecordCommand> implements C
 			protected void onCompleted() {
 				super.onCompleted();
 				notifyEvents(result, command, eventListener);
+			}
+
+			@Override
+			protected void onFailed() {
+				super.onFailed();
+				if (this.getLastException() != null && this.getLastException() instanceof Exception) {
+					exceptionHandler.onException((Exception) this.getLastException());
+				}
 			}
 
 		}, new JobConfig(true, null, true));
