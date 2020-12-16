@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.26.36] - NOT RELEASED YET
 ### Added
-- Data entry new UI: show number label (if any); use label width specified in survey designer;
+- Data entry new UI: show number label (if any); use label width specified in survey designer; handle system errors; export edited record to Excel;
 
 ## [3.26.35] - 2020-12-15
 ### Added

@@ -53,6 +53,7 @@ import org.openforis.collect.io.data.TransactionalDataRestoreJob;
 import org.openforis.collect.io.data.XMLParsingRecordProvider;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.data.csv.CSVDataExportParametersBase;
+import org.openforis.collect.io.data.csv.CSVDataExportParametersBase.OutputFormat;
 import org.openforis.collect.io.data.csv.CSVDataImportSettings;
 import org.openforis.collect.io.data.proxy.DataImportStatusProxy;
 import org.openforis.collect.manager.MessageSource;
@@ -158,38 +159,34 @@ public class RecordController extends BasicController implements Serializable {
 	private transient EventQueue eventQueue;
 	@Autowired
 	private AppWS appWS;
-	
+
 	private CSVDataExportJob csvDataExportJob;
 	private SurveyBackupJob fullBackupJob;
 	private DataRestoreSummaryJob dataRestoreSummaryJob;
 	private CSVDataImportJob csvDataImportJob;
 	private ValidationReportJob validationReportJob;
 
-	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}/binary_data.json", method=GET)
-	public @ResponseBody
-	Map<String, Object> loadData(
-			@PathVariable("surveyId") int surveyId,
-			@PathVariable("recordId") int recordId,
-			@RequestParam(value="step") Integer stepNumber) throws Exception {
+	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}/binary_data.json", method = GET)
+	public @ResponseBody Map<String, Object> loadData(@PathVariable("surveyId") int surveyId,
+			@PathVariable("recordId") int recordId, @RequestParam(value = "step") Integer stepNumber) throws Exception {
 		stepNumber = getStepNumberOrDefault(stepNumber);
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		byte[] data = recordManager.loadBinaryData(survey, recordId, Step.valueOf(stepNumber));
 		byte[] encoded = Base64.encodeBase64(data);
 		String result = new String(encoded);
-		
-		Map<String,Object> map = new HashMap<String, Object>();
+
+		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("data", result);
-		
- 		return map;
+
+		return map;
 	}
 
-	@RequestMapping(value = "survey/{surveyId}/data/records/count.json", method=GET)
-	public @ResponseBody
-	int getCount(@PathVariable("surveyId") int surveyId,
-			@RequestParam(value="rootEntityDefinitionId", required=false) Integer rootEntityDefinitionId,
-			@RequestParam(value="step", required=false) Integer stepNumber) throws Exception {
+	@RequestMapping(value = "survey/{surveyId}/data/records/count.json", method = GET)
+	public @ResponseBody int getCount(@PathVariable("surveyId") int surveyId,
+			@RequestParam(value = "rootEntityDefinitionId", required = false) Integer rootEntityDefinitionId,
+			@RequestParam(value = "step", required = false) Integer stepNumber) throws Exception {
 		CollectSurvey survey = surveyManager.getById(surveyId);
-		RecordFilter filter = createRecordFilter(survey, sessionManager.getLoggedUser(), userGroupManager, 
+		RecordFilter filter = createRecordFilter(survey, sessionManager.getLoggedUser(), userGroupManager,
 				rootEntityDefinitionId, false);
 		if (stepNumber != null) {
 			filter.setStepGreaterOrEqual(Step.valueOf(stepNumber));
@@ -197,26 +194,26 @@ public class RecordController extends BasicController implements Serializable {
 		int count = recordManager.countRecords(filter);
 		return count;
 	}
-	
-	@RequestMapping(value = "survey/{surveyId}/data/records/summary", method=GET)
-	public @ResponseBody Map<String, Object> loadRecordSummaries(
-			@PathVariable("surveyId") int surveyId,
+
+	@RequestMapping(value = "survey/{surveyId}/data/records/summary", method = GET)
+	public @ResponseBody Map<String, Object> loadRecordSummaries(@PathVariable("surveyId") int surveyId,
 			@Valid RecordSummarySearchParameters params) {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
 		User user = loadUser(params.getUserId(), params.getUsername());
-		
+
 		Map<String, Object> result = new HashMap<String, Object>();
 		Schema schema = survey.getSchema();
-		EntityDefinition rootEntityDefinition = params.getRootEntityName() == null ? schema.getFirstRootEntityDefinition() : 
-			schema.getRootEntityDefinition(params.getRootEntityName());
-		
+		EntityDefinition rootEntityDefinition = params.getRootEntityName() == null
+				? schema.getFirstRootEntityDefinition()
+				: schema.getRootEntityDefinition(params.getRootEntityName());
+
 		RecordFilter filter = createRecordFilter(survey, user, userGroupManager, rootEntityDefinition.getId(), false);
-		
+
 		filter.setKeyValues(params.getKeyValues());
 		filter.setCaseSensitiveKeyValues(params.isCaseSensitiveKeyValues());
-		
+
 		if (CollectionUtils.isEmpty(filter.getQualifiers())) {
-			//filter by qualifiers only if not already done by user group qualifiers
+			// filter by qualifiers only if not already done by user group qualifiers
 			filter.setQualifiers(params.getQualifierValues());
 		}
 		filter.setSummaryValues(params.getSummaryValues());
@@ -225,45 +222,45 @@ public class RecordController extends BasicController implements Serializable {
 		}
 		filter.setOffset(params.getOffset());
 		filter.setMaxNumberOfRecords(params.getMaxNumberOfRows());
-		
-		//load summaries
-		List<CollectRecordSummary> summaries = params.isFullSummary() ? 
-				recordManager.loadFullSummaries(filter, params.getSortFields())
+
+		// load summaries
+		List<CollectRecordSummary> summaries = params.isFullSummary()
+				? recordManager.loadFullSummaries(filter, params.getSortFields())
 				: recordManager.loadSummaries(filter, params.getSortFields());
 		result.put("records", toProxies(summaries));
-		
-		//count total records
+
+		// count total records
 		int count = recordManager.countRecords(filter);
 		result.put("count", count);
-		
+
 		if (params.isIncludeOwners()) {
-			Set<User> owners = recordManager.loadDistinctOwners(createRecordFilter(survey, user, userGroupManager, 
-					rootEntityDefinition.getId(), false));
+			Set<User> owners = recordManager.loadDistinctOwners(
+					createRecordFilter(survey, user, userGroupManager, rootEntityDefinition.getId(), false));
 			Set<BasicUserProxy> ownerProxies = Proxies.fromSet(owners, BasicUserProxy.class);
 			result.put("owners", ownerProxies);
 		}
-		
+
 		return result;
 	}
 
-	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}", method=GET, produces=APPLICATION_JSON_VALUE)
-	public @ResponseBody
-	RecordProxy loadRecord(
-			@PathVariable("surveyId") int surveyId, 
-			@PathVariable("recordId") int recordId,
-			@RequestParam(value="step", required=false) Integer stepNumber,
-			@RequestParam(value="lock", required=false, defaultValue="false") boolean lock) throws RecordPersistenceException {
+	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}", method = GET, produces = APPLICATION_JSON_VALUE)
+	public @ResponseBody RecordProxy loadRecord(@PathVariable("surveyId") int surveyId,
+			@PathVariable("recordId") int recordId, @RequestParam(value = "step", required = false) Integer stepNumber,
+			@RequestParam(value = "lock", required = false, defaultValue = "false") boolean lock)
+			throws RecordPersistenceException {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		Step step = stepNumber == null ? null : Step.valueOf(stepNumber);
-		CollectRecord record = lock 
-				? recordManager.checkout(survey, sessionManager.getLoggedUser(), recordId, step, sessionManager.getSessionState().getSessionId(), true)
+		CollectRecord record = lock
+				? recordManager.checkout(survey, sessionManager.getLoggedUser(), recordId, step,
+						sessionManager.getSessionState().getSessionId(), true)
 				: recordManager.load(survey, recordId, step);
 		return toProxy(record);
 	}
 
-	@RequestMapping(value = "survey/{surveyId}/data/update/records/{recordId}", method=POST, produces=APPLICATION_JSON_VALUE)
-	public @ResponseBody Response updateOwner(@PathVariable("surveyId") int surveyId, @PathVariable("recordId") int recordId,
-			@RequestBody Map<String, String> body) throws RecordLockedException, MultipleEditException {
+	@RequestMapping(value = "survey/{surveyId}/data/update/records/{recordId}", method = POST, produces = APPLICATION_JSON_VALUE)
+	public @ResponseBody Response updateOwner(@PathVariable("surveyId") int surveyId,
+			@PathVariable("recordId") int recordId, @RequestBody Map<String, String> body)
+			throws RecordLockedException, MultipleEditException {
 		String ownerIdStr = body.get("ownerId");
 		Integer ownerId = ownerIdStr == null ? null : Integer.parseInt(ownerIdStr);
 		CollectSurvey survey = surveyManager.getById(surveyId);
@@ -272,23 +269,25 @@ public class RecordController extends BasicController implements Serializable {
 		return new Response();
 	}
 
-	@RequestMapping(value = "survey/{surveyId}/data/records/promote/{recordId}", method=POST, produces=APPLICATION_JSON_VALUE)
-	public @ResponseBody Response promoteRecord(@PathVariable("surveyId") int surveyId, @PathVariable("recordId") int recordId) throws MissingRecordKeyException, RecordPromoteException {
+	@RequestMapping(value = "survey/{surveyId}/data/records/promote/{recordId}", method = POST, produces = APPLICATION_JSON_VALUE)
+	public @ResponseBody Response promoteRecord(@PathVariable("surveyId") int surveyId,
+			@PathVariable("recordId") int recordId) throws MissingRecordKeyException, RecordPromoteException {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		CollectRecord record = recordManager.load(survey, recordId);
 		recordManager.promote(record, sessionManager.getLoggedUser(), true);
 		return new Response();
 	}
 
-	@RequestMapping(value = "survey/{surveyId}/data/records/demote/{recordId}", method=POST, produces=APPLICATION_JSON_VALUE)
-	public @ResponseBody Response demoteRecord(@PathVariable("surveyId") int surveyId, @PathVariable("recordId") int recordId) throws RecordPersistenceException {
+	@RequestMapping(value = "survey/{surveyId}/data/records/demote/{recordId}", method = POST, produces = APPLICATION_JSON_VALUE)
+	public @ResponseBody Response demoteRecord(@PathVariable("surveyId") int surveyId,
+			@PathVariable("recordId") int recordId) throws RecordPersistenceException {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		recordManager.demote(survey, recordId, sessionManager.getLoggedUser());
 		return new Response();
 	}
 
-	@RequestMapping(value = "survey/{surveyId}/data/move/records", method=POST, produces=APPLICATION_JSON_VALUE)
-	public @ResponseBody JobProxy moveRecords(@PathVariable("surveyId") int surveyId, @RequestParam String fromStep, 
+	@RequestMapping(value = "survey/{surveyId}/data/move/records", method = POST, produces = APPLICATION_JSON_VALUE)
+	public @ResponseBody JobProxy moveRecords(@PathVariable("surveyId") int surveyId, @RequestParam String fromStep,
 			@RequestParam boolean promote) {
 		BulkRecordMoveJob job = jobManager.createJob(BulkRecordMoveJob.class);
 		SessionState sessionState = sessionManager.getSessionState();
@@ -314,43 +313,46 @@ public class RecordController extends BasicController implements Serializable {
 		jobManager.startSurveyJob(job);
 		return new JobProxy(job);
 	}
-	
+
 	@Transactional
-	@RequestMapping(value = "survey/{surveyId}/data/records", method=POST, consumes=APPLICATION_JSON_VALUE)
-	public @ResponseBody
-	RecordProxy newRecord(@PathVariable("surveyId") int surveyId, @RequestBody NewRecordParameters params) throws RecordPersistenceException {
+	@RequestMapping(value = "survey/{surveyId}/data/records", method = POST, consumes = APPLICATION_JSON_VALUE)
+	public @ResponseBody RecordProxy newRecord(@PathVariable("surveyId") int surveyId,
+			@RequestBody NewRecordParameters params) throws RecordPersistenceException {
 		User user = sessionManager.getLoggedUser();
 		if (user == null) {
 			user = loadUser(params.getUserId(), params.getUsername());
 		}
-		CollectSurvey survey = params.isPreview() ? surveyManager.loadSurvey(surveyId) : surveyManager.getById(surveyId);
-		params.setRootEntityName(ObjectUtils.defaultIfNull(params.getRootEntityName(), survey.getSchema().getFirstRootEntityDefinition().getName()));
-		Integer latestVersionId = survey.getLatestVersion() != null ? survey.getLatestVersion().getId(): null;
+		CollectSurvey survey = params.isPreview() ? surveyManager.loadSurvey(surveyId)
+				: surveyManager.getById(surveyId);
+		params.setRootEntityName(ObjectUtils.defaultIfNull(params.getRootEntityName(),
+				survey.getSchema().getFirstRootEntityDefinition().getName()));
+		Integer latestVersionId = survey.getLatestVersion() != null ? survey.getLatestVersion().getId() : null;
 		params.setVersionId(ObjectUtils.defaultIfNull(params.getVersionId(), latestVersionId));
 		params.setUserId(user.getId());
 		CollectRecord record = recordGenerator.generate(survey, params);
 		sessionRecordProvider.putRecord(record);
 		return toProxy(record);
 	}
-	
+
 	@Transactional
-	@RequestMapping(value = "survey/{surveyId}/data/records/random", method=POST, consumes=APPLICATION_JSON_VALUE)
-	public @ResponseBody
-	RecordProxy createRandomRecord(@PathVariable("surveyId") int surveyId, @RequestBody NewRecordParameters params) throws RecordPersistenceException {
+	@RequestMapping(value = "survey/{surveyId}/data/records/random", method = POST, consumes = APPLICATION_JSON_VALUE)
+	public @ResponseBody RecordProxy createRandomRecord(@PathVariable("surveyId") int surveyId,
+			@RequestBody NewRecordParameters params) throws RecordPersistenceException {
 		CollectRecord record = randomRecordGenerator.generate(surveyId, params);
 		return toProxy(record);
 	}
 
-	@RequestMapping(value = "survey/{surveyId}/data/records", method=DELETE, produces=APPLICATION_JSON_VALUE)
-	public @ResponseBody
-	Response deleteRecord(@PathVariable("surveyId") int surveyId, @Valid RecordDeleteParameters params) throws RecordPersistenceException {
+	@RequestMapping(value = "survey/{surveyId}/data/records", method = DELETE, produces = APPLICATION_JSON_VALUE)
+	public @ResponseBody Response deleteRecord(@PathVariable("surveyId") int surveyId,
+			@Valid RecordDeleteParameters params) throws RecordPersistenceException {
 		if (canDeleteRecords(surveyId, Sets.newHashSet(params.getRecordIds()))) {
 			CollectSurvey survey = surveyManager.getById(surveyId);
 			for (Integer recordId : params.getRecordIds()) {
 				CollectRecord record = recordManager.load(survey, recordId);
 				recordFileManager.deleteAllFiles(record);
 				recordManager.delete(recordId);
-				publishRecordDeletedEvent(record, record.getStep().toRecordStep(), sessionManager.getLoggedUser().getUsername());
+				publishRecordDeletedEvent(record, record.getStep().toRecordStep(),
+						sessionManager.getLoggedUser().getUsername());
 			}
 			return new Response();
 		} else {
@@ -361,14 +363,13 @@ public class RecordController extends BasicController implements Serializable {
 		}
 	}
 
-	@RequestMapping(value = "survey/{surveyId}/data/import/records/summary", method=POST, consumes=MULTIPART_FORM_DATA_VALUE)
-	public @ResponseBody
-	JobView startRecordImportSummaryJob(@PathVariable("surveyId") int surveyId, @RequestParam("file") MultipartFile multipartFile, 
-			@RequestParam String rootEntityName) throws IOException {
+	@RequestMapping(value = "survey/{surveyId}/data/import/records/summary", method = POST, consumes = MULTIPART_FORM_DATA_VALUE)
+	public @ResponseBody JobView startRecordImportSummaryJob(@PathVariable("surveyId") int surveyId,
+			@RequestParam("file") MultipartFile multipartFile, @RequestParam String rootEntityName) throws IOException {
 		File file = File.createTempFile("ofc_data_restore", ".collect-data");
 		FileUtils.copyInputStreamToFile(multipartFile.getInputStream(), file);
 		CollectSurvey survey = surveyManager.getById(surveyId);
-		
+
 		DataRestoreSummaryJob job = jobManager.createJob(DataRestoreSummaryJob.class);
 		job.setUser(sessionManager.getLoggedUser());
 		job.setFullSummary(true);
@@ -376,26 +377,27 @@ public class RecordController extends BasicController implements Serializable {
 		job.setPublishedSurvey(survey);
 		job.setCloseRecordProviderOnComplete(false);
 		job.setDeleteInputFileOnDestroy(true);
-		
+
 		jobManager.start(job);
 		this.dataRestoreSummaryJob = job;
 		return new JobView(job);
 	}
 
-	@RequestMapping(value = "survey/{surveyId}/data/import/records/summary", method=GET)
-	public @ResponseBody
-	DataImportSummaryProxy downloadRecordImportSummary(@PathVariable("surveyId") int surveyId) throws IOException {
-		if (this.dataRestoreSummaryJob == null || ! this.dataRestoreSummaryJob.isCompleted()) {
-			throw new IllegalStateException("Data restore summary not generated or an error occurred during the generation");
+	@RequestMapping(value = "survey/{surveyId}/data/import/records/summary", method = GET)
+	public @ResponseBody DataImportSummaryProxy downloadRecordImportSummary(@PathVariable("surveyId") int surveyId)
+			throws IOException {
+		if (this.dataRestoreSummaryJob == null || !this.dataRestoreSummaryJob.isCompleted()) {
+			throw new IllegalStateException(
+					"Data restore summary not generated or an error occurred during the generation");
 		}
 		DataImportSummary summary = this.dataRestoreSummaryJob.getSummary();
 		return new DataImportSummaryProxy(summary, sessionManager.getSessionState().getLocale());
 	}
-	
-	@RequestMapping(value = "survey/{surveyId}/data/import/records", method=POST)
-	public @ResponseBody
-	JobView startRecordImport(@PathVariable("surveyId") int surveyId, @RequestParam List<Integer> entryIdsToImport, 
-			@RequestParam(defaultValue="true") boolean validateRecords) throws IOException {
+
+	@RequestMapping(value = "survey/{surveyId}/data/import/records", method = POST)
+	public @ResponseBody JobView startRecordImport(@PathVariable("surveyId") int surveyId,
+			@RequestParam List<Integer> entryIdsToImport, @RequestParam(defaultValue = "true") boolean validateRecords)
+			throws IOException {
 		RecordProvider recordProvider = dataRestoreSummaryJob.getRecordProvider();
 		if (recordProvider instanceof XMLParsingRecordProvider)
 			((XMLParsingRecordProvider) recordProvider).setInitializeRecords(true);
@@ -413,19 +415,17 @@ public class RecordController extends BasicController implements Serializable {
 		jobManager.start(job);
 		return new JobView(job);
 	}
-	
-	@RequestMapping(value = "survey/{surveyId}/data/csvimport/records", method=POST, consumes=MULTIPART_FORM_DATA_VALUE)
-	public @ResponseBody
-	JobView startCsvDataImportJob(@PathVariable("surveyId") int surveyId, 
-			@RequestParam("file") MultipartFile multipartFile, 
-			@RequestParam String rootEntityName, 
-			@RequestParam String importType, 
-			@RequestParam String steps, 
-			@RequestParam(required=false) Integer entityDefinitionId, 
-			@RequestParam(required=false) boolean validateRecords, 
-			@RequestParam(required=false) boolean deleteEntitiesBeforeImport, 
-			@RequestParam(required=false) String newRecordVersionName) throws IOException {
-		File file = Files.writeToTempFile(multipartFile.getInputStream(), multipartFile.getOriginalFilename(), "ofc_csv_data_import");
+
+	@RequestMapping(value = "survey/{surveyId}/data/csvimport/records", method = POST, consumes = MULTIPART_FORM_DATA_VALUE)
+	public @ResponseBody JobView startCsvDataImportJob(@PathVariable("surveyId") int surveyId,
+			@RequestParam("file") MultipartFile multipartFile, @RequestParam String rootEntityName,
+			@RequestParam String importType, @RequestParam String steps,
+			@RequestParam(required = false) Integer entityDefinitionId,
+			@RequestParam(required = false) boolean validateRecords,
+			@RequestParam(required = false) boolean deleteEntitiesBeforeImport,
+			@RequestParam(required = false) String newRecordVersionName) throws IOException {
+		File file = Files.writeToTempFile(multipartFile.getInputStream(), multipartFile.getOriginalFilename(),
+				"ofc_csv_data_import");
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		CSVDataImportJob job = jobManager.createJob(TransactionalCSVDataImportJob.class);
 		CSVDataImportSettings settings = new CSVDataImportSettings();
@@ -433,18 +433,19 @@ public class RecordController extends BasicController implements Serializable {
 		settings.setRecordValidationEnabled(validateRecords);
 		settings.setInsertNewRecords("newRecords".equals(importType));
 		settings.setNewRecordVersionName(newRecordVersionName);
-		CSVDataImportInput input = new CSVDataImportInput(file, survey, fromStepNames(steps), entityDefinitionId, settings);
+		CSVDataImportInput input = new CSVDataImportInput(file, survey, fromStepNames(steps), entityDefinitionId,
+				settings);
 		job.setInput(input);
 		jobManager.start(job);
 		this.csvDataImportJob = job;
 		return new JobView(job);
 	}
-	
-	@RequestMapping(value = "survey/{surveyId}/data/csvimport/records", method=GET)
+
+	@RequestMapping(value = "survey/{surveyId}/data/csvimport/records", method = GET)
 	public @ResponseBody DataImportStatusProxy getCsvDataImportStatus(@PathVariable("surveyId") int surveyId) {
 		return new DataImportStatusProxy(csvDataImportJob);
 	}
-	
+
 	private Step[] fromStepNames(String stepNamesStr) {
 		String[] stepNames = stepNamesStr.split(",");
 		Step[] steps = new Step[stepNames.length];
@@ -454,13 +455,22 @@ public class RecordController extends BasicController implements Serializable {
 		return steps;
 	}
 
-	@RequestMapping(value = "survey/{survey_id}/data/records/{record_id}/steps/{step}/csv_content.zip", method=GET, produces=MediaTypes.ZIP_CONTENT_TYPE)
-	public void exportRecord(
-			@PathVariable(value="survey_id") int surveyId, 
-			@PathVariable(value="record_id") int recordId,
-			@PathVariable(value="step") int stepNumber,
-			HttpServletResponse response
-			) throws RecordPersistenceException, IOException {
+	@RequestMapping(value = "survey/{survey_id}/data/records/{record_id}/steps/{step}/content/csv/data.zip", method = GET, produces = MediaTypes.ZIP_CONTENT_TYPE)
+	public void exportRecordToCsv(@PathVariable(value = "survey_id") int surveyId,
+			@PathVariable(value = "record_id") int recordId, @PathVariable(value = "step") int stepNumber,
+			HttpServletResponse response) throws RecordPersistenceException, IOException {
+		exportRecord(surveyId, recordId, stepNumber, OutputFormat.CSV, response);
+	}
+
+	@RequestMapping(value = "survey/{survey_id}/data/records/{record_id}/steps/{step}/content/xlsx/data.zip", method = GET, produces = MediaTypes.ZIP_CONTENT_TYPE)
+	public void exportRecordToExcel(@PathVariable(value = "survey_id") int surveyId,
+			@PathVariable(value = "record_id") int recordId, @PathVariable(value = "step") int stepNumber,
+			HttpServletResponse response) throws RecordPersistenceException, IOException {
+		exportRecord(surveyId, recordId, stepNumber, OutputFormat.XLSX, response);
+	}
+
+	public void exportRecord(int surveyId, int recordId, int stepNumber, OutputFormat outputFormat,
+			HttpServletResponse response) throws RecordPersistenceException, IOException {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		CollectRecord record = recordManager.load(survey, recordId);
 		RecordAccessControlManager accessControlManager = new RecordAccessControlManager();
@@ -468,12 +478,13 @@ public class RecordController extends BasicController implements Serializable {
 			CSVDataExportJob job = jobManager.createJob(CSVDataExportJob.class);
 			job.setSurvey(survey);
 			CSVDataExportParameters parameters = new CSVDataExportParameters();
-			RecordFilter recordFilter = createRecordFilter(survey, sessionManager.getLoggedUser(), userGroupManager, 
+			RecordFilter recordFilter = createRecordFilter(survey, sessionManager.getLoggedUser(), userGroupManager,
 					null, false);
 			recordFilter.setRecordId(recordId);
 			recordFilter.setStepGreaterOrEqual(Step.valueOf(stepNumber));
 			parameters.setRecordFilter(recordFilter);
 			parameters.setAlwaysGenerateZipFile(true);
+			parameters.setOutputFormat(outputFormat);
 			job.setParameters(parameters);
 			File outputFile = File.createTempFile("record_export", ".zip");
 			job.setOutputFile(outputFile);
@@ -484,33 +495,32 @@ public class RecordController extends BasicController implements Serializable {
 			}
 		}
 	}
-	
-	@RequestMapping(value="data/records/{recordId}/surveyId", method=GET)
+
+	@RequestMapping(value = "data/records/{recordId}/surveyId", method = GET)
 	public @ResponseBody int loadSurveyId(@PathVariable("recordId") int recordId) {
 		return recordManager.loadSurveyId(recordId);
 	}
-	
-	@RequestMapping(value="survey/{surveyId}/data/records/startcsvexport", method=POST)
-	public @ResponseBody JobView startCsvDataExportJob(
-			@PathVariable("surveyId") int surveyId,
+
+	@RequestMapping(value = "survey/{surveyId}/data/records/startcsvexport", method = POST)
+	public @ResponseBody JobView startCsvDataExportJob(@PathVariable("surveyId") int surveyId,
 			@RequestBody CSVExportParametersForm parameters) throws IOException {
 		User user = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.getById(surveyId);
-		
+
 		csvDataExportJob = jobManager.createJob(CSVDataExportJob.class);
 		csvDataExportJob.setSurvey(survey);
 
 		csvDataExportJob.setOutputFile(File.createTempFile("collect-csv-data-export", ".zip"));
-		
+
 		CSVDataExportParameters exportParameters = parameters.toExportParameters(survey, user, userGroupManager);
 		csvDataExportJob.setParameters(exportParameters);
-		
+
 		jobManager.start(csvDataExportJob);
-		
+
 		return new JobView(csvDataExportJob);
 	}
-	
-	@RequestMapping(value="survey/{surveyId}/data/records/currentcsvexport", method=GET)
+
+	@RequestMapping(value = "survey/{surveyId}/data/records/currentcsvexport", method = GET)
 	public @ResponseBody JobView getCsvDataExportJob(HttpServletResponse response) {
 		if (csvDataExportJob == null) {
 			HttpResponses.setNoContentStatus(response);
@@ -519,8 +529,8 @@ public class RecordController extends BasicController implements Serializable {
 			return new JobView(csvDataExportJob);
 		}
 	}
-	
-	@RequestMapping(value="survey/{surveyId}/data/records/csvexportresult.zip", method=GET)
+
+	@RequestMapping(value = "survey/{surveyId}/data/records/csvexportresult.zip", method = GET)
 	public void downloadCsvExportResult(HttpServletResponse response) throws FileNotFoundException, IOException {
 		File file = csvDataExportJob.getOutputFile();
 		RecordFilter recordFilter = csvDataExportJob.getParameters().getRecordFilter();
@@ -529,13 +539,13 @@ public class RecordController extends BasicController implements Serializable {
 		CSVDataExportParameters parameters = csvDataExportJob.getParameters();
 		String outputFormat = parameters.getOutputFormat().name().toLowerCase(Locale.ENGLISH);
 		String step = parameters.getRecordFilter().getStepGreaterOrEqual().name();
-		String fileName = String.format("collect-%s-data-export-%s-%s-%s.zip", outputFormat, surveyName, step, Dates.formatLocalDateTime(new Date()));
+		String fileName = String.format("collect-%s-data-export-%s-%s-%s.zip", outputFormat, surveyName, step,
+				Dates.formatLocalDateTime(new Date()));
 		Controllers.writeFileToResponse(response, file, fileName, MediaTypes.ZIP_CONTENT_TYPE);
 	}
-	
-	@RequestMapping(value="survey/{surveyId}/data/records/startbackupexport", method=POST)
-	public @ResponseBody JobView startBackupDataExportJob(
-			@PathVariable("surveyId") int surveyId,
+
+	@RequestMapping(value = "survey/{surveyId}/data/records/startbackupexport", method = POST)
+	public @ResponseBody JobView startBackupDataExportJob(@PathVariable("surveyId") int surveyId,
 			@RequestBody BackupDataExportParameters parameters) throws IOException {
 		User user = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.getById(surveyId);
@@ -549,18 +559,18 @@ public class RecordController extends BasicController implements Serializable {
 		jobManager.start(fullBackupJob);
 		return getFullBackupJobView();
 	}
-	
-	@RequestMapping(value="survey/{surveyId}/data/records/exportresult.collect-data", method=GET)
+
+	@RequestMapping(value = "survey/{surveyId}/data/records/exportresult.collect-data", method = GET)
 	public void downloadBackupExportResult(HttpServletResponse response) throws FileNotFoundException, IOException {
 		File file = fullBackupJob.getOutputFile();
 		CollectSurvey survey = fullBackupJob.getSurvey();
 		String surveyName = survey.getName();
-		Controllers.writeFileToResponse(response, file, 
-				String.format("%s-%s.collect-data", surveyName, Dates.formatLocalDateTime(new Date())), 
+		Controllers.writeFileToResponse(response, file,
+				String.format("%s-%s.collect-data", surveyName, Dates.formatLocalDateTime(new Date())),
 				MediaTypes.ZIP_CONTENT_TYPE);
 	}
-	
-	@RequestMapping(value="survey/{surveyId}/data/records/stats", method=GET)
+
+	@RequestMapping(value = "survey/{surveyId}/data/records/stats", method = GET)
 	public @ResponseBody RecordsStats generateStats(@PathVariable("surveyId") int surveyId) {
 		Date[] period = recordManager.findWorkingPeriod(surveyId);
 		if (period == null) {
@@ -569,8 +579,8 @@ public class RecordController extends BasicController implements Serializable {
 		RecordsStats stats = recordStatsGenerator.generate(surveyId, period);
 		return stats;
 	}
-	
-	@RequestMapping(value="survey/{surveyId}/data/records/validationreport", method=POST)
+
+	@RequestMapping(value = "survey/{surveyId}/data/records/validationreport", method = POST)
 	public @ResponseBody JobProxy startValidationResportJob(@PathVariable("surveyId") int surveyId) {
 		User user = sessionManager.getLoggedUser();
 		Locale locale = sessionManager.getSessionState().getLocale();
@@ -587,18 +597,18 @@ public class RecordController extends BasicController implements Serializable {
 		jobManager.start(job);
 		return new JobProxy(job);
 	}
-	
-	@RequestMapping(value="survey/{surveyId}/data/records/validationreport.csv", method=GET)
+
+	@RequestMapping(value = "survey/{surveyId}/data/records/validationreport.csv", method = GET)
 	public void downloadValidationReportResult(HttpServletResponse response) throws FileNotFoundException, IOException {
 		File file = validationReportJob.getOutputFile();
 		CollectSurvey survey = validationReportJob.getInput().getRecordFilter().getSurvey();
 		String surveyName = survey.getName();
-		Controllers.writeFileToResponse(response, file, 
-				String.format("collect-validation-report-%s-%s.csv", surveyName, Dates.formatDate(new Date())), 
+		Controllers.writeFileToResponse(response, file,
+				String.format("collect-validation-report-%s-%s.csv", surveyName, Dates.formatDate(new Date())),
 				MediaTypes.CSV_CONTENT_TYPE);
 	}
-	
-	@RequestMapping(value="survey/{surveyId}/data/records/backupexportjob", method=GET)
+
+	@RequestMapping(value = "survey/{surveyId}/data/records/backupexportjob", method = GET)
 	public @ResponseBody JobView getFullBackupJobView() {
 		if (fullBackupJob == null) {
 			return null;
@@ -608,8 +618,8 @@ public class RecordController extends BasicController implements Serializable {
 			return jobView;
 		}
 	}
-	
-	@RequestMapping(value="survey/{surveyId}/data/records/releaselock/{recordId}", method=POST)
+
+	@RequestMapping(value = "survey/{surveyId}/data/records/releaselock/{recordId}", method = POST)
 	public @ResponseBody Response releaseRecordLock(@PathVariable int recordId) {
 		CollectRecord activeRecord = sessionManager.getActiveRecord();
 		Response res = new Response();
@@ -619,28 +629,26 @@ public class RecordController extends BasicController implements Serializable {
 			appWS.sendMessage(new AppWS.RecordUnlockedMessage(recordId));
 		} else {
 			res.setErrorStatus();
-			res.setErrorMessage(String.format(
-					"Cannot unlock record with id %d: it is not being edited by user %s", 
-					recordId, sessionManager.getLoggedUsername()
-			));
+			res.setErrorMessage(String.format("Cannot unlock record with id %d: it is not being edited by user %s",
+					recordId, sessionManager.getLoggedUsername()));
 		}
 		return res;
 	}
-	
+
 	private Integer getStepNumberOrDefault(Integer stepNumber) {
 		if (stepNumber == null) {
 			stepNumber = Step.ENTRY.getStepNumber();
 		}
 		return stepNumber;
 	}
-	
+
 	private RecordProxy toProxy(CollectRecord record) {
 		String defaultLanguage = record.getSurvey().getDefaultLanguage();
 		Locale locale = new Locale(defaultLanguage);
 		ProxyContext context = new ProxyContext(locale, messageSource, surveyContext);
 		return new RecordProxy(record, context);
 	}
-	
+
 	private List<RecordSummaryProxy> toProxies(List<CollectRecordSummary> summaries) {
 		List<RecordSummaryProxy> result = new ArrayList<RecordSummaryProxy>(summaries.size());
 		for (CollectRecordSummary summary : summaries) {
@@ -648,29 +656,32 @@ public class RecordController extends BasicController implements Serializable {
 		}
 		return result;
 	}
-	
+
 	private RecordSummaryProxy toSummaryProxy(CollectRecordSummary summary) {
-		ProxyContext context = new ProxyContext(sessionManager.getSessionState().getLocale(), messageSource, surveyContext);
+		ProxyContext context = new ProxyContext(sessionManager.getSessionState().getLocale(), messageSource,
+				surveyContext);
 		return new RecordSummaryProxy(summary, context);
 	}
-	
+
 	private void publishRecordPromotedEvents(CollectRecord record, String userName) {
-		if (! eventQueue.isEnabled()) {
+		if (!eventQueue.isEnabled()) {
 			return;
 		}
-		SessionState sessionState = sessionManager.getSessionState(); 
-		EventProducerContext context = new EventProducer.EventProducerContext(messageSource, sessionState.getLocale(), userName);
+		SessionState sessionState = sessionManager.getSessionState();
+		EventProducerContext context = new EventProducer.EventProducerContext(messageSource, sessionState.getLocale(),
+				userName);
 		EventListenerToList consumer = new EventListenerToList();
 		new EventProducer(context, consumer).produceFor(record);
-		eventQueue.publish(new RecordTransaction(record.getSurvey().getName(), record.getId(), record.getStep().toRecordStep(), consumer.getList()));
+		eventQueue.publish(new RecordTransaction(record.getSurvey().getName(), record.getId(),
+				record.getStep().toRecordStep(), consumer.getList()));
 	}
-	
+
 	private void publishRecordDeletedEvent(CollectRecord record, RecordStep recordStep, String userName) {
-		if (! eventQueue.isEnabled()) {
+		if (!eventQueue.isEnabled()) {
 			return;
 		}
-		List<RecordDeletedEvent> events = Arrays.asList(new RecordDeletedEvent(record.getSurvey().getName(), 
-				record.getId(), new Date(), userName));
+		List<RecordDeletedEvent> events = Arrays
+				.asList(new RecordDeletedEvent(record.getSurvey().getName(), record.getId(), new Date(), userName));
 		String surveyName = record.getSurvey().getName();
 		eventQueue.publish(new RecordTransaction(surveyName, record.getId(), recordStep, events));
 	}
@@ -684,7 +695,7 @@ public class RecordController extends BasicController implements Serializable {
 			return null;
 		}
 	}
-	
+
 	private boolean canDeleteRecords(int surveyId, Set<Integer> recordIds) {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		RecordFilter filter = new RecordFilter(survey);
@@ -692,16 +703,18 @@ public class RecordController extends BasicController implements Serializable {
 		List<CollectRecordSummary> recordSummaries = recordManager.loadSummaries(filter);
 		User loggedUser = sessionManager.getLoggedUser();
 		RecordAccessControlManager recordAccessControlManager = new RecordAccessControlManager();
-		UserInGroup userInSurveyGroup = userGroupManager.findUserInGroupOrDescendants(survey.getUserGroupId(), loggedUser.getId());
-		boolean canDeleteRecords = userInSurveyGroup != null && recordAccessControlManager.canDeleteRecords(loggedUser, userInSurveyGroup.getRole(), recordSummaries);
+		UserInGroup userInSurveyGroup = userGroupManager.findUserInGroupOrDescendants(survey.getUserGroupId(),
+				loggedUser.getId());
+		boolean canDeleteRecords = userInSurveyGroup != null && recordAccessControlManager.canDeleteRecords(loggedUser,
+				userInSurveyGroup.getRole(), recordSummaries);
 		return canDeleteRecords;
 	}
 
 	public static class SearchParameters {
-		
+
 		private int offset;
 		private int maxNumberOfRows;
-		
+
 		public int getOffset() {
 			return offset;
 		}
@@ -718,9 +731,9 @@ public class RecordController extends BasicController implements Serializable {
 			this.maxNumberOfRows = maxNumberOfRows;
 		}
 	}
-	
+
 	public static class RecordSummarySearchParameters extends SearchParameters {
-		
+
 		private String username;
 		private Integer userId;
 		private String rootEntityName;
@@ -736,19 +749,19 @@ public class RecordController extends BasicController implements Serializable {
 		public String getUsername() {
 			return username;
 		}
-		
+
 		public void setUsername(String username) {
 			this.username = username;
 		}
-		
+
 		public Integer getUserId() {
 			return userId;
 		}
-		
+
 		public void setUserId(Integer userId) {
 			this.userId = userId;
 		}
-		
+
 		public String getRootEntityName() {
 			return rootEntityName;
 		}
@@ -772,78 +785,78 @@ public class RecordController extends BasicController implements Serializable {
 		public void setKeyValues(String[] keyValues) {
 			this.keyValues = keyValues;
 		}
-		
+
 		public String[] getQualifierValues() {
 			return qualifierValues;
 		}
-		
+
 		public void setQualifierValues(String[] qualifierValues) {
 			this.qualifierValues = qualifierValues;
 		}
-		
+
 		public String[] getSummaryValues() {
 			return summaryValues;
 		}
-		
+
 		public void setSummaryValues(String[] summaryValues) {
 			this.summaryValues = summaryValues;
 		}
-		
+
 		public boolean isCaseSensitiveKeyValues() {
 			return caseSensitiveKeyValues;
 		}
-		
+
 		public void setCaseSensitiveKeyValues(boolean caseSensitiveKeyValues) {
 			this.caseSensitiveKeyValues = caseSensitiveKeyValues;
 		}
-		
+
 		public boolean isFullSummary() {
 			return fullSummary;
 		}
-		
+
 		public void setFullSummary(boolean fullSummary) {
 			this.fullSummary = fullSummary;
 		}
-		
+
 		public Integer[] getOwnerIds() {
 			return ownerIds;
 		}
-		
+
 		public void setOwnerIds(Integer[] ownerIds) {
 			this.ownerIds = ownerIds;
 		}
-		
+
 		public boolean isIncludeOwners() {
 			return includeOwners;
 		}
-		
+
 		public void setIncludeOwners(boolean includeOwners) {
 			this.includeOwners = includeOwners;
 		}
 	}
-	
+
 	public static class RecordDeleteParameters {
-		
+
 		private int userId;
 		private Integer[] recordIds;
-		
+
 		public int getUserId() {
 			return userId;
 		}
-		
+
 		public void setUserId(int userId) {
 			this.userId = userId;
 		}
-		
+
 		public Integer[] getRecordIds() {
 			return recordIds;
 		}
-		
+
 		public void setRecordIds(Integer[] recordIds) {
 			this.recordIds = recordIds;
 		}
 	}
-	
+
 	public static class BackupDataExportParameters {
 
 		private boolean onlyOwnedRecords;
@@ -875,12 +888,12 @@ public class RecordController extends BasicController implements Serializable {
 		}
 	}
 
-	private static RecordFilter createRecordFilter(CollectSurvey survey, User user, UserGroupManager userGroupManager, 
+	private static RecordFilter createRecordFilter(CollectSurvey survey, User user, UserGroupManager userGroupManager,
 			Integer rootEntityId, boolean onlyOwnedRecords) {
 		return createRecordFilter(survey, user, userGroupManager, rootEntityId, onlyOwnedRecords, null, null);
 	}
-	
-	private static RecordFilter createRecordFilter(CollectSurvey survey, User user, UserGroupManager userGroupManager, 
+
+	private static RecordFilter createRecordFilter(CollectSurvey survey, User user, UserGroupManager userGroupManager,
 			Integer rootEntityId, boolean onlyOwnedRecords, Date modifiedSince, Date modifiedUntil) {
 		if (rootEntityId == null) {
 			rootEntityId = survey.getSchema().getFirstRootEntityDefinition().getId();
@@ -892,7 +905,7 @@ public class RecordController extends BasicController implements Serializable {
 		}
 		if (user.getRole() != UserRole.ADMIN) {
 			Map<String, String> qualifiers = userGroupManager.getQualifiers(survey.getUserGroupId(), user.getId());
-			if (! qualifiers.isEmpty()) {
+			if (!qualifiers.isEmpty()) {
 				recordFilter.setQualifiersByName(qualifiers);
 			}
 		}
@@ -900,9 +913,9 @@ public class RecordController extends BasicController implements Serializable {
 		recordFilter.setModifiedUntil(modifiedUntil);
 		return recordFilter;
 	}
-	
+
 	public static class CSVExportParametersForm extends CSVDataExportParametersBase {
-		
+
 		private Integer surveyId;
 		private Integer rootEntityId;
 		private Integer recordId;
@@ -912,11 +925,12 @@ public class RecordController extends BasicController implements Serializable {
 		private Date modifiedUntil;
 		private List<String> keyAttributeValues = new ArrayList<String>();
 		private List<String> summaryAttributeValues = new ArrayList<String>();
-		
-		public CSVDataExportParameters toExportParameters(CollectSurvey survey, User user, UserGroupManager userGroupManager) {
+
+		public CSVDataExportParameters toExportParameters(CollectSurvey survey, User user,
+				UserGroupManager userGroupManager) {
 			CSVDataExportParameters result = new CSVDataExportParameters();
-			RecordFilter recordFilter = createRecordFilter(survey, user, userGroupManager, rootEntityId, exportOnlyOwnedRecords, 
-					modifiedSince, modifiedUntil);
+			RecordFilter recordFilter = createRecordFilter(survey, user, userGroupManager, rootEntityId,
+					exportOnlyOwnedRecords, modifiedSince, modifiedUntil);
 			recordFilter.setStepGreaterOrEqual(stepGreaterOrEqual);
 			recordFilter.setKeyValues(keyAttributeValues);
 			recordFilter.setSummaryValues(summaryAttributeValues);
@@ -964,39 +978,39 @@ public class RecordController extends BasicController implements Serializable {
 		public boolean isExportOnlyOwnedRecords() {
 			return exportOnlyOwnedRecords;
 		}
-		
+
 		public void setExportOnlyOwnedRecords(boolean exportOnlyOwnedRecords) {
 			this.exportOnlyOwnedRecords = exportOnlyOwnedRecords;
 		}
-		
+
 		public Date getModifiedSince() {
 			return modifiedSince;
 		}
-		
+
 		public void setModifiedSince(Date modifiedSince) {
 			this.modifiedSince = modifiedSince;
 		}
-		
+
 		public Date getModifiedUntil() {
 			return modifiedUntil;
 		}
-		
+
 		public void setModifiedUntil(Date modifiedUntil) {
 			this.modifiedUntil = modifiedUntil;
 		}
-		
+
 		public List<String> getKeyAttributeValues() {
 			return keyAttributeValues;
 		}
-		
+
 		public void setKeyAttributeValues(List<String> keyAttributeValues) {
 			this.keyAttributeValues = keyAttributeValues;
 		}
-		
+
 		public List<String> getSummaryAttributeValues() {
 			return summaryAttributeValues;
 		}
-		
+
 		public void setSummaryAttributeValues(List<String> summaryAttributeValues) {
 			this.summaryAttributeValues = summaryAttributeValues;
 		}

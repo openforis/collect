@@ -12,6 +12,7 @@
     },
     "download": "Download",
     "exportToCsv": "Export to CSV",
+    "exportToExcel": "Export to Excel",
     "label": "Label",
     "message": "Message",
     "name": "Name",

@@ -1,7 +1,7 @@
 import AbstractService from './AbstractService'
 import { Record } from 'model/Record'
 import RecordSummary from 'model/RecordSummary'
-import Workflow from '../model/Workflow'
+import Workflow from 'model/Workflow'
 
 export default class RecordService extends AbstractService {
   fetchRecordSummaries(surveyId, rootEntityName, userId, filterOptions, sortFields, fullSummary = false) {
@@ -63,6 +63,15 @@ export default class RecordService extends AbstractService {
 
   downloadCSVDataExportResult(surveyId) {
     this.downloadFile(this.BASE_URL + 'survey/' + surveyId + '/data/records/csvexportresult.zip')
+  }
+
+  exportRecordToExcel(record) {
+    const { survey, id: recordId, step } = record
+    const { id: surveyId } = survey
+    const stepNumber = Workflow.getStepNumber(step)
+    this.downloadFile(
+      `${this.BASE_URL}survey/${surveyId}/data/records/${recordId}/steps/${stepNumber}/content/xlsx/data.zip`
+    )
   }
 
   startBackupDataExport(surveyId, parameters) {

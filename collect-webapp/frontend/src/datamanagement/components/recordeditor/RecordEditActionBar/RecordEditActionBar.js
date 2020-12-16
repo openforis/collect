@@ -3,7 +3,7 @@ import './RecordEditActionBar.css'
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useHistory } from 'react-router'
-import { Button } from '@material-ui/core'
+import { Button, Icon, IconButton } from '@material-ui/core'
 import { ThumbDown, ThumbUp } from '@material-ui/icons'
 
 import L from 'utils/Labels'
@@ -46,6 +46,8 @@ const RecordEditActionBar = (props) => {
   const nextStepLabel = nextStep ? L.l(`dataManagement.workflow.step.${nextStep.toLocaleLowerCase()}`) : null
   const prevStep = Workflow.getPrevStep(step)
   const prevStepLabel = prevStep ? L.l(`dataManagement.workflow.step.${prevStep.toLocaleLowerCase()}`) : null
+
+  const onExportToExcel = () => ServiceFactory.recordService.exportRecordToExcel(record)
 
   const onPromote = () => {
     const performPromote = async () => {
@@ -99,6 +101,11 @@ const RecordEditActionBar = (props) => {
         {definition.labelOrName}: {rootEntitySummary}
       </label>
       <ValidationReportIcon record={record} />
+      {!preview && (
+        <IconButton title={L.l('common.exportToExcel')} onClick={onExportToExcel}>
+          <Icon className="fa fa-file-excel" color="primary" />
+        </IconButton>
+      )}
       {!preview && prevStep && (
         <Button
           variant="contained"
