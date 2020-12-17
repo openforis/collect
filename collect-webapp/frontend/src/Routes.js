@@ -53,12 +53,6 @@ const routes = [
     surveySelectRequired: true,
   },
   {
-    path: '/datamanagement_new/:id',
-    name: 'Record New UI',
-    pathRegExp: new RegExp('/datamanagement_new/(\\d)+'),
-    surveySelectRequired: true,
-  },
-  {
     path: '/surveydesigner',
     name: 'Survey Designer',
   },

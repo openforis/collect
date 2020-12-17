@@ -25,10 +25,6 @@ class RouterUtils {
     RouterUtils._navigateToUrl(history, `/datamanagement/${recordId}`)
   }
 
-  static navigateToRecordEditPageNew(history, recordId) {
-    RouterUtils._navigateToUrl(history, `/datamanagement_new/${recordId}`)
-  }
-
   static navigateToRecordCsvExportPage(history) {
     RouterUtils._navigateToUrl(history, '/datamanagement/csvexport')
   }

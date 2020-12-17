@@ -17,7 +17,6 @@ import BackupDataExportPage from 'datamanagement/pages/BackupDataExportPage'
 import BackupDataImportPage from 'datamanagement/pages/BackupDataImportPage'
 import CsvDataExportPage from 'datamanagement/pages/CsvDataExportPage'
 import CsvDataImportPage from 'datamanagement/pages/CsvDataImportPage'
-import OldClientRecordEditPage from 'datamanagement/pages/OldClientRecordEditPage'
 import RecordEditPage from 'datamanagement/pages/RecordEditPage'
 import BackupPage from 'backuprestore/pages/BackupPage'
 import DashboardPage from 'scenes/DashboardPage'
@@ -89,8 +88,7 @@ const App = () => {
           component={BackupDataImportPage}
         />
         <DefaultRoute path="/datamanagement/csvimport" exact name="CsvDataImport" component={CsvDataImportPage} />
-        <DefaultRoute path="/datamanagement/:id" name="RecordDetails" component={OldClientRecordEditPage} />
-        <DefaultRoute path="/datamanagement_new/:id" name="RecordEditNew" component={RecordEditPage} />
+        <DefaultRoute path="/datamanagement/:id" name="RecordEdit" component={RecordEditPage} />
         <DefaultRoute path="/datacleansing" exact name="DataCleansing" component={DataCleansingPage} />
         <DefaultRoute path="/map" exact name="Map" component={MapPage} />
         <DefaultRoute path="/restore" exact name="Restore" component={RestorePage} />
@@ -111,6 +109,12 @@ const App = () => {
           exact
           name="SurveyDataEntryPreview"
           component={SurveyDataEntryPreviewPage}
+        />
+        <FullScreenRoute
+          path="/record_fullscreen/:id"
+          exact
+          name="RecordEditFullScreen"
+          component={RecordEditPage}
         />
       </Switch>
       <AppWebSocket />

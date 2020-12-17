@@ -5,7 +5,7 @@ import TabSet from './recordeditor/TabSet'
 import RecordEditActionBar from './recordeditor/RecordEditActionBar'
 
 const RecordEditForm = (props) => {
-  const { record } = props
+  const { record, inPopUp } = props
   if (!record) {
     return <div>Loading...</div>
   }
@@ -17,11 +17,15 @@ const RecordEditForm = (props) => {
   return (
     <>
       <MaxAvailableSpaceContainer className="record-edit-form">
-        <RecordEditActionBar record={record} />
+        <RecordEditActionBar record={record} inPopUp={inPopUp} />
         <TabSet tabSetDef={tabSetDefinition} record={record} />
       </MaxAvailableSpaceContainer>
     </>
   )
+}
+
+RecordEditForm.defaultProps = {
+  inPopUp: false,
 }
 
 export default RecordEditForm

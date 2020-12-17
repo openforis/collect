@@ -17,10 +17,16 @@ class RecordEditPage extends Component {
   }
 
   componentDidMount() {
-    const { match, language, loggedUser } = this.props
+    const { match, language: languageProps, loggedUser, location } = this.props
     const { id: idParam } = match.params
 
     const recordId = Number(idParam)
+
+    const urlSearchParams = new URLSearchParams(location.search)
+    const inPopUp = urlSearchParams.get('inPopUp') === 'true'
+    const locale = urlSearchParams.get('locale')
+    const localeLangCode = locale?.split('_')[0]
+    const language = languageProps ? languageProps : localeLangCode
 
     ServiceFactory.recordService.fetchSurveyId(recordId).then((res) => {
       const surveyId = Number(res)
@@ -29,7 +35,7 @@ class RecordEditPage extends Component {
         ServiceFactory.recordService.fetchById(survey, recordId).then((record) => {
           record.readOnly = !loggedUser.canEditRecord(record)
           this.recordUpdater = new RecordUpdater(record)
-          this.setState({ record })
+          this.setState({ record, inPopUp })
         })
       })
     })
@@ -42,9 +48,9 @@ class RecordEditPage extends Component {
   }
 
   render() {
-    const { record } = this.state
+    const { record, inPopUp } = this.state
 
-    return <RecordEditForm record={record} />
+    return <RecordEditForm record={record} inPopUp={inPopUp} />
   }
 }
 const mapStateToProps = (state) => {

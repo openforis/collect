@@ -38,7 +38,6 @@ const INITIAL_STATE = {
   selectedItemIds: [],
   selectedItem: null,
   newRecordParametersDialogOpen: false,
-  shiftPressed: false,
 }
 
 class DataManagementPage extends React.Component {
@@ -69,19 +68,6 @@ class DataManagementPage extends React.Component {
     this.handleDemoteCleansingToEntryButtonClick = this.handleDemoteCleansingToEntryButtonClick.bind(this)
     this.handleMoveRecordsJobCompleted = this.handleMoveRecordsJobCompleted.bind(this)
     this.handleSurveyLanguageChange = this.handleSurveyLanguageChange.bind(this)
-
-    this.onKeyDown = this.onKeyDown.bind(this)
-    this.onKeyUp = this.onKeyUp.bind(this)
-  }
-
-  componentDidMount() {
-    window.addEventListener('keydown', this.onKeyDown)
-    window.addEventListener('keyup', this.onKeyUp)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.onKeyDown)
-    window.removeEventListener('keyup', this.onKeyUp)
   }
 
   componentDidUpdate(prevProps) {
@@ -89,18 +75,6 @@ class DataManagementPage extends React.Component {
     const { survey: surveyPrev } = prevProps
     if (survey && surveyPrev && survey.id !== surveyPrev.id) {
       this.setState(INITIAL_STATE)
-    }
-  }
-
-  onKeyDown(event) {
-    if (event.shiftKey) {
-      this.setState({ shiftPressed: true })
-    }
-  }
-
-  onKeyUp(event) {
-    if (this.state.shiftPressed && !event.shiftPressed) {
-      this.setState({ shiftPressed: false })
     }
   }
 
@@ -158,11 +132,7 @@ class DataManagementPage extends React.Component {
   }
 
   navigateToItemEditView(itemId) {
-    if (this.state.shiftPressed) {
-      RouterUtils.navigateToRecordEditPageNew(this.props.history, itemId)
-    } else {
-      RouterUtils.navigateToRecordEditPage(this.props.history, itemId)
-    }
+    RouterUtils.navigateToRecordEditPage(this.props.history, itemId)
   }
 
   handleRowDoubleClick(record) {
@@ -302,7 +272,6 @@ class DataManagementPage extends React.Component {
 
   render() {
     const { survey, loggedUser, surveyLanguage, userRoleInSurveyGroup } = this.props
-    const { shiftPressed } = this.state
 
     if (!survey) {
       return <div>{L.l('survey.selectPublishedSurveyFirst')}</div>
@@ -314,20 +283,12 @@ class DataManagementPage extends React.Component {
         <Row className="justify-content-between">
           <Col md={2}>
             {loggedUser.canCreateRecords(userRoleInSurveyGroup) && (
-              <Button
-                color={shiftPressed ? 'danger' : 'info'}
-                onClick={this.handleNewButtonClick}
-                title={shiftPressed ? 'With New UI' : ''}
-              >
+              <Button color={'info'} onClick={this.handleNewButtonClick}>
                 New
               </Button>
             )}{' '}
             {loggedUser.canEditRecords(userRoleInSurveyGroup) && this.state.selectedItem && (
-              <Button
-                color={shiftPressed ? 'danger' : 'success'}
-                onClick={this.handleEditButtonClick}
-                title={shiftPressed ? 'With New UI' : ''}
-              >
+              <Button color={'success'} onClick={this.handleEditButtonClick}>
                 Edit
               </Button>
             )}{' '}
