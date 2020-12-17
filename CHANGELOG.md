@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.26.36] - NOT RELEASED YET
 ### Added
-- Data entry new UI: show number label (if any); use label width specified in survey designer; handle system errors; export edited record to Excel; hide calculated attributes from UI (if specified);
+- Data entry new UI: show number label (if any); use label width specified in survey designer; handle system errors; export edited record to Excel; hide calculated attributes from UI (if specified); numeric attributes: limit decimal places;
 
 ### Fixed
 - Data entry new UI: fixed value deleted from Taxon attribute after focusing into field without selection;

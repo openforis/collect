@@ -1,3 +1,5 @@
+import './NumberField.scss'
+
 import React from 'react'
 
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
@@ -5,6 +7,9 @@ import InputNumber from 'common/components/InputNumber'
 
 import UnitField from './UnitField'
 import AbstractNumericField from './AbstractNumericField'
+import Numbers from 'utils/Numbers'
+
+const UNIT_FIELD_WIDTH = 80
 
 export default class NumberField extends AbstractNumericField {
   constructor(props) {
@@ -33,17 +38,20 @@ export default class NumberField extends AbstractNumericField {
     const { record } = parentEntity
     const { value, unit: unitId } = valueState || {}
     const { attributeDefinition } = fieldDef
+
     const readOnly = record.readOnly || attributeDefinition.calculated
 
+    // keep decimal places of already inserted values (backwards compatibility)
+    const decimalScale = Math.max(attributeDefinition.getDecimalScale(unitId), Numbers.countDecimals(value))
     const unitVisible = attributeDefinition.isUnitVisible({ inTable })
-    const wrapperStyle = unitVisible ? { display: 'grid', gridTemplateColumns: '1fr 80px' } : null
+    const wrapperStyle = unitVisible ? { display: 'grid', gridTemplateColumns: `1fr ${UNIT_FIELD_WIDTH}px` } : null
 
     return (
       <>
-        <div style={wrapperStyle}>
+        <div className="number-field-wrapper" style={wrapperStyle}>
           <InputNumber
-            decimalScale={attributeDefinition.isInteger() ? 0 : 10}
-            maxLength={attributeDefinition.isInteger() ? 10 : undefined}
+            decimalScale={decimalScale}
+            maxLength={attributeDefinition.getMaxLength(unitId)}
             value={value}
             readOnly={readOnly}
             onChange={this.onInputValueChange}

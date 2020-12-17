@@ -47,7 +47,8 @@ export default class RangeField extends AbstractNumericField {
 
     const getInputField = ({ fieldName }) => (
       <InputNumber
-        decimalScale={attributeDefinition.isInteger() ? 0 : 10}
+        decimalScale={attributeDefinition.getDecimalScale(unitId)}
+        maxLength={attributeDefinition.getMaxLength(unitId)}
         value={Objects.getProp(fieldName, '')(value)}
         readOnly={readOnly}
         onChange={(fieldValue) => this.onInputValueChange({ fieldName, fieldValue })}
