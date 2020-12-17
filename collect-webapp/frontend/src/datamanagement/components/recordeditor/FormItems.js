@@ -50,23 +50,32 @@ export default class FormItems extends AbstractFormComponent {
     const { itemDefs, parentEntity } = this.props
     const { record } = parentEntity
     const { version } = record
-    const itemDefsInVersion =
-      version === null ? itemDefs : itemDefs.filter((itemDef) => itemDef.nodeDefinition.isInVersion(version))
 
-    const firstDef = itemDefsInVersion[0]
+    // include only items in record version and non-hidden calculated attributes
+    const itemDefsVisible = itemDefs.filter((itemDef) => {
+      const { nodeDefinition } = itemDef
+      const { calculated, hidden } = nodeDefinition
+      return !(calculated && hidden) && (version === null || nodeDefinition.isInVersion(version))
+    })
+
+    const firstDef = itemDefsVisible[0]
 
     const onlyOneMultipleEntity =
-      itemDefsInVersion.length === 1 &&
+      itemDefsVisible.length === 1 &&
       (firstDef instanceof TableDefinition || firstDef instanceof MultipleFieldsetDefinition)
 
-    return onlyOneMultipleEntity ? (
-      <FormItemsItem itemDef={firstDef} parentEntity={parentEntity} fullSize />
-    ) : itemDefsInVersion.length > 0 ? (
-      <div className="form-items">
-        {itemDefsInVersion.map((itemDef) => (
-          <FormItemsItem key={itemDef.id} itemDef={itemDef} parentEntity={parentEntity} />
-        ))}
-      </div>
-    ) : null
+    if (onlyOneMultipleEntity) {
+      return <FormItemsItem itemDef={firstDef} parentEntity={parentEntity} fullSize />
+    }
+    if (itemDefsVisible.length > 0) {
+      return (
+        <div className="form-items">
+          {itemDefsVisible.map((itemDef) => (
+            <FormItemsItem key={itemDef.id} itemDef={itemDef} parentEntity={parentEntity} />
+          ))}
+        </div>
+      )
+    }
+    return null
   }
 }

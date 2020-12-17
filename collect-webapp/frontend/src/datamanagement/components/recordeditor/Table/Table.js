@@ -23,7 +23,7 @@ const calculateWidth = (headingColumn) => FieldsSizes.getWidth({ fieldDef: headi
 
 const determineColumnInfo = ({ headingColumn, entities, col }) => {
   const { attributeDefinition, col: colOriginal, colSpan } = headingColumn
-  const { alwaysRelevant, hideWhenNotRelevant, id: attributeDefinitionId } = attributeDefinition
+  const { alwaysRelevant, hideWhenNotRelevant, id: attributeDefinitionId, calculated, hidden } = attributeDefinition
 
   const relevant =
     alwaysRelevant ||
@@ -33,7 +33,7 @@ const determineColumnInfo = ({ headingColumn, entities, col }) => {
     entities.length > 0 &&
     entities.some((entity) => entity.hasSomeDescendantNotEmpty({ nodeDefinition: attributeDefinition }))
 
-  const visible = !hideWhenNotRelevant || relevant || isNotEmpty()
+  const visible = !(calculated && hidden) && (!hideWhenNotRelevant || relevant || isNotEmpty())
 
   return {
     colOriginal,
@@ -354,9 +354,11 @@ export default class Table extends EntityCollectionComponent {
         )}
       </>
     )
-    return fullSize ? (
-      content
-    ) : (
+
+    if (fullSize) {
+      return content
+    }
+    return (
       <fieldset className="form-item-fieldset">
         <legend>{itemDef.entityDefinition.label}</legend>
         {content}

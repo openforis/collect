@@ -6,6 +6,8 @@ export class AttributeDefinition extends NodeDefinition {
   fieldNames
   fieldLabels
   mandatoryFieldNames
+  calculated
+  hidden // true for calculated attributes hidden in entry form
 
   static Types = {
     BOOLEAN: 'BOOLEAN',

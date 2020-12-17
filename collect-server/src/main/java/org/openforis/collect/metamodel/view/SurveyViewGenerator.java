@@ -287,6 +287,7 @@ public class SurveyViewGenerator {
 		view.setFieldLabels(fieldLabelsView);
 		view.setVisibilityByField(visibilityByField);
 		view.setCalculated(def.isCalculated());
+		view.setHidden(uiOptions.isHidden(def));
 		return view;
 	}
 

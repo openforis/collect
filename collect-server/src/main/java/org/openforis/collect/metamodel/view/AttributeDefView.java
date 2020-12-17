@@ -15,6 +15,7 @@ public class AttributeDefView extends NodeDefView {
 	private boolean qualifier;
 	private Map<String, Boolean> visibilityByField;
 	private boolean calculated;
+	private boolean hidden;
 
 	public AttributeDefView(int id, String name, String label, AttributeType type, List<String> fieldNames, boolean key,
 			boolean multiple) {
@@ -69,6 +70,14 @@ public class AttributeDefView extends NodeDefView {
 
 	public void setCalculated(boolean calculated) {
 		this.calculated = calculated;
+	}
+
+	public boolean isHidden() {
+		return hidden;
+	}
+
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
 	}
 
 }
