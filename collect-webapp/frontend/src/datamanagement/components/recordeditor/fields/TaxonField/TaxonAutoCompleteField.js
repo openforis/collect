@@ -38,16 +38,7 @@ const fetchTaxa = ({ surveyId, fieldDef, queryField }) => ({ searchString, onCom
 }
 
 const TaxonAutoCompleteField = (props) => {
-  const {
-    parentEntity,
-    fieldDef,
-    field,
-    valueByFields,
-    onInputChange: onInputChangeProps,
-    onSelect,
-    onDismiss,
-    readOnly,
-  } = props
+  const { parentEntity, fieldDef, field, valueByFields, onInputChange, onSelect, onDismiss, readOnly } = props
 
   const { attributeDefinition } = fieldDef
   const { showFamily } = attributeDefinition
@@ -82,7 +73,7 @@ const TaxonAutoCompleteField = (props) => {
   return (
     <Autocomplete
       asynchronous
-      inputFieldValue={initialInputValue}
+      inputValue={initialInputValue}
       inputFieldWidth={FieldsSizes.TaxonFieldWidths[field]}
       selectedItems={Arrays.singleton(selectedTaxonOccurrence)}
       fetchFunction={fetchTaxa({ surveyId, fieldDef, queryField })}
@@ -91,6 +82,7 @@ const TaxonAutoCompleteField = (props) => {
       itemRenderFunction={(taxonOccurrence) => (
         <TaxonAutoCompleteDialogItem taxonOccurrence={taxonOccurrence} showFamily={showFamily} />
       )}
+      onInputChange={onInputChange}
       onSelect={onTaxonSelected}
       onDismiss={onDismiss}
       readOnly={readOnly}

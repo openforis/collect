@@ -106,8 +106,8 @@ const Autocomplete = (props) => {
 
   const onOpen = () => setState({ open: true })
 
-  const onClose = (_, reason) => {
-    setState({ open: false })
+  const onClose = async (_, reason) => {
+    await setState({ open: false })
     if (['escape', 'blur'].includes(reason)) {
       onDismiss()
     }

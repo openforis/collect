@@ -55,7 +55,9 @@ export default class TaxonField extends AbstractField {
 
   undoValueUpdate() {
     const { previousValue } = this.state
-    this.setState({ previousValue: null, value: previousValue, dirty: false })
+    if (previousValue) {
+      this.setState({ previousValue: null, value: previousValue, dirty: false })
+    }
   }
 
   render() {
