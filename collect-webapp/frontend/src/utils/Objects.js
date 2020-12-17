@@ -65,4 +65,14 @@ export default class Objects {
     const val = obj ? obj[prop] : null
     return Objects.isNullOrUndefined(val) ? defaultTo : val
   }
+
+  static getPath = (path, defaultTo = null) => (obj) => {
+    let currentObj = obj
+    const parts = [...path]
+    while (parts.length > 0 && currentObj) {
+      const part = parts.pop()
+      currentObj = Objects.getProp(part)(currentObj)
+    }
+    return currentObj || defaultTo
+  }
 }

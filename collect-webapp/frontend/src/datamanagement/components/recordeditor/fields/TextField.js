@@ -3,8 +3,9 @@ import MuiTextField from '@material-ui/core/TextField'
 
 import { TextAttributeDefinition } from 'model/Survey'
 import { TextFieldDefinition } from 'model/ui/TextFieldDefinition'
-
+import Objects from 'utils/Objects'
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
+
 import AbstractField from './AbstractField'
 import * as FieldsSizes from './FieldsSizes'
 
@@ -23,10 +24,22 @@ export default class TextField extends AbstractField {
   onChange(event) {
     const { fieldDef } = this.props
     const { textTransform = TextFieldDefinition.TextTranform.NONE } = fieldDef
-    const value = event.target.value
-    const valueTranformed = tranformFunctions[textTransform](value)
 
-    this.updateValue({ value: { value: valueTranformed } })
+    const inputFieldValue = event.target.value
+    const valueTranformed = tranformFunctions[textTransform](inputFieldValue.trimLeft())
+
+    const attribute = this.getAttribute()
+    const valuePrev = Objects.getPath(['value', 'value'], '')(attribute)
+    const valueNew = { value: valueTranformed }
+
+    // check if value has changed
+    if (valueTranformed.trim() === valuePrev) {
+      // value not changed: update UI but do not send update to server side
+      this.setState({ value: valueNew })
+    } else {
+      // value changed: updated UI and server side
+      this.updateValue({ value: valueNew })
+    }
   }
 
   render() {
