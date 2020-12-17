@@ -2,14 +2,11 @@ package org.openforis.collect.manager;
 
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.granite.context.GraniteContext;
-import org.granite.messaging.webapp.HttpGraniteContext;
 import org.openforis.collect.config.CollectConfiguration;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.model.CollectRecord;
@@ -175,17 +172,11 @@ public class SessionManager {
 	}
 
 	private Object getSessionAttribute(String attributeName) {
-		//try to get session attribute from GraniteDS context
-		GraniteContext graniteContext = GraniteContext.getCurrentInstance();
-		if (graniteContext != null) {
-			return graniteContext.getSessionMap().get(attributeName);
-		} else {
-			//try to get session attribute from current request context holder session
-			ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-			if ( requestAttributes != null ) {
-				HttpSession session = requestAttributes.getRequest().getSession(false);
-				return session == null ? null : session.getAttribute(attributeName);
-			}
+		//try to get session attribute from current request context holder session
+		ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+		if ( requestAttributes != null ) {
+			HttpSession session = requestAttributes.getRequest().getSession(false);
+			return session == null ? null : session.getAttribute(attributeName);
 		}
 		return null;
 	}
@@ -195,13 +186,6 @@ public class SessionManager {
 			releaseRecord();
 		} catch (RecordUnlockedException e) {
 			//do nothing
-		}
-		GraniteContext graniteContext = GraniteContext.getCurrentInstance();
-		if ( graniteContext != null && graniteContext instanceof HttpGraniteContext ) {
-			HttpGraniteContext httpGraniteContext = (HttpGraniteContext) graniteContext;
-			HttpServletRequest request = httpGraniteContext.getRequest();
-			HttpSession session = request.getSession();
-			session.invalidate();
 		}
 	}
 	

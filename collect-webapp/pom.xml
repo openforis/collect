@@ -138,32 +138,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-flex-resources</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>org.openforis.collect</groupId>
-									<artifactId>collect-client</artifactId>
-									<version>${project.version}</version>
-									<type>swf</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
-									<destFileName>collect.swf</destFileName>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 			<!-- CLEAN -->
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
@@ -186,13 +160,6 @@
 			<groupId>org.openforis.collect</groupId>
 			<artifactId>collect-server</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openforis.collect</groupId>
-			<artifactId>collect-client</artifactId>
-			<version>${project.version}</version>
-			<type>swf</type>
-			<scope>runtime</scope>
 		</dependency>
 		<!-- JSTL -->
 		<dependency>

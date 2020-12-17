@@ -29,7 +29,6 @@
 	<mvc:resources mapping="login.html" location="login.html" />
 	<mvc:resources mapping="index.html" location="index.html" />
 	<mvc:resources mapping="collect.swf" location="collect.swf" />
-	<mvc:resources mapping="old_client.html" location="old_client.html" />
 	<mvc:resources mapping="/assets/**" location="/assets/" />
 	<mvc:resources mapping="/datacleansing/**" location="/datacleansing/" />
 	<mvc:resources mapping="/datamanager/**" location="/datamanager/" />

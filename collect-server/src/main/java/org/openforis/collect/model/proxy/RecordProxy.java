@@ -7,10 +7,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.collect.ProxyContext;
-import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -66,91 +64,74 @@ public class RecordProxy implements Proxy {
 		return result;
 	}
 	
-	@ExternalizedProperty
 	public int getSurveyId() {
 		return record.getSurvey().getId();
 	}
 	
-	@ExternalizedProperty
 	public boolean isNewRecord() {
 		return newRecord;
 	}
 	
-	@ExternalizedProperty
 	public boolean isPreview() {
 		return record.isPreview();
 	}
 	
-	@ExternalizedProperty
 	public Step getStep() {
 		return record.getStep();
 	}
 	
-	@ExternalizedProperty
 	public Step getDataStep() {
 		return record.getDataStep();
 	}
 
-	@ExternalizedProperty
 	public State getState() {
 		return record.getState();
 	}
 
-	@ExternalizedProperty
 	public Date getCreationDate() {
 		return record.getCreationDate();
 	}
 
-	@ExternalizedProperty
 	public BasicUserProxy getCreatedBy() {
 		User createdBy = record.getCreatedBy();
 		return createdBy == null ? null: new BasicUserProxy(createdBy);
 	}
 
-	@ExternalizedProperty
 	public Date getModifiedDate() {
 		return record.getModifiedDate();
 	}
 
-	@ExternalizedProperty
 	public Integer getId() {
 		return record.getId();
 	}
 
-	@ExternalizedProperty
 	public BasicUserProxy getModifiedBy() {
 		User modifiedBy = record.getModifiedBy();
 		return modifiedBy == null ? null: new BasicUserProxy(modifiedBy);
 	}
 	
-	@ExternalizedProperty
 	public EntityProxy getRootEntity() {
 		Entity rootEntity = record.getRootEntity();
 		return rootEntity == null ? null: new EntityProxy(null, record.getRootEntity(), context);
 	}
 
-	@ExternalizedProperty
-	public ModelVersionProxy getVersion() {
+	public Integer getVersionId() {
 		ModelVersion version = record.getVersion();
-		return version == null ? null: new ModelVersionProxy(version);
+		return version == null ? null : version.getId();
 	}
-
-	@ExternalizedProperty
+	
 	public List<String> getRootEntityKeys() {
 		return record.getRootEntityKeyValues();
 	}
 
-	@ExternalizedProperty
 	public List<Integer> getEntityCounts() {
 		return record.getEntityCounts();
 	}
 	
-	@ExternalizedProperty
 	public List<String> getSummaryValues() {
 		return record.getSummaryValues();
 	}
 
-	@ExternalizedProperty
 	public boolean isEntryComplete() {
 		if(record.getStep() != null) {
 			switch(record.getStep()) {
@@ -164,7 +145,6 @@ public class RecordProxy implements Proxy {
 		return false;
 	}
 	
-	@ExternalizedProperty
 	public boolean isCleansingComplete() {
 		if(record.getStep() != null) {
 			switch(record.getStep()) {

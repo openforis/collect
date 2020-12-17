@@ -832,9 +832,8 @@ Collect.DataManager.MapPanelComposer.openRecordEditPopUp = function(surveyId, re
 
 	modalContainer
 		.on('show.bs.modal', function() {
-			iframe.attr("src", "old_client.html?edit=true"
-				+ "&surveyId=" + surveyId
-				+ "&recordId=" + recordId
+			iframe.attr("src", "record_fullscreen/" + recordId + "?"
+				+ "inPopUp=true"
 				+ "&locale=" + OF.i18n.currentLocale());
 			$(this).find('.modal-body').css({
 				'max-height' : '100%'

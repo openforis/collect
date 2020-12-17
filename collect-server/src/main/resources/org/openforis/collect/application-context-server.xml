@@ -40,46 +40,14 @@
 	<bean id="userGroupManager" class="org.openforis.collect.manager.LocalUserGroupManager" />
 	
 	<!-- ===================================== -->
-	<!-- GraniteDs services -->
+	<!-- Services -->
 	<!-- ===================================== -->
-	<bean id="codeListSessionService"
-		class="org.openforis.collect.remoting.service.CodeListSessionService"
-		scope="session" />
 	<bean id="collectInfoService"
 		class="org.openforis.collect.remoting.service.CollectInfoService"
 		autowire="byName" />
 	<bean id="configurationService"
 		class="org.openforis.collect.remoting.service.ConfigurationService"
 		autowire="byName" init-method="init" />
-	<bean id="csvDataImportService"
-		class="org.openforis.collect.remoting.service.CSVDataImportService"
-		autowire="byName" init-method="init" scope="session" />
-	<bean id="dataService" class="org.openforis.collect.remoting.service.DataService"
-		autowire="byName" scope="session" />
-	<bean id="dataExportService"
-		class="org.openforis.collect.remoting.service.DataExportService"
-		autowire="byName" scope="session" />
-	<bean id="dataImportService"
-		class="org.openforis.collect.remoting.service.DataImportService"
-		autowire="byName" scope="session" />
-	<bean id="logoService" class="org.openforis.collect.remoting.service.LogoService"
-		autowire="byName" />
-	<bean id="modelService" class="org.openforis.collect.remoting.service.ModelService"
-		autowire="byName" />
-	<bean id="recordIndexService"
-		class="org.openforis.collect.remoting.service.recordindex.RecordIndexService"
-		autowire="byName" scope="session" />
-	<bean id="samplingDesignService"
-		class="org.openforis.collect.remoting.service.SamplingDesignService"
-		autowire="byName" />
-	<bean id="collectSessionService" class="org.openforis.collect.remoting.service.SessionService"
-		autowire="byName" />
-	<bean id="speciesService" class="org.openforis.collect.remoting.service.SpeciesService"
-		autowire="byName" />
-	<bean id="userService" class="org.openforis.collect.remoting.service.UserService"
-		autowire="byName" />
-	<bean id="userSessionService" class="org.openforis.collect.remoting.service.UserSessionService"
-		autowire="byName" scope="session" />
 		
 <!-- 	<bean id="dataRestoreService" class="org.openforis.collect.remoting.service.io.data.restore.DataRestoreServiceImpl" /> -->
 	

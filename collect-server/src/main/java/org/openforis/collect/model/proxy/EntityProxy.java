@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.ProxyContext;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
@@ -36,7 +35,6 @@ public class EntityProxy extends NodeProxy {
 		this.availableChildDefinitions = getAvailableChildDefinitions();
 	}
 
-	@ExternalizedProperty
 	public Map<Integer, List<NodeProxy>> getChildrenByDefinitionId() {
 		Map<Integer, List<NodeProxy>> result = new HashMap<Integer, List<NodeProxy>>();
 		for (NodeDefinition childDefinition : availableChildDefinitions) {
@@ -47,32 +45,12 @@ public class EntityProxy extends NodeProxy {
 		return result;
 	}
 
-	@ExternalizedProperty
-	public List<Boolean> getChildrenRelevance() {
-		List<Boolean> result = new ArrayList<Boolean>(availableChildDefinitions.size());
-		for (NodeDefinition childDefinition : availableChildDefinitions) {
-			boolean relevant = entity.isRelevant(childDefinition);
-			result.add(relevant);
-		}
-		return result;
-	}
-	
 	public Map<Integer, Boolean> getChildrenRelevanceByDefinitionId() {
 		Map<Integer, Boolean> map = new HashMap<Integer, Boolean>(availableChildDefinitions.size());
 		for (NodeDefinition childDefinition : availableChildDefinitions) {
 			map.put(childDefinition.getId(), entity.isRelevant(childDefinition));
 		}
 		return map;
-	}
-
-	@ExternalizedProperty
-	public List<ValidationResultFlag> getChildrenMinCountValidation() {
-		List<ValidationResultFlag> result = new ArrayList<ValidationResultFlag>(availableChildDefinitions.size());
-		for (NodeDefinition childDefinition : availableChildDefinitions) {
-			ValidationResultFlag valid = entity.getMinCountValidationResult(childDefinition);
-			result.add(valid);
-		}
-		return result;
 	}
 
 	public Map<Integer, ValidationResultFlag> getChildrenMinCountValidationByDefinitionId() {
@@ -83,32 +61,12 @@ public class EntityProxy extends NodeProxy {
 		return map;
 	}
 	
-	@ExternalizedProperty
-	public List<ValidationResultFlag> getChildrenMaxCountValidation() {
-		List<ValidationResultFlag> result = new ArrayList<ValidationResultFlag>(availableChildDefinitions.size());
-		for (NodeDefinition childDefinition : availableChildDefinitions) {
-			ValidationResultFlag valid = entity.getMaxCountValidationResult(childDefinition);
-			result.add(valid);
-		}
-		return result;
-	}
-	
 	public Map<Integer, ValidationResultFlag> getChildrenMaxCountValidationByDefinitionId() {
 		Map<Integer, ValidationResultFlag> map = new HashMap<Integer, ValidationResultFlag>(availableChildDefinitions.size());
 		for (NodeDefinition childDefinition : availableChildDefinitions) {
 			map.put(childDefinition.getId(), entity.getMaxCountValidationResult(childDefinition));
 		}
 		return map;
-	}
-	
-	@ExternalizedProperty
-	public List<Integer> getChildrenMinCount() {
-		List<Integer> result = new ArrayList<Integer>(availableChildDefinitions.size());
-		for (NodeDefinition childDefinition : availableChildDefinitions) {
-			int count = entity.getMinCount(childDefinition);
-			result.add(count);
-		}
-		return result;
 	}
 	
 	public Map<Integer, Integer> getChildrenMinCountByDefinitionId() {
@@ -119,16 +77,6 @@ public class EntityProxy extends NodeProxy {
 		return map;
 	}
 
-	@ExternalizedProperty
-	public List<Integer> getChildrenMaxCount() {
-		List<Integer> result = new ArrayList<Integer>(availableChildDefinitions.size());
-		for (NodeDefinition childDefinition : availableChildDefinitions) {
-			Integer count = entity.getMaxCount(childDefinition);
-			result.add(count);
-		}
-		return result;
-	}
-	
 	public Map<Integer, Integer> getChildrenMaxCountByDefinitionId() {
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>(availableChildDefinitions.size());
 		for (NodeDefinition childDefinition : availableChildDefinitions) {
@@ -137,15 +85,6 @@ public class EntityProxy extends NodeProxy {
 		return map;
 	}
 
-	@ExternalizedProperty
-	public List<Boolean> getChildrenErrorVisible() {
-		List<Boolean> result = new ArrayList<Boolean>(availableChildDefinitions.size());
-		for (int i = 0; i < availableChildDefinitions.size(); i++) {
-			result.add(Boolean.FALSE);
-		}
-		return result;
-	}
-	
 	public Map<Integer, Boolean> getChildrenErrorVisibleByDefinitionId() {
 		Map<Integer, Boolean> map = new HashMap<Integer, Boolean>(availableChildDefinitions.size());
 		for (NodeDefinition childDefinition : availableChildDefinitions) {
@@ -171,7 +110,6 @@ public class EntityProxy extends NodeProxy {
 		return version == null || version.isApplicable(childDefinition);
 	}
 	
-	@ExternalizedProperty
 	public boolean isEnumerated() {
 		EntityDefinition definition = entity.getDefinition();
 		return definition.isEnumerable() && definition.isEnumerate();

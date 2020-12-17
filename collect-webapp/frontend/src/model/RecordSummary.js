@@ -1,7 +1,6 @@
 import Serializable from 'model/Serializable'
 
 export default class RecordSummary extends Serializable {
-  
   cleansingComplete
   createdBy
   creationDate
@@ -24,7 +23,7 @@ export default class RecordSummary extends Serializable {
   summaryValues
   surveyId
   totalErrors
-  version
+  versionId
   warnings
 
   get ownerId() {

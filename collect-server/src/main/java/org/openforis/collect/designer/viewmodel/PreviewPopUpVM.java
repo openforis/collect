@@ -29,14 +29,9 @@ public class PreviewPopUpVM extends SurveyBaseVM {
 	@Init(superclass = false)
 	public void init(@ExecutionArgParam("surveyId") String surveyId, @ExecutionArgParam("work") String work,
 			@ExecutionArgParam("rootEntityId") String rootEntityId, @ExecutionArgParam("versionId") String versionId,
-			@ExecutionArgParam("locale") String locale, @ExecutionArgParam("recordStep") String recordStep,
-			@ExecutionArgParam("newUi") String newUi) throws URISyntaxException {
+			@ExecutionArgParam("locale") String locale, @ExecutionArgParam("recordStep") String recordStep) throws URISyntaxException {
 		super.init();
-		
-		String basePath = Boolean.valueOf(newUi) 
-				? Resources.Page.PREVIEW_PATH_NEW.getLocation() + surveyId
-				: Resources.Page.PREVIEW_PATH.getLocation();
-		
+				
 		URIBuilder uriBuilderParams = new URIBuilder()
 				.addParameter("preview", "true")
 				.addParameter("surveyId", surveyId)
@@ -47,7 +42,7 @@ public class PreviewPopUpVM extends SurveyBaseVM {
 			uriBuilderParams.addParameter("versionId", versionId);
 		}
 		uriBuilderParams.addParameter("recordStep", recordStep);
-		this.uri = basePath + uriBuilderParams.build().toString();
+		this.uri = Resources.Page.PREVIEW_PATH.getLocation() + uriBuilderParams.build().toString();
 	}
 
 	public String getContentUrl() throws URISyntaxException {

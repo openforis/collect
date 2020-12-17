@@ -3,7 +3,6 @@
  */
 package org.openforis.collect.model.proxy;
 
-import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
@@ -20,38 +19,31 @@ public class TaxonOccurrenceProxy implements Proxy {
 		super();
 		this.occurrence = occurence;
 	}
-	
-	@ExternalizedProperty
+
 	public String getCode() {
 		return occurrence.getCode();
 	}
 
-	@ExternalizedProperty
 	public String getScientificName() {
 		return occurrence.getScientificName();
 	}
 
-	@ExternalizedProperty
 	public String getVernacularName() {
 		return occurrence.getVernacularName();
 	}
 
-	@ExternalizedProperty
 	public String getLanguageCode() {
 		return occurrence.getLanguageCode();
 	}
 
-	@ExternalizedProperty
 	public String getLanguageVariety() {
 		return occurrence.getLanguageVariety();
 	}
-	
-	@ExternalizedProperty
+
 	public TaxonRank getTaxonRank() {
 		return occurrence.getTaxonRank();
 	}
-	
-	@ExternalizedProperty
+
 	public String getFamilyCode() {
 		if (occurrence.getTaxonRank() == TaxonRank.FAMILY) {
 			return occurrence.getCode();
@@ -60,8 +52,7 @@ public class TaxonOccurrenceProxy implements Proxy {
 			return familyTaxon == null ? null : familyTaxon.getCode();
 		}
 	}
-	
-	@ExternalizedProperty
+
 	public String getFamilyScientificName() {
 		if (occurrence.getTaxonRank() == TaxonRank.FAMILY) {
 			return occurrence.getScientificName();
@@ -70,6 +61,5 @@ public class TaxonOccurrenceProxy implements Proxy {
 			return familyTaxon == null ? null : familyTaxon.getScientificName();
 		}
 	}
-	
-	
+
 }

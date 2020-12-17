@@ -17,7 +17,6 @@
 			/WEB-INF/conf/applicationContext.xml
 			/WEB-INF/conf/applicationContext-database.xml
 			/WEB-INF/conf/applicationContext-security.xml
-			/WEB-INF/conf/applicationContext-graniteds.xml
 		</param-value>
 	</context-param>
 
@@ -32,9 +31,6 @@
 	</listener>
 	<listener>
 		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
-	</listener>
-	<listener>
-		<listener-class>org.granite.config.GraniteConfigListener</listener-class>
 	</listener>
 	<listener>
 		<listener-class>org.openforis.collect.web.listener.SessionListener</listener-class>
@@ -70,21 +66,6 @@
 		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
 		<async-supported>true</async-supported>
 	</filter>
-	<!-- swf cache filter (adds max-age=0 in response header to prevent wrong 
-		caching of swf files) -->
-	<filter>
-		<filter-name>swfCache</filter-name>
-		<filter-class>com.samaxes.filter.CacheFilter</filter-class>
-		<async-supported>true</async-supported>
-		<init-param>
-			<param-name>private</param-name>
-			<param-value>true</param-value>
-		</init-param>
-		<init-param>
-			<param-name>expiration</param-name>
-			<param-value>0</param-value>
-		</init-param>
-	</filter>
 
 	<filter-mapping>
 		<filter-name>corsFilter</filter-name>
@@ -102,12 +83,6 @@
 		<filter-name>springSecurityFilterChain</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	<!-- start of cache filter mapping -->
-	<filter-mapping>
-		<filter-name>swfCache</filter-name>
-		<url-pattern>*.swf</url-pattern>
-	</filter-mapping>
-	<!-- end of cache filter mapping -->
 
 	<!-- ========== SERVLETS ========== -->
 	<servlet>

@@ -179,10 +179,6 @@
 								<menuitem
 									label="${labels.survey.preview.data_entry}"
 									onClick="@command('showDataEntryPreview')" />
-								<menuitem
-									label="${labels.survey.preview.data_entry_new_ui}"
-									onClick="@command('showDataEntryPreviewNew')"
-									visible="@load(not vm.collectEarthSurvey)" />
 							</menupopup>
 						</combobutton>
 					</hlayout>

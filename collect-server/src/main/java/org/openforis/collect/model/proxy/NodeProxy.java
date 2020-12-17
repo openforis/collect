@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.collect.ProxyContext;
 import org.openforis.collect.manager.MessageSource;
@@ -25,14 +24,14 @@ public class NodeProxy implements Proxy {
 
 	private transient Node<?> node;
 	protected transient ProxyContext context;
-	
+
 	public static NodeProxy fromNode(Node<?> node, ProxyContext context) {
 		return fromNode(null, node, context);
 	}
-	
+
 	public static NodeProxy fromNode(EntityProxy parent, Node<?> node, ProxyContext context) {
 		if (node instanceof Attribute<?, ?>) {
-			if(node instanceof CodeAttribute) {
+			if (node instanceof CodeAttribute) {
 				return new CodeAttributeProxy(parent, (CodeAttribute) node, context);
 			} else {
 				return new AttributeProxy(parent, (Attribute<?, ?>) node, context);
@@ -43,14 +42,14 @@ public class NodeProxy implements Proxy {
 			throw new IllegalArgumentException("Unsupported node type: " + node.getClass().getName());
 		}
 	}
-	
+
 	public static List<NodeProxy> fromList(EntityProxy parent, List<Node<?>> list, ProxyContext context) {
 		List<NodeProxy> result = new ArrayList<NodeProxy>();
-		if(list != null) {
+		if (list != null) {
 			for (Node<?> node : list) {
 				NodeProxy proxy = fromNode(node, context);
-				if(node instanceof Attribute<?, ?>) {
-					if(node instanceof CodeAttribute) {
+				if (node instanceof Attribute<?, ?>) {
+					if (node instanceof CodeAttribute) {
 						proxy = new CodeAttributeProxy(parent, (CodeAttribute) node, context);
 					} else {
 						proxy = new AttributeProxy(parent, (Attribute<?, ?>) node, context);
@@ -63,38 +62,33 @@ public class NodeProxy implements Proxy {
 		}
 		return result;
 	}
-	
+
 	public NodeProxy(EntityProxy parent, Node<?> node, ProxyContext context) {
 		super();
 		this.node = node;
 		this.context = context;
 	}
 
-	@ExternalizedProperty
 	public Integer getId() {
 		return node.getInternalId();
 	}
-	
-	@ExternalizedProperty
+
 	public Integer getDefinitionId() {
 		return node.getDefinition() == null ? null : node.getDefinition().getId();
 	}
-	
-	@ExternalizedProperty
+
 	public String getPath() {
 		return node.getPath();
 	}
 
-	@ExternalizedProperty
 	public Integer getParentId() {
 		return node.getParent() == null ? null : node.getParent().getInternalId();
 	}
-	
-	@ExternalizedProperty
+
 	public boolean isUserSpecified() {
 		return node.isUserSpecified();
 	}
-	
+
 	protected MessageSource getMessageSource() {
 		return context.getMessageSource();
 	}

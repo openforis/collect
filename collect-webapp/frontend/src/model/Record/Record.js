@@ -11,7 +11,7 @@ export class Record extends Serializable {
   rootEntity
   rootEntityKeys = []
   owner
-  version
+  versionId
   readOnly
   errorsMissingValues
   errorsInvalidValues
@@ -58,8 +58,8 @@ export class Record extends Serializable {
     return this.owner ? this.owner.id : null
   }
 
-  get versionId() {
-    return this.version ? this.version.id : null
+  get version() {
+    return this.versionId ? this.survey.getVersionById(this.versionId) : null
   }
 
   get errors() {
