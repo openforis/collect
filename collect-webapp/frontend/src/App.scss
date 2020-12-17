@@ -4,11 +4,15 @@
 }
 
 .record-edit-form {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
   /**
   * ==== TABS
   **/
   .tabset-wrapper {
-    height: 100%;
+    height: calc(100% - 40px); // consider record action bar height
 
     .tab-content {
       height: 100%;
