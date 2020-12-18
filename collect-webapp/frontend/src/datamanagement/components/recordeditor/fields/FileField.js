@@ -114,7 +114,7 @@ export default class FileField extends AbstractField {
               extensions,
             ])}
             handleFileDrop={(file) => this.onFileSelect(file)}
-            height={inTable ? '30px' : '60px'}
+            height={inTable ? '30px' : 'auto'}
             size={inTable ? 'small' : 'medium'}
           />
         )}
