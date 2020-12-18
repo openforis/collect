@@ -190,8 +190,7 @@ class CsvDataImportPage extends Component {
       </option>
     ))
 
-    const steps = Workflow.STEPS
-    const stepsChecks = Object.keys(steps).map((s) => {
+    const stepsChecks = Workflow.STEP_CODES.map((s) => {
       const checked = this.state.selectedSteps.indexOf(s) >= 0
       return (
         <Label check key={s}>
