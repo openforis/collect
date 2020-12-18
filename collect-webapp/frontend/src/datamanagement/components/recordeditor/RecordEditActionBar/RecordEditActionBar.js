@@ -1,4 +1,4 @@
-import './RecordEditActionBar.css'
+import './RecordEditActionBar.scss'
 
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -100,42 +100,44 @@ const RecordEditActionBar = (props) => {
         {stepSummary}
         {definition.labelOrName}: {rootEntitySummary}
       </label>
-      <ValidationReportIcon record={record} />
-      {!preview && (
-        <>
-          <IconButton title={L.l('common.exportToExcel')} onClick={onExportToExcel}>
-            <Icon className="fa fa-file-excel" color="primary" />
-          </IconButton>
-          {!inPopUp && (
-            <>
-              {prevStep && (
-                <Button
-                  variant="contained"
-                  color="default"
-                  size="small"
-                  startIcon={<ThumbDown />}
-                  title={L.l('dataManagement.dataEntry.demoteTo', [prevStepLabel])}
-                  onClick={onDemote}
-                >
-                  {L.l('dataManagement.dataEntry.demote')}
-                </Button>
-              )}
-              {nextStep && (
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  size="small"
-                  endIcon={<ThumbUp />}
-                  title={L.l('dataManagement.dataEntry.promoteTo', [nextStepLabel])}
-                  onClick={onPromote}
-                >
-                  {L.l('dataManagement.dataEntry.promote')}
-                </Button>
-              )}
-            </>
-          )}
-        </>
-      )}
+      <div className="button-group">
+        <ValidationReportIcon record={record} />
+        {!preview && (
+          <>
+            <IconButton title={L.l('common.exportToExcel')} onClick={onExportToExcel}>
+              <Icon className="fa fa-file-excel" color="primary" />
+            </IconButton>
+            {!inPopUp && (
+              <>
+                {prevStep && (
+                  <Button
+                    variant="contained"
+                    color="default"
+                    size="small"
+                    startIcon={<ThumbDown />}
+                    title={L.l('dataManagement.dataEntry.demoteTo', [prevStepLabel])}
+                    onClick={onDemote}
+                  >
+                    {L.l('dataManagement.dataEntry.demote')}
+                  </Button>
+                )}
+                {nextStep && (
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="small"
+                    endIcon={<ThumbUp />}
+                    title={L.l('dataManagement.dataEntry.promoteTo', [nextStepLabel])}
+                    onClick={onPromote}
+                  >
+                    {L.l('dataManagement.dataEntry.promote')}
+                  </Button>
+                )}
+              </>
+            )}
+          </>
+        )}
+      </div>
     </div>
   )
 }

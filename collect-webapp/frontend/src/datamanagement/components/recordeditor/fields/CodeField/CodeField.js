@@ -269,7 +269,7 @@ export default class CodeField extends AbstractField {
 
     if (enumerator) {
       return (
-        <InputLabel style={{ width: FieldsSizes.getWidth({ fieldDef, textAlign: 'left' }) }}>
+        <InputLabel style={{ width: FieldsSizes.getWidth({ fieldDef, inTable }) }}>
           <CodeFieldItemLabel item={Arrays.head(selectedItems)} attributeDefinition={attributeDefinition} />
         </InputLabel>
       )

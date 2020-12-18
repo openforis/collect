@@ -65,7 +65,7 @@ const TaxonAutoCompleteField = (props) => {
       ].includes(field) &&
       ['UNK', 'UNL'].includes(taxonOccurrence.code)
     ) {
-      taxonOccurrenceUpdated[valueField] = inputValue
+      taxonOccurrenceUpdated[valueField] = inputValue.trim()
     }
     onSelect(taxonOccurrenceUpdated)
   }

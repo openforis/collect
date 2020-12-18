@@ -1,0 +1,23 @@
+.record-edit-action-bar {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  gap: 4px;
+  height: 34px;
+  top: 0;
+  right: 0;
+
+  label {
+    font-weight: 500;
+    font-size: 1.2rem;
+  }
+
+  .icon.validation-report {
+    color: green;
+
+    &.error {
+      color: orange;
+    }
+  }
+}
