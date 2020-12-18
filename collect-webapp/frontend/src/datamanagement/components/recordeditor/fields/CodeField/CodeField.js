@@ -162,7 +162,12 @@ export default class CodeField extends AbstractField {
         attributeDefinition,
       })
 
-      if (levelIndex === 0 || (ancestorCodes && ancestorCodes.length === levelIndex)) {
+      if (
+        levelIndex === 0 ||
+        (ancestorCodes &&
+          ancestorCodes.length === levelIndex &&
+          ancestorCodes.every((ancestorCode) => Strings.isNotBlank(ancestorCode)))
+      ) {
         const count = await ServiceFactory.codeListService.countAvailableItems({
           surveyId,
           codeListId,

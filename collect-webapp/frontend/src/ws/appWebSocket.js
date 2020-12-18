@@ -8,10 +8,13 @@ import { recordLocked, recordUnlocked } from '../datamanagement/actions'
 import EventQueue from 'model/event/EventQueue'
 import { RecordEvent, RecordEventWrapper } from 'model/event/RecordEvent'
 import { showSystemError } from 'actions/systemError'
+import ServiceFactory from 'services/ServiceFactory'
 
 const eventsDestination = '/events'
 
 const messageTypes = {
+  surveyUpdated: 'SURVEY_UPDATED',
+  surveyDeleted: 'SURVEY_DELETED',
   surveysUpdated: 'SURVEYS_UPDATED',
   recordLocked: 'RECORD_LOCKED',
   recordUnlocked: 'RECORD_UNLOCKED',
@@ -20,6 +23,16 @@ const messageTypes = {
 }
 
 const handlersByType = {
+  // TODO
+  [messageTypes.surveyUpdated]: (message) => () => {
+    const { surveyId } = message
+    ServiceFactory.codeListService.invalidateCache({ surveyId })
+  },
+  // TODO
+  [messageTypes.surveyDeleted]: (message) => () => {
+    const { surveyId } = message
+    ServiceFactory.codeListService.invalidateCache({ surveyId })
+  },
   [messageTypes.surveysUpdated]: fetchSurveySummaries,
   [messageTypes.recordLocked]: (message) => recordLocked(message.recordId, message.lockedBy),
   [messageTypes.recordUnlocked]: (message) => recordUnlocked(message.recordId),
