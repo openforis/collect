@@ -5,6 +5,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
 
+import java.text.Normalizer.Form;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -112,6 +113,13 @@ public class UserController extends AbstractPersistedObjectEditFormController<In
 	protected User createItemInstance() {
 		return new User();
 	}
+	
+	protected void copyFormIntoItem(UserForm form, User item) {
+		super.copyFormIntoItem(form, item);
+		if (form.getRole() != null) {
+			item.setRole(form.getRole());
+		}
+	};
 	
 	public static class UsersDeleteParameters {
 		

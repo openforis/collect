@@ -106,7 +106,10 @@ public class User implements PersistedObject<Integer>, Comparable<User>, DeepCom
 	}
 
 	public void setRoles(List<UserRole> roles) {
-		this.roles = roles;
+		this.roles.clear();
+		if (roles != null) {
+			this.roles.addAll(roles);
+		}
 	}
 
 	public void setUsername(String name) {
