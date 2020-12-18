@@ -10,6 +10,7 @@ import org.openforis.collect.command.handler.RecordCommandHandler;
 import org.openforis.collect.command.handler.UpdateAttributeCommandHandler;
 import org.openforis.collect.command.handler.UpdateMultipleAttributeCommandHandler;
 import org.openforis.collect.manager.MessageSource;
+import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
@@ -24,6 +25,8 @@ public class SpringCommandDispatcher extends RegistryCommandDispatcher {
 	private JobManager jobManager;
 	@Autowired
 	private RecordManager recordManager;
+	@Autowired
+	private RecordFileManager recordFileManager;
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
@@ -61,6 +64,7 @@ public class SpringCommandDispatcher extends RegistryCommandDispatcher {
 		register(UpdateTimeAttributeCommand.class, updateAttributeCommandHandler);
 
 		DeleteNodeCommandHandler deleteNodeCommandHandler = new DeleteNodeCommandHandler();
+		deleteNodeCommandHandler.setRecordFileManager(recordFileManager);
 		register(DeleteAttributeCommand.class, deleteNodeCommandHandler);
 		register(DeleteEntityCommand.class, deleteNodeCommandHandler);
 	}

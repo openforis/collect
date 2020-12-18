@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.SessionRecordFileManager;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ExecutionArgParam;
@@ -25,6 +26,8 @@ public class PreviewPopUpVM extends SurveyBaseVM {
 
 	@WireVariable
 	private SessionManager sessionManager;
+	@WireVariable
+	private SessionRecordFileManager sessionRecordFileManager;
 
 	@Init(superclass = false)
 	public void init(@ExecutionArgParam("surveyId") String surveyId, @ExecutionArgParam("work") String work,
@@ -34,15 +37,13 @@ public class PreviewPopUpVM extends SurveyBaseVM {
 				
 		URIBuilder uriBuilderParams = new URIBuilder()
 				.addParameter("preview", "true")
-				.addParameter("surveyId", surveyId)
-				.addParameter("work", work)
 				.addParameter("rootEntityId", rootEntityId)
 				.addParameter("locale", locale);
 		if (StringUtils.isNotBlank(versionId)) {
 			uriBuilderParams.addParameter("versionId", versionId);
 		}
 		uriBuilderParams.addParameter("recordStep", recordStep);
-		this.uri = Resources.Page.PREVIEW_PATH.getLocation() + uriBuilderParams.build().toString();
+		this.uri = Resources.Page.PREVIEW_PATH.getLocation() + surveyId + uriBuilderParams.build().toString();
 	}
 
 	public String getContentUrl() throws URISyntaxException {
@@ -51,10 +52,12 @@ public class PreviewPopUpVM extends SurveyBaseVM {
 
 	@Command
 	public void close() {
+		// TODO check if release record is necessary
 		try {
 			sessionManager.releaseRecord();
 		} catch (RecordUnlockedException e) {
 			// Ignore it
 		}
+		sessionRecordFileManager.deleteAllTempFiles();
 	}
 }
