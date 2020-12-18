@@ -31,7 +31,7 @@ const WIDTH_CALCULATORS_BY_ATTRIBUTE_TYPE = {
     return inTable ? availableFieldNames.length * COORDINATE_FIELD_WIDTH : COORDINATE_FIELD_WIDTH
   },
   [AttributeDefinition.Types.DATE]: () => 180,
-  [AttributeDefinition.Types.FILE]: () => 200,
+  [AttributeDefinition.Types.FILE]: ({ inTable }) => (inTable ? 200 : 400),
   [AttributeDefinition.Types.NUMBER]: ({ fieldDef, inTable }) => {
     const { attributeDefinition } = fieldDef
     return 120 + (attributeDefinition.isUnitVisible({ inTable }) ? 30 : 0)

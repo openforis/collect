@@ -11,6 +11,7 @@ import { FileAttributeDefinition } from 'model/Survey'
 import DeleteIconButton from 'common/components/DeleteIconButton'
 import Dropzone from 'common/components/Dropzone'
 import Image from 'common/components/Image'
+import * as FieldsSizes from './FieldsSizes'
 
 import AbstractField from './AbstractField'
 
@@ -22,23 +23,23 @@ const EXTENSIONS_BY_FILE_TYPE = {
 }
 
 const FileThumbnail = (props) => {
-  const { node, onClick } = props
+  const { inTable, node, onClick } = props
   if (!node) {
     return null
   }
   const { filename = null } = node.value || {}
-  const { definition, record } = node
+  const { definition } = node
   const { fileType } = definition
-  const { id: recordId = 0 } = record
-  const { survey } = record
 
   const thumbnailUrl =
     fileType === FileAttributeDefinition.FileTypes.IMAGE && filename
-      ? `${ServiceFactory.recordFileService.BASE_URL}survey/${survey.id}/data/records/${recordId}/${record.step}/node/${node.id}/thumbnail`
+      ? ServiceFactory.recordFileService.getRecordFileThumbnailUrl({ node })
       : null
 
+  const thumbnailSize = inTable ? 30 : 150
+
   return thumbnailUrl ? (
-    <Image src={thumbnailUrl} maxWidth={150} maxHeight={150} onClick={onClick} />
+    <Image src={thumbnailUrl} maxWidth={thumbnailSize} maxHeight={thumbnailSize} onClick={onClick} />
   ) : (
     <Button type="button" onClick={onClick}>
       {L.l('common.download')}
@@ -80,7 +81,7 @@ export default class FileField extends AbstractField {
   }
 
   render() {
-    const { fieldDef, parentEntity } = this.props
+    const { fieldDef, inTable, parentEntity } = this.props
     const { value: valueState = {}, uploading } = this.state
     const { record } = parentEntity
     const { filename = null } = valueState || {}
@@ -92,24 +93,29 @@ export default class FileField extends AbstractField {
     const extensions = EXTENSIONS_BY_FILE_TYPE[fileType]
 
     return (
-      <div>
+      <div style={{ width: FieldsSizes.getWidth({ inTable, fieldDef }), textAlign: inTable ? 'center' : 'inherit' }}>
         {filename && (
-          <div>
-            <FileThumbnail node={node} onClick={this.onDownloadClick} />
-            {!readOnly && <DeleteIconButton onClick={this.onDeleteClick} />}
-          </div>
+          <>
+            <FileThumbnail inTable={inTable} node={node} onClick={this.onDownloadClick} />
+            {!readOnly && (
+              <DeleteIconButton
+                title={L.l('dataManagement.dataEntry.attribute.file.deleteFile')}
+                onClick={this.onDeleteClick}
+              />
+            )}
+          </>
         )}
         {!readOnly && !uploading && !filename && (
           <Dropzone
             className="file-field-dropzone"
-            compact
             acceptedFileTypes={extensions}
             acceptedFileTypesDescription={L.l('dataManagement.dataEntry.attribute.file.acceptedFileDescription', [
               fileType,
               extensions,
             ])}
             handleFileDrop={(file) => this.onFileSelect(file)}
-            height="60px"
+            height={inTable ? '30px' : '60px'}
+            size={inTable ? 'small' : 'medium'}
           />
         )}
         {uploading && <Progress animated value={100} />}

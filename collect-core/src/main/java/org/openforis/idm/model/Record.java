@@ -133,13 +133,18 @@ public class Record implements DeepComparable {
 	}
 
 	/**
+	 * Looks for a node in the specified path and throws an Exception if the node is not found.
+	 * 
 	 * @param path Node path
 	 * @return Node
-	 * @deprecated use {@link #findNodeByPath(path)} instead.  
+	 * @throws IllegalArgumentException if the node is not found.
 	 */
-	@Deprecated
 	public <N extends Node<?>> N getNodeByPath(String path) {
-		return findNodeByPath(path);
+		N node = findNodeByPath(path);
+		if (node == null) {
+			throw new IllegalArgumentException(String.format("Could not find node %s in survey %d record %d ", path, getSurvey().getId(), getId()));
+		}
+		return node;
 	}
 	
 	public <N extends Node<?>> N findNodeByPath(String path) {
@@ -334,7 +339,7 @@ public class Record implements DeepComparable {
 		this.id = id;
 	}
 
-	public SurveyContext getSurveyContext() {
+	public SurveyContext<?> getSurveyContext() {
 		return survey.getContext();
 	}
 

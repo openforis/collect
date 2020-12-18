@@ -85,7 +85,8 @@
   "forms": {
     "dropzone": {
       "selectFile": "Click to select a file or drop it here.",
-      "supportedFileTypes": "Supported file types: {0}"
+      "selectFileCompact": "Select file",
+      "supportedFileTypes": "Allowed files: {0}"
     },
     "selectOne": "--- Please select one ---"
   },
@@ -311,7 +312,9 @@
             "image": "Image",
             "video": "Video"
           },
-          "acceptedFileDescription": "{0} file types ({1})"
+          "acceptedFileDescription": "{0} file types ({1})",
+          "errorDownloadingImage": "Error dowloading image",
+          "deleteFile": "Delete the file"
         },
         "range": {
           "from": "From",

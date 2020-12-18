@@ -18,7 +18,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.web.manager.SessionRecordProvider;
-import org.openforis.collect.web.session.SessionState;
+import org.openforis.idm.model.FileAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -53,65 +53,57 @@ public class RecordFileController extends BasicController implements Serializabl
 	@Autowired
 	private SessionRecordProvider recordProvider;
 
-	@RequestMapping(value = "/downloadRecordFile.htm", method = RequestMethod.POST)
-	@Deprecated
-	public void download(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("nodeId") Integer nodeId) throws Exception {
-		SessionState sessionState = getSessionState(request);
-		CollectRecord record = sessionState.getActiveRecord();
-		File file = sessionRecordFileManager.getFile(record, nodeId);
-		if (file != null && file.exists()) {
-			Controllers.writeFileToResponse(response, file);
-		} else {
-			Integer recordId = record == null ? null : record.getId();
-			String fileName = file == null ? null : file.getName();
-			Exception e = new Exception(
-					"File not found: " + fileName + " record id: " + recordId + " node id: " + nodeId);
-			LOG.error(e);
-			throw e;
+	@RequestMapping(value = "/survey/{surveyId}/data/records/{recordId}/{recordStep}/file", method = RequestMethod.GET)
+	public void downloadFile(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable("surveyId") int surveyId, @PathVariable("recordId") int recordId,
+			@PathVariable("recordStep") Step recordStep, @RequestParam("nodePath") String nodePath) throws Exception {
+		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
+		CollectRecord record = recordProvider.provide(survey, recordId == 0 ? null : recordId, recordStep);
+		FileAttribute node = record.getNodeByPath(nodePath);
+		File file = getFile(node);
+		writeFileToResponse(response, file, surveyId, recordId, nodePath);
+	}
+
+	@RequestMapping(value = "/survey/{surveyId}/data/records/{recordId}/{recordStep}/file-thumbnail", method = RequestMethod.GET)
+	public void downloadThumbnail(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable("surveyId") int surveyId, @PathVariable("recordId") int recordId,
+			@PathVariable("recordStep") Step recordStep, @RequestParam("nodePath") String nodePath) throws Exception {
+		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
+		CollectRecord record = recordProvider.provide(survey, recordId == 0 ? null : recordId, recordStep);
+		FileAttribute node = record.getNodeByPath(nodePath);
+		File file = getFile(node);
+		try {
+			String extension = FilenameUtils.getExtension(file.getName());
+			String outputFileName = String.format("node-%d-file-thumbnail.%s", node.getId(), extension);
+			String contentType = Files.getContentType(outputFileName);
+			response.setContentType(contentType);
+			Thumbnails.of(file).size(THUMBNAIL_SIZE, THUMBNAIL_SIZE).toOutputStream(response.getOutputStream());
+			return;
+		} catch (Exception e) {
+			// Try to write original file to response
+			writeFileToResponse(response, file, surveyId, recordId, nodePath);
 		}
 	}
 
-	@RequestMapping(value = "/survey/{surveyId}/data/records/{recordId}/{recordStep}/node/{nodeId}/file", method = RequestMethod.GET)
-	public void downloadFile(HttpServletRequest request, HttpServletResponse response,
-			@PathVariable("surveyId") int surveyId, @PathVariable("recordId") int recordId,
-			@PathVariable("recordStep") Step recordStep, @PathVariable("nodeId") int nodeId) throws Exception {
-		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
-		CollectRecord record = recordProvider.provide(survey, recordId == 0 ? null : recordId, recordStep);
-		File file = sessionRecordFileManager.getFile(record, nodeId);
-		writeFileToResponse(response, file, surveyId, recordId, nodeId);
+	private File getFile(FileAttribute node) {
+		File file = sessionRecordFileManager.getFile(node);
+		if (file == null || !file.exists()) {
+			throw new IllegalStateException(String.format("File not found for attribute %s in record %d in survey %d",
+					node.getPath(), node.getRecord().getId(), node.getSurvey().getId()));
+		}
+		return file;
 	}
 
-	@RequestMapping(value = "/survey/{surveyId}/data/records/{recordId}/{recordStep}/node/{nodeId}/thumbnail", method = RequestMethod.GET)
-	public void downloadThumbnail(HttpServletRequest request, HttpServletResponse response,
-			@PathVariable("surveyId") int surveyId, @PathVariable("recordId") int recordId,
-			@PathVariable("recordStep") Step recordStep, @PathVariable("nodeId") int nodeId) throws Exception {
-		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
-		CollectRecord record = recordProvider.provide(survey, recordId == 0 ? null : recordId, recordStep);
-		File file = sessionRecordFileManager.getFile(record, nodeId);
-		try {
-			if (file != null) {
-				String extension = FilenameUtils.getExtension(file.getName());
-				String outputFileName = String.format("node-%d-file-thumbnail.%s", nodeId, extension);
-				String contentType = Files.getContentType(outputFileName);
-				response.setContentType(contentType);
-				Thumbnails.of(file).size(THUMBNAIL_SIZE, THUMBNAIL_SIZE).toOutputStream(response.getOutputStream());
-				return;
-			}
-		} catch (Exception e) {}
-		// Try to write original file to response
-		writeFileToResponse(response, file, surveyId, recordId, nodeId);
-	}
+	private void writeFileToResponse(HttpServletResponse response, File file, int surveyId, int recordId,
+			String nodePath) throws IOException, Exception {
 
-	private void writeFileToResponse(HttpServletResponse response, File file, int surveyId, int recordId, int nodeId)
-			throws IOException, Exception {
 		if (file != null && file.exists()) {
 			Controllers.writeFileToResponse(response, file);
 		} else {
 			String fileName = file == null ? null : file.getName();
 			Exception e = new Exception(
-					String.format("File not found: %s - survey id : %d - record id: %d - node id : %d", fileName,
-							surveyId, recordId, nodeId));
+					String.format("File not found: %s - survey id : %d - record id: %d - node path : %s", fileName,
+							surveyId, recordId, nodePath));
 			LOG.error(e);
 			throw e;
 		}

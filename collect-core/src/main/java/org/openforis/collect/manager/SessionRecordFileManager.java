@@ -149,17 +149,17 @@ public class SessionRecordFileManager implements Serializable {
 		return recordChanged;
 	}
 	
-	public java.io.File getFile(CollectRecord record, int nodeId) {
+	public java.io.File getFile(FileAttribute fileAttribute) {
 		java.io.File file;
-		TempFileInfo tempFileInfo = nodeIdToTempFilePath.get(nodeId);
+		TempFileInfo tempFileInfo = nodeIdToTempFilePath.get(fileAttribute.getInternalId());
 		if ( tempFileInfo == null ) {
-			file = recordFileManager.getRepositoryFile(record, nodeId);
+			file = recordFileManager.getRepositoryFile(fileAttribute);
 		} else {
 			file = new java.io.File(tempFileInfo.getTempFilePath());
 		}
 		return file;
 	}
-
+	
 	protected boolean performFilesDelete(CollectRecord record) {
 		boolean result = false;
 		Set<Entry<Integer,String>> entrySet = filesToDelete.entrySet();

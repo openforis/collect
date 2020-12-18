@@ -1,24 +1,31 @@
-import React, { Suspense } from 'react'
-import { useImage } from 'react-image'
-import { Spinner } from 'reactstrap'
+import React, { Suspense, useState } from 'react'
+import WarningIcon from '@material-ui/icons/Warning'
 
-const LoadingSpinner = () => <Spinner color="primary" />
+import LoadingSpinnerSmall from './LoadingSpinnerSmall'
+import L from 'utils/Labels'
 
 const ImageComponent = (props) => {
-  const { src: srcList, onClick, maxWidth, maxHeight } = props
-  const { src, isLoading } = useImage({ srcList })
+  const { src, onClick, maxWidth, maxHeight } = props
 
   const maxWidthPx = maxWidth ? `${maxWidth}px` : null
   const maxHeightPx = maxHeight ? `${maxHeight}px` : null
 
-  return isLoading ? (
-    <LoadingSpinner />
-  ) : (
+  const [error, setError] = useState(null)
+
+  if (error) {
+    return (
+      <span className="error" title={L.l('dataManagement.dataEntry.attribute.file.errorDownloadingImage')}>
+        <WarningIcon />
+      </span>
+    )
+  }
+  return (
     <img
       src={src}
       alt="img"
       onClick={onClick}
       style={{ cursor: onClick ? 'pointer' : null, maxWidth: maxWidthPx, maxHeight: maxHeightPx }}
+      onError={() => setError(true)}
     />
   )
 }
@@ -26,7 +33,7 @@ const ImageComponent = (props) => {
 const Image = (props) => {
   const { src, onClick, maxWidth, maxHeight } = props
   return (
-    <Suspense fallback={<LoadingSpinner />}>
+    <Suspense fallback={<LoadingSpinnerSmall />}>
       <ImageComponent src={src} onClick={onClick} maxWidth={maxWidth} maxHeight={maxHeight} />
     </Suspense>
   )

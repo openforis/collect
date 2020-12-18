@@ -171,4 +171,5 @@ export default class RecordService extends AbstractService {
   demoteRecord({ surveyId, recordId }) {
     return this.post(`survey/${surveyId}/data/records/demote/${recordId}`)
   }
+
 }

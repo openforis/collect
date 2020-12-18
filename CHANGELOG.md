@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.26.37] - NOT RELEASED YET
 ### Added
-- Data entry new UI: layout adjustments;
+- Data entry new UI: file attribute / layout adjustments;
 
 ## [3.26.36] - 2020-12-17
 ### Added
