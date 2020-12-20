@@ -3,7 +3,6 @@ package org.openforis.collect.web.ws;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.web.ws.WebSocketMessageSender.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,7 +14,8 @@ public class AppWS {
 	private WebSocketMessageSender messageSender;
 
 	public enum MessageType {
-		SURVEYS_UPDATED, RECORD_LOCKED, RECORD_UNLOCKED, RECORD_UPDATED, RECORD_UPDATE_ERROR
+		SURVEYS_UPDATED, SURVEY_UPDATED, SURVEY_PUBLISHED, SURVEY_UNPUBLISHED, SURVEY_DELETED, RECORD_LOCKED,
+		RECORD_UNLOCKED, RECORD_UPDATED, RECORD_UPDATE_ERROR
 	}
 
 	public void sendMessage(MessageType type) {
@@ -30,7 +30,7 @@ public class AppWS {
 		sendMessage(message, 0);
 	}
 
-	private void sendMessage(final Message message, int delay) {
+	public void sendMessage(final Message message, int delay) {
 		if (delay > 0) {
 			new Timer().schedule(new TimerTask() {
 				public void run() {
@@ -42,17 +42,17 @@ public class AppWS {
 		}
 	}
 
-	public static class SurveyUpdateMessage extends Message {
+	public static class SurveyMessage extends Message {
 
-		private SurveySummary survey;
+		private int surveyId;
 
-		public SurveyUpdateMessage(MessageType updateType, SurveySummary survey) {
-			super(updateType.name());
-			this.survey = survey;
+		public SurveyMessage(MessageType messageType, int surveyId) {
+			super(messageType.name());
+			this.surveyId = surveyId;
 		}
 
-		public SurveySummary getSurvey() {
-			return survey;
+		public int getSurveyId() {
+			return surveyId;
 		}
 	}
 

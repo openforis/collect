@@ -13,8 +13,10 @@ import ServiceFactory from 'services/ServiceFactory'
 const eventsDestination = '/events'
 
 const messageTypes = {
-  surveyUpdated: 'SURVEY_UPDATED',
+  //TODO surveyUpdated: 'SURVEY_UPDATED',
   surveyDeleted: 'SURVEY_DELETED',
+  surveyPublished: 'SURVEY_PUBLISHED',
+  surveyUnpublished: 'SURVEY_UNPUBLISHED',
   surveysUpdated: 'SURVEYS_UPDATED',
   recordLocked: 'RECORD_LOCKED',
   recordUnlocked: 'RECORD_UNLOCKED',
@@ -22,16 +24,27 @@ const messageTypes = {
   recordUpdateError: 'RECORD_UPDATE_ERROR',
 }
 
+const invalidateSurveyCache = ({ surveyId }) => {
+  ServiceFactory.codeListService.invalidateCache({ surveyId })
+}
+
 const handlersByType = {
   // TODO
-  [messageTypes.surveyUpdated]: (message) => () => {
+  // [messageTypes.surveyUpdated]: (message) => () => {
+  //   const { surveyId } = message
+  //   ServiceFactory.codeListService.invalidateCache({ surveyId })
+  // },
+  [messageTypes.surveyPublished]: (message) => () => {
     const { surveyId } = message
-    ServiceFactory.codeListService.invalidateCache({ surveyId })
+    invalidateSurveyCache({ surveyId })
   },
-  // TODO
+  [messageTypes.surveyUnpublished]: (message) => () => {
+    const { surveyId } = message
+    invalidateSurveyCache({ surveyId })
+  },
   [messageTypes.surveyDeleted]: (message) => () => {
     const { surveyId } = message
-    ServiceFactory.codeListService.invalidateCache({ surveyId })
+    invalidateSurveyCache({ surveyId })
   },
   [messageTypes.surveysUpdated]: fetchSurveySummaries,
   [messageTypes.recordLocked]: (message) => recordLocked(message.recordId, message.lockedBy),

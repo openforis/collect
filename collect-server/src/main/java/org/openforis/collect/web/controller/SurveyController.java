@@ -68,6 +68,8 @@ import org.openforis.collect.web.validator.SurveyCloneParametersValidator;
 import org.openforis.collect.web.validator.SurveyCreationParametersValidator;
 import org.openforis.collect.web.validator.SurveyImportParametersValidator;
 import org.openforis.collect.web.ws.AppWS;
+import org.openforis.collect.web.ws.AppWS.MessageType;
+import org.openforis.collect.web.ws.AppWS.SurveyMessage;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.web.Response;
 import org.openforis.concurrency.Job;
@@ -267,7 +269,7 @@ public class SurveyController extends BasicController {
 			try {
 				User activeUser = sessionManager.getLoggedUser();
 				surveyManager.publish(survey, activeUser);
-				sendSurveysUpdatedMessage();
+				sendSurveyMessage(MessageType.SURVEY_PUBLISHED, id);
 				return new SurveyPublishResult(generateView(survey, false, langCode));
 			} catch(Exception e) {
 				LOG.error("Error publishing survey: " + e.getMessage(), e);
@@ -283,7 +285,7 @@ public class SurveyController extends BasicController {
 			throws SurveyStoreException {
 		User activeUser = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.unpublish(id, activeUser);
-		sendSurveysUpdatedMessage();
+		sendSurveyMessage(AppWS.MessageType.SURVEY_UNPUBLISHED, id);
 		return generateView(survey, false, langCode);
 	}
 
@@ -313,7 +315,7 @@ public class SurveyController extends BasicController {
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public @ResponseBody Response deleteSurvey(@PathVariable int id) throws SurveyImportException {
 		surveyManager.deleteSurvey(id);
-		sendSurveysUpdatedMessage();
+		sendSurveyMessage(AppWS.MessageType.SURVEY_DELETED, id);
 		return new Response();
 	}
 
@@ -596,6 +598,12 @@ public class SurveyController extends BasicController {
 		appWS.sendMessage(SURVEYS_UPDATED, 500); // delay to allow transaction commit
 	}
 
+	private void sendSurveyMessage(MessageType surveydMessageType, int surveyId) {
+		appWS.sendMessage(new SurveyMessage(surveydMessageType, surveyId), 500);
+		sendSurveysUpdatedMessage();
+	}
+
+	
 	private SurveyValidator getSurveyValidator(CollectSurvey survey) {
 		return survey.getTarget() == SurveyTarget.COLLECT_EARTH ? collectEarthSurveyValidator : surveyValidator;
 	}
