@@ -28,7 +28,7 @@ import Arrays from 'utils/Arrays'
 import L from 'utils/Labels'
 import RouterUtils from 'utils/RouterUtils'
 
-import { selectActiveSurveyLanguage } from 'actions'
+import { selectActiveSurveyLanguage } from 'actions/activeSurvey'
 import { startJobMonitor } from 'actions/job'
 import { deleteRecords } from 'datamanagement/actions'
 import { fetchRecordSummaries } from 'datamanagement/recordDataTable/actions'

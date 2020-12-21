@@ -16,7 +16,6 @@ The project has been developed as a Maven project and it's divided into sub-modu
 ### Default built modules
 
 * collect-base (basic environment classes used even by Collect Mobile)
-* collect-client (client side module, written in Adobe Flex)
 * collect-core (core functionalities, used even by Collect Earth and Collect Mobile)
 * collect-rdb (Relational DataBase generator module).
 * collect-server (server side module used by the web application).
@@ -105,7 +104,3 @@ npm start
 ```
 Once started, Collect user interface will be available from the web browser at the address `http://localhost:3000` (please CHANGE IT INTO `http://127.0.0.1:3000` to avoid problems if running Collect with Google Chrome).
 When running in dev mode, the web application will try to access the Collect RESTful API at the address `http://127.0.0.1:8080/collect/`; the CORS filter will prevent calls to the API from a different location, this is why you will have to use a plugin like Access Control Allow Origin (`https://mybrowseraddon.com/access-control-allow-origin.html`) to enable the connection to the server side.
-
-The collect-client module won't compile in Tomcat under Eclipse, because the plugin responsible to compile the Flex code does not work there.
-The migration to the new UI will be completed by the end of 2020, meanwhile please be patient.
-If you want to build the collect-client module, you have to do it from command line, with "mvn clean build".
