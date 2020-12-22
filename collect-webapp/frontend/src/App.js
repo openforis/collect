@@ -4,7 +4,6 @@ import React, { useEffect } from 'react'
 import { Switch, Route } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
-import AppWebSocket from 'ws/appWebSocket'
 import Header from 'common/components/Header'
 import Sidebar from 'common/components/Sidebar'
 import CurrentJobMonitorDialog from 'common/containers/CurrentJobMonitorDialog'
@@ -110,14 +109,8 @@ const App = () => {
           name="SurveyDataEntryPreview"
           component={SurveyDataEntryPreviewPage}
         />
-        <FullScreenRoute
-          path="/record_fullscreen/:id"
-          exact
-          name="RecordEditFullScreen"
-          component={RecordEditPage}
-        />
+        <FullScreenRoute path="/record_fullscreen/:id" exact name="RecordEditFullScreen" component={RecordEditPage} />
       </Switch>
-      <AppWebSocket />
       <CurrentJobMonitorDialog />
       {systemErrorShown && (
         <SystemErrorDialog message={systemErrorMessage} details={systemErrorStackTrace} width={800} />

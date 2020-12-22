@@ -1,41 +1,28 @@
 import {
-  REQUEST_FULL_ACTIVE_SURVEY,
-  RECEIVE_FULL_ACTIVE_SURVEY,
-  INVALIDATE_ACTIVE_SURVEY,
+  ACTIVE_SURVEY_REQUESTED,
+  ACTIVE_SURVEY_FETCHED,
   SELECT_ACTIVE_SURVEY_LANGUAGE,
+  ACTIVE_SURVEY_CLEARED,
 } from '../actions/activeSurvey'
 
 const initialState = {
   isFetching: false,
-  didInvalidate: false,
   survey: null,
   language: null,
+  lastUpdated: null,
 }
 
 function activeSurvey(state = initialState, action) {
   switch (action.type) {
-    case INVALIDATE_ACTIVE_SURVEY:
-      return Object.assign({}, state, {
-        didInvalidate: true,
-      })
-    case REQUEST_FULL_ACTIVE_SURVEY:
-      return Object.assign({}, state, {
-        isFetching: true,
-        didInvalidate: false,
-      })
-    case RECEIVE_FULL_ACTIVE_SURVEY:
+    case ACTIVE_SURVEY_CLEARED:
+      return { ...initialState }
+    case ACTIVE_SURVEY_REQUESTED:
+      return { ...state, isFetching: true }
+    case ACTIVE_SURVEY_FETCHED:
       const { survey, language } = action
-      return Object.assign({}, state, {
-        isFetching: false,
-        didInvalidate: false,
-        survey,
-        language,
-        lastUpdated: action.receivedAt,
-      })
+      return { ...state, isFetching: false, survey, language, lastUpdated: action.receivedAt }
     case SELECT_ACTIVE_SURVEY_LANGUAGE:
-      return Object.assign({}, state, {
-        language: action.language,
-      })
+      return { ...state, language: action.language }
     default:
       return state
   }

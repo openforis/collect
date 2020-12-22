@@ -4,21 +4,20 @@ import BrowserUtils from 'utils/BrowserUtils'
 import Arrays from 'utils/Arrays'
 import { ActiveSurveyLocalStorage } from 'localStorage'
 
-export const REQUEST_FULL_ACTIVE_SURVEY = 'REQUEST_FULL_ACTIVE_SURVEY'
-export const RECEIVE_FULL_ACTIVE_SURVEY = 'RECEIVE_FULL_ACTIVE_SURVEY'
-export const INVALIDATE_ACTIVE_SURVEY = 'INVALIDATE_ACTIVE_SURVEY'
-
+export const ACTIVE_SURVEY_REQUESTED = 'ACTIVE_SURVEY_REQUESTED'
+export const ACTIVE_SURVEY_FETCHED = 'ACTIVE_SURVEY_FETCHED'
 export const SELECT_ACTIVE_SURVEY_LANGUAGE = 'SELECT_ACTIVE_SURVEY_LANGUAGE'
+export const ACTIVE_SURVEY_CLEARED = 'ACTIVE_SURVEY_CLEARED'
 
-const receiveFullActiveSurvey = (json, language) => ({
-  type: RECEIVE_FULL_ACTIVE_SURVEY,
+const activeSurveyReceived = (json, language) => ({
+  type: ACTIVE_SURVEY_FETCHED,
   survey: new Survey(json),
   language,
   receivedAt: Date.now(),
 })
 
 const requestFullActiveSurvey = (surveyId) => ({
-  type: REQUEST_FULL_ACTIVE_SURVEY,
+  type: ACTIVE_SURVEY_REQUESTED,
   surveyId: surveyId,
   receivedAt: Date.now(),
 })
@@ -31,16 +30,19 @@ export const selectActiveSurvey = (surveyId) => (dispatch) => {
   ServiceFactory.surveyService.fetchById(surveyId).then((json) => {
     const browserLangCode = BrowserUtils.determineBrowserLanguageCode()
     const language = Arrays.contains(json.languages, browserLangCode) ? browserLangCode : json.languages[0]
-    dispatch(receiveFullActiveSurvey(json, language))
+    dispatch(activeSurveyReceived(json, language))
   })
 }
-
-const invalidateActiveSurvey = (activeSurvey) => ({
-  type: INVALIDATE_ACTIVE_SURVEY,
-  activeSurvey,
-})
 
 export const selectActiveSurveyLanguage = (language) => ({
   type: SELECT_ACTIVE_SURVEY_LANGUAGE,
   language,
 })
+
+export const clearActiveSurvey = () => (dispatch) => {
+  ActiveSurveyLocalStorage.removeActiveSurveyId()
+
+  dispatch({
+    type: ACTIVE_SURVEY_CLEARED,
+  })
+}

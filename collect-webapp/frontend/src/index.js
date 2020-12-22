@@ -17,7 +17,7 @@ import Page404 from 'scenes/Pages/Page404'
 import Page500 from 'scenes/Pages/Page500'
 
 import rootReducer from 'reducers'
-import Startup from 'common/containers/Startup'
+import Startup from 'common/Startup/Startup'
 import SessionTimeoutVerifier from 'common/containers/SessionTimeoutVerifier'
 import Labels from 'utils/Labels'
 

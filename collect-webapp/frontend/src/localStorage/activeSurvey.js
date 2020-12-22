@@ -10,4 +10,4 @@ export const setActiveSurveyId = (surveyId) => {
 
 export const getActiveSurveyId = () => Numbers.toNumber(localStorage.getItem(KEYS.activeSurvey))
 
-export const deleteActiveSurveyId = () => localStorage.removeItem(KEYS.activeSurvey)
+export const removeActiveSurveyId = () => localStorage.removeItem(KEYS.activeSurvey)

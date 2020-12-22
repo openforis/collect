@@ -7,9 +7,9 @@ import * as SessionActions from 'actions/session'
 import * as UserActions from 'actions/users'
 import * as UserGroupActions from 'actions/usergroups'
 
+import AppWebSocket from 'ws/appWebSocket'
 import Preloader from 'common/components/Preloader'
-import { ActiveSurveyLocalStorage } from 'localStorage'
-import { selectActiveSurvey } from 'actions/activeSurvey'
+import StartupActiveSurvey from './StartupActiveSurvey'
 
 const Startup = (props) => {
   const dispatch = useDispatch()
@@ -33,10 +33,6 @@ const Startup = (props) => {
     loggedOut: false,
   }
 
-  const { initialized: surveySummariesReady, items: surveySummaries } = useSelector(
-    (state) => state.surveyDesigner.surveysList
-  )
-
   const { isFetching: isFetchingUsers, initialized: isUsersReady } = useSelector((state) => state.users) || {
     isUsersReady: false,
     isFetchingUsers: true,
@@ -49,16 +45,6 @@ const Startup = (props) => {
     isFetchingUserGroups: true,
   }
 
-  // get active survey from local storage and set it in UI
-  useEffect(() => {
-    if (surveySummariesReady) {
-      const activeSurveyId = ActiveSurveyLocalStorage.getActiveSurveyId()
-      if (activeSurveyId && surveySummaries.some((surveySummary) => surveySummary.id === activeSurveyId)) {
-        dispatch(selectActiveSurvey(activeSurveyId))
-      }
-    }
-  }, [surveySummariesReady])
-
   const loading =
     !isLoggedUserReady ||
     isFetchingLoggedUser ||
@@ -69,7 +55,13 @@ const Startup = (props) => {
 
   const { children } = props
 
-  return <Preloader loading={loading}>{children}</Preloader>
+  return (
+    <Preloader loading={loading}>
+      <AppWebSocket />
+      <StartupActiveSurvey />
+      {children}
+    </Preloader>
+  )
 }
 
 export default Startup

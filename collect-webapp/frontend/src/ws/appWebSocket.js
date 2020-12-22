@@ -1,18 +1,21 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import SockJsClient from 'react-stomp'
 
 import Constants from '../Constants'
-import { fetchSurveySummaries } from 'actions/surveys'
-import { recordLocked, recordUnlocked } from '../datamanagement/actions'
 import EventQueue from 'model/event/EventQueue'
 import { RecordEvent, RecordEventWrapper } from 'model/event/RecordEvent'
-import { showSystemError } from 'actions/systemError'
+
 import ServiceFactory from 'services/ServiceFactory'
+
+import { showSystemError } from 'actions/systemError'
+import { clearActiveSurvey } from 'actions/activeSurvey'
+import { fetchSurveySummaries } from 'actions/surveys'
+import { recordLocked, recordUnlocked } from '../datamanagement/actions'
 
 const eventsDestination = '/events'
 
-const messageTypes = {
+const MESSAGE_TYPES = {
   //TODO surveyUpdated: 'SURVEY_UPDATED',
   surveyDeleted: 'SURVEY_DELETED',
   surveyPublished: 'SURVEY_PUBLISHED',
@@ -24,45 +27,50 @@ const messageTypes = {
   recordUpdateError: 'RECORD_UPDATE_ERROR',
 }
 
-const invalidateSurveyCache = ({ surveyId }) => {
-  ServiceFactory.codeListService.invalidateCache({ surveyId })
-}
-
-const handlersByType = {
-  // TODO
-  // [messageTypes.surveyUpdated]: (message) => () => {
-  //   const { surveyId } = message
-  //   ServiceFactory.codeListService.invalidateCache({ surveyId })
-  // },
-  [messageTypes.surveyPublished]: (message) => () => {
-    const { surveyId } = message
-    invalidateSurveyCache({ surveyId })
-  },
-  [messageTypes.surveyUnpublished]: (message) => () => {
-    const { surveyId } = message
-    invalidateSurveyCache({ surveyId })
-  },
-  [messageTypes.surveyDeleted]: (message) => () => {
-    const { surveyId } = message
-    invalidateSurveyCache({ surveyId })
-  },
-  [messageTypes.surveysUpdated]: fetchSurveySummaries,
-  [messageTypes.recordLocked]: (message) => recordLocked(message.recordId, message.lockedBy),
-  [messageTypes.recordUnlocked]: (message) => recordUnlocked(message.recordId),
-  [messageTypes.recordUpdated]: (message) => () => {
-    const eventWrapper = new RecordEventWrapper(message.event)
-    EventQueue.publish(RecordEvent.TYPE, eventWrapper.event)
-  },
-  [messageTypes.recordUpdateError]: (content) => (dispatch) => {
-    dispatch(showSystemError(content))
-  },
-}
-
 const AppWebSocket = () => {
   const dispatch = useDispatch()
 
+  const { survey: activeSurvey } = useSelector((state) => state.activeSurvey)
+
+  const invalidateSurveyCache = ({ surveyId }) => {
+    ServiceFactory.codeListService.invalidateCache({ surveyId })
+    if (activeSurvey?.id === surveyId) {
+      dispatch(clearActiveSurvey())
+    }
+  }
+
+  const messageHandlersByType = {
+    // TODO
+    // [messageTypes.surveyUpdated]: (message) => () => {
+    //   const { surveyId } = message
+    //   ServiceFactory.codeListService.invalidateCache({ surveyId })
+    // },
+    [MESSAGE_TYPES.surveyPublished]: (message) => () => {
+      const { surveyId } = message
+      invalidateSurveyCache({ surveyId })
+    },
+    [MESSAGE_TYPES.surveyUnpublished]: (message) => () => {
+      const { surveyId } = message
+      invalidateSurveyCache({ surveyId })
+    },
+    [MESSAGE_TYPES.surveyDeleted]: (message) => () => {
+      const { surveyId } = message
+      invalidateSurveyCache({ surveyId })
+    },
+    [MESSAGE_TYPES.surveysUpdated]: fetchSurveySummaries,
+    [MESSAGE_TYPES.recordLocked]: (message) => recordLocked(message.recordId, message.lockedBy),
+    [MESSAGE_TYPES.recordUnlocked]: (message) => recordUnlocked(message.recordId),
+    [MESSAGE_TYPES.recordUpdated]: (message) => () => {
+      const eventWrapper = new RecordEventWrapper(message.event)
+      EventQueue.publish(RecordEvent.TYPE, eventWrapper.event)
+    },
+    [MESSAGE_TYPES.recordUpdateError]: (content) => (dispatch) => {
+      dispatch(showSystemError(content))
+    },
+  }
+
   const onMessage = (message) => {
-    const handler = handlersByType[message.type]
+    const handler = messageHandlersByType[message.type]
     dispatch(handler(message))
   }
 
