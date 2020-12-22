@@ -8,7 +8,7 @@ class CurrentJobMonitorDialog extends Component {
   timer = null
 
   constructor(props) {
-    super()
+    super(props)
 
     const { open, jobMonitorConfiguration } = props
 
@@ -22,15 +22,17 @@ class CurrentJobMonitorDialog extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentDidUpdate(prevProps) {
+    const { jobMonitorConfiguration: jobMonitorConfigurationPrev } = prevProps
+    const { open, job, jobMonitorConfiguration } = this.props
+
     if (
-      nextProps.open &&
-      nextProps.jobMonitorConfiguration.jobId &&
-      (this.props.jobMonitorConfiguration === null ||
-        nextProps.jobMonitorConfiguration.jobId !== this.props.jobMonitorConfiguration.jobId)
+      open &&
+      jobMonitorConfiguration.jobId &&
+      (jobMonitorConfigurationPrev === null || jobMonitorConfiguration.jobId !== jobMonitorConfigurationPrev.jobId)
     ) {
       this.startTimer()
-    } else if (nextProps.job && nextProps.job.ended) {
+    } else if (job && job.ended) {
       this.stopTimer()
     }
   }
@@ -83,7 +85,7 @@ class CurrentJobMonitorDialog extends Component {
     const { open, jobMonitorConfiguration, job, cancellingJob } = this.props
 
     if (!open) {
-      return <div></div>
+      return null
     }
     return (
       <JobMonitorDialog
