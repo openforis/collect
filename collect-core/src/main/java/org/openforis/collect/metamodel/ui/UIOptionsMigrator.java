@@ -4,14 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.ui.UIOptions.CoordinateAttributeFieldsOrder;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITable.Direction;
-import org.openforis.collect.metamodel.ui.UITextField.TextTransform;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.LanguageSpecificText;
@@ -20,7 +17,6 @@ import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.metamodel.TextAttributeDefinition;
 
 /**
  * 
@@ -183,26 +179,7 @@ public class UIOptionsMigrator {
 	protected UIField createField(UIFormContentContainer parent, NodeDefinition nodeDefn) {
 		CollectSurvey survey = (CollectSurvey) nodeDefn.getSurvey();
 		UIOptions uiOptions = survey.getUIOptions();
-		CollectAnnotations annotations = survey.getAnnotations();
-		UIField field;
-		if (nodeDefn instanceof CodeAttributeDefinition) {
-			UICodeField codeField = parent.createCodeField();
-			CodeAttributeDefinition codeAttrDefn = (CodeAttributeDefinition) nodeDefn;
-			codeField.setLayout(uiOptions.getLayoutType(codeAttrDefn));
-			codeField.setShowCode(uiOptions.getShowCode(codeAttrDefn));
-			codeField.setItemsOrientation(uiOptions.getLayoutDirection(codeAttrDefn));
-			field = codeField;
-		} else if (nodeDefn instanceof TextAttributeDefinition) {
-			UITextField textField = parent.createTextField();
-			textField.setAutoCompleteGroup(annotations.getAutoCompleteGroup((TextAttributeDefinition) nodeDefn));
-			TextTransform textTranform = uiOptions.isAutoUppercase((TextAttributeDefinition) nodeDefn)
-					? TextTransform.UPPERCASE
-					: TextTransform.NONE;
-			textField.setTextTranform(textTranform);
-			field = textField;
-		} else {
-			field = parent.createField();
-		}
+		UIField field = parent.createField();
 		field.setAttributeDefinitionId(nodeDefn.getId());
 		
 		if ( nodeDefn instanceof CoordinateAttributeDefinition ) {

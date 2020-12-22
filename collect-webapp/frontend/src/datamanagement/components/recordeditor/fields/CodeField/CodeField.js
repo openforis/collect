@@ -5,7 +5,7 @@ import { InputLabel } from '@material-ui/core'
 
 import ServiceFactory from 'services/ServiceFactory'
 import { CodeAttributeUpdatedEvent } from 'model/event/RecordEvent'
-import { CodeFieldDefinition } from 'model/ui/CodeFieldDefinition'
+import { CodeAttributeDefinition } from 'model/Survey'
 
 import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 
@@ -142,7 +142,7 @@ export default class CodeField extends AbstractField {
     const { attributeDefinition } = fieldDef
     const { layout } = attributeDefinition
 
-    const nullCode = [CodeFieldDefinition.Layouts.DROPDOWN].includes(layout) ? EMPTY_OPTION.value : ''
+    const nullCode = [CodeAttributeDefinition.Layouts.DROPDOWN].includes(layout) ? EMPTY_OPTION.value : ''
     const codeUpdated = code === null ? nullCode : code
 
     return { code: codeUpdated }
@@ -281,7 +281,7 @@ export default class CodeField extends AbstractField {
     }
 
     if (
-      (multiple && (asynchronous || inTable || layout !== CodeFieldDefinition.Layouts.RADIO)) ||
+      (multiple && (asynchronous || inTable || layout !== CodeAttributeDefinition.Layouts.RADIO)) ||
       (inTable && hasQualifiableItems)
     ) {
       return (
@@ -301,7 +301,7 @@ export default class CodeField extends AbstractField {
       )
     }
 
-    if (!inTable && !asynchronous && layout === CodeFieldDefinition.Layouts.RADIO) {
+    if (!inTable && !asynchronous && layout === CodeAttributeDefinition.Layouts.RADIO) {
       return (
         <CodeFieldRadio
           parentEntity={parentEntity}

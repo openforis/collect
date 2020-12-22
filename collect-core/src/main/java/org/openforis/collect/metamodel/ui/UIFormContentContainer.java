@@ -16,20 +16,20 @@ public abstract class UIFormContentContainer extends UIModelObject {
 
 	private List<UIFormComponent> children = new ArrayList<UIFormComponent>();
 	private List<UIForm> forms;
-	
+
 	UIFormContentContainer(UIModelObject parent, int id) {
 		super(parent, id);
 	}
-	
+
 	public List<UIFormComponent> getChildren() {
 		return CollectionUtils.unmodifiableList(children);
 	}
-	
+
 	public void addChild(UIFormComponent child) {
 		children.add(child);
 		getUIConfiguration().attachItem(child);
 	}
-	
+
 	public void removeChild(UIFormComponent child) {
 		children.remove(child);
 		getUIConfiguration().detachItem(child);
@@ -39,50 +39,34 @@ public abstract class UIFormContentContainer extends UIModelObject {
 		UIConfiguration uiOptions = getUIConfiguration();
 		return createFormSection(uiOptions.nextId());
 	}
-	
+
 	public UIFormSection createFormSection(int id) {
 		return new UIFormSection(this, id);
 	}
-	
+
 	public UIField createField() {
 		UIConfiguration uiOptions = getUIConfiguration();
 		return createField(uiOptions.nextId());
 	}
-	
+
 	public UIField createField(int id) {
 		return new UIField(this, id);
-	}
-
-	public UICodeField createCodeField() {
-		return createCodeField(getUIConfiguration().nextId());
-	}
-	
-	public UICodeField createCodeField(int id) {
-		return new UICodeField(this, id);
-	}
-	
-	public UITextField createTextField() {
-		return createTextField(getUIConfiguration().nextId());
-	}
-	
-	public UITextField createTextField(int id) {
-		return new UITextField(this, id);
 	}
 
 	public UITable createTable() {
 		UIConfiguration uiOptions = getUIConfiguration();
 		return createTable(uiOptions.nextId());
 	}
-	
+
 	public UITable createTable(int id) {
 		return new UITable(this, id);
 	}
-	
+
 	public UIForm createForm() {
 		UIConfiguration uiOptions = getUIConfiguration();
 		return createForm(uiOptions.nextId());
 	}
-	
+
 	public UIForm createForm(int id) {
 		return new UIForm(this, id);
 	}
@@ -90,20 +74,20 @@ public abstract class UIFormContentContainer extends UIModelObject {
 	public List<UIForm> getForms() {
 		return CollectionUtils.unmodifiableList(forms);
 	}
-	
+
 	public void addForm(UIForm form) {
-		if ( forms == null ) {
+		if (forms == null) {
 			forms = new ArrayList<UIForm>();
 		}
 		forms.add(form);
 		getUIConfiguration().attachItem(form);
 	}
-	
+
 	public void removeForm(UIForm form) {
 		forms.remove(form);
 		getUIConfiguration().detachItem(form);
 	}
-	
+
 	public int getTotalColumns() {
 		int maxExtent = 1;
 		for (UIFormComponent child : children) {
@@ -114,14 +98,14 @@ public abstract class UIFormContentContainer extends UIModelObject {
 		}
 		return maxExtent;
 	}
-	
+
 	public int getTotalRows() {
 		int totalRows = 0;
 		int lastColumn = 1;
 		for (UIFormComponent child : children) {
 			int childColumn = child.getColumn();
 			if (childColumn <= lastColumn) {
-				totalRows ++;
+				totalRows++;
 			}
 			lastColumn = childColumn;
 		}

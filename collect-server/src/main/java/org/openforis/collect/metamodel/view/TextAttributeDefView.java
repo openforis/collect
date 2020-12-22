@@ -7,7 +7,12 @@ import org.openforis.idm.metamodel.TextAttributeDefinition.Type;
 
 public class TextAttributeDefView extends AttributeDefView {
 
+	public enum TextTransform {
+		NONE, UPPERCASE, LOWERCASE, CAMELCASE;
+	}
+
 	private Type textType;
+	private TextTransform textTransform;
 
 	public TextAttributeDefView(int id, String name, String label, AttributeType type, List<String> fieldNames,
 			boolean key, boolean multiple) {
@@ -22,4 +27,11 @@ public class TextAttributeDefView extends AttributeDefView {
 		this.textType = type;
 	}
 
+	public TextTransform getTextTransform() {
+		return textTransform;
+	}
+
+	public void setTextTransform(TextTransform textTransform) {
+		this.textTransform = textTransform;
+	}
 }

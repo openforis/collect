@@ -1,6 +1,3 @@
-import { AttributeDefinition } from 'model/Survey'
-import { CodeFieldDefinition } from './CodeFieldDefinition'
-import { TextFieldDefinition } from './TextFieldDefinition'
 import { FieldDefinition } from './FieldDefinition'
 import { FieldsetDefinition } from './FieldsetDefinition'
 import { MultipleFieldsetDefinition } from './MultipleFieldsetDefinition'
@@ -9,17 +6,10 @@ import { TabDefinition } from './TabDefinition'
 import { TableDefinition } from './TableDefinition'
 import FormItemTypes from './FormItemTypes'
 
-const getFormItemClass = (itemType, attributeType) => {
+const getFormItemClass = (itemType) => {
   switch (itemType) {
     case FormItemTypes.FIELD:
-      switch (attributeType) {
-        case AttributeDefinition.Types.CODE:
-          return CodeFieldDefinition
-        case AttributeDefinition.Types.TEXT:
-          return TextFieldDefinition
-        default:
-          return FieldDefinition
-      }
+      return FieldDefinition
     case FormItemTypes.FIELDSET:
       return FieldsetDefinition
     case FormItemTypes.MULTIPLE_FIELD:
@@ -45,8 +35,8 @@ export class TabContainers {
 
   static createItemsFromJSON({ json = [], parent }) {
     return json.reduce((itemsAcc, itemJsonObj) => {
-      const { type, attributeType, id } = itemJsonObj
-      const formItemClass = getFormItemClass(type, attributeType)
+      const { type, id } = itemJsonObj
+      const formItemClass = getFormItemClass(type)
       if (formItemClass) {
         const item = new formItemClass(id, parent)
         item.fillFromJSON(itemJsonObj)

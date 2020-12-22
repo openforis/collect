@@ -1,4 +1,3 @@
-import { CodeFieldDefinition } from 'model/ui/CodeFieldDefinition'
 import {
   AttributeDefinition,
   CoordinateAttributeDefinition,

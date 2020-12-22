@@ -10,6 +10,7 @@ import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.uiconfiguration.view.Views;
 import org.openforis.collect.metamodel.view.BooleanAttributeDefView.LayoutType;
+import org.openforis.collect.metamodel.view.TextAttributeDefView.TextTransform;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserInGroup;
@@ -271,6 +272,9 @@ public class SurveyViewGenerator {
 			TextAttributeDefView attrDefView = new TextAttributeDefView(id, name, label, attributeType, fieldNames, key,
 					multiple);
 			attrDefView.setTextType(textDef.getType());
+			boolean autoUppercase = uiOptions.isAutoUppercase(textDef);
+			TextTransform textTransform = autoUppercase ? TextTransform.UPPERCASE : TextTransform.NONE;
+			attrDefView.setTextTransform(textTransform);
 			view = attrDefView;
 		} else {
 			view = new AttributeDefView(id, name, label, attributeType, fieldNames, key, multiple);

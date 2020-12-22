@@ -2,17 +2,17 @@ import React from 'react'
 import MuiTextField from '@material-ui/core/TextField'
 
 import { TextAttributeDefinition } from 'model/Survey'
-import { TextFieldDefinition } from 'model/ui/TextFieldDefinition'
+
 import Objects from 'utils/Objects'
 
 import AbstractField from './AbstractField'
 import * as FieldsSizes from './FieldsSizes'
 import DirtyFieldSpinner from './DirtyFieldSpinner'
 
-const tranformFunctions = {
-  [TextFieldDefinition.TextTranform.NONE]: (value) => value,
-  [TextFieldDefinition.TextTranform.UPPERCASE]: (value) => value.toUpperCase(),
-  [TextFieldDefinition.TextTranform.LOWERCASE]: (value) => value.toLowerCase(),
+const transformFunctions = {
+  [TextAttributeDefinition.TextTransform.NONE]: (value) => value,
+  [TextAttributeDefinition.TextTransform.UPPERCASE]: (value) => value.toLocaleUpperCase(),
+  [TextAttributeDefinition.TextTransform.LOWERCASE]: (value) => value.toLocaleLowerCase(),
 }
 
 export default class TextField extends AbstractField {
@@ -23,17 +23,18 @@ export default class TextField extends AbstractField {
 
   onChange(event) {
     const { fieldDef } = this.props
-    const { textTransform = TextFieldDefinition.TextTranform.NONE } = fieldDef
+    const { attributeDefinition } = fieldDef
+    const { textTransform = TextAttributeDefinition.TextTransform.NONE } = attributeDefinition
 
     const inputFieldValue = event.target.value
-    const valueTranformed = tranformFunctions[textTransform](inputFieldValue.trimLeft())
+    const valueTransformed = transformFunctions[textTransform](inputFieldValue.trimLeft())
 
     const attribute = this.getAttribute()
     const valuePrev = Objects.getPath(['value', 'value'], '')(attribute)
-    const valueNew = { value: valueTranformed }
+    const valueNew = { value: valueTransformed }
 
     // check if value has changed
-    if (valueTranformed.trim() === valuePrev) {
+    if (valueTransformed.trim() === valuePrev) {
       // value not changed: update UI but do not send update to server side
       this.setState({ value: valueNew })
     } else {

@@ -7,6 +7,14 @@ export class CodeAttributeDefinition extends AttributeDefinition {
   itemsOrientation
   enumerator
   hasQualifiableItems
+  layout
+  showCode
+
+  static Layouts = {
+    RADIO: 'RADIO',
+    DROPDOWN: 'DROPDOWN',
+    TEXT: 'TEXT',
+  }
 
   static ItemsOrientations = {
     VERTICAL: 'VERTICAL',
