@@ -2,7 +2,6 @@ import React from 'react'
 import { MenuItem, Select, TextField as MuiTextField } from '@material-ui/core'
 import { CoordinateAttributeDefinition } from 'model/Survey'
 
-import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 import InputNumber from 'common/components/InputNumber'
 import L from 'utils/Labels'
 import Objects from 'utils/Objects'
@@ -10,6 +9,7 @@ import Objects from 'utils/Objects'
 import AbstractField from './AbstractField'
 import CompositeAttributeFormItem from './CompositeAttributeFormItem'
 import { COORDINATE_FIELD_WIDTH_PX } from './FieldsSizes'
+import DirtyFieldSpinner from './DirtyFieldSpinner'
 
 export default class CoordinateField extends AbstractField {
   constructor() {
@@ -111,12 +111,14 @@ export default class CoordinateField extends AbstractField {
     )
 
     return (
-      <div style={{ flexDirection: inTable ? 'row' : 'column' }} className="form-item-composite-wrapper">
-        {inTable
-          ? inputFields
-          : availableFieldNames.map((field, index) => getFormItem({ field, inputField: inputFields[index] }))}
-        {dirty && <LoadingSpinnerSmall />}
-      </div>
+      <>
+        <div style={{ flexDirection: inTable ? 'row' : 'column' }} className="form-item-composite-wrapper">
+          {inTable
+            ? inputFields
+            : availableFieldNames.map((field, index) => getFormItem({ field, inputField: inputFields[index] }))}
+        </div>
+        {dirty && <DirtyFieldSpinner />}
+      </>
     )
   }
 }

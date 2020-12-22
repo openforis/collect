@@ -2,11 +2,13 @@ import React from 'react'
 import classNames from 'classnames'
 import { Checkbox, TextField } from '@material-ui/core'
 
-import AbstractField from './AbstractField'
-import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 import { BooleanAttributeDefinition } from 'model/Survey'
+
 import L from 'utils/Labels'
 import Strings from 'utils/Strings'
+
+import AbstractField from './AbstractField'
+import DirtyFieldSpinner from './DirtyFieldSpinner'
 
 const TRUE_KEY = 'dataManagement.dataEntry.attribute.boolean.textValue.yes'
 const FALSE_KEY = 'dataManagement.dataEntry.attribute.boolean.textValue.no'
@@ -76,7 +78,7 @@ export default class BooleanField extends AbstractField {
             value={valueToText(fieldValue)}
           />
         )}
-        {dirty && <LoadingSpinnerSmall />}
+        {dirty && <DirtyFieldSpinner />}
       </div>
     )
   }

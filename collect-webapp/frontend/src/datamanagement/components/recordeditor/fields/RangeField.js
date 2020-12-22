@@ -1,6 +1,5 @@
 import React from 'react'
 
-import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 import InputNumber from 'common/components/InputNumber'
 import L from 'utils/Labels'
 import Objects from 'utils/Objects'
@@ -8,6 +7,7 @@ import Objects from 'utils/Objects'
 import AbstractNumericField from './AbstractNumericField'
 import UnitField from './UnitField'
 import * as FieldsSizes from './FieldsSizes'
+import DirtyFieldSpinner from './DirtyFieldSpinner'
 
 export default class RangeField extends AbstractNumericField {
   constructor(props) {
@@ -71,7 +71,7 @@ export default class RangeField extends AbstractNumericField {
             />
           )}
         </div>
-        {dirty && <LoadingSpinnerSmall />}
+        {dirty && <DirtyFieldSpinner />}
       </>
     )
   }

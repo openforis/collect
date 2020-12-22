@@ -2,12 +2,12 @@ import './NumberField.scss'
 
 import React from 'react'
 
-import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 import InputNumber from 'common/components/InputNumber'
 
 import UnitField from './UnitField'
 import AbstractNumericField from './AbstractNumericField'
 import Numbers from 'utils/Numbers'
+import DirtyFieldSpinner from './DirtyFieldSpinner'
 
 const UNIT_FIELD_WIDTH = 80
 
@@ -67,7 +67,7 @@ export default class NumberField extends AbstractNumericField {
             />
           )}
         </div>
-        {dirty && <LoadingSpinnerSmall />}
+        {dirty && <DirtyFieldSpinner />}
       </>
     )
   }

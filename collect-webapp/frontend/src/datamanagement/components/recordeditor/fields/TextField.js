@@ -4,10 +4,10 @@ import MuiTextField from '@material-ui/core/TextField'
 import { TextAttributeDefinition } from 'model/Survey'
 import { TextFieldDefinition } from 'model/ui/TextFieldDefinition'
 import Objects from 'utils/Objects'
-import LoadingSpinnerSmall from 'common/components/LoadingSpinnerSmall'
 
 import AbstractField from './AbstractField'
 import * as FieldsSizes from './FieldsSizes'
+import DirtyFieldSpinner from './DirtyFieldSpinner'
 
 const tranformFunctions = {
   [TextFieldDefinition.TextTranform.NONE]: (value) => value,
@@ -67,7 +67,7 @@ export default class TextField extends AbstractField {
           disabled={readOnly}
           style={{ width: FieldsSizes.getWidth({ fieldDef, inTable }) }}
         />
-        {dirty && <LoadingSpinnerSmall />}
+        {dirty && <DirtyFieldSpinner />}
       </>
     )
   }
