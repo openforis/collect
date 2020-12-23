@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd
+    http://www.springframework.org/schema/tx https://www.springframework.org/schema/tx/spring-tx.xsd"
+	default-lazy-init="true" default-autowire="byName">
+
+	<context:component-scan base-package="org.openforis.collect" />
+
+	<import
+		resource="classpath:org/openforis/collect/application-context-core.xml" />
+
+	<bean name="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>org/openforis/collect/resourcebundles/validation</value>
+				<value>org/openforis/collect/resourcebundles/datacleansing</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- Override scope for Collect core sessionRecordFileManager bean, use 
+		"session" scope -->
+	<bean id="recordSessionManager"
+		class="org.openforis.collect.manager.RecordSessionManager"
+		scope="session" />
+	<bean id="sessionManager"
+		class="org.openforis.collect.manager.SessionManager" />
+	<bean id="sessionRecordFileManager"
+		class="org.openforis.collect.manager.SessionRecordFileManager"
+		scope="session" init-method="init" destroy-method="destroy" />
+	<bean id="volatileRecordIndexManager"
+		class="org.openforis.collect.remoting.service.recordindex.VolatileRecordIndexManager"
+		init-method="init" scope="session" lazy-init="false" autowire="byName" />
+	<!-- <bean id="userManager" class="org.openforis.collect.manager.ClientUserManager" 
+		/> -->
+	<!-- <bean id="userGroupManager" class="org.openforis.collect.manager.ClientUserGroupManager" 
+		/> -->
+	<bean id="userManager"
+		class="org.openforis.collect.manager.LocalUserManager" />
+	<bean id="userGroupManager"
+		class="org.openforis.collect.manager.LocalUserGroupManager" />
+
+	<!-- ===================================== -->
+	<!-- Services -->
+	<!-- ===================================== -->
+	<bean id="collectInfoService"
+		class="org.openforis.collect.remoting.service.CollectInfoService"
+		autowire="byName" />
+	<bean id="configurationService"
+		class="org.openforis.collect.remoting.service.ConfigurationService"
+		autowire="byName" init-method="init" />
+
+	<!-- <bean id="dataRestoreService" class="org.openforis.collect.remoting.service.io.data.restore.DataRestoreServiceImpl" 
+		/> -->
+
+	<!-- <bean class="org.springframework.remoting.rmi.RmiServiceExporter"> -->
+	<!-- <property name="serviceName" value="dataRestoreService" /> -->
+	<!-- <property name="service" ref="dataRestoreService" /> -->
+	<!-- <property name="serviceInterface" value="org.openforis.collect.remoting.service.io.data.restore.RestoreService"/> -->
+	<!-- <property name="registryPort" value="1099" /> -->
+	<!-- </bean> -->
+
+	<!-- ===================================== -->
+	<!-- Security -->
+	<!-- ===================================== -->
+
+	<bean id="userDetailsService"
+		class="org.openforis.collect.security.CollectUserDetailsService" />
+
+	<!-- Survey Context -->
+	<bean id="coordinateOperations"
+		class="org.openforis.collect.geospatial.GeoToolsCoordinateOperations"
+		init-method="initialize" />
+
+	<bean id="collectSurveyContext"
+		class="org.openforis.collect.model.CollectSurveyContext">
+		<constructor-arg ref="expressionFactory" />
+		<constructor-arg ref="validator" />
+		<property name="externalCodeListProvider"
+			ref="externalCodeListProvider" />
+		<property name="codeListService" ref="codeListService" />
+		<property name="speciesListService" ref="speciesListService" />
+		<property name="coordinateOperations"
+			ref="coordinateOperations" />
+	</bean>
+
+	<!-- ===================================== -->
+	<!-- =============== RDB ================= -->
+	<!-- ===================================== -->
+
+	<!-- deprecated -->
+	<bean id="rdbPublisher"
+		class="org.openforis.collect.relational.CollectRDBPublisher" />
+
+	<bean id="messageBroker"
+		class="org.openforis.collect.event.ConfiguredMessageBroker"
+		init-method="start" destroy-method="stop">
+		<constructor-arg ref="dataSource" />
+		<constructor-arg ref="jooqConfig" />
+	</bean>
+
+	<bean id="eventQueue"
+		class="org.openforis.collect.event.EventBrokerEventQueue">
+		<constructor-arg>
+			<bean class="org.openforis.rmb.spring.SpringMessageQueue">
+				<constructor-arg ref="messageBroker" />
+				<constructor-arg value="collect_events" />
+				<constructor-arg>
+					<list>
+						<bean class="org.openforis.rmb.spring.SpringMessageConsumer">
+							<constructor-arg
+								value="collect_reporting_repository_event_consumer" />
+							<constructor-arg>
+								<bean
+									class="org.openforis.collect.event.RepositoryEventHandler">
+									<constructor-arg ref="reportingRepositories" />
+								</bean>
+							</constructor-arg>
+							<property name="messagesHandledInParallel" value="1" />
+						</bean>
+					</list>
+				</constructor-arg>
+			</bean>
+		</constructor-arg>
+
+		<!-- Event Queue DISABLED by default -->
+		<property name="enabled" value="false" />
+	</bean>
+
+	<bean id="reportingRepositories"
+		class="org.openforis.collect.relational.RDBReportingRepositories"
+		lazy-init="false" init-method="init">
+		<constructor-arg ref="surveyManager" />
+		<constructor-arg ref="recordManager" />
+		<constructor-arg ref="collectLocalRDBStorageManager" />
+		<constructor-arg ref="mondrianSchemaStorageManager" />
+		<constructor-arg ref="saikuDatasourceStorageManager" />
+	</bean>
+
+	<bean id="rdbMonitor"
+		class="org.openforis.collect.relational.CollectRDBMonitor"
+		lazy-init="false" init-method="init" />
+
+	<bean id="sessionEventDispatcher"
+		class="org.openforis.collect.manager.SessionEventDispatcher"
+		scope="session">
+		<constructor-arg ref="eventQueue" />
+	</bean>
+
+	<!-- <bean id="recordEventBatchPublisher" class="org.openforis.collect.io.data.RecordEventBatchPublisher" -->
+	<!-- scope="prototype"> -->
+	<!-- <constructor-arg ref="eventQueue" /> -->
+	<!-- </bean> -->
+
+	<bean id="cachedRecordProvider"
+		class="org.openforis.collect.manager.CachedRecordProvider">
+		<constructor-arg ref="recordManager" />
+	</bean>
+
+	<bean id="sessionRecordProvider"
+		class="org.openforis.collect.web.manager.SessionRecordProvider"
+		scope="session">
+		<constructor-arg ref="cachedRecordProvider" />
+	</bean>
+
+	<bean id="commandDispatcher"
+		class="org.openforis.collect.command.SpringCommandDispatcher"
+		init-method="init" scope="session" />
+
+</beans>

@@ -29,43 +29,41 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
  */
 public class CollectMobileBackupConvertTask extends Task {
 
-	private static final String SERVER_APPLICATION_CONTEXT_FILE_NAME = "org/openforis/collect/application-context-server.xml";
+	private static final String SERVER_APPLICATION_CONTEXT_FILE_NAME = "org/openforis/collect/application-context-server-base.xml";
 	private static final String DATASOURCE_TEMPLATE_FILE_NAME = "org/openforis/collect/application-context-datasource-template.xml";
 	private static final String COLLECT_DB_FILE_NAME = "collect.db";
-	//input
+	// input
 	private File collectBackupFile;
 	private String surveyName;
-	
-	//output
+
+	// output
 	private File outputDbFile;
 	private File outputFile;
-	
-	//transient
+
+	// transient
 	private ConfigurableApplicationContext ctx;
 	private UserGroupManager userGroupManager;
-	
+
 	@Override
 	protected void createInternalVariables() throws Throwable {
 		outputDbFile = File.createTempFile("collect_mobile_" + surveyName, ".db");
 
-		//initialize application context
+		// initialize application context
 		File dataSourceConfigFile = createDataSourceConfigFile();
-		
-		InputStream serverApplicationContextIS = this.getClass().getClassLoader().getResourceAsStream(SERVER_APPLICATION_CONTEXT_FILE_NAME);
-		File serverApplicationContextFile = OpenForisIOUtils.copyToTempFile(serverApplicationContextIS);
-		
+		File serverApplicationContextFile = getResourceAsFile(SERVER_APPLICATION_CONTEXT_FILE_NAME);
+
 		ctx = new FileSystemXmlApplicationContext(
-				"/" + serverApplicationContextFile.getAbsolutePath(), 
-				"/" + dataSourceConfigFile.getAbsolutePath()
-				);
-		
+				"/" + serverApplicationContextFile.getAbsolutePath(),
+				"/" + dataSourceConfigFile.getAbsolutePath());
+
 		userGroupManager = ctx.getBean(UserGroupManager.class);
 
 		super.createInternalVariables();
 	}
-	
+
 	private File createDataSourceConfigFile() throws IOException {
-		InputStream templateFileIS = this.getClass().getClassLoader().getResourceAsStream(DATASOURCE_TEMPLATE_FILE_NAME);
+		InputStream templateFileIS = this.getClass().getClassLoader()
+				.getResourceAsStream(DATASOURCE_TEMPLATE_FILE_NAME);
 		StringWriter writer = new StringWriter();
 		IOUtils.copy(templateFileIS, writer, OpenForisIOUtils.UTF_8);
 		String dataSourceTemplate = writer.toString();
@@ -75,14 +73,19 @@ public class CollectMobileBackupConvertTask extends Task {
 		return dataSourceConfigFile;
 	}
 
+	private File getResourceAsFile(String fileName) {
+		InputStream serverApplicationContextIS = this.getClass().getClassLoader().getResourceAsStream(fileName);
+		return OpenForisIOUtils.copyToTempFile(serverApplicationContextIS);
+	}
+
 	@Override
 	protected long countTotalItems() {
 		return 2;
 	}
-	
+
 	@Override
 	protected void execute() throws Throwable {
-		//import survey into db file
+		// import survey into db file
 		CollectJobManager jobManager = (CollectJobManager) ctx.getBean("jobManager");
 		SurveyRestoreJob restoreJob = ctx.getBean(SurveyRestoreJob.class);
 
@@ -92,10 +95,10 @@ public class CollectMobileBackupConvertTask extends Task {
 		restoreJob.setRestoreIntoPublishedSurvey(true);
 		restoreJob.setValidateSurvey(false);
 		jobManager.start(restoreJob, false);
-		
+
 		incrementProcessedItems();
-		
-		if ( restoreJob.isCompleted() ) {
+
+		if (restoreJob.isCompleted()) {
 			createOutpuFile();
 			incrementProcessedItems();
 		} else {
@@ -113,17 +116,17 @@ public class CollectMobileBackupConvertTask extends Task {
 		BackupFileExtractor backupFileExtractor = null;
 		try {
 			backupFileExtractor = new BackupFileExtractor(collectBackupFile);
-			
+
 			outputFile = File.createTempFile("collect_" + surveyName, ".zip");
 			zipOutputStream = new ZipOutputStream(new FileOutputStream(outputFile));
 
-			//include collect.db file
+			// include collect.db file
 			zipOutputStream.putNextEntry(new ZipEntry(COLLECT_DB_FILE_NAME));
 			FileInputStream dbFileIS = new FileInputStream(outputDbFile);
 			IOUtils.copy(dbFileIS, zipOutputStream);
 			zipOutputStream.closeEntry();
-			
-			//include info.properties file
+
+			// include info.properties file
 			File infoFile = backupFileExtractor.extract(SurveyBackupJob.INFO_FILE_NAME);
 			zipOutputStream.putNextEntry(new ZipEntry(SurveyBackupJob.INFO_FILE_NAME));
 			IOUtils.copy(new FileInputStream(infoFile), zipOutputStream);
@@ -133,7 +136,7 @@ public class CollectMobileBackupConvertTask extends Task {
 			IOUtils.closeQuietly(zipOutputStream);
 		}
 	}
-	
+
 	@Override
 	protected void onEnd() {
 		super.onEnd();
@@ -143,13 +146,13 @@ public class CollectMobileBackupConvertTask extends Task {
 	public File getOutputFile() {
 		return outputFile;
 	}
-	
+
 	public void setCollectBackupFile(File collectBackupFile) {
 		this.collectBackupFile = collectBackupFile;
 	}
-	
+
 	public void setSurveyName(String surveyName) {
 		this.surveyName = surveyName;
 	}
-	
+
 }
