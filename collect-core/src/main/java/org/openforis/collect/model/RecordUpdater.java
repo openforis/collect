@@ -387,20 +387,40 @@ public class RecordUpdater {
 				}
 				changeMap.addRelevanceChanges(updatedRelevancePointers);
 				
-				if (clearNotRelevantAttributes) {
-					Set<Attribute<?, ?>> noMoreRelevantAttributes = retainNotRelevantAttributes(updatedRelevanceNodes);
-					if (! noMoreRelevantAttributes.isEmpty()) {
-						Set<Attribute<?, ?>> clearedAttributes = clearUserSpecifiedAttributes(noMoreRelevantAttributes);
-						if (! clearedAttributes.isEmpty()) {
-							updatedAttributes.addAll(clearedAttributes);
-							changeMap.addValueChanges(clearedAttributes);
-							stack.add(nodesToPointers(clearedAttributes));
-						}
-					}
+				// clear no more relevant attributes (not empty, not calculated or with default value applied)
+				final Set<Attribute<?, ?>> clearedAttributes = clearNoMoreRelevantAttributes(updatedRelevanceNodes);
+				if (! clearedAttributes.isEmpty()) {
+					updatedAttributes.addAll(clearedAttributes);
+					changeMap.addValueChanges(clearedAttributes);
+					stack.add(nodesToPointers(clearedAttributes));
 				}
 			}
 		}
 		return totalUpdatedRelevancePointers;
+	}
+
+	private Set<Attribute<?, ?>> clearNoMoreRelevantAttributes(Set<Node<?>> updatedRelevanceNodes) {
+		final Set<Attribute<?, ?>> clearedAttributes = new HashSet<Attribute<?,?>>();
+		for (Node<?> updatedRelevanceNode: updatedRelevanceNodes) {
+			if (updatedRelevanceNode instanceof Entity) {
+				((Entity) updatedRelevanceNode).traverseDescendants(new NodeVisitor() {
+					public void visit(Node<? extends NodeDefinition> node, int idx) {
+						if (node instanceof Attribute) {
+							Attribute<?, ?> attr = (Attribute<?, ?>) node;
+							if (clearNoMoreRelevantAttribute(attr)) {
+								clearedAttributes.add(attr);
+							}
+						}
+					}
+				});
+			} else {
+				Attribute<?, ?> attr = (Attribute<?, ?>) updatedRelevanceNode;
+				if (clearNoMoreRelevantAttribute(attr)) {
+					clearedAttributes.add(attr);
+				}
+			}
+		}
+		return clearedAttributes;
 	}
 
 	private Set<CodeAttribute> clearDependentCodeAttributes(NodePointer nodePointer) {
@@ -409,6 +429,16 @@ public class RecordUpdater {
 		return clearUserSpecifiedAttributes(attributes);
 	}
 
+	private boolean clearNoMoreRelevantAttribute(Attribute<?, ?> attr) {
+		if (!attr.isRelevant() && !attr.isEmpty() && 
+				((clearNotRelevantAttributes && attr.isUserSpecified()) || isDefaultValueApplied(attr))) {
+			attr.clearValue();
+			attr.updateSummaryInfo();
+			return true;
+		}
+		return false;
+	}
+	
 	private <A extends Attribute<?, ?>> Set<A> clearUserSpecifiedAttributes(Set<A> attributes) {
 		Set<A> updatedAttributes = new HashSet<A>();
 		for (A attr : attributes) {
@@ -419,20 +449,6 @@ public class RecordUpdater {
 			}
 		}
 		return updatedAttributes;
-	}
-
-	private Set<Attribute<?, ?>> retainNotRelevantAttributes(Set<Node<?>> nodes) {
-		Set<Attribute<?, ?>> result = new HashSet<Attribute<?,?>>();
-		Deque<Node<?>> stack = new LinkedList<Node<?>>(nodes);
-		while (!stack.isEmpty()) {
-			Node<?> node = stack.pop();
-			if (node instanceof Entity) {
-				stack.addAll(((Entity) node).getDescendants());
-			} else if (! node.isRelevant()) {
-				result.add((Attribute<?, ?>) node);
-			}
-		}
-		return result;
 	}
 
 	private void validateAttributes(Record record, Set<Attribute<?, ?>> attributes, NodeChangeMap changeMap) {
@@ -973,7 +989,7 @@ public class RecordUpdater {
 			public void visit(Node<?> node, int idx) {
 				if (node instanceof Attribute) {
 					Attribute<?, ?> attr = (Attribute<?, ?>) node;
-					Value value = applyInitialValue(attr);
+					Value value = applyInitialValue(attr, true);
 					if (value != null) {
 						updatedAttributes.add(attr);
 					}
@@ -982,9 +998,14 @@ public class RecordUpdater {
 		});
 		return updatedAttributes;
 	}
-
+	
 	private Value applyInitialValue(Attribute<?, ?> attr) {
-		if (!attr.getDefinition().isCalculated() && attr.isRelevant() && (attr.isEmpty() || isDefaultValueApplied(attr))) {
+		return applyInitialValue(attr, false);
+	}
+
+	private Value applyInitialValue(Attribute<?, ?> attr, boolean onlyIfEmpty) {
+		if (!attr.getDefinition().isCalculated() && attr.isRelevant() && 
+				(attr.isEmpty() || (!onlyIfEmpty && isDefaultValueApplied(attr)))) {
 			if (canApplyDefaultValueInCurrentPhase(attr)) {
 				// check if default value can be applied
 				Value value = performDefaultValueApply(attr);
