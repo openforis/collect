@@ -11,15 +11,10 @@
 		preserve-publish-order="true">
 		<websocket:stomp-endpoint path="/ws"
 			allowed-origins="*">
-			<websocket:handshake-handler
-				ref="webSocketHandshakeHandler" />
 			<websocket:sockjs
 				client-library-url="../assets/js/sockjs/1.5.0/sockjs.js" />
 		</websocket:stomp-endpoint>
 		<websocket:simple-broker />
 	</websocket:message-broker>
-
-	<bean id="webSocketHandshakeHandler"
-		class="org.openforis.collect.config.WebSocketHandshakeHandler" />
 
 </beans>
