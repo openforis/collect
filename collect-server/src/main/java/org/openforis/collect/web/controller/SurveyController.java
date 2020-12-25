@@ -62,6 +62,7 @@ import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.MediaTypes;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.controller.SurveyController.SurveyCloneParameters.SurveyType;
+import org.openforis.collect.web.manager.SessionRecordProvider;
 import org.openforis.collect.web.service.SurveyService;
 import org.openforis.collect.web.validator.SimpleSurveyCreationParametersValidator;
 import org.openforis.collect.web.validator.SurveyCloneParametersValidator;
@@ -116,6 +117,8 @@ public class SurveyController extends BasicController {
 	private JobManager jobManager;
 	@Autowired
 	private SessionManager sessionManager;
+	@Autowired
+	private SessionRecordProvider sessionRecordProvider;
 	@Autowired
 	private SurveyService surveyService;
 	@Autowired
@@ -269,7 +272,7 @@ public class SurveyController extends BasicController {
 			try {
 				User activeUser = sessionManager.getLoggedUser();
 				surveyManager.publish(survey, activeUser);
-				sendSurveyMessage(MessageType.SURVEY_PUBLISHED, id);
+				sendSurveyMessage(MessageType.SURVEY_PUBLISHED, survey.getId());
 				return new SurveyPublishResult(generateView(survey, false, langCode));
 			} catch(Exception e) {
 				LOG.error("Error publishing survey: " + e.getMessage(), e);
@@ -600,6 +603,7 @@ public class SurveyController extends BasicController {
 
 	private void sendSurveyMessage(MessageType surveydMessageType, int surveyId) {
 		appWS.sendMessage(new SurveyMessage(surveydMessageType, surveyId), 500);
+		sessionRecordProvider.clearRecords(surveyId);
 		sendSurveysUpdatedMessage();
 	}
 
