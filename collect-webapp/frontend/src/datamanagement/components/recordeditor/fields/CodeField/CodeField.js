@@ -1,4 +1,4 @@
-import './CodeField.css'
+import './CodeField.scss'
 
 import React from 'react'
 import { InputLabel } from '@material-ui/core'
@@ -275,7 +275,11 @@ export default class CodeField extends AbstractField {
     if (enumerator) {
       return (
         <InputLabel style={{ width: FieldsSizes.getWidth({ fieldDef, inTable }) }}>
-          <CodeFieldItemLabel item={Arrays.head(selectedItems)} attributeDefinition={attributeDefinition} />
+          <CodeFieldItemLabel
+            item={Arrays.head(selectedItems)}
+            attributeDefinition={attributeDefinition}
+            singleLine={inTable}
+          />
         </InputLabel>
       )
     }

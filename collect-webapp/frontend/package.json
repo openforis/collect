@@ -44,6 +44,7 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-stomp": "^5.0.0",
+    "react-truncate": "^2.4.0",
     "react-virtualized": "^9.22.2",
     "reactstrap": "^8.7.1",
     "redux": "^4.0.5",

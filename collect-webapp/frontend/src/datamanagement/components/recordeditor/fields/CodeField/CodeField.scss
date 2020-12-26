@@ -1,0 +1,15 @@
+.code-field-item-label {
+  display: inline-block;
+  width: 100%;
+
+  &.single-line {
+    .text {
+      max-width: 100%;
+    }
+  }
+  &.with-info-icon {
+    .text {
+      max-width: calc(100% - 30px);
+    }
+  }
+}
