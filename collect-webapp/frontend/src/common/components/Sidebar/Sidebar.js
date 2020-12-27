@@ -177,7 +177,7 @@ const Sidebar = () => {
             <a href="http://www.openforis.org" target="_blank" rel="noopener noreferrer">
               Open Foris
             </a>{' '}
-            &copy; 2020
+            &copy; 2010-2020
           </span>
         </div>
       </nav>
