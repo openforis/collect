@@ -97,6 +97,7 @@
   **/
   .form-item-wrapper,
   .form-item-field-wrapper {
+    position: relative;
     width: fit-content;
 
     .MuiFormControl-root.MuiTextField-root,
