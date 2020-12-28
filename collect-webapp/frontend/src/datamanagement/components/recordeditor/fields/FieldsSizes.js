@@ -62,11 +62,21 @@ const WIDTH_CALCULATORS_BY_ATTRIBUTE_TYPE = {
 
 export const getWidth = ({ fieldDef, inTable }) => {
   const { attributeDefinition } = fieldDef
+  const { width = 0 } = attributeDefinition
   const widthCalculator = WIDTH_CALCULATORS_BY_ATTRIBUTE_TYPE[attributeDefinition.attributeType]
-  return widthCalculator({ fieldDef, inTable })
+  const minWidth = widthCalculator({ fieldDef, inTable })
+  return Math.max(minWidth, width)
 }
 
 export const getWidthPx = ({ fieldDef, inTable }) => `${getWidth({ fieldDef, inTable })}px`
+
+export const getFormItemWidth = ({ fieldDef, inTable }) => {
+  const { attributeDefinition } = fieldDef
+  const { labelWidth = 200 } = attributeDefinition
+  return getWidth({ fieldDef, inTable }) + labelWidth
+}
+
+export const getFormItemWidthPx = ({ fieldDef, inTable }) => `${getFormItemWidth({ fieldDef, inTable })}px`
 
 export const getFieldWidth = ({ fieldDef, fieldName }) => {
   const { attributeDefinition } = fieldDef

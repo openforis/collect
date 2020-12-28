@@ -10,7 +10,7 @@ import FormItem from './FormItem'
 import AbstractFormComponent from './AbstractFormComponent'
 
 const FormItemsItem = (props) => {
-  const { itemDef, parentEntity, fullSize } = props
+  const { itemDef, parentEntity, fullSize, style } = props
   const { nodeDefinition } = itemDef
   const { id: nodeDefId, hideWhenNotRelevant } = nodeDefinition
   const relevant = parentEntity.childrenRelevanceByDefinitionId[nodeDefId]
@@ -22,12 +22,14 @@ const FormItemsItem = (props) => {
 
   return hideWhenNotRelevant ? (
     visible && (
-      <Fade in={visible} className={className}>
+      <Fade in={visible} className={className} style={style}>
         {formItem}
       </Fade>
     )
   ) : (
-    <div className={className}>{formItem}</div>
+    <div className={className} style={style}>
+      {formItem}
+    </div>
   )
 }
 
@@ -47,7 +49,8 @@ export default class FormItems extends AbstractFormComponent {
   }
 
   render() {
-    const { itemDefs, parentEntity } = this.props
+    const { parentItemDef, parentEntity } = this.props
+    const { items: itemDefs, totalColumns } = parentItemDef
     const { record } = parentEntity
     const { version } = record
 
@@ -68,11 +71,19 @@ export default class FormItems extends AbstractFormComponent {
       return <FormItemsItem itemDef={firstDef} parentEntity={parentEntity} fullSize />
     }
     if (itemDefsVisible.length > 0) {
+      const gridTemplateColumns = `repeat(${totalColumns}, auto)`
       return (
-        <div className="form-items">
-          {itemDefsVisible.map((itemDef) => (
-            <FormItemsItem key={itemDef.id} itemDef={itemDef} parentEntity={parentEntity} />
-          ))}
+        <div className="form-items" style={{ gridTemplateColumns }}>
+          {itemDefsVisible.map((itemDef) => {
+            const { column, columnSpan, row } = itemDef
+            const itemStyle = {
+              gridRowStart: row,
+              gridRowEnd: row + 1,
+              gridColumnStart: column,
+              gridColumnEnd: column + columnSpan,
+            }
+            return <FormItemsItem key={itemDef.id} itemDef={itemDef} parentEntity={parentEntity} style={itemStyle} />
+          })}
         </div>
       )
     }

@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { Row, Col } from 'reactstrap'
 import classNames from 'classnames'
 
 import { FieldDefinition } from 'model/ui/FieldDefinition'
@@ -60,19 +59,19 @@ const FormItem = (props) => {
   }
 
   return (
-    <Row>
+    <>
       {_includeLabel(itemDef) && (
-        <Col style={{ flexGrow: 0 }}>
+        <div>
           <NodeDefLabel nodeDefinition={nodeDefinition} />
-        </Col>
+        </div>
       )}
-      <Col>
+      <div>
         <div id={wrapperId} className={classNames('form-item-wrapper', { error: cardinalityValidation.hasErrors() })}>
           {internalComponent}
         </div>
         <ValidationTooltip target={wrapperId} validation={cardinalityValidation} />
-      </Col>
-    </Row>
+      </div>
+    </>
   )
 }
 

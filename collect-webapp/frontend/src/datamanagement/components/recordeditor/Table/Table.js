@@ -277,7 +277,7 @@ export default class Table extends EntityCollectionComponent {
     const maxCountReached = maxCount && entities.length >= maxCount
 
     const content = (
-      <>
+      <div className="table-external-wrapper">
         <div className="table-wrapper" style={{ width: totalWidth }}>
           <TableVirtualized
             headerRowRenderer={this.headerRowRenderer}
@@ -336,6 +336,7 @@ export default class Table extends EntityCollectionComponent {
 
         {canAddOrDeleteRows && (
           <Button
+            className="add-btn"
             variant="outlined"
             color="primary"
             onClick={this.onNewButtonClick}
@@ -352,7 +353,7 @@ export default class Table extends EntityCollectionComponent {
             {L.l('common.add')}
           </Button>
         )}
-      </>
+      </div>
     )
 
     if (fullSize) {

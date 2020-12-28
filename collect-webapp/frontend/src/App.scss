@@ -37,14 +37,26 @@
 
   .form-items {
     padding: 5px;
+    display: grid;
+    row-gap: 4px;
+    column-gap: 6px;
+    width: fit-content;
+  }
+
+  .form-item-external-wrapper {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    flex-direction: row;
+    width: fit-content;
   }
 
   .form-item-composite-wrapper {
     display: flex;
     gap: 6px;
+  }
+
+  .multiple-fieldset-wrapper {
+    display: flex;
+    flex-direction: column;
   }
 
   .multiple-fieldset-header {

@@ -111,7 +111,7 @@ export default class MultipleFieldset extends EntityCollectionComponent {
     const maxCountReached = maxCount && entitiesSummary.length >= maxCount
 
     return (
-      <>
+      <div className="multiple-fieldset-wrapper">
         <div className="multiple-fieldset-header">
           <NodeDefLabel nodeDefinition={entityDefinition} limitWidth={false} />:
           {entitiesSummary.length > 0 && (
@@ -142,11 +142,11 @@ export default class MultipleFieldset extends EntityCollectionComponent {
         </div>
         {selectedEntity && (
           <>
-            <FormItems itemDefs={itemDef.items} parentEntity={selectedEntity} />
+            <FormItems parentItemDef={itemDef} parentEntity={selectedEntity} />
             <TabSetContent tabSetDef={itemDef} parentEntity={selectedEntity} />
           </>
         )}
-      </>
+      </div>
     )
   }
 }

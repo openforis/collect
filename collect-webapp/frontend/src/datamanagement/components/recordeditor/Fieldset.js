@@ -17,7 +17,7 @@ const Fieldset = (props) => {
       <legend>
         <NodeDefLabel nodeDefinition={entityDefinition} limitWidth={false} />
       </legend>
-      <FormItems itemDefs={itemDef.items} parentEntity={entity} />
+      <FormItems parentItemDef={itemDef} parentEntity={entity} />
       <TabSetContent tabSetDef={itemDef} parentEntity={entity} />
     </fieldset>
   )

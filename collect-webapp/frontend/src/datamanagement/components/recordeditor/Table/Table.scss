@@ -38,6 +38,15 @@
   padding-right: 0.5rem;
 }
 
+.table-external-wrapper {
+  display: flex;
+  flex-direction: column;
+
+  .add-btn {
+    width: fit-content;
+  }
+}
+
 .table-wrapper {
   border: 1px solid gray;
 

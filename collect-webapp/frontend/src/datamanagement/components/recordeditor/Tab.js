@@ -12,7 +12,7 @@ const Tab = (props) => {
 
   return (
     <>
-      <FormItems itemDefs={tabDef.items} parentEntity={parentEntity} />
+      <FormItems parentItemDef={tabDef} parentEntity={parentEntity} />
       <TabSetContent tabSetDef={tabDef} parentEntity={parentEntity} />
     </>
   )
