@@ -14,9 +14,12 @@ const CodeFieldRadioItem = (props) => {
     color: 'primary',
     size: 'small',
     disabled: readOnly,
-    onChange: () => onChange({ item, selected: !selected }),
   }
-  const control = multiple ? <Checkbox checked={selected} {...commonProps} /> : <Radio value={code} {...commonProps} />
+  const control = multiple ? (
+    <Checkbox checked={selected} {...commonProps} onChange={() => onChange({ item, selected: !selected })} />
+  ) : (
+    <Radio value={code} {...commonProps} onClick={() => onChange({ item, selected: !selected })} />
+  )
 
   return (
     <div key={code} style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline' }}>
