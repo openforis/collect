@@ -231,10 +231,17 @@ public class CodeListManager {
 			return (T) list.getItem(code, 0, version);
 		}
 	}
+	
+	public boolean hasRootItems(CodeList list) {
+		return hasChildItemsInLevel(list, 1);
+	}
 
 	public boolean hasChildItemsInLevel(CodeList list, int level) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
 		if (list.isExternal()) {
+			if (level == 1) {
+				return provider.countRootItems(list) > 0;
+			}
 			throw new UnsupportedOperationException();
 		} else if (persistedSurvey && list.isEmpty()) {
 			return codeListItemDao.countItemsInLevel(list, level) > 0;
@@ -344,7 +351,7 @@ public class CodeListManager {
 	public boolean hasItems(Entity parent, CodeAttributeDefinition def) {
 		CodeList list = def.getList();
 		if (StringUtils.isEmpty(def.getParentExpression())) {
-			return hasChildItemsInLevel(list, 1);
+			return hasRootItems(list);
 		} else {
 			CodeAttribute parentCodeAttribute = getCodeParent(parent, def);
 			if (parentCodeAttribute != null) {

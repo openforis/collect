@@ -101,6 +101,16 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<Long, SamplingDesig
 		return (Integer) r.getValue(0);
 	}
 	
+	public int countItemsInLevel(int surveyId, int level) {
+		SamplingDesignDSLContext dsl = dsl();
+		SelectQuery<?> q = dsl.selectQuery();
+		q.addSelect(DSL.count());
+		q.addFrom(OFC_SAMPLING_DESIGN);
+		q.addConditions(OFC_SAMPLING_DESIGN.SURVEY_ID.eq(surveyId));
+		addLevelKeyNullConditions(q, level);
+		return q.fetchOne(0, Integer.class);
+	}
+	
 	public int countMaxByLevel(int surveyId, int level) {
 		SamplingDesignDSLContext dsl = dsl();
 		SelectQuery<?> q = dsl.selectQuery();

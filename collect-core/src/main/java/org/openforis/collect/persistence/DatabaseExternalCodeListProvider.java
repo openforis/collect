@@ -295,6 +295,16 @@ public class DatabaseExternalCodeListProvider implements
 				});
 	}
 	
+	public int countRootItems(CodeList list) {
+		if (isSamplingDesignCodeList(list)) {
+			return samplingDesignDao.countItemsInLevel(list.getSurvey().getId(), 1);
+		} else {
+			throw new UnsupportedOperationException(
+					String.format("Count items on dynamic table is not supported; code list '%s' lookup table '%s'",
+							list.getName(), list.getLookupTable()));
+		}
+	}
+	
 	public int countMaxChildren(CodeList list, int level) {
 		if (isSamplingDesignCodeList(list)) {
 			return samplingDesignDao.countMaxByLevel(list.getSurvey().getId(), level);
