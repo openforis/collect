@@ -46,7 +46,12 @@ public class CollectCodeListService implements CodeListService {
 			CodeAttributeDefinition def) {
 		return codeListManager.loadValidItems(parent, def);
 	}
-
+	
+	@Override
+	public boolean hasItems(Entity parent, CodeAttributeDefinition def) {
+		return codeListManager.hasItems(parent, def);
+	}
+	
 	@Override
 	public <T extends CodeListItem> T loadParentItem(T item) {
 		return codeListManager.loadParentItem(item);

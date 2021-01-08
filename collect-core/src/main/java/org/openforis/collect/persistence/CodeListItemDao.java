@@ -579,16 +579,15 @@ public class CodeListItemDao extends MappingJooqDaoSupport<Long, PersistedCodeLi
 		return count > 0;
 	}
 	
-	public boolean hasItemsInLevel(CodeList codeList, int level) {
+	public int countItemsInLevel(CodeList codeList, int level) {
 		JooqDSLContext jf = dsl(codeList);
 		SelectQuery<Record> q = createSelectFromCodeListQuery(jf, codeList);
 		q.addSelect(DSL.count());
 		q.addConditions(OFC_CODE_LIST.LEVEL.equal(level));
 		Record record = q.fetchOne();
-		Integer count = (Integer) record.getValue(0);
-		return count > 0;
+		return (Integer) record.getValue(0);
 	}
-	
+
 	public void removeItemsInLevel(CodeList list, int level) {
 		DeleteConditionStep<OfcCodeListRecord> q = createDeleteQuery(list);
 		q.and(OFC_CODE_LIST.LEVEL.equal(level));

@@ -54,8 +54,7 @@ public class CodeListController {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
 		CodeList list = survey.getCodeListById(codeListId);
 		ModelVersion version = params.versionId == null ? null : survey.getVersionById(params.versionId);
-		List<CodeListItem> items = codeListManager.loadValidItems(list, version, params.ancestorCodes);
-		return items.size();
+		return codeListManager.countValidItems(list, version, params.ancestorCodes);
 	}
 
 	@RequestMapping(value = "survey/{surveyId}/codelist/{codeListId}/validitems", method = POST)

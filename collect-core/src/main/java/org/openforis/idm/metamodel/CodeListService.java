@@ -22,6 +22,8 @@ public interface CodeListService {
 	
 	<T extends CodeListItem> List<T> loadItems(CodeList codeList, int level);
 	
+	boolean hasItems(Entity parent, CodeAttributeDefinition def);
+	
 	<T extends CodeListItem> List<T> loadValidItems(Entity parent, CodeAttributeDefinition def);
 
 	<T extends CodeListItem> T loadParentItem(T item);

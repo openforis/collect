@@ -219,7 +219,7 @@ public class CodeListManager {
 			return list.getItems();
 		}
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	public <T extends CodeListItem> T loadRootItem(CodeList list, String code, ModelVersion version) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
@@ -237,7 +237,7 @@ public class CodeListManager {
 		if (list.isExternal()) {
 			throw new UnsupportedOperationException();
 		} else if (persistedSurvey && list.isEmpty()) {
-			return codeListItemDao.hasItemsInLevel(list, level);
+			return codeListItemDao.countItemsInLevel(list, level) > 0;
 		} else {
 			return list.hasItemsInLevel(level - 1);
 		}
@@ -335,6 +335,27 @@ public class CodeListManager {
 		ModelVersion version = record.getVersion();
 		return filterApplicableItems(items, version);
 	}
+	
+	public int countValidItems(CodeList list, ModelVersion version, List<String> ancestorCodes) {
+		List<CodeListItem> items = loadValidItems(list, version, ancestorCodes);
+		return items.size();
+	}
+	
+	public boolean hasItems(Entity parent, CodeAttributeDefinition def) {
+		CodeList list = def.getList();
+		if (StringUtils.isEmpty(def.getParentExpression())) {
+			return hasChildItemsInLevel(list, 1);
+		} else {
+			CodeAttribute parentCodeAttribute = getCodeParent(parent, def);
+			if (parentCodeAttribute != null) {
+				CodeListItem parentCodeListItem = loadItemByAttribute(parentCodeAttribute);
+				if (parentCodeListItem != null) {
+					return hasChildItems(parentCodeListItem);
+				}
+			}
+		}
+		return false;
+	}
 
 	public <T extends CodeListItem> List<T> loadValidItems(CodeList list, ModelVersion version,
 			List<String> ancestorCodes) {
@@ -407,7 +428,7 @@ public class CodeListManager {
 			return null;
 		}
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	public <T extends CodeListItem> List<T> loadChildItems(CodeListItem parent) {
 		CodeList list = parent.getCodeList();

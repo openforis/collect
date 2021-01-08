@@ -10,7 +10,6 @@ import java.util.List;
 
 import org.openforis.idm.metamodel.Calculable;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
-import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -77,8 +76,7 @@ public class MinCountValidator implements ValidationRule<Entity> {
 			//test context does not have a CodeListService
 			return true;
 		}
-		List<CodeListItem> validItems = codeListService.loadValidItems(parentEntity, codeAttrDef);
-		return ! validItems.isEmpty();
+		return codeListService.hasItems(parentEntity, codeAttrDef);
 	}
 	
 	@Override
