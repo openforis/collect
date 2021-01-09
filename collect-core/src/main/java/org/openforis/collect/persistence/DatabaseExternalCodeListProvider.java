@@ -200,24 +200,28 @@ public class DatabaseExternalCodeListProvider implements
 			ancestorKeys.add(item.getCode());
 			List<SamplingDesignItem> samplingDesignItems = samplingDesignDao.loadChildItems(list.getSurvey().getId(), ancestorKeys);
 			return samplingDesignItemsToItems(list, samplingDesignItems, childrenLevel);
-		} else {			
-			List<NameValueEntry> filters = createChildItemsFilters(item);
-			String childrenKeyColName = getLevelKeyColumnName(list, childrenLevel);
-			String[] notNullColumns = new String[]{childrenKeyColName};
-			List<Map<String, String>> rows = dynamicTableDao.loadRows(list.getLookupTable(), 
-					filters.toArray(new NameValueEntry[filters.size()]),
-					notNullColumns);
-			List<ExternalCodeListItem> result = new ArrayList<ExternalCodeListItem>();
-			for (Map<String, String> row : rows) {
-				ExternalCodeListItem child = parseRow(row, list, childrenLevel);
-				result.add(child);
-			}
-			return result;
+		}			
+		List<NameValueEntry> filters = createChildItemsFilters(item);
+		String childrenKeyColName = getLevelKeyColumnName(list, childrenLevel);
+		String[] notNullColumns = new String[]{childrenKeyColName};
+		List<Map<String, String>> rows = dynamicTableDao.loadRows(list.getLookupTable(), 
+				filters.toArray(new NameValueEntry[filters.size()]),
+				notNullColumns);
+		List<ExternalCodeListItem> result = new ArrayList<ExternalCodeListItem>();
+		for (Map<String, String> row : rows) {
+			ExternalCodeListItem child = parseRow(row, list, childrenLevel);
+			result.add(child);
 		}
+		return result;
 	}
 	
 	public boolean hasChildItems(ExternalCodeListItem item) {
 		CodeList list = item.getCodeList();
+		if (isSamplingDesignCodeList(list)) {
+			List<String> ancestorKeys = new ArrayList<String>(item.getParentKeys());
+			ancestorKeys.add(item.getCode());
+			return samplingDesignDao.countChildItems(list.getSurvey().getId(), ancestorKeys) > 0;
+		}
 		List<NameValueEntry> filters = createChildItemsFilters(item);
 		int itemLevel = item.getLevel();
 		int childrenLevel = itemLevel + 1;
