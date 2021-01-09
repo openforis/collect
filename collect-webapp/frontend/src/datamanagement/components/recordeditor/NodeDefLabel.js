@@ -11,8 +11,7 @@ const NodeDefLabel = (props) => {
   const { numberLabel, labelOrName, description, labelWidth: labelWidthNodeDef } = nodeDefinition
 
   const hasNumberLabel = !!numberLabel
-
-  const style = limitWidth ? { width: `${labelWidthNodeDef || 200}px` } : {}
+  const style = limitWidth ? { width: `${Math.max(labelWidthNodeDef || 0, 200)}px` } : {}
 
   return (
     <div className={classNames('node-def-label-wrapper', { 'with-number': hasNumberLabel })} style={style}>

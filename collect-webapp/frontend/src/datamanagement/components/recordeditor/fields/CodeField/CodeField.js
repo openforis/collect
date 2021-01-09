@@ -83,6 +83,7 @@ export default class CodeField extends AbstractField {
               versionId,
               ancestorCodes,
               code: value.code,
+              language: survey.preferredLanguage,
             })
           } catch (e) {
             return null
