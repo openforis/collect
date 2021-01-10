@@ -5,18 +5,21 @@ import { RecordUpdater } from 'model/RecordUpdater'
 import ServiceFactory from 'services/ServiceFactory'
 
 import RecordEditForm from '../components/RecordEditForm'
+import RouterUtils from 'utils/RouterUtils'
 
 class RecordEditPage extends Component {
   recordUpdater = null
 
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
+
     this.state = {
       record: null,
+      inPopUp: false,
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const { match, language: languageProps, loggedUser, location } = this.props
     const { id: idParam } = match.params
 
@@ -28,22 +31,26 @@ class RecordEditPage extends Component {
     const localeLangCode = locale?.split('_')[0]
     const language = languageProps ? languageProps : localeLangCode
 
-    ServiceFactory.recordService.fetchSurveyId(recordId).then((res) => {
-      const surveyId = Number(res)
+    const surveyIdRes = await ServiceFactory.recordService.fetchSurveyId(recordId)
+    const surveyId = Number(surveyIdRes)
 
-      ServiceFactory.surveyService.fetchById(surveyId, language).then((survey) => {
-        ServiceFactory.recordService.fetchById(survey, recordId).then((record) => {
-          record.readOnly = !loggedUser.canEditRecord(record)
-          this.recordUpdater = new RecordUpdater(record)
-          this.setState({ record, inPopUp })
-        })
-      })
-    })
+    const survey = await ServiceFactory.surveyService.fetchById(surveyId, language)
+    const record = await ServiceFactory.recordService.fetchById(survey, recordId)
+    record.readOnly = !loggedUser.canEditRecord(record)
+    this.recordUpdater = new RecordUpdater(record)
+    this.setState({ record, inPopUp })
   }
 
   componentWillUnmount() {
-    if (this.recordUpdater) {
-      this.recordUpdater.destroy()
+    this.recordUpdater?.destroy()
+  }
+
+  componentDidUpdate(propsPrev) {
+    const { history, survey } = this.props
+    const { survey: surveyPrev } = propsPrev
+
+    if (survey && surveyPrev && survey.id !== surveyPrev.id) {
+      RouterUtils.navigateToDataManagementHomePage(history)
     }
   }
 
