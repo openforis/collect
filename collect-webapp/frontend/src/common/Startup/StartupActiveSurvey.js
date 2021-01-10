@@ -7,13 +7,15 @@ import { clearActiveSurvey, selectActiveSurvey } from 'actions/activeSurvey'
 const StartupActiveSurvey = () => {
   const dispatch = useDispatch()
 
+  const { survey: activeSurvey } = useSelector((state) => state.activeSurvey)
+
   const { initialized: surveySummariesReady, items: surveySummaries } = useSelector(
     (state) => state.surveyDesigner.surveysList
   )
 
-  // get active survey from local storage and set it in UI
+  // get active survey from local storage if not in Redux store and set it in UI
   useEffect(() => {
-    if (surveySummariesReady) {
+    if (!activeSurvey && surveySummariesReady) {
       const activeSurveyId = ActiveSurveyLocalStorage.getActiveSurveyId()
       if (activeSurveyId) {
         // active survey exists an it has not been deleted
@@ -25,7 +27,7 @@ const StartupActiveSurvey = () => {
         }
       }
     }
-  }, [surveySummariesReady])
+  }, [activeSurvey, surveySummariesReady])
 
   return null
 }

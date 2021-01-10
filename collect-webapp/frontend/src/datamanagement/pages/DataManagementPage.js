@@ -41,8 +41,8 @@ const INITIAL_STATE = {
 }
 
 class DataManagementPage extends React.Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
 
     this.state = INITIAL_STATE
 
