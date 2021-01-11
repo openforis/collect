@@ -176,6 +176,10 @@ public class DatabaseExternalCodeListProvider implements
 	}
 	
 	public ExternalCodeListItem getRootItem(CodeList list, String code) {
+		if (isSamplingDesignCodeList(list)) {
+			SamplingDesignItem samplingDesignItem = samplingDesignDao.loadItem(list.getSurvey().getId(), code);
+			return samplingDesignItemToItem(samplingDesignItem, list, 1);
+		}
 		List<NameValueEntry> filters = new ArrayList<NameValueEntry>();
 		addSurveyFilter(list, filters);
 		List<NameValueEntry> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, 1);
