@@ -15,7 +15,7 @@ import com.jamesmurty.utils.XMLBuilder;
 
 
 /**
- * 
+ *
  * @author S. Ricci
  * @author A. Sanchez-Paus Diaz
  *
@@ -23,7 +23,7 @@ import com.jamesmurty.utils.XMLBuilder;
 public class CEComponentHTMLFormatter {
 
 	private static final String EXTRA_VALUE_FORMAT = "$[EXTRA_%s]";
-	
+
 	private String language;
 
 	public CEComponentHTMLFormatter(String language) {
@@ -39,7 +39,7 @@ public class CEComponentHTMLFormatter {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	private XMLBuilder createBuilder(CETabSet tabSet, XMLBuilder parentBuilder) throws Exception {
 		XMLBuilder tabSetBuilder = parentBuilder == null ? XMLBuilder.create("div") : parentBuilder.e("div"); //$NON-NLS-1$ //$NON-NLS-2$
 		tabSetBuilder.a("class", "steps"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -48,7 +48,7 @@ public class CEComponentHTMLFormatter {
 		}
 		return tabSetBuilder;
 	}
-	
+
 	private XMLBuilder createBuilder(CETab tab, XMLBuilder parentBuilder) throws Exception {
 		parentBuilder.e("h3").t(  HtmlUnicodeEscaperUtil.escapeHtmlUnicode(  tab.getLabel() ) ); //$NON-NLS-1$
 
@@ -58,7 +58,7 @@ public class CEComponentHTMLFormatter {
 		if (tab.getAncillaryDataHeader() != null) {
 			createBuilder( tab.getAncillaryDataHeader(), bodyContentBuilder);
 		}
-		
+
 		for (CEComponent component : tab.getChildren()) {
 			if (component instanceof CEField) {
 				createBuilder((CEField) component, true, bodyContentBuilder);
@@ -70,7 +70,7 @@ public class CEComponentHTMLFormatter {
 		}
 		return bodyContentBuilder;
 	}
-	
+
 	private XMLBuilder createBuilder(CEEnumeratedEntityTable comp, XMLBuilder parentBuilder) throws Exception {
 		XMLBuilder builder =  parentBuilder.e("fieldset").attr("class", "entity-group" ); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		String legend =  comp.getLabelOrName() ;
@@ -89,16 +89,16 @@ public class CEComponentHTMLFormatter {
 			for (CEComponent child : row.getChildren()) {
 				XMLBuilder cellBuilder = rowBuilder.e("td"); //$NON-NLS-1$
 				if (child instanceof CEEnumeratingCodeField) {
-					
+
 					cellBuilder
 						.e("label") //$NON-NLS-1$
 							.a("class", "control-label col-sm-4") //$NON-NLS-1$ //$NON-NLS-2$
 							.t( row.getLabelOrName() );
-					
-					
+
+
 					String tooltip = row.getTooltip();
 					addTooltip(cellBuilder, tooltip);
-					
+
 				} else if (child instanceof CEField) {
 					createBuilder((CEField) child, false, cellBuilder);
 				}
@@ -106,11 +106,11 @@ public class CEComponentHTMLFormatter {
 		}
 		return builder;
 	}
-	
+
 	private XMLBuilder createBuilder(CEFieldSet comp, XMLBuilder parentBuilder) throws Exception {
 		XMLBuilder fieldSetBuilder =  parentBuilder.e("fieldset").attr("class", "entity-group" );; //$NON-NLS-1$
 		fieldSetBuilder.e("legend").t( comp.getLabelOrName()); //$NON-NLS-1$
-		
+
 		for (CEComponent child : comp.getChildren()) {
 			if (child instanceof CEField) {
 				createBuilder((CEField) child, true, fieldSetBuilder);
@@ -120,7 +120,7 @@ public class CEComponentHTMLFormatter {
 		}
 		return fieldSetBuilder;
 	}
-	
+
 	private XMLBuilder createBuilder(CEAncillaryFields comp, XMLBuilder parentBuilder) throws Exception {
 		XMLBuilder informationFieldsBuilder =  parentBuilder.e("div").attr("class", "ancillary-data" ); //$NON-NLS-1$
 		//informationFieldsBuilder.e("span").t( comp.getLabelOrName() ); //$NON-NLS-1$
@@ -134,14 +134,14 @@ public class CEComponentHTMLFormatter {
 				throw new IllegalArgumentException("Only attribute fields supported inside single entity"); //$NON-NLS-1$
 			}
 		}
-		
+
 		return informationFieldsBuilder;
 	}
-	
+
 	private XMLBuilder createBuilder(CEField comp, boolean includeLabel, XMLBuilder parentBuilder) throws Exception {
 		//start of external container
 		String elId = comp.getHtmlParameterName();
-		
+
 		//external form-group container
 		XMLBuilder formGroupBuilder = parentBuilder == null ? XMLBuilder.create("div") : parentBuilder.e("div"); //$NON-NLS-1$ //$NON-NLS-2$
 		formGroupBuilder.a("class", "form-group"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -151,16 +151,16 @@ public class CEComponentHTMLFormatter {
 				.a("for", elId) //$NON-NLS-1$
 				.a("class", "control-label col-sm-4") //$NON-NLS-1$ //$NON-NLS-2$
 				.t( comp.getLabelOrName() );
-			
+
 			String tooltip = comp.getTooltip();
 			addTooltip(formGroupBuilder, tooltip);
 		}
 		//form control external container (for grid alignment)
 		XMLBuilder formControlContainer = formGroupBuilder.e("div") //$NON-NLS-1$
 				.a("class", "col-sm-8"); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		String componentAdditionalClass =  comp.isExtra() ? " " + CollectEarthBalloonGenerator.EXTRA_HIDDEN_FIELD_CLASS : "";
-		
+
 		if (comp instanceof CECodeField) {
 			if (comp.isReadOnly()) {
 				XMLBuilder inputBuilder = formControlContainer.e("input") //$NON-NLS-1$
@@ -258,12 +258,12 @@ public class CEComponentHTMLFormatter {
 						.a("type", "button") //$NON-NLS-1$ //$NON-NLS-2$
 						.a("class", "btn btn-info") //$NON-NLS-1$ //$NON-NLS-2$
 						.a("value", "true") //$NON-NLS-1$ //$NON-NLS-2$
-						.t( HtmlUnicodeEscaperUtil.escapeForBalloon( Messages.getString("CEComponentHTMLFormatter.0", language)) ); //$NON-NLS-1$
+						.t( HtmlUnicodeEscaperUtil.escapeHtmlUnicode( Messages.getString("CEComponentHTMLFormatter.0", language) ); //$NON-NLS-1$
 					containerBuilder.e("button") //$NON-NLS-1$
 						.a("type", "button") //$NON-NLS-1$ //$NON-NLS-2$
 						.a("class", "btn btn-info") //$NON-NLS-1$ //$NON-NLS-2$
 						.a("value", "false") //$NON-NLS-1$ //$NON-NLS-2$
-						.t( HtmlUnicodeEscaperUtil.escapeForBalloon( Messages.getString("CEComponentHTMLFormatter.88", language) )); //$NON-NLS-1$
+						.t( HtmlUnicodeEscaperUtil.escapeHtmlUnicode( Messages.getString("CEComponentHTMLFormatter.88", language) ); //$NON-NLS-1$
 				}
 				break;
 			case COORDINATE:
@@ -308,7 +308,7 @@ public class CEComponentHTMLFormatter {
 
 	private void buildCodeSelect(XMLBuilder builder, CECodeField comp) {
 		String elId = comp.getHtmlParameterName();
-		
+
 		//build select
 		XMLBuilder selectBuilder = builder.e("select") //$NON-NLS-1$
 			.a("id", elId) //$NON-NLS-1$
@@ -323,34 +323,34 @@ public class CEComponentHTMLFormatter {
 		Map<Integer, List<CodeListItem>> itemsByParentCode = ((CECodeField) comp).getCodeItemsByParentId();
 		List<CodeListItem> rootItems = itemsByParentCode.get(0);
 		if (rootItems != null) {
-			
+
 			boolean hasNAoption = false;
 			for (CodeListItem item : rootItems) {
-				if( 
+				if(
 						item.getCode().equalsIgnoreCase("na") ||  //$NON-NLS-1$
 						item.getCode().equalsIgnoreCase("n/a") //$NON-NLS-1$
 				){
-					hasNAoption=true;	
+					hasNAoption=true;
 				}
 			}
-			
+
 			if(!hasNAoption){
 				selectBuilder.e("option").a("selected","true").a("value", "").t( Messages.getString("CEComponentHTMLFormatter.119", language) ); //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
-			
+
 			for (CodeListItem item : rootItems) {
 				String itemLabel = getItemLabel(item);
 				selectBuilder.e("option") //$NON-NLS-1$
 					.a("value", item.getCode()) //$NON-NLS-1$
 					.t(itemLabel);
 			}
-			
+
 		}
 	}
-	
+
 	private void buildCodeRange(XMLBuilder builder, CERangeField comp) {
 		String elId = comp.getHtmlParameterName();
-		
+
 		//build select
 		XMLBuilder selectBuilder = builder.e("select") //$NON-NLS-1$
 			.a("id", elId) //$NON-NLS-1$
@@ -358,7 +358,7 @@ public class CEComponentHTMLFormatter {
 			.a("data-field-type", comp.getType().name()) //$NON-NLS-1$
 			.a("class", "form-control selectboxit show-menu-arrow show-tick") //$NON-NLS-1$ //$NON-NLS-2$
 			.a("data-width", "75px"); //$NON-NLS-1$ //$NON-NLS-2$
-	
+
 		//add root items, if any
 		for( int i=comp.getFrom(); i<comp.getTo(); i++ ){
 				String item = i+""; //$NON-NLS-1$
@@ -370,25 +370,25 @@ public class CEComponentHTMLFormatter {
 
 	private void buildCodeButtonGroup(XMLBuilder formControlContainer, CECodeField comp) {
 		String elId = comp.getHtmlParameterName();
-		
+
 		//button groups external container
 		String groupId = elId + "_group"; //$NON-NLS-1$
-		
+
 		XMLBuilder itemsGroupExternalContainer = formControlContainer.e("div") //$NON-NLS-1$
 			.a("id", groupId) //$NON-NLS-1$
 			.a("class", "code-items-group"); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		XMLBuilder hiddenInputField = itemsGroupExternalContainer.e("input") //$NON-NLS-1$
 				.a("id", elId) //$NON-NLS-1$
 				.a("name", elId) //$NON-NLS-1$
 				.a("type", "hidden") //$NON-NLS-1$ //$NON-NLS-2$
 				.a("class", "form-control") //$NON-NLS-1$ //$NON-NLS-2$
 				.a("data-field-type", comp.getType().name()); //$NON-NLS-1$
-		
+
 		if (comp.getParentName() != null) {
 			hiddenInputField.a("data-parent-id-field-id", comp.getParentName()); //$NON-NLS-1$
 		}
-		
+
 		Map<Integer, List<CodeListItem>> itemsByParentCode = ((CECodeField) comp).getCodeItemsByParentId();
 		for (Entry<Integer, List<CodeListItem>> entry : itemsByParentCode.entrySet()) {
 			//one button group for every list of codes by parent code
@@ -417,7 +417,7 @@ public class CEComponentHTMLFormatter {
 							.a("data-code-item-id", String.valueOf(item.getId())) //$NON-NLS-1$
 							.a("value", item.getCode()) //$NON-NLS-1$
 							.t(itemLabel);
-					
+
 					String description = getDescription(item);
 
 					if (item.hasUploadedImage()) {
@@ -453,7 +453,7 @@ public class CEComponentHTMLFormatter {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	private String getItemLabel(CodeListItem item) {
 		return getItemLabel(item, language);
 	}
@@ -461,7 +461,7 @@ public class CEComponentHTMLFormatter {
 	private String getDescription(CodeListItem item) {
 		return getDescription(item, language);
 	}
-	
+
 	public static String getItemLabel(CodeListItem item, String lang) {
 		String itemLabel = item.getLabel(lang, true);
 		if (StringUtils.isBlank(itemLabel)) {
