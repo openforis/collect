@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.0.7] - 2021-01-13
 ### Fixed
+- Issue with special characters in Portuguese
 - Error exporting Collect Earth survey with multiple code attribute inside multiple entity;
 
 ## [4.0.6] - 2021-01-11

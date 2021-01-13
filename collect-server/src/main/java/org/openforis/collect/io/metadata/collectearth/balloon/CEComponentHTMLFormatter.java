@@ -258,12 +258,12 @@ public class CEComponentHTMLFormatter {
 						.a("type", "button") //$NON-NLS-1$ //$NON-NLS-2$
 						.a("class", "btn btn-info") //$NON-NLS-1$ //$NON-NLS-2$
 						.a("value", "true") //$NON-NLS-1$ //$NON-NLS-2$
-						.t( HtmlUnicodeEscaperUtil.escapeHtmlUnicode( Messages.getString("CEComponentHTMLFormatter.0", language) ); //$NON-NLS-1$
+						.t( HtmlUnicodeEscaperUtil.escapeHtmlUnicode( Messages.getString("CEComponentHTMLFormatter.0", language) ) ); //$NON-NLS-1$
 					containerBuilder.e("button") //$NON-NLS-1$
 						.a("type", "button") //$NON-NLS-1$ //$NON-NLS-2$
 						.a("class", "btn btn-info") //$NON-NLS-1$ //$NON-NLS-2$
 						.a("value", "false") //$NON-NLS-1$ //$NON-NLS-2$
-						.t( HtmlUnicodeEscaperUtil.escapeHtmlUnicode( Messages.getString("CEComponentHTMLFormatter.88", language) ); //$NON-NLS-1$
+						.t( HtmlUnicodeEscaperUtil.escapeHtmlUnicode( Messages.getString("CEComponentHTMLFormatter.88", language) ) ); //$NON-NLS-1$
 				}
 				break;
 			case COORDINATE:
