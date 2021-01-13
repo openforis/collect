@@ -114,12 +114,13 @@ public class MondrianCubeGenerator {
 				} 
 				cube.dimensions.add(dimension);
 			} else {
+				EntityDefinition entityDef = (EntityDefinition) nodeDef;
+				String entityName = nodeName;
+				String entityLabel = extractFailsafeLabel(entityDef);
+
 				String rootEntityIdColumnName = getRootEntityIdColumnName(rootEntityDef);
 				
-				String entityName = nodeName;
-				String entityLabel = extractFailsafeLabel(nodeDef);
-				
-				for (NodeDefinition childDef : ((EntityDefinition) nodeDef).getChildDefinitions()) {
+				for (NodeDefinition childDef : entityDef.getChildDefinitions()) {
 					String childLabel = extractReportingLabel(childDef);
 					if (childLabel == null) {
 						childLabel = extractFailsafeLabel(childDef);
@@ -130,17 +131,17 @@ public class MondrianCubeGenerator {
 					Dimension dimension = new Dimension(childLabel);
 					Hierarchy hierarchy = new Hierarchy(childLabel);
 					
-					if( nodeDef.isMultiple() ){
+					if( entityDef.isMultiple() ){
 						dimension.foreignKey = rootEntityIdColumnName;
 						hierarchy.primaryKey = rootEntityIdColumnName;
 						hierarchy.primaryKeyTable = entityName;
 						
-						if (childDef instanceof CodeAttributeDefinition) {
+						if (childDef instanceof CodeAttributeDefinition && !childDef.isMultiple()) {
 							CodeAttributeDefinition codeAttr = (CodeAttributeDefinition) childDef;
 							
 							Join join = new Join(null);
 							
-							DataTable dataTable = rdbSchema.getDataTable(nodeDef);
+							DataTable dataTable = rdbSchema.getDataTable(entityDef);
 							CodeValueFKColumn foreignKeyCodeColumn = dataTable.getForeignKeyCodeColumn(codeAttr);
 							join.leftKey = foreignKeyCodeColumn.getName();
 							
@@ -173,7 +174,7 @@ public class MondrianCubeGenerator {
 //		cube.dimensions.addAll(generatePredefinedDimensions());
 		//add predefined measures
 		
-		// Add the measures AFTER the 1st measure, which shouyld be Plot Count
+		// Add the measures AFTER the 1st measure, which should be Plot Count
 		cube.measures.addAll(1, generatePredefinedMeasures());
 		return cube;
 	}
