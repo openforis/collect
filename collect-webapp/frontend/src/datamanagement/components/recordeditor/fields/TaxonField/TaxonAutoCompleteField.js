@@ -41,7 +41,6 @@ const TaxonAutoCompleteField = (props) => {
   const { parentEntity, fieldDef, field, valueByFields, onInputChange, onSelect, onDismiss, readOnly } = props
 
   const { attributeDefinition } = fieldDef
-  const { showFamily } = attributeDefinition
 
   const queryField = TaxonAttributeDefinition.QueryFieldByField[field]
 
@@ -80,7 +79,7 @@ const TaxonAutoCompleteField = (props) => {
       itemLabelFunction={Objects.getProp(valueField, '')}
       itemSelectedFunction={(item, value) => item.code === value.code}
       itemRenderFunction={(taxonOccurrence) => (
-        <TaxonAutoCompleteDialogItem taxonOccurrence={taxonOccurrence} showFamily={showFamily} />
+        <TaxonAutoCompleteDialogItem attributeDefinition={attributeDefinition} taxonOccurrence={taxonOccurrence} />
       )}
       onInputChange={onInputChange}
       onSelect={onTaxonSelected}

@@ -1,17 +1,29 @@
 import React from 'react'
 
-const TaxonAutoCompleteDialogItem = (props) => {
-  const { taxonOccurrence, showFamily } = props
-  const gridTemplateColumns = `${showFamily ? '150px 300px ' : ''}150px 300px 200px 50px 50px`
+import { TaxonAttributeDefinition } from 'model/Survey'
 
-  const { code, scientificName, vernacularName, languageCode, languageVariety } = taxonOccurrence
+const widthByField = {
+  [TaxonAttributeDefinition.Fields.CODE]: '150px',
+  [TaxonAttributeDefinition.Fields.SCIENTIFIC_NAME]: '300px',
+  [TaxonAttributeDefinition.Fields.VERNACULAR_NAME]: '200px',
+  [TaxonAttributeDefinition.Fields.LANGUAGE_CODE]: '50px',
+  [TaxonAttributeDefinition.Fields.LANGUAGE_VARIETY]: '50px',
+}
+
+const TaxonAutoCompleteDialogItem = (props) => {
+  const { taxonOccurrence, attributeDefinition } = props
+  const { availableFieldNames } = attributeDefinition
+
+  const visibleFields = Object.keys(widthByField).filter((field) => availableFieldNames.includes(field))
+  const gridTemplateColumns = visibleFields.map((field) => widthByField[field]).join(' ')
+
   return (
     <div className="taxon-autocomplete-dialog-item" style={{ gridTemplateColumns }}>
-      <div>{code}</div>
-      <div>{scientificName}</div>
-      <div>{vernacularName}</div>
-      <div>{languageCode}</div>
-      <div>{languageVariety}</div>
+      {visibleFields.map((field) => {
+        const valueFieldName = TaxonAttributeDefinition.ValueFieldByField[field]
+        const fieldValue = taxonOccurrence[valueFieldName]
+        return <div>{fieldValue}</div>
+      })}
     </div>
   )
 }

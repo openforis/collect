@@ -1,4 +1,4 @@
-import './TaxonField.css'
+import './TaxonField.scss'
 
 import React from 'react'
 
