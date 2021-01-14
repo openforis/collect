@@ -4,7 +4,7 @@ import RecordSummary from 'model/RecordSummary'
 import Workflow from 'model/Workflow'
 
 export default class RecordService extends AbstractService {
-  fetchRecordSummaries(surveyId, rootEntityName, userId, filterOptions, sortFields, fullSummary = false) {
+  fetchRecordSummaries({ surveyId, rootEntityName, userId, filterOptions, sortFields = null, fullSummary = false }) {
     return this.get('survey/' + surveyId + '/data/records/summary', {
       rootEntityName,
       userId: userId,
@@ -171,5 +171,4 @@ export default class RecordService extends AbstractService {
   demoteRecord({ surveyId, recordId }) {
     return this.post(`survey/${surveyId}/data/records/demote/${recordId}`)
   }
-
 }

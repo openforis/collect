@@ -71,19 +71,19 @@ export const fetchRecordSummaries = () => (dispatch, getState) => {
   const rootEntityName = survey.schema.firstRootEntityDefinition.name
 
   ServiceFactory.recordService
-    .fetchRecordSummaries(
+    .fetchRecordSummaries({
       surveyId,
       rootEntityName,
       userId,
-      {
+      filterOptions: {
         recordsPerPage,
         page,
         keyValues,
         summaryValues,
         ownerIds,
       },
-      sortFields
-    )
+      sortFields,
+    })
     .then((res) => {
       dispatchRecordDataTableStateUpdate(dispatch, {
         records: res.records,

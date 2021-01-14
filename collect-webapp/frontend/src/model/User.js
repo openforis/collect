@@ -160,6 +160,10 @@ export default class User extends Serializable {
     return this.role === User.ROLE.ADMIN
   }
 
+  canEditOnlyOwnedRecords() {
+    return this.role === User.ROLE.ENTRY_LIMITED
+  }
+
   canPromoteRecordWithErrors(roleInSurveyGroup) {
     return this.canChangeRecordOwner(roleInSurveyGroup)
   }

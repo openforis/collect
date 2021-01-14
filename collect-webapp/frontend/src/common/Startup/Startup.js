@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router'
 
 import * as Actions from 'actions'
 import * as SurveysActions from 'actions/surveys'
@@ -12,7 +13,41 @@ import Preloader from 'common/components/Preloader'
 import StartupActiveSurvey from './StartupActiveSurvey'
 
 const Startup = (props) => {
+  const { children } = props
+
   const dispatch = useDispatch()
+
+  const { isFetching: fetchingLoggedUser, initialized: loggedUserReady } = useSelector((state) => state.session) || {
+    loggedUserReady: false,
+    fetchingLoggedUser: true,
+  }
+
+  const { isFetching: fetchingUsers, initialized: usersReady } = useSelector((state) => state.users) || {
+    usersReady: false,
+    fetchingUsers: true,
+  }
+
+  const { isFetching: fetchingUserGroups, initialized: userGroupsReady } = useSelector((state) => state.userGroups) || {
+    userGroupsReady: false,
+    fetchingUserGroups: true,
+  }
+
+  const { isFetching: fetchingSurveySummaries, initialized: surveySummariesReady } = useSelector(
+    (state) => state.surveyDesigner.surveysList
+  ) || {
+    fetchingSurveySummaries: true,
+    surveySummariesReady: false,
+  }
+
+  const loading =
+    !loggedUserReady ||
+    fetchingLoggedUser ||
+    !usersReady ||
+    fetchingUsers ||
+    !userGroupsReady ||
+    fetchingUserGroups ||
+    !surveySummariesReady ||
+    fetchingSurveySummaries
 
   useEffect(() => {
     dispatch(Actions.fetchApplicationInfo())
@@ -21,39 +56,6 @@ const Startup = (props) => {
     dispatch(UserGroupActions.fetchUserGroups())
     dispatch(SurveysActions.fetchSurveySummaries())
   }, [])
-
-  const { isFetching: isFetchingLoggedUser, initialized: isLoggedUserReady } = useSelector(
-    (state) => state.session
-  ) || {
-    loggedUser: null,
-    isLoggedUserReady: false,
-    isFetchingLoggedUser: true,
-    sessionExpired: false,
-    loggingOut: false,
-    loggedOut: false,
-  }
-
-  const { isFetching: isFetchingUsers, initialized: isUsersReady } = useSelector((state) => state.users) || {
-    isUsersReady: false,
-    isFetchingUsers: true,
-  }
-
-  const { isFetching: isFetchingUserGroups, initialized: isUserGroupsReady } = useSelector(
-    (state) => state.userGroups
-  ) || {
-    isUserGroupsReady: true,
-    isFetchingUserGroups: true,
-  }
-
-  const loading =
-    !isLoggedUserReady ||
-    isFetchingLoggedUser ||
-    !isUsersReady ||
-    isFetchingUsers ||
-    !isUserGroupsReady ||
-    isFetchingUserGroups
-
-  const { children } = props
 
   return (
     <Preloader loading={loading}>
