@@ -8,7 +8,6 @@ import static org.springframework.transaction.annotation.Propagation.REQUIRED;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -309,13 +308,8 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	public Map<String, String> getQualifiers(int userGroupId, int userId) {
 		UserInGroup userInGroup = findUserInGroupOrDescendants(userGroupId, userId);
 		if (userInGroup == null) {
-			UserGroup rootGroup = loadById(userGroupId);
-			if (DEFAULT_PUBLIC_USER_GROUP_NAME.equals(rootGroup.getName())) {
-				return Collections.emptyMap();
-			} else {
-				throw new IllegalArgumentException(String.format("User %s not allowed to see records for user group %s", 
-						userId, userGroupId));
-			}
+			throw new IllegalArgumentException(String.format("User %s not allowed to see records for user group %s", 
+					userId, userGroupId));
 		}
 		UserGroup associatedGroup = loadById(userInGroup.getGroupId());
 		return associatedGroup.getQualifiersByName();

@@ -38,11 +38,13 @@ const Sidebar = () => {
     <div className="sidebar">
       <nav className="sidebar-nav">
         <ul className="nav">
-          <li className="nav-item">
-            <NavLink to={'/dashboard'} className="nav-link" activeClassName="active">
-              <i className="fa fa-tachometer-alt"></i>Dashboard
-            </NavLink>
-          </li>
+          {loggedUser.canAccessDashboard && (
+            <li className="nav-item">
+              <NavLink to={'/dashboard'} className="nav-link" activeClassName="active">
+                <i className="fa fa-tachometer-alt"></i>Dashboard
+              </NavLink>
+            </li>
+          )}
           <li className="nav-item">
             <NavLink to={'/datamanagement'} className="nav-link" activeClassName="active">
               <i className="fa fa-database"></i>Data Management
@@ -84,11 +86,13 @@ const Sidebar = () => {
               </NavLink>
             </li>
           )}
-          <li className="nav-item">
-            <NavLink to={'/map'} className="nav-link" activeClassName="active">
-              <i className="fa fa-map"></i>Map
-            </NavLink>
-          </li>
+          {loggedUser.canAccessMap && (
+            <li className="nav-item">
+              <NavLink to={'/map'} className="nav-link" activeClassName="active">
+                <i className="fa fa-map"></i>Map
+              </NavLink>
+            </li>
+          )}
           {loggedUser.canAccessSaiku && (
             <li className="nav-item">
               <NavLink to={'/saiku'} className="nav-link" activeClassName="active">
@@ -177,7 +181,7 @@ const Sidebar = () => {
             <a href="http://www.openforis.org" target="_blank" rel="noopener noreferrer">
               Open Foris
             </a>{' '}
-            &copy; 2010-2020
+            &copy; 2010-2021
           </span>
         </div>
       </nav>

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [4.0.8] - NOT RELEASED YET
 ### Fixed
 - Hide not visible fields from taxon autocomplete;
+- Record edit for users with ENTRY_LIMITED role;
 
 ## [4.0.7] - 2021-01-13
 ### Fixed

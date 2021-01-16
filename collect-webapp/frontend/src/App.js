@@ -98,7 +98,7 @@ const App = () => {
     EventQueue.dispatch = dispatch
   }, [])
 
-  const { loggedUser } = useSelector((state) => state.session) || { loggedUser: null }
+  const { loggedUser } = useSelector((state) => state.session)
 
   const { items: surveySummaries } = useSelector((state) => state.surveyDesigner.surveysList) || {
     surveySummaries: null,

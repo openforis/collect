@@ -250,10 +250,18 @@ public class RecordController extends BasicController implements Serializable {
 			throws RecordPersistenceException {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		Step step = stepNumber == null ? null : Step.valueOf(stepNumber);
+		User user = sessionManager.getLoggedUser();
 		CollectRecord record = lock
-				? recordManager.checkout(survey, sessionManager.getLoggedUser(), recordId, step,
+				? recordManager.checkout(survey, user, recordId, step,
 						sessionManager.getSessionState().getSessionId(), true)
 				: recordManager.load(survey, recordId, step);
+		if (user.hasRole(UserRole.ENTRY_LIMITED)
+				&& (record.getOwner() == null || record.getOwner().getId() != user.getId())) {
+			throw new IllegalStateException(
+					String.format("User '%s' (entry_limited) cannot access record with ID %d: he doesn't own it.",
+							user.getUsername(), recordId));
+
+		}
 		return toProxy(record);
 	}
 

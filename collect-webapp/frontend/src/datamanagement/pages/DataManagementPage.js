@@ -136,8 +136,10 @@ class DataManagementPage extends React.Component {
   }
 
   handleRowDoubleClick(record) {
-    const { loggedUser, userRoleInSurveyGroup } = this.props
-    if (loggedUser.canEditRecords(userRoleInSurveyGroup)) {
+    const { loggedUser, survey } = this.props
+    const { userInGroupRole, userGroup } = survey
+    
+    if (loggedUser.canEditRecords(userInGroupRole)) {
       if (record.lockedBy && !loggedUser.canUnlockRecords()) {
         Dialogs.alert(
           L.l('dataManagement.recordLockedAlert.title'),

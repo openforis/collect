@@ -62,7 +62,7 @@ export default class User extends Serializable {
     return max
   }
 
-  _hasEffectiveRole(role) {
+  _hasAtLeastRole(role) {
     const highestIndex = this._calculateHighestRoleIndex()
     const index = User.ROLES_HIERARCHY.indexOf(role)
     return highestIndex >= index
@@ -73,10 +73,18 @@ export default class User extends Serializable {
   }
 
   canCreateRecords(roleInSurveyGroup) {
-    const mainRole = this.role
-    switch (mainRole) {
+    switch (this.role) {
       case User.ROLE.VIEW:
       case User.ROLE.ENTRY_LIMITED:
+        return false
+      default:
+        return this.canEditRecords(roleInSurveyGroup)
+    }
+  }
+
+  canEditRecords(roleInSurveyGroup) {
+    switch (this.role) {
+      case User.ROLE.VIEW:
         return false
       default:
         if (roleInSurveyGroup === null) {
@@ -95,18 +103,16 @@ export default class User extends Serializable {
     }
   }
 
-  canEditRecords(roleInSurveyGroup) {
-    return this.canCreateRecords(roleInSurveyGroup)
-  }
-
   canEditRecord(record) {
     const { step } = record
 
     switch (step) {
       case Workflow.STEPS.entry:
-        return this._hasEffectiveRole(User.ROLE.ENTRY_LIMITED)
+        return (
+          this._hasAtLeastRole(User.ROLE.ENTRY) || (this.role === User.ROLE.ENTRY_LIMITED && record.ownerId === this.id)
+        )
       case Workflow.STEPS.cleansing:
-        return this._hasEffectiveRole(User.ROLE.CLEANSING)
+        return this._hasAtLeastRole(User.ROLE.CLEANSING)
       case Workflow.STEPS.analysis:
       default:
         return false
@@ -179,7 +185,7 @@ export default class User extends Serializable {
   canChangeRecordOwner(roleInSurveyGroup) {
     const mainRole = this.role
     switch (mainRole) {
-      case 'ADMIN':
+      case User.ROLE.ADMIN:
         return true
       case User.ROLE.VIEW:
       case User.ROLE.ENTRY:
@@ -199,6 +205,14 @@ export default class User extends Serializable {
             return false
         }
     }
+  }
+
+  get canAccessDashboard() {
+    return this.role !== User.ROLE.ENTRY_LIMITED
+  }
+
+  get canAccessMap() {
+    return this.canAccessDashboard
   }
 
   get canAccessSaiku() {
