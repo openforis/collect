@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory } from 'react-router'
 
 import * as Actions from 'actions'
 import * as SurveysActions from 'actions/surveys'
@@ -32,22 +31,8 @@ const Startup = (props) => {
     fetchingUserGroups: true,
   }
 
-  const { isFetching: fetchingSurveySummaries, initialized: surveySummariesReady } = useSelector(
-    (state) => state.surveyDesigner.surveysList
-  ) || {
-    fetchingSurveySummaries: true,
-    surveySummariesReady: false,
-  }
-
   const loading =
-    !loggedUserReady ||
-    fetchingLoggedUser ||
-    !usersReady ||
-    fetchingUsers ||
-    !userGroupsReady ||
-    fetchingUserGroups ||
-    !surveySummariesReady ||
-    fetchingSurveySummaries
+    !loggedUserReady || fetchingLoggedUser || !usersReady || fetchingUsers || !userGroupsReady || fetchingUserGroups
 
   useEffect(() => {
     dispatch(Actions.fetchApplicationInfo())

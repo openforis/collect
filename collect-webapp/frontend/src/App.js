@@ -1,7 +1,7 @@
 import './App.scss'
 
 import React, { useEffect } from 'react'
-import { Switch, Route, useHistory } from 'react-router-dom'
+import { Switch, Route } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
 import Header from 'common/components/Header'
@@ -36,8 +36,7 @@ import UserGroupsPage from 'security/pages/UserGroupsPage'
 import UserGroupDetailsPage from 'security/pages/UserGroupDetailsPage'
 import PasswordChangePage from 'security/pages/PasswordChangePage'
 
-import ServiceFactory from 'services/ServiceFactory'
-import RouterUtils from 'utils/RouterUtils'
+import { useCheckShouldNavigateToRecordEditPage } from 'common/hooks/useCheckShouldNavigateToRecordEditPage'
 
 export const DefaultRoute = ({ component: Component, ...rest }) => (
   <Route
@@ -62,57 +61,18 @@ export const FullScreenRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} component={(props) => <Component {...props} />} />
 )
 
-const checkShouldNavigateToRecordEditPage = ({ surveyId, userId, history }) => {
-  ServiceFactory.recordService
-    .fetchRecordSummaries({
-      surveyId,
-      rootEntityName: null,
-      userId,
-      filterOptions: {
-        recordsPerPage: 10,
-        page: 1,
-        ownerIds: [userId],
-        keyValues: [],
-        summaryValues: [],
-      },
-    })
-    .then((res) => {
-      const { count, records } = res
-      if (count === 1) {
-        const recordId = records[0].id
-        RouterUtils.navigateToRecordEditPage(history, recordId)
-      }
-    })
-}
-
 const App = () => {
   const { show: systemErrorShown, message: systemErrorMessage, stackTrace: systemErrorStackTrace } = useSelector(
     (state) => state.systemError
   )
 
   const dispatch = useDispatch()
-  const history = useHistory()
+
+  useCheckShouldNavigateToRecordEditPage()
 
   useEffect(() => {
     // init EventQueue
     EventQueue.dispatch = dispatch
-  }, [])
-
-  const { loggedUser } = useSelector((state) => state.session)
-
-  const { items: surveySummaries } = useSelector((state) => state.surveyDesigner.surveysList) || {
-    surveySummaries: null,
-  }
-
-  useEffect(() => {
-    if (loggedUser.canEditOnlyOwnedRecords()) {
-      const publishedSurveys = surveySummaries.filter((surveySummary) => surveySummary.published)
-      if (publishedSurveys.length === 1) {
-        const surveyId = publishedSurveys[0].id
-        const userId = loggedUser.id
-        checkShouldNavigateToRecordEditPage({ surveyId, userId, history })
-      }
-    }
   }, [])
 
   return (
