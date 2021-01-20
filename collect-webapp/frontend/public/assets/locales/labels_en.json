@@ -11,6 +11,7 @@
       }
     },
     "download": "Download",
+    "emptyItem": "---Empty---",
     "exportToCsv": "Export to CSV",
     "exportToExcel": "Export to Excel",
     "label": "Label",

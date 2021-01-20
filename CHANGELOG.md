@@ -6,7 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.0.9] - 2021-01-20
 ### Fixed
-- Page reload when saving survey from Survey Designer
+- Page reload when saving survey from Survey Designer;
+
+### Added
+- Improved multiple entity form selector layout;
 
 ## [4.0.8] - 2021-01-16
 ### Fixed

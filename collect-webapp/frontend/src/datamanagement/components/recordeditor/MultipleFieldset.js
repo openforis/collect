@@ -4,6 +4,7 @@ import { MenuItem, Select } from '@material-ui/core'
 
 import DeleteIconButton from 'common/components/DeleteIconButton'
 import L from 'utils/Labels'
+import Strings from 'utils/Strings'
 
 import FormItems from './FormItems'
 import EntityCollectionComponent from './EntityCollectionComponent'
@@ -15,14 +16,14 @@ const EntitySelect = (props) => {
   const { entitiesSummary, selectedEntityIndex, onChange } = props
 
   return (
-    <Select value={selectedEntityIndex} variant="outlined" onChange={onChange} style={{ width: '200px' }}>
+    <Select value={selectedEntityIndex} variant="outlined" onChange={onChange} style={{ width: '300px' }}>
       {[
         <MenuItem key="-1" value="-1">
           <em>{L.l('common.selectOne')}</em>
         </MenuItem>,
         ...entitiesSummary.map((summary, index) => (
           <MenuItem key={`entity_${index}`} value={index}>
-            {summary}
+            {Strings.isBlank(summary) ? L.l('common.emptyItem') : summary}
           </MenuItem>
         )),
       ]}

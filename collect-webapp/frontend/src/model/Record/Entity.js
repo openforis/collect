@@ -47,7 +47,7 @@ export class Entity extends Node {
   get summaryLabel() {
     const keyValuePairs = this.keyNodes.map((keyNode) => {
       const keyValue = keyNode ? keyNode.humanReadableValue : ''
-      return keyNode ? `${keyNode.definition.labelOrName}: ${keyValue}` : ''
+      return keyNode ? keyValue : ''
     })
     return `${keyValuePairs.join(', ')}`
   }

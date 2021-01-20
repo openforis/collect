@@ -1,7 +1,8 @@
-import Objects from '../../utils/Objects'
+import { Attribute } from './Attribute'
 import { TaxonAttributeDefinition } from '../Survey'
 
-import { Attribute } from './Attribute'
+import Strings from 'utils/Strings'
+import Objects from 'utils/Objects'
 
 export class TaxonAttribute extends Attribute {
   // get value() {
@@ -21,6 +22,23 @@ export class TaxonAttribute extends Attribute {
 
   get value() {
     return super.value
+  }
+
+  get humanReadableValue() {
+    if (this.fields && this.fields.length) {
+      const { availableFieldNames } = this.definition
+      const fieldValues = []
+      // show code only if visible
+      if (availableFieldNames.includes(TaxonAttributeDefinition.Fields.CODE)) {
+        fieldValues.push(this.fields[0].value)
+      }
+      // always show scientific name
+      fieldValues.push(this.fields[1].value)
+
+      return fieldValues.filter((v) => Strings.isNotBlank(v)).join(' - ')
+    } else {
+      return ''
+    }
   }
 
   set value(value) {
