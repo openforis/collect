@@ -380,12 +380,23 @@ public class CodeListManager {
 	}
 
 	public <T extends CodeListItem> List<T> findValidItems(CodeList list, ModelVersion version, final String language,
-			List<String> ancestorCodes, final String searchString) {
+			List<String> ancestorCodes, String searchString) {
+		final String searchStringTrimmed = StringUtils.trimToNull(searchString);
 		return findValidItems(list, version, ancestorCodes, new Predicate<T>() {
 			public boolean evaluate(T item) {
+				if (searchStringTrimmed == null) {
+					return true;
+				}
 				String code = item.getCode();
-				return StringUtils.isBlank(searchString) || StringUtils.startsWithIgnoreCase(code, searchString)
-						|| StringUtils.startsWithIgnoreCase(item.getLabel(language, true), searchString);
+				if (StringUtils.startsWithIgnoreCase(code, searchStringTrimmed)) {
+					return true;
+				}
+				String label = StringUtils.trimToNull(item.getLabel(language, true));
+				if (label != null) {
+					return StringUtils.startsWithIgnoreCase(label, searchStringTrimmed) || 
+							StringUtils.startsWithIgnoreCase(code + " - " + label, searchStringTrimmed);
+				}
+				return false;
 			}
 		});
 	}

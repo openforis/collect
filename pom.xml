@@ -422,16 +422,6 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>flex-compiler</id>
-			<url>https://repository.sonatype.org/content/groups/flexgroup</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-		<repository>
 			<id>openforis-public</id>
 			<name>Open Foris Repository</name>
 			<url>http://www.openforis.org/nexus/content/groups/public/</url>

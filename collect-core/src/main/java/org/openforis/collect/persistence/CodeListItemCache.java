@@ -1,5 +1,6 @@
 package org.openforis.collect.persistence;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,11 +118,12 @@ public class CodeListItemCache {
 		private Map<Long, List<PersistedCodeListItem>> itemsByParentId = new HashMap<Long, List<PersistedCodeListItem>>();
 		
 		public List<PersistedCodeListItem> getItemsByParentId(Long parentId) {
-			return itemsByParentId.get(createMapKeyByParentId(parentId));
+			 List<PersistedCodeListItem> items = itemsByParentId.get(createMapKeyByParentId(parentId));
+			 return items == null ? null : new ArrayList<PersistedCodeListItem>(items);
 		}
 		
 		public void putItems(Long parentId, List<PersistedCodeListItem> items) {
-			itemsByParentId.put(createMapKeyByParentId(parentId), items);
+			itemsByParentId.put(createMapKeyByParentId(parentId), new ArrayList<PersistedCodeListItem>(items));
 		}
 
 		public void clearItems(Long parentId) {
