@@ -1,6 +1,7 @@
 import './NumberField.scss'
 
 import React from 'react'
+import { connect } from 'react-redux'
 
 import InputNumber from 'common/components/InputNumber'
 
@@ -11,7 +12,7 @@ import DirtyFieldSpinner from './DirtyFieldSpinner'
 
 const UNIT_FIELD_WIDTH = 80
 
-export default class NumberField extends AbstractNumericField {
+class NumberField extends AbstractNumericField {
   constructor(props) {
     super(props)
     this.onInputValueChange = this.onInputValueChange.bind(this)
@@ -33,13 +34,13 @@ export default class NumberField extends AbstractNumericField {
   }
 
   render() {
-    const { fieldDef, inTable, parentEntity } = this.props
+    const { fieldDef, inTable, parentEntity, user } = this.props
     const { dirty, value: valueState } = this.state
     const { record } = parentEntity
     const { value, unit: unitId } = valueState || {}
     const { attributeDefinition } = fieldDef
 
-    const readOnly = record.readOnly || attributeDefinition.calculated
+    const readOnly = !user.canEditRecordAttribute({ record, attributeDefinition })
 
     // keep decimal places of already inserted values (backwards compatibility)
     const decimalScale = Math.max(attributeDefinition.getDecimalScale(unitId), Numbers.countDecimals(value))
@@ -72,3 +73,11 @@ export default class NumberField extends AbstractNumericField {
     )
   }
 }
+
+const mapStateToProps = (state) => {
+  const { session } = state
+  const { loggedUser: user } = session
+  return { user }
+}
+
+export default connect(mapStateToProps)(NumberField)

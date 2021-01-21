@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import { MenuItem, Select, TextField as MuiTextField } from '@material-ui/core'
 import { CoordinateAttributeDefinition } from 'model/Survey'
 
@@ -11,7 +12,7 @@ import CompositeAttributeFormItem from './CompositeAttributeFormItem'
 import { COORDINATE_FIELD_WIDTH_PX } from './FieldsSizes'
 import DirtyFieldSpinner from './DirtyFieldSpinner'
 
-export default class CoordinateField extends AbstractField {
+class CoordinateField extends AbstractField {
   constructor() {
     super()
     this.onChangeSrs = this.onChangeSrs.bind(this)
@@ -46,13 +47,13 @@ export default class CoordinateField extends AbstractField {
   }
 
   render() {
-    const { inTable, fieldDef, parentEntity } = this.props
+    const { inTable, fieldDef, parentEntity, user } = this.props
     const { dirty, value } = this.state
     const { record } = parentEntity
     const { srs = '' } = value || {}
     const { attributeDefinition } = fieldDef
-    const { availableFieldNames, calculated } = attributeDefinition
-    const readOnly = record.readOnly || calculated
+    const { availableFieldNames } = attributeDefinition
+    const readOnly = !user.canEditRecordAttribute({ record, attributeDefinition })
 
     const numericField = ({ field }) => (
       <InputNumber
@@ -122,3 +123,11 @@ export default class CoordinateField extends AbstractField {
     )
   }
 }
+
+const mapStateToProps = (state) => {
+  const { session } = state
+  const { loggedUser: user } = session
+  return { user }
+}
+
+export default connect(mapStateToProps)(CoordinateField)

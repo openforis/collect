@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import classNames from 'classnames'
 import { Checkbox, TextField } from '@material-ui/core'
 
@@ -25,7 +26,7 @@ const textToValue = (text) => {
   return null
 }
 
-export default class BooleanField extends AbstractField {
+class BooleanField extends AbstractField {
   constructor() {
     super()
     this.onChange = this.onChange.bind(this)
@@ -40,14 +41,14 @@ export default class BooleanField extends AbstractField {
   }
 
   render() {
-    const { fieldDef, parentEntity } = this.props
+    const { fieldDef, parentEntity, user } = this.props
     const { dirty, value: valueState = {} } = this.state
     const { record } = parentEntity
     const { attributeDefinition } = fieldDef
-    const { calculated, layoutType } = attributeDefinition
+    const { layoutType } = attributeDefinition
     const { value: fieldValue } = valueState || {}
     const checked = fieldValue || false
-    const readOnly = record.readOnly || calculated
+    const readOnly = !user.canEditRecordAttribute({ record, attributeDefinition })
 
     return (
       <div>
@@ -83,3 +84,11 @@ export default class BooleanField extends AbstractField {
     )
   }
 }
+
+const mapStateToProps = (state) => {
+  const { session } = state
+  const { loggedUser: user } = session
+  return { user }
+}
+
+export default connect(mapStateToProps)(BooleanField)

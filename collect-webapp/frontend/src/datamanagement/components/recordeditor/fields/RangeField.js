@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 
 import InputNumber from 'common/components/InputNumber'
 import L from 'utils/Labels'
@@ -9,7 +10,7 @@ import UnitField from './UnitField'
 import * as FieldsSizes from './FieldsSizes'
 import DirtyFieldSpinner from './DirtyFieldSpinner'
 
-export default class RangeField extends AbstractNumericField {
+class RangeField extends AbstractNumericField {
   constructor(props) {
     super(props)
 
@@ -31,12 +32,13 @@ export default class RangeField extends AbstractNumericField {
   }
 
   render() {
-    const { fieldDef, inTable, parentEntity } = this.props
+    const { fieldDef, inTable, parentEntity, user } = this.props
     const { dirty, value = {} } = this.state
     const { record } = parentEntity
     const { unit: unitId } = value || {}
     const { attributeDefinition } = fieldDef
-    const readOnly = record.readOnly || attributeDefinition.calculated
+
+    const readOnly = !user.canEditRecordAttribute({ record, attributeDefinition })
 
     const unitVisible = attributeDefinition.isUnitVisible({ inTable })
     const wrapperStyle = {
@@ -76,3 +78,11 @@ export default class RangeField extends AbstractNumericField {
     )
   }
 }
+
+const mapStateToProps = (state) => {
+  const { session } = state
+  const { loggedUser: user } = session
+  return { user }
+}
+
+export default connect(mapStateToProps)(RangeField)

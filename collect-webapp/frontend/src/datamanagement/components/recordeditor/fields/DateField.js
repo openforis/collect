@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers'
 import DateFnsUtils from '@date-io/date-fns'
 
@@ -17,7 +18,7 @@ const fromDateToValue = (date) => {
   }
 }
 
-export default class DateField extends AbstractField {
+class DateField extends AbstractField {
   constructor() {
     super()
     this.onChange = this.onChange.bind(this)
@@ -32,11 +33,12 @@ export default class DateField extends AbstractField {
   }
 
   render() {
-    const { fieldDef, inTable, parentEntity } = this.props
+    const { fieldDef, inTable, parentEntity, user } = this.props
     const { dirty, value: valueState } = this.state
     const { record } = parentEntity
     const { attributeDefinition } = fieldDef
-    const readOnly = record.readOnly || attributeDefinition.calculated
+
+    const readOnly = !user.canEditRecordAttribute({ record, attributeDefinition })
 
     const selectedDate = fromValueToDate(valueState)
 
@@ -59,3 +61,11 @@ export default class DateField extends AbstractField {
     )
   }
 }
+
+const mapStateToProps = (state) => {
+  const { session } = state
+  const { loggedUser: user } = session
+  return { user }
+}
+
+export default connect(mapStateToProps)(DateField)

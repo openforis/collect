@@ -15,6 +15,7 @@ import CodeFieldQualifier from './CodeFieldQualifier'
 
 const CodeFieldAutocomplete = (props) => {
   const {
+    readOnly,
     parentEntity,
     fieldDef,
     inTable,
@@ -32,8 +33,7 @@ const CodeFieldAutocomplete = (props) => {
   const { id: surveyId, preferredLanguage: language } = survey
   const { attributeDefinition } = fieldDef
   const { versionId } = record
-  const { calculated, codeListId } = attributeDefinition
-  const readOnly = record.readOnly || calculated
+  const { codeListId } = attributeDefinition
 
   const fetchCodeItems = useCallback(
     ({ surveyId, codeListId, versionId, language, ancestorCodes }) => ({ searchString, onComplete }) =>

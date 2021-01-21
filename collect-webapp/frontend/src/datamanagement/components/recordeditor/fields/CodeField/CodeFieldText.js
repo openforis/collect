@@ -16,6 +16,7 @@ const CodeFieldText = (props) => {
     items,
     onChange,
     onChangeQualifier,
+    readOnly,
     parentEntity,
     selectedItems,
     values,
@@ -56,6 +57,7 @@ const CodeFieldText = (props) => {
           onChange={onChange}
           onChangeQualifier={onChangeQualifier}
           onClose={() => setDialogOpen(false)}
+          readOnly={readOnly}
           selectedItems={selectedItems}
           values={values}
         />

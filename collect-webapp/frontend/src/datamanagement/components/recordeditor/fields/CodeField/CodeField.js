@@ -1,6 +1,7 @@
 import './CodeField.scss'
 
 import React from 'react'
+import { connect } from 'react-redux'
 import { InputLabel } from '@material-ui/core'
 
 import ServiceFactory from 'services/ServiceFactory'
@@ -27,7 +28,7 @@ const EMPTY_OPTION = (
   </option>
 )
 
-export default class CodeField extends AbstractField {
+class CodeField extends AbstractField {
   constructor(props) {
     super(props)
 
@@ -263,15 +264,18 @@ export default class CodeField extends AbstractField {
   }
 
   render() {
-    const { fieldDef, inTable, parentEntity } = this.props
+    const { fieldDef, inTable, parentEntity, user } = this.props
     const { items, selectedItems, asynchronous, loading, ancestorCodes, values } = this.state
 
     if (loading) {
       return <LoadingSpinnerSmall />
     }
 
+    const { record } = parentEntity
     const { attributeDefinition } = fieldDef
     const { layout, multiple, enumerator, hasQualifiableItems } = attributeDefinition
+
+    const readOnly = !user.canEditRecordAttribute({ record, attributeDefinition })
 
     if (enumerator) {
       return (
@@ -300,6 +304,7 @@ export default class CodeField extends AbstractField {
           items={items}
           onChange={this.onCodeListItemSelect}
           onChangeQualifier={this.onChangeQualifier}
+          readOnly={readOnly}
           selectedItems={selectedItems}
           values={values}
         />
@@ -309,12 +314,12 @@ export default class CodeField extends AbstractField {
     if (!inTable && !asynchronous && layout === CodeAttributeDefinition.Layouts.RADIO) {
       return (
         <CodeFieldRadio
-          parentEntity={parentEntity}
           attributeDefinition={attributeDefinition}
           values={values}
           items={items}
           onChange={this.onCodeListItemSelect}
           onChangeQualifier={this.onChangeQualifier}
+          readOnly={readOnly}
         />
       )
     }
@@ -332,7 +337,16 @@ export default class CodeField extends AbstractField {
         itemLabelFunction={itemLabelFunction(attributeDefinition)}
         onSelect={(item) => this.onCodeListItemSelect({ item, selected: Boolean(item) })}
         onChangeQualifier={this.onChangeQualifier}
+        readOnly={readOnly}
       />
     )
   }
 }
+
+const mapStateToProps = (state) => {
+  const { session } = state
+  const { loggedUser: user } = session
+  return { user }
+}
+
+export default connect(mapStateToProps)(CodeField)

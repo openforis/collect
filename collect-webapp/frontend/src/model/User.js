@@ -147,15 +147,25 @@ export default class User extends Serializable {
     }
   }
 
-  canFilterRecordsBySummaryAttribute(attr, roleInSurvey) {
-    const rootEntityDef = attr.rootEntity
-    const isQualifier = rootEntityDef.qualifierAttributeDefinitions.find((qDef) => qDef.name === attr.name) != null
+  canEditQualifier(roleInSurvey) {
     return (
-      !isQualifier ||
       this.role === User.ROLE.ADMIN ||
       roleInSurvey === User.ROLE_IN_GROUP.ADMINISTRATOR ||
       roleInSurvey === User.ROLE_IN_GROUP.OWNER
     )
+  }
+
+  canFilterRecordsBySummaryAttribute(attr, roleInSurvey) {
+    const rootEntityDef = attr.rootEntity
+    const isQualifier = rootEntityDef.qualifierAttributeDefinitions.find((qDef) => qDef.name === attr.name) != null
+    return !isQualifier || this.canEditQualifier(roleInSurvey)
+  }
+
+  canEditRecordAttribute({ record, attributeDefinition }) {
+    const { survey } = record
+    const { userInGroupRole } = survey
+    const { calculated, qualifier } = attributeDefinition
+    return this.canEditRecord(record) && !calculated && (!qualifier || this.canEditQualifier(userInGroupRole))
   }
 
   canUnlockRecords() {

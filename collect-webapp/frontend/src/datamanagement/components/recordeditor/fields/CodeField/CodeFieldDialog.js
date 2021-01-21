@@ -20,13 +20,10 @@ const CodeFieldDialog = (props) => {
     onChangeQualifier,
     onClose,
     parentEntity,
+    readOnly,
     selectedItems,
     values,
   } = props
-
-  const { calculated, multiple } = attributeDefinition
-  const { record } = parentEntity
-  const readOnly = record.readOnly || calculated
 
   const [items, setItems] = useState([])
 

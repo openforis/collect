@@ -1,6 +1,7 @@
 import './TaxonField.scss'
 
 import React from 'react'
+import { connect } from 'react-redux'
 
 import { TaxonAttributeDefinition } from 'model/Survey'
 
@@ -17,7 +18,7 @@ import * as FieldsSizes from '../FieldsSizes'
 
 const LANG_CODE_STANDARD = Languages.STANDARDS.ISO_639_3
 
-export default class TaxonField extends AbstractField {
+class TaxonField extends AbstractField {
   LANG_CODES = Languages.codes(LANG_CODE_STANDARD)
 
   constructor() {
@@ -61,13 +62,14 @@ export default class TaxonField extends AbstractField {
   }
 
   render() {
-    const { inTable, fieldDef, parentEntity } = this.props
+    const { inTable, fieldDef, parentEntity, user } = this.props
     const { value = {} } = this.state
     const { record } = parentEntity
     const { attributeDefinition } = fieldDef
-    const { availableFieldNames, calculated } = attributeDefinition
+    const { availableFieldNames } = attributeDefinition
     const { code, vernacular_name: vernacularName } = value || {}
-    const readOnly = record.readOnly || calculated
+
+    const readOnly = !user.canEditRecordAttribute({ record, attributeDefinition })
 
     const getLangLabel = (langCode) => Languages.label(langCode, LANG_CODE_STANDARD)
     const langOptions = Languages.items(LANG_CODE_STANDARD)
@@ -128,3 +130,11 @@ export default class TaxonField extends AbstractField {
     )
   }
 }
+
+const mapStateToProps = (state) => {
+  const { session } = state
+  const { loggedUser: user } = session
+  return { user }
+}
+
+export default connect(mapStateToProps)(TaxonField)

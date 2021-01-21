@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import MuiTextField from '@material-ui/core/TextField'
 
 import { TextAttributeDefinition } from 'model/Survey'
@@ -15,7 +16,7 @@ const transformFunctions = {
   [TextAttributeDefinition.TextTransform.LOWERCASE]: (value) => value.toLocaleLowerCase(),
 }
 
-export default class TextField extends AbstractField {
+class TextField extends AbstractField {
   constructor() {
     super()
     this.onChange = this.onChange.bind(this)
@@ -44,14 +45,14 @@ export default class TextField extends AbstractField {
   }
 
   render() {
-    const { fieldDef, inTable, parentEntity } = this.props
+    const { fieldDef, inTable, parentEntity, user } = this.props
     const { dirty, value: valueState } = this.state
     const { record } = parentEntity
     const { value } = valueState || {}
     const text = value || ''
     const { attributeDefinition } = fieldDef
-    const { textType, calculated } = attributeDefinition
-    const readOnly = record.readOnly || calculated
+    const { textType } = attributeDefinition
+    const readOnly = !user.canEditRecordAttribute({ record, attributeDefinition })
 
     const showAsTextArea = textType === TextAttributeDefinition.TextTypes.MEMO && !inTable
     const inputFieldType = showAsTextArea ? 'textarea' : 'text'
@@ -73,3 +74,11 @@ export default class TextField extends AbstractField {
     )
   }
 }
+
+const mapStateToProps = (state) => {
+  const { session } = state
+  const { loggedUser: user } = session
+  return { user }
+}
+
+export default connect(mapStateToProps)(TextField)
