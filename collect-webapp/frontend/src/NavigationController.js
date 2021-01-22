@@ -1,16 +1,16 @@
 import { useEffect } from 'react'
-import { useSelector } from 'react-redux'
-import { useHistory } from 'react-router'
+import { useHistory } from 'react-router-dom'
+import { connect } from 'react-redux'
 
 import ServiceFactory from 'services/ServiceFactory'
 import RouterUtils from 'utils/RouterUtils'
 
-const checkShouldNavigateToRecordEditPage = async ({ userId, history }) => {
+const checkShouldNavigateToRecordEditPage = async ({ user, history }) => {
   const surveySummaries = await ServiceFactory.surveyService.fetchAllSummaries()
   const publishedSurveys = surveySummaries.filter((surveySummary) => surveySummary.published)
   if (publishedSurveys.length === 1) {
     const surveyId = publishedSurveys[0].id
-
+    const { id: userId } = user
     const recordsRes = await ServiceFactory.recordService.fetchRecordSummaries({
       surveyId,
       rootEntityName: null,
@@ -31,14 +31,24 @@ const checkShouldNavigateToRecordEditPage = async ({ userId, history }) => {
   }
 }
 
-export const useCheckShouldNavigateToRecordEditPage = () => {
+const NavigationController = (props) => {
+  const { user } = props
+
   const history = useHistory()
 
-  const { loggedUser } = useSelector((state) => state.session)
-
   useEffect(() => {
-    if (loggedUser.canEditOnlyOwnedRecords()) {
-      checkShouldNavigateToRecordEditPage({ userId: loggedUser.id, history })
-    }
+    checkShouldNavigateToRecordEditPage({ user, history })
   }, [])
+
+  return null
 }
+
+const mapStateToProps = (state) => {
+  const user = state.session.loggedUser
+
+  return {
+    user,
+  }
+}
+
+export default connect(mapStateToProps)(NavigationController)

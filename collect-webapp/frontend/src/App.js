@@ -2,7 +2,7 @@ import './App.scss'
 
 import React, { useEffect } from 'react'
 import { Switch, Route } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 
 import Header from 'common/components/Header'
 import Sidebar from 'common/components/Sidebar'
@@ -36,7 +36,7 @@ import UserGroupsPage from 'security/pages/UserGroupsPage'
 import UserGroupDetailsPage from 'security/pages/UserGroupDetailsPage'
 import PasswordChangePage from 'security/pages/PasswordChangePage'
 
-import { useCheckShouldNavigateToRecordEditPage } from 'common/hooks/useCheckShouldNavigateToRecordEditPage'
+import NavigationController from 'NavigationController'
 
 export const DefaultRoute = ({ component: Component, ...rest }) => (
   <Route
@@ -61,14 +61,10 @@ export const FullScreenRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} component={(props) => <Component {...props} />} />
 )
 
-const App = () => {
-  const { show: systemErrorShown, message: systemErrorMessage, stackTrace: systemErrorStackTrace } = useSelector(
-    (state) => state.systemError
-  )
+const App = (props) => {
+  const { systemErrorShown, systemErrorMessage, systemErrorStackTrace } = props
 
   const dispatch = useDispatch()
-
-  useCheckShouldNavigateToRecordEditPage()
 
   useEffect(() => {
     // init EventQueue
@@ -115,7 +111,11 @@ const App = () => {
         />
         <FullScreenRoute path="/record_fullscreen/:id" exact name="RecordEditFullScreen" component={RecordEditPage} />
       </Switch>
+
+      <NavigationController />
+
       <CurrentJobMonitorDialog />
+
       {systemErrorShown && (
         <SystemErrorDialog message={systemErrorMessage} details={systemErrorStackTrace} width={800} />
       )}
@@ -123,4 +123,14 @@ const App = () => {
   )
 }
 
-export default App
+const mapStateToProps = (state) => {
+  const { show: systemErrorShown, message: systemErrorMessage, stackTrace: systemErrorStackTrace } = state.systemError
+
+  return {
+    systemErrorShown,
+    systemErrorMessage,
+    systemErrorStackTrace,
+  }
+}
+
+export default connect(mapStateToProps)(App)
