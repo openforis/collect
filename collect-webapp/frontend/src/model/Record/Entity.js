@@ -45,11 +45,17 @@ export class Entity extends Node {
   }
 
   get summaryLabel() {
-    const keyValuePairs = this.keyNodes.map((keyNode) => {
-      const keyValue = keyNode ? keyNode.humanReadableValue : ''
-      return keyNode ? keyValue : ''
-    })
-    return `${keyValuePairs.join(', ')}`
+    const keyNodes = this.keyNodes
+    if (keyNodes.length > 0) {
+      const keyValuePairs = this.keyNodes.map((keyNode) => {
+        const keyValue = keyNode ? keyNode.humanReadableValue : ''
+        return keyNode ? keyValue : ''
+      })
+      return `${keyValuePairs.join(', ')}`
+    } else {
+      // show position if key nodes are missing
+      return this.index + 1
+    }
   }
 
   fillFromJSON(jsonObj) {
