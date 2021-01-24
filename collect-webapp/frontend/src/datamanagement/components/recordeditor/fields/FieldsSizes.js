@@ -9,8 +9,8 @@ export const COORDINATE_FIELD_WIDTH = 150
 export const COORDINATE_FIELD_WIDTH_PX = `${COORDINATE_FIELD_WIDTH}px`
 
 export const TaxonFieldWidths = {
-  [TaxonAttributeDefinition.Fields.FAMILY_CODE]: 200,
-  [TaxonAttributeDefinition.Fields.FAMILY_SCIENTIFIC_NAME]: 380,
+  [TaxonAttributeDefinition.Fields.FAMILY_CODE]: 150,
+  [TaxonAttributeDefinition.Fields.FAMILY_SCIENTIFIC_NAME]: 280,
   [TaxonAttributeDefinition.Fields.CODE]: 200,
   [TaxonAttributeDefinition.Fields.SCIENTIFIC_NAME]: 380,
   [TaxonAttributeDefinition.Fields.VERNACULAR_NAME]: 380,

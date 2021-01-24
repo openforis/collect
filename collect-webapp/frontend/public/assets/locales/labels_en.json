@@ -337,7 +337,8 @@
       "multipleNodesComponent": {
         "cannotAddNewNodes": {
           "maxCountReached": "Only a maximum of {0} {1} can be added"
-        }
+        },
+        "rowNumberHeading": "N."
       },
       "validation": {
         "required": "Required field",

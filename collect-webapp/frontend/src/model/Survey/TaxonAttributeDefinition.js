@@ -61,11 +61,10 @@ export class TaxonAttributeDefinition extends AttributeDefinition {
   }
 
   static AUTOCOMPLETE_FIELDS = [
-    TaxonAttributeDefinition.Fields.FAMILY_CODE,
-    TaxonAttributeDefinition.Fields.FAMILY_SCIENTIFIC_NAME,
     TaxonAttributeDefinition.Fields.CODE,
     TaxonAttributeDefinition.Fields.SCIENTIFIC_NAME,
     TaxonAttributeDefinition.Fields.VERNACULAR_NAME,
+    TaxonAttributeDefinition.Fields.FAMILY_SCIENTIFIC_NAME,
   ]
 
   static LANGUAGE_FIELDS = [
@@ -98,11 +97,11 @@ export class TaxonAttributeDefinition extends AttributeDefinition {
   allowUnlisted
 
   _isFieldAvailable = (field) =>
-    this.visibilityByField[field] &&
-    (![TaxonAttributeDefinition.Fields.FAMILY_CODE, TaxonAttributeDefinition.Fields.FAMILY_SCIENTIFIC_NAME].includes(
+    [TaxonAttributeDefinition.Fields.FAMILY_CODE, TaxonAttributeDefinition.Fields.FAMILY_SCIENTIFIC_NAME].includes(
       field
-    ) ||
-      this.showFamily)
+    )
+      ? this.showFamily
+      : this.visibilityByField[field]
 
   get availableFieldNames() {
     return TaxonAttributeDefinition.ALL_FIELDS_IN_ORDER.reduce((acc, field) => {

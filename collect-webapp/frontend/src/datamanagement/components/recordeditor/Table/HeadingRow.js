@@ -48,7 +48,7 @@ const HeadingRow = ({
             gridColumnEnd: 2,
           }}
         >
-          #
+          {L.l('dataManagement.dataEntry.multipleNodesComponent.rowNumberHeading')}
         </div>,
       ]
     : []),
