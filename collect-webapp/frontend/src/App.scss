@@ -54,6 +54,12 @@
     gap: 6px;
   }
 
+  .grid-cell {
+    .form-item-composite-wrapper {
+      gap: 1px;
+    }
+  }
+
   .multiple-fieldset-wrapper {
     display: flex;
     flex-direction: column;
