@@ -306,6 +306,9 @@
           "altitude": "Altitude",
           "accuracy": "Accuracy"
         },
+        "date": {
+          "incompleteDate": "Incomplete date"
+        },
         "file": {
           "fileType": {
             "audio": "Audio",
