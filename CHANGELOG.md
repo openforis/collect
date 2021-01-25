@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [4.0.11] - NOT RELEASED YET
 ### Fixed
 - Error after logout;
+- Multiple entities with form layout: show position in selector if keys are missing;
+- Error loading code list items in table when column visibility changes;
 
 ## [4.0.10] - 2021-01-21
 ### Fixed
