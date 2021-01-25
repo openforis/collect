@@ -1,17 +1,20 @@
 package org.openforis.collect.controlpanel;
 
+import java.awt.Desktop;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Properties;
-import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
+
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -19,42 +22,17 @@ import org.apache.logging.log4j.Logger;
 import org.openforis.utils.Files;
 import org.openforis.web.server.ApplicationServer;
 
-import com.sun.deploy.uitoolkit.impl.fx.HostServicesFactory;
-import com.sun.javafx.application.HostServicesDelegate;
-
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TextArea;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.Window;
-
-public class CollectControlPanelController implements Initializable {
+public class CollectControlPanelController {
 
 	private static final Logger LOG = LogManager.getLogger(CollectControlPanelController.class);
 
 	private static final String COLLECT_USER_HOME_LOCATION = Files.getLocation(Files.getUserHomeLocation(), "OpenForis",
 			"Collect");
 	private static final String COLLECT_DATA_FOLDER_NAME = "data";
-	private static final String LOGS_LOCATION = Files.getLocation(Files.getCurrentLocation(), "logs");
-	private static final String SERVER_LOG_FILE_LOCATION = Files.getLocation(LOGS_LOCATION, "collect_server.log");
-	private static final String COLLECT_LOG_FILE_LOCATION = Files.getLocation(LOGS_LOCATION, "collect.log");
-	private static final String SAIKU_LOG_FILE_LOCATION = Files.getLocation(LOGS_LOCATION, "saiku.log");
+//	private static final String LOGS_LOCATION = Files.getLocation(Files.getCurrentLocation(), "logs");
+//	private static final String SERVER_LOG_FILE_LOCATION = Files.getLocation(LOGS_LOCATION, "collect_server.log");
+//	private static final String COLLECT_LOG_FILE_LOCATION = Files.getLocation(LOGS_LOCATION, "collect.log");
+//	private static final String SAIKU_LOG_FILE_LOCATION = Files.getLocation(LOGS_LOCATION, "saiku.log");
 	private static final String SETTINGS_FILENAME = "collect.properties";
 	private static final String SETTINGS_FILE_LOCATION = Files.getLocation(COLLECT_USER_HOME_LOCATION,
 			SETTINGS_FILENAME);
@@ -63,56 +41,39 @@ public class CollectControlPanelController implements Initializable {
 	private static final String DEFAULT_WEBAPPS_FOLDER_NAME = "webapps";
 	private static final String DEFAULT_WEBAPPS_LOCATION = Files.getLocation(Files.getCurrentLocation(),
 			DEFAULT_WEBAPPS_FOLDER_NAME);
-	private static final int LOG_OPENED_WINDOW_HEIGHT = 580;
-	private static final int LOG_CLOSED_WINDOW_HEIGHT = 260;
-	private static final int LOG_TEXT_MAX_LENGTH = 20000;
+//	private static final int LOG_OPENED_WINDOW_HEIGHT = 580;
+//	private static final int LOG_CLOSED_WINDOW_HEIGHT = 260;
+//	private static final int LOG_TEXT_MAX_LENGTH = 20000;
 	private static final String CATALINA_BASE = "catalina.base";
-	private static final String ONLINE_MANUAL_URI = "http://www.openforis.org/tools/collect.html";
-	private static final String CHANGELOG_URI = "https://github.com/openforis/collect/blob/master/CHANGELOG.md";
+	private static final URI ONLINE_MANUAL_URI;
+	private static final URI CHANGELOG_URI;
+	static {
+		try {
+			ONLINE_MANUAL_URI = new URI("http://www.openforis.org/tools/collect.html");
+			CHANGELOG_URI = new URI("https://github.com/openforis/collect/blob/master/CHANGELOG.md");
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	public enum Status {
 		INITIALIZING, STARTING, RUNNING, STOPPING, ERROR, IDLE;
 	}
 
 	// ui elements
-	@FXML
-	private Pane applicationPane;
-	@FXML
-	private Button logBtn;
-	@FXML
-	private Button shutdownBtn;
-	@FXML
-	public TextArea serverConsole;
-	@FXML
-	public TextArea collectConsole;
-	@FXML
-	public TextArea saikuConsole;
-	@FXML
-	public Hyperlink urlHyperlink;
-	@FXML
-	public Text statusTxt;
-	@FXML
-	public ProgressBar progressBar;
-	@FXML
-	public Text errorMessageTxt;
-	@FXML
-	private VBox runningAtUrlBox;
-
-	private CollectControlPanel app;
-	private Stage stage;
+	private ControlPanel controlPanel;
 	private ApplicationServer server;
 	private ScheduledExecutorService executorService;
 
 	private String webappsLocation;
 	private Status status = Status.INITIALIZING;
 	private String errorMessage;
-	private boolean logOpened = false;
-	private ConsoleLogFileReader serverLogFileReader;
-	private ConsoleLogFileReader collectLogFileReader;
-	private ConsoleLogFileReader saikuLogFileReader;
+//	private boolean logOpened = false;
+//	private ConsoleLogFileReader serverLogFileReader;
+//	private ConsoleLogFileReader collectLogFileReader;
+//	private ConsoleLogFileReader saikuLogFileReader;
 
-	@Override
-	public void initialize(URL location, ResourceBundle resources) {
+	public void init() {
 		LOG.info("initializing control panel");
 		try {
 			executorService = Executors.newScheduledThreadPool(5);
@@ -143,9 +104,9 @@ public class CollectControlPanelController implements Initializable {
 					collectProperties.getCollectDataSourceConfiguration());
 			server.initialize();
 
-			initLogFileReaders();
+//			initLogFileReaders();
 
-			urlHyperlink.setText(server.getUrl());
+			controlPanel.getUrlHyperlink().setUri(new URI(server.getUrl()));
 		} catch (Exception e) {
 			LOG.error("error initializing Collect: " + e.getMessage(), e);
 			throw new RuntimeException(e);
@@ -163,26 +124,26 @@ public class CollectControlPanelController implements Initializable {
 	 * 
 	 * @throws IOException
 	 */
-	private void initLogFileReaders() throws IOException {
-		this.serverLogFileReader = new ConsoleLogFileReader(new File(SERVER_LOG_FILE_LOCATION), serverConsole);
-		this.collectLogFileReader = new ConsoleLogFileReader(new File(COLLECT_LOG_FILE_LOCATION), collectConsole);
-		this.saikuLogFileReader = new ConsoleLogFileReader(new File(SAIKU_LOG_FILE_LOCATION), saikuConsole);
+//	private void initLogFileReaders() throws IOException {
+//		this.serverLogFileReader = new ConsoleLogFileReader(new File(SERVER_LOG_FILE_LOCATION), serverConsole);
+//		this.collectLogFileReader = new ConsoleLogFileReader(new File(COLLECT_LOG_FILE_LOCATION), collectConsole);
+//		this.saikuLogFileReader = new ConsoleLogFileReader(new File(SAIKU_LOG_FILE_LOCATION), saikuConsole);
+//
+//		// write logging info to console
+//		executorService.scheduleWithFixedDelay(() -> {
+//			Platform.runLater(() -> {
+//				serverLogFileReader.readFile();
+//				collectLogFileReader.readFile();
+//				saikuLogFileReader.readFile();
+//			});
+//		}, 3, 3, TimeUnit.SECONDS);
+//	}
 
-		// write logging info to console
-		executorService.scheduleWithFixedDelay(() -> {
-			Platform.runLater(() -> {
-				serverLogFileReader.readFile();
-				collectLogFileReader.readFile();
-				saikuLogFileReader.readFile();
-			});
-		}, 3, 3, TimeUnit.SECONDS);
-	}
-
-	public void startServer(MouseEvent event) throws Exception {
+	public void startServer() {
 		startServer((Runnable) null);
 	}
 
-	public void startServer(Runnable onComplete) throws Exception {
+	public void startServer(Runnable onComplete) {
 		executorService.schedule(() -> {
 			changeStatus(Status.STARTING);
 
@@ -214,9 +175,7 @@ public class CollectControlPanelController implements Initializable {
 			try {
 				server.stop();
 
-				waitUntilConditionIsVerifiedThenRun(
-						() -> changeStatus(Status.IDLE), 
-						(Void) -> server.isRunning(),
+				waitUntilConditionIsVerifiedThenRun(() -> changeStatus(Status.IDLE), (Void) -> server.isRunning(),
 						1000);
 			} catch (Exception e) {
 				handleException(e);
@@ -224,91 +183,87 @@ public class CollectControlPanelController implements Initializable {
 		}
 	}
 
-	void stop() throws Exception {
+	public void stop() throws Exception {
 		stopServer();
 		executorService.shutdownNow();
 	}
 
-	@FXML
-	void openBrowserFromLink(MouseEvent event) {
-		openBrowser();
-	}
-
-	@FXML
-	void shutdown(MouseEvent event) throws Exception {
-		Alert alert = new Alert(AlertType.CONFIRMATION, "Shutdown Collect ?", ButtonType.YES, ButtonType.CANCEL);
-		alert.showAndWait();
-		if (alert.getResult() == ButtonType.YES) {
-			try {
-				stop();
-				Platform.exit();
-			} catch(Exception e) {
-				LOG.error(e);
-			}
+	public void shutdown() {
+		try {
+			stop();
+			exit();
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Error shutting down Collect: " + e.getMessage());
+			LOG.error(e);
 		}
 	}
 
-	void openBrowser() {
-		HostServicesDelegate hostServices = HostServicesFactory.getInstance(app);
+	private void exit() {
+		System.exit(0);
+	}
+
+	public void openBrowser() {
 		String url = server.getUrl();
-		hostServices.showDocument(url);
+		try {
+			openWebpage(new URI(url));
+		} catch (Exception e) {
+			// ignore it
+		}
 	}
 
-	@FXML
-	public void toggleLog(MouseEvent event) {
-		setLogVisible(!logOpened);
-	}
-	
-	@FXML
-	public void handleShowOnlineManual(ActionEvent event) {
-		app.getHostServices().showDocument(ONLINE_MANUAL_URI);
+//	@FXML
+//	public void toggleLog(MouseEvent event) {
+//		setLogVisible(!logOpened);
+//	}
+
+	public void handleShowOnlineManual() {
+		openWebpage(ONLINE_MANUAL_URI);
 	}
 
-	@FXML
-	public void handleShowChangelog(ActionEvent event) {
-		app.getHostServices().showDocument(CHANGELOG_URI);
-	}
-	
-	@FXML
-	public void handleAboutAction(ActionEvent event) throws IOException {
-		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("about_dialog.fxml"));
-		Parent parent = fxmlLoader.load();
-		AboutController aboutController = fxmlLoader.getController();
-		aboutController.setHostServices(app.getHostServices());
-
-		Scene scene = new Scene(parent, 300, 200);
-		Stage dialogStage = new Stage();
-		dialogStage.setTitle("About");
-		dialogStage.initModality(Modality.APPLICATION_MODAL);
-		dialogStage.setScene(scene);
-		dialogStage.showAndWait();
+	public void handleShowChangelog() {
+		openWebpage(CHANGELOG_URI);
 	}
 
-	@FXML
-	public void handleExitAction(ActionEvent event) {
-		if (status == Status.RUNNING || status == Status.ERROR) {
-			try {
-				shutdown(null);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
+//	public void handleAboutAction(ActionEvent event) throws IOException {
+//		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("about_dialog.fxml"));
+//		Parent parent = fxmlLoader.load();
+//		AboutController aboutController = fxmlLoader.getController();
+//		aboutController.setHostServices(app.getHostServices());
+//
+//		Scene scene = new Scene(parent, 300, 200);
+//		Stage dialogStage = new Stage();
+//		dialogStage.setTitle("About");
+//		dialogStage.initModality(Modality.APPLICATION_MODAL);
+//		dialogStage.setScene(scene);
+//		dialogStage.showAndWait();
+//	}
+
+	public void onExit() {
+		int confirmResult = JOptionPane.showConfirmDialog(null, "Shutdown Collect?", "Confirm shutdown",
+				JOptionPane.YES_NO_OPTION);
+		if (confirmResult == JOptionPane.YES_OPTION) {
+			if (status == Status.RUNNING || status == Status.ERROR) {
+				shutdown();
+			} else {
+				exit();
 			}
 		}
 	}
 
-	public void closeLog() {
-		setLogVisible(false);
-	}
+//	public void closeLog() {
+//		setLogVisible(false);
+//	}
 
-	private void setLogVisible(boolean visible) {
-		logOpened = visible;
-		logBtn.setText(visible ? "Hide Log" : "Show Log");
-		updateUI();
-	}
+//	private void setLogVisible(boolean visible) {
+//		logOpened = visible;
+//		logBtn.setText(visible ? "Hide Log" : "Show Log");
+//		updateUI();
+//	}
 
 	private void updateUI() {
-		int windowHeight = this.logOpened ? LOG_OPENED_WINDOW_HEIGHT : LOG_CLOSED_WINDOW_HEIGHT;
-		Window window = applicationPane.getScene().getWindow();
-		window.setHeight(windowHeight);
+//		int windowHeight = this.logOpened ? LOG_OPENED_WINDOW_HEIGHT : LOG_CLOSED_WINDOW_HEIGHT;
+//		Window window = applicationPane.getScene().getWindow();
+//		window.setHeight(windowHeight);
 
 		boolean runningAtUrlVisible = false;
 		boolean errorMessageVisible = false;
@@ -347,15 +302,15 @@ public class CollectControlPanelController implements Initializable {
 			break;
 		}
 		statusMessageClassName = status.name().toLowerCase();
-		runningAtUrlBox.setVisible(runningAtUrlVisible);
-		shutdownBtn.setVisible(shutdownBtnVisible);
-		errorMessageTxt.setText(detailedErrorMessage);
-		errorMessageTxt.setVisible(errorMessageVisible);
-		statusTxt.setText(statusMessage);
-		statusTxt.getStyleClass().clear();
-		statusTxt.getStyleClass().add(statusMessageClassName);
-		progressBar.setVisible(progressBarVisible);
-		serverConsole.setVisible(logOpened);
+		controlPanel.getRunningAtUrlBox().setVisible(runningAtUrlVisible);
+		controlPanel.getShutdownBtn().setVisible(shutdownBtnVisible);
+		controlPanel.getErrorMessageTxt().setText(detailedErrorMessage);
+		controlPanel.getErrorMessageTxt().setVisible(errorMessageVisible);
+		controlPanel.getStatusTxt().setText(statusMessage);
+//		controlPanel.getStatusTxt().getStyleClass().clear();
+//		controlPanel.getStatusTxt().getStyleClass().add(statusMessageClassName);
+		controlPanel.getProgressBar().setVisible(progressBarVisible);
+//		serverConsole.setVisible(logOpened);
 	}
 
 	private void handleException(Exception e) {
@@ -372,7 +327,7 @@ public class CollectControlPanelController implements Initializable {
 			} catch (InterruptedException e) {
 			}
 		}
-		Platform.runLater(runnable);
+		SwingUtilities.invokeLater(runnable);
 	}
 
 	private CollectProperties loadProperties() throws IOException {
@@ -414,16 +369,12 @@ public class CollectControlPanelController implements Initializable {
 
 	}
 
-	public void setApp(CollectControlPanel app) {
-		this.app = app;
-	}
-
-	public void setStage(Stage stage) {
-		this.stage = stage;
-	}
-
 	public Status getStatus() {
 		return status;
+	}
+
+	public void setControlPanel(ControlPanel controlPanel) {
+		this.controlPanel = controlPanel;
 	}
 
 	static void closeQuietly(Closeable closeable) {
@@ -441,23 +392,30 @@ public class CollectControlPanelController implements Initializable {
 		}
 	}
 
-	private static class ConsoleLogFileReader {
-		private File file;
-		private TextArea textArea;
+//	private static class ConsoleLogFileReader {
+//		private File file;
+//		private TextArea textArea;
+//
+//		public ConsoleLogFileReader(File file, TextArea textArea) {
+//			this.file = file;
+//			this.textArea = textArea;
+//		}
+//
+//		public void readFile() {
+//			String content = Files.tail(file, LOG_TEXT_MAX_LENGTH);
+//			String oldContent = textArea.getText();
+//			if (!content.equals(oldContent)) {
+//				textArea.setText(content);
+//				textArea.setScrollTop(Double.MAX_VALUE);
+//			}
+//		}
+//	}
 
-		public ConsoleLogFileReader(File file, TextArea textArea) {
-			this.file = file;
-			this.textArea = textArea;
-		}
-
-		public void readFile() {
-			String content = Files.tail(file, LOG_TEXT_MAX_LENGTH);
-			String oldContent = textArea.getText();
-			if (!content.equals(oldContent)) {
-				textArea.setText(content);
-				textArea.setScrollTop(Double.MAX_VALUE);
-			}
+	public static void openWebpage(URI uri) {
+		try {
+			Desktop.getDesktop().browse(uri);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
-
 }
