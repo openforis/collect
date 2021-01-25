@@ -5,11 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [4.0.11] - NOT RELEASED YET
+## [4.0.11] - 2021-01-25
 ### Fixed
 - Error after logout;
 - Multiple entities with form layout: show position in selector if keys are missing;
 - Error loading code list items in table when column visibility changes;
+
+### Added
+- Schema labels import;
 
 ## [4.0.10] - 2021-01-21
 ### Fixed

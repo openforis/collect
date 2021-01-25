@@ -120,6 +120,10 @@
 										onClick="@command('exportSchemaSummary')" />
 									<menuseparator />
 									<menuitem
+										label="${labels.survey.schema.labels_import.$}"
+										onClick="@command('openSchemaLabelsImportPopUp')" />
+									<menuseparator />
+									<menuitem
 										label="${labels.survey.schema.attributes_import.$}"
 										onClick="@command('openSchemaAttributesImportPopUp')" />
 									<menuseparator />

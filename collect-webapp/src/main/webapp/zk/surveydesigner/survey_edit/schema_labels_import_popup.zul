@@ -1,0 +1,45 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+  <window id="schemaLabelsImportPopUp"
+    title="${labels.survey.schema.labels_import.popup.title}"
+    width="500px" border="normal" position="center"
+    apply="org.zkoss.bind.BindComposer"
+    viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SchemaLabelsImportVM')"
+    validationMessages="@id('vmsgs')"
+    onUpload="@command('fileUploaded')"
+    onClose="@command('close')"
+    closable="true">
+
+   <zscript deferred="true"><![CDATA[
+	     import org.zkoss.util.media.Media;
+	  
+	     Executions.getCurrent().getDesktop().setAttribute(
+	             "org.zkoss.zul.Fileupload.target", schemaLabelsImportPopUp);
+   ]]></zscript>
+   
+  <vlayout hflex="true" spacing="40px">
+  	<label hflex="true" value="${labels.survey.schema.labels_import.introduction}"
+  		multiline="true" />
+  	<hbox hflex="true" pack="center">
+  		<label value="${labels.global.file_to_import}:"
+  			multiline="false" />
+  		<hbox hflex="true">
+  			<label visible="@load(not empty vm.uploadedFileName)"
+  				value="@load(vm.uploadedFileName)" />
+  			<label visible="@load(empty vm.uploadedFileName)"
+  				value="${labels.global.file_not_selected}" />
+  		</hbox>
+  		<button id="selectFileBtn"
+  			label="${labels.global.select_file_to_upload}"
+  			upload="true,maxsize=-1" onUpload="@command('fileUploaded')" />
+  	</hbox>
+  	<box width="100%" align="center">
+  		<hlayout>
+  			<button id="okBtn" label="${labels.global.import_start}"
+  				onClick="@command('startImport')" />
+  		</hlayout>
+  	</box>
+  </vlayout>
+	
+  </window>
+</zk>

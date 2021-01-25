@@ -53,7 +53,7 @@ public class SchemaAttributesImportVM extends BaseSurveyFileImportVM {
 	private boolean labelsInSecondRow;
 	
 	public SchemaAttributesImportVM() {
-		super(new String[] {Files.CSV_FILE_EXTENSION}, null);
+		super(new String[] {Files.CSV_FILE_EXTENSION, Files.EXCEL_FILE_EXTENSION}, null);
 		reset();
 	}
 	
