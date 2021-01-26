@@ -79,7 +79,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	public static final String SHOW_PREVIEW_POP_UP_GLOBAL_COMMAND = "showPreview";
 	public static final String BACKGROUD_SAVE_GLOBAL_COMMAND = "backgroundSurveySave";
 	private static final String CODE_LISTS_POP_UP_CLOSED_COMMAND = "codeListsPopUpClosed";
-	
+
 	private static final String SCHEMA_SUMMARY_FILE_NAME_PATTERN = "%s_schema_summary_%s.%s";
 	private static final String DATA_IMPORT_TEMPLATE_FILE_NAME_PATTERN = "%s_data_import_template_%s.%s";
 	
@@ -89,6 +89,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private Window codeListsPopUp;
 	private Window unitsPopUp;
 	private Window versioningPopUp;
+	private Window schemaLabelsImportPopUp;
 
 	@WireVariable
 	private SurveyManager surveyManager;
@@ -150,6 +151,20 @@ public class SurveyEditVM extends SurveyBaseVM {
 			selectLanguagePopUp = openPopUp(Resources.Component.SELECT_LANGUAGE_POP_UP.getLocation(), true);
 		}
 	}
+
+	@Command
+	public void openSchemaLabelsImportPopUp() {
+		if ( checkCanLeaveForm() ) {
+			schemaLabelsImportPopUp = openPopUp(Resources.Component.SCHEMA_LABELS_IMPORT_POP_UP.getLocation(), true);
+		}
+	}
+	
+	@GlobalCommand
+	public void closeSchemaLabelsImportPopUp() {
+		closePopUp(schemaLabelsImportPopUp);
+		schemaLabelsImportPopUp = null;
+	}
+
 
 	@Command
 	public void openSchemaAttributesImportPopUp() {
