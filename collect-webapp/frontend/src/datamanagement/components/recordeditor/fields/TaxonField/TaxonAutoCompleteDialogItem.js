@@ -7,7 +7,7 @@ const widthByField = {
   [TaxonAttributeDefinition.Fields.SCIENTIFIC_NAME]: '300px',
   [TaxonAttributeDefinition.Fields.VERNACULAR_NAME]: '200px',
   [TaxonAttributeDefinition.Fields.LANGUAGE_CODE]: '50px',
-  [TaxonAttributeDefinition.Fields.LANGUAGE_VARIETY]: '50px',
+  // [TaxonAttributeDefinition.Fields.LANGUAGE_VARIETY]: '50px',
 }
 
 const TaxonAutoCompleteDialogItem = (props) => {

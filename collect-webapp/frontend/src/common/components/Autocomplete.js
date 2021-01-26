@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import MuiAutocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete'
-import { TextField } from '@material-ui/core'
+import { Popper, TextField } from '@material-ui/core'
 
 import Arrays from 'utils/Arrays'
 import LoadingSpinnerSmall from './LoadingSpinnerSmall'
+
+const PopperCustom = ({ popUpWidth, popUpWidthContentBased }) => (props) => {
+  const { style: styleProps = {} } = props
+  const width = popUpWidthContentBased ? null : popUpWidth || styleProps?.width
+  const style = { ...styleProps, minWidth: '100px', width: width ? `${width}px` : 'auto' }
+  return <Popper {...props} style={style} placement="bottom-start" />
+}
 
 const Autocomplete = (props) => {
   const {
@@ -15,6 +22,8 @@ const Autocomplete = (props) => {
     items: itemsProps,
     inputValue: initialInputValue,
     inputFieldWidth,
+    popUpWidth,
+    popUpWidthContentBased,
     selectedItems,
     fetchFunction,
     itemRenderFunction,
@@ -155,6 +164,7 @@ const Autocomplete = (props) => {
       className={className}
       disabled={disabled || readOnly}
       multiple={multiple}
+      PopperComponent={PopperCustom({ popUpWidth, popUpWidthContentBased })}
     />
   )
 }
@@ -177,6 +187,11 @@ Autocomplete.propTypes = {
   onSelect: PropTypes.func.isRequired,
   onInputChange: PropTypes.func,
   onDismiss: PropTypes.func,
+  popUpWidth: PropTypes.number,
+  popUpWidthLimited: PropTypes.bool,
+  readOnly: PropTypes.bool,
+  selectedItems: PropTypes.array,
+  tagsRenderFunction: PropTypes.func,
 }
 
 Autocomplete.defaultProps = {
@@ -191,11 +206,13 @@ Autocomplete.defaultProps = {
   itemRenderFunction: null,
   itemLabelFunction: null,
   itemSelectedFunction: null,
+  onInputChange: () => {},
+  onDismiss: () => {},
+  popUpWidth: null, // default to inputFieldWidth
+  popUpWidthContentBased: false,
   readOnly: false,
   selectedItems: [],
   tagsRenderFunction: null,
-  onInputChange: () => {},
-  onDismiss: () => {},
 }
 
 export default Autocomplete

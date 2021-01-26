@@ -85,6 +85,7 @@ const TaxonAutoCompleteField = (props) => {
       onSelect={onTaxonSelected}
       onDismiss={onDismiss}
       readOnly={readOnly}
+      popUpWidthContentBased
     />
   )
 }
