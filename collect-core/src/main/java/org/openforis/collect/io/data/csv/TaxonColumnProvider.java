@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 
 /**
@@ -18,14 +20,6 @@ import org.openforis.idm.metamodel.TaxonAttributeDefinition;
  */
 public class TaxonColumnProvider extends CompositeAttributeColumnProvider<TaxonAttributeDefinition> {
 
-	private static final String[] DEFAULT_FIELDS = new String[] {
-			TaxonAttributeDefinition.CODE_FIELD_NAME,
-			TaxonAttributeDefinition.SCIENTIFIC_NAME_FIELD_NAME,
-			TaxonAttributeDefinition.VERNACULAR_NAME_FIELD_NAME,
-			TaxonAttributeDefinition.LANGUAGE_CODE_FIELD_NAME,
-			TaxonAttributeDefinition.LANGUAGE_VARIETY_FIELD_NAME
-	};
-	
 	private static final String[] FAMILY_FIELDS = new String[] {
 			TaxonAttributeDefinition.FAMILY_CODE_FIELD_NAME,
 			TaxonAttributeDefinition.FAMILY_SCIENTIFIC_NAME_FIELD_NAME
@@ -39,14 +33,22 @@ public class TaxonColumnProvider extends CompositeAttributeColumnProvider<TaxonA
 	protected String[] getFieldNames() {
 		CollectSurvey survey = attributeDefinition.getSurvey();
 		CollectAnnotations annotations = survey.getAnnotations();
-		List<String> visibleFieldNames = new ArrayList<String>(Arrays.asList(
+		final List<String> visibleFieldNames = new ArrayList<String>(Arrays.asList(
 				survey.getUIOptions().getVisibleFields(attributeDefinition)));
-		boolean showFamily = annotations.isShowFamily(attributeDefinition);
 		if (! visibleFieldNames.contains(TaxonAttributeDefinition.CODE_FIELD_NAME)) {
 			//always include CODE field
 			visibleFieldNames.add(0, TaxonAttributeDefinition.CODE_FIELD_NAME);
 		}
-		if (! showFamily) {
+		if (annotations.isShowFamily(attributeDefinition)) {
+			// add family fields first (only if not in visible fields already)
+			List<String> familyFieldsToInclude = new ArrayList<String>(Arrays.asList(FAMILY_FIELDS));
+			CollectionUtils.filter(familyFieldsToInclude, new Predicate<String>() {
+				public boolean evaluate(String familyField) {
+					return !visibleFieldNames.contains(familyField);
+				}
+			});
+			visibleFieldNames.addAll(familyFieldsToInclude);
+		} else {
 			visibleFieldNames.removeAll(Arrays.asList(FAMILY_FIELDS));
 		}
 		return visibleFieldNames.toArray(new String[visibleFieldNames.size()]);

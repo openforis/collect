@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [4.0.12] - 2021-01-26
+### Fixed
+- Taxon attribute: when "show family" is specified, always include family in CSV export and in data entry form;
+
 ## [4.0.11] - 2021-01-25
 ### Fixed
 - Error after logout;
