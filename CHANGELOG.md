@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [4.0.13] - 2021-01-28
+### Added
+- Schema labels export;
+
+### Fixed
+- Schema labels import: validate input file before import;
+
 ## [4.0.12] - 2021-01-26
 ### Fixed
 - Taxon attribute: when "show family" is specified, always include family in CSV export and in data entry form;

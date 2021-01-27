@@ -1,7 +1,7 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
   <window id="schemaLabelsImportPopUp"
-    title="${labels.survey.schema.labels_import.popup.title}"
+    title="${labels.survey.schema.labels_import_export.popup.title}"
     width="500px" border="normal" position="center"
     apply="org.zkoss.bind.BindComposer"
     viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SchemaLabelsImportVM')"
@@ -20,6 +20,10 @@
   <vlayout hflex="true" spacing="40px">
   	<label hflex="true" value="${labels.survey.schema.labels_import.introduction}"
   		multiline="true" />
+	<box hflex="1" align="center">
+	  <button id="downloadBtn" label="${labels.survey.schema.labels_export.export_labels}"
+	    onClick="@command('download')" />
+	</box>
   	<hbox hflex="true" pack="center">
   		<label value="${labels.global.file_to_import}:"
   			multiline="false" />

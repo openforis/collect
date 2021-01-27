@@ -30,6 +30,7 @@ public class SchemaSummaryCSVExportJob extends Job {
 
 	//input
 	private CollectSurvey survey;
+	private boolean onlyLabels;
 	//output
 	private File outputFile;
 	
@@ -54,12 +55,14 @@ public class SchemaSummaryCSVExportJob extends Job {
 						@Override
 						public void visit(NodeDefinition nodeDefn) {
 							List<String> values = new ArrayList<String>();
-							values.addAll(Arrays.asList(
-									Integer.toString(nodeDefn.getId()), 
-									nodeDefn.getPath(),
-									nodeDefn instanceof EntityDefinition ? "entity": "attribute",
-									nodeDefn instanceof AttributeDefinition ? AttributeType.valueOf((AttributeDefinition) nodeDefn).getLabel(): ""
-							));
+							values.add(Integer.toString(nodeDefn.getId()));
+							if (!onlyLabels) {
+								values.addAll(Arrays.asList(
+										nodeDefn.getPath(),
+										nodeDefn instanceof EntityDefinition ? "entity": "attribute",
+										nodeDefn instanceof AttributeDefinition ? AttributeType.valueOf((AttributeDefinition) nodeDefn).getLabel(): ""
+								));
+							}
 							// Instance labels
 							for (String lang : survey.getLanguages())
 								values.add(nodeDefn.getLabel(Type.INSTANCE, lang));
@@ -67,13 +70,16 @@ public class SchemaSummaryCSVExportJob extends Job {
 							for (String lang : survey.getLanguages())
 								values.add(nodeDefn.getLabel(Type.REPORTING, lang));
 							
-							values.addAll(Arrays.asList(
-									String.valueOf(nodeDefn.isAlwaysRelevant()),
-									nodeDefn.isAlwaysRelevant() ? "" : nodeDefn.getRelevantExpression(),
-									String.valueOf(nodeDefn.isAlwaysRequired()),
-									nodeDefn.isAlwaysRequired() ? "" : nodeDefn.extractRequiredExpression(),
-									extractValidationRules(nodeDefn)
-							));
+							if (!onlyLabels) {
+								// Expressions
+								values.addAll(Arrays.asList(
+										String.valueOf(nodeDefn.isAlwaysRelevant()),
+										nodeDefn.isAlwaysRelevant() ? "" : nodeDefn.getRelevantExpression(),
+										String.valueOf(nodeDefn.isAlwaysRequired()),
+										nodeDefn.isAlwaysRequired() ? "" : nodeDefn.extractRequiredExpression(),
+										extractValidationRules(nodeDefn)
+								));
+							}
 							csvWriter.writeNext(values);
 						}
 					});
@@ -89,16 +95,22 @@ public class SchemaSummaryCSVExportJob extends Job {
 	
 	private void writeHeaders(final FlatDataWriter valuesWriter) {
 		List<String> headers = new ArrayList<String>();
-		// Generic info
-		headers.addAll(Arrays.asList("id", "path", "type", "attribute_type"));
+		headers.add("id");
+		if (!onlyLabels) {
+			// Generic node info
+			headers.addAll(Arrays.asList("path", "type", "attribute_type"));
+		}
 		// Instance labels
 		for (String lang : survey.getLanguages())
 			headers.add("label_" + lang);
 		// Reporting labels
 		for (String lang : survey.getLanguages())
 			headers.add("label_reporting_" + lang);
-		// Expressions
-		headers.addAll(Arrays.asList("always_relevant", "relevant_when", "always_required", "required_when", "validation_rules"));
+		
+		if (!onlyLabels) {
+			// Expressions
+			headers.addAll(Arrays.asList("always_relevant", "relevant_when", "always_required", "required_when", "validation_rules"));
+		}
 		valuesWriter.writeHeaders(headers);
 	}
 	
@@ -120,6 +132,10 @@ public class SchemaSummaryCSVExportJob extends Job {
 	
 	public void setSurvey(CollectSurvey survey) {
 		this.survey = survey;
+	}
+	
+	public void setOnlyLabels(boolean onlyLabels) {
+		this.onlyLabels = onlyLabels;
 	}
 	
 	public File getOutputFile() {

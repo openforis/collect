@@ -23,6 +23,7 @@ import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.Resources.Page;
+import org.openforis.collect.designer.viewmodel.JobStatusPopUpVM.JobEndHandler;
 import org.openforis.collect.designer.viewmodel.SurveyValidationResultsVM.ConfirmEvent;
 import org.openforis.collect.io.data.CSVDataExportJob;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
@@ -44,7 +45,6 @@ import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.MediaTypes;
 import org.openforis.collect.web.ws.AppWS;
 import org.openforis.collect.web.ws.AppWS.MessageType;
-import org.openforis.concurrency.Job;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -153,7 +153,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 
 	@Command
-	public void openSchemaLabelsImportPopUp() {
+	public void openSchemaLabelsImportExportPopUp() {
 		if ( checkCanLeaveForm() ) {
 			schemaLabelsImportPopUp = openPopUp(Resources.Component.SCHEMA_LABELS_IMPORT_POP_UP.getLocation(), true);
 		}
@@ -425,7 +425,24 @@ public class SurveyEditVM extends SurveyBaseVM {
 		jobManager.start(job, survey.getId().toString());
 		
 		String statusPopUpTitle = Labels.getLabel("survey.schema.export_summary.process_status_popup.message", new String[] { survey.getName() });
-		jobStatusPopUp = JobStatusPopUpVM.openPopUp(statusPopUpTitle, job, true);
+		jobStatusPopUp = JobStatusPopUpVM.openPopUp(statusPopUpTitle, job, true, new JobEndHandler<SchemaSummaryCSVExportJob>() {
+			public void onJobEnd(SchemaSummaryCSVExportJob job) {
+				closePopUp(jobStatusPopUp);
+				jobStatusPopUp = null;
+				File file = ((SchemaSummaryCSVExportJob) job).getOutputFile();
+				String surveyName = survey.getName();
+				String dateStr = Dates.formatLocalDateTime(new Date());
+				String fileName = String.format(SCHEMA_SUMMARY_FILE_NAME_PATTERN, surveyName, dateStr, Files.EXCEL_FILE_EXTENSION);
+				String contentType = URLConnection.guessContentTypeFromName(fileName);
+				try {
+					FileInputStream is = new FileInputStream(file);
+					Filedownload.save(is, contentType, fileName);
+				} catch (FileNotFoundException e) {
+					log.error(e);
+					MessageUtil.showError("survey.schema.export_summary.error", e.getMessage());
+				}
+			}
+		});
 	}
 	
 	@Command
@@ -496,30 +513,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 		Filedownload.save(new FileInputStream(templateFile), MediaTypes.CSV_CONTENT_TYPE, fileName);
 	}
 	
-	@GlobalCommand
-	public void jobCompleted(@BindingParam("job") Job job) {
-		closeJobStatusPopUp();
-		if ( job instanceof SchemaSummaryCSVExportJob ) {
-			File file = ((SchemaSummaryCSVExportJob) job).getOutputFile();
-			String surveyName = survey.getName();
-			String dateStr = Dates.formatLocalDateTime(new Date());
-			String fileName = String.format(SCHEMA_SUMMARY_FILE_NAME_PATTERN, surveyName, dateStr, Files.EXCEL_FILE_EXTENSION);
-			String contentType = URLConnection.guessContentTypeFromName(fileName);
-			try {
-				FileInputStream is = new FileInputStream(file);
-				Filedownload.save(is, contentType, fileName);
-			} catch (FileNotFoundException e) {
-				log.error(e);
-				MessageUtil.showError("survey.schema.export_summary.error", e.getMessage());
-			}
-		}
-	}
-
-	private void closeJobStatusPopUp() {
-		closePopUp(jobStatusPopUp);
-		jobStatusPopUp = null;
-	}
-
 	private void openPreviewPopUp() {
 		if ( isSingleRootEntityDefined() && survey.getVersions().size() <= 1 ) {
 			ModelVersion version = survey.getVersions().isEmpty() ? null: survey.getVersions().get(0);
