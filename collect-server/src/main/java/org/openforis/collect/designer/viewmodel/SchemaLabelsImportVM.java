@@ -182,7 +182,7 @@ public class SchemaLabelsImportVM extends BaseSurveyFileImportVM {
 				// parse rows
 				Map<Integer, List<NodeLabel>> result = new HashMap<Integer, List<NodeLabel>>();
 				FlatRecord row = reader.nextRecord();
-				while (row != null && !isEmpty(row)) {
+				while (row != null && !row.isEmpty()) {
 					if (!validateRow(reader.getLinesRead() + 1, row, survey.getDefaultLanguage())) {
 						return null;
 					}
@@ -281,16 +281,6 @@ public class SchemaLabelsImportVM extends BaseSurveyFileImportVM {
 
 		private void handleError(String messageKey, Object[] args) {
 			MessageUtil.showError(messageKey, args);
-		}
-
-		private boolean isEmpty(FlatRecord row) {
-			String[] values = row.toStringArray();
-			for (String val : values) {
-				if (StringUtils.isNotBlank(val)) {
-					return false;
-				}
-			}
-			return true;
 		}
 
 	}
