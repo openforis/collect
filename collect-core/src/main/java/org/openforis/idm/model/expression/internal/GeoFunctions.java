@@ -120,6 +120,7 @@ public class GeoFunctions extends CustomFunctions {
 		
 		String coordinatesText = coordinatesToString(coordinates, coordinateOperations);
 		
+		XMLBuilder2.failIfExternalEntityParsingCannotBeConfigured = false; // prevents exceptions in Collect Mobile
 		XMLBuilder2 builder = XMLBuilder2.create("kml", "http://www.opengis.net/kml/2.2")
 				.e("Placemark")
 					.e("name").text(placemarkName)
