@@ -11,18 +11,19 @@ import java.net.URI;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
-public class HyperlinkLabel extends JLabel {
+public class JHyperlinkLabel extends JLabel {
 
 	private static final long serialVersionUID = 1L;
 
 	private URI uri;
 	private String _text;
+	private boolean mouseEntered;
 
-	public HyperlinkLabel() {
+	public JHyperlinkLabel() {
 		this(null, null);
 	}
 
-	public HyperlinkLabel(URI uri, String text) {
+	public JHyperlinkLabel(URI uri, String text) {
 		super(text);
 		this.uri = uri;
 		this._text = text;
@@ -35,7 +36,7 @@ public class HyperlinkLabel extends JLabel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				try {
-					Desktop.getDesktop().browse(HyperlinkLabel.this.getUri());
+					Desktop.getDesktop().browse(JHyperlinkLabel.this.getUri());
 				} catch (IOException ex) {
 					JOptionPane.showMessageDialog(null, "Error opening browser: " + ex.getMessage());
 				}
@@ -43,17 +44,23 @@ public class HyperlinkLabel extends JLabel {
 
 			@Override
 			public void mouseExited(MouseEvent e) {
-				HyperlinkLabel.this.setText(HyperlinkLabel.this._text);
+				JHyperlinkLabel.this.mouseEntered = false;
+				JHyperlinkLabel.this.updateText();
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				HyperlinkLabel.this.setText("<html><a href=''>" + HyperlinkLabel.this._text + "</a></html>");
+				JHyperlinkLabel.this.mouseEntered = true;
+				JHyperlinkLabel.this.updateText();
 			}
 
 		});
 	}
 
+	private void updateText() {
+		this.setText(mouseEntered ? "<html><a href=''>" + _text + "</a></html>" : _text);
+	}
+	
 	public URI getUri() {
 		return uri;
 	}
@@ -61,7 +68,7 @@ public class HyperlinkLabel extends JLabel {
 	public void setUri(URI uri) {
 		this.uri = uri;
 		this._text = uri == null ? null : uri.toString();
-		this.setText(_text);
+		this.updateText();
 	}
 
 }

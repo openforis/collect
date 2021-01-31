@@ -1,4 +1,4 @@
-package org.openforis.collect.controlpanel;
+package org.openforis.web.server;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,8 +19,6 @@ import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.webapp.Configuration.ClassList;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.openforis.web.server.ApplicationServer;
-import org.openforis.web.server.JndiDataSourceConfiguration;
 
 import net.lingala.zip4j.ZipFile;
 

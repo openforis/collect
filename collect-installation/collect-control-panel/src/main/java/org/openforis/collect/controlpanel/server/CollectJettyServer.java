@@ -1,7 +1,8 @@
-package org.openforis.collect.controlpanel;
+package org.openforis.collect.controlpanel.server;
 
 import java.io.File;
 
+import org.openforis.web.server.JettyApplicationServer;
 import org.openforis.web.server.JndiDataSourceConfiguration;
 
 public class CollectJettyServer extends JettyApplicationServer {

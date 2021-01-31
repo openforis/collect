@@ -1,5 +1,6 @@
 package org.openforis.collect.controlpanel;
 
+import java.awt.Color;
 import java.awt.Desktop;
 import java.io.Closeable;
 import java.io.File;
@@ -19,6 +20,7 @@ import javax.swing.SwingUtilities;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openforis.collect.controlpanel.server.CollectJettyServer;
 import org.openforis.utils.Files;
 import org.openforis.web.server.ApplicationServer;
 
@@ -55,6 +57,8 @@ public class CollectControlPanelController {
 			throw new RuntimeException(e);
 		}
 	}
+	private static final String ERROR_MSG_FORMAT = "An error has occurred: %s\nOpen Log for more details";
+	private static final String ERROR_SHUTTING_DOWN_MSG_FORMAT = "Error shutting down Collect: %s";
 
 	public enum Status {
 		INITIALIZING, STARTING, RUNNING, STOPPING, ERROR, IDLE;
@@ -175,8 +179,7 @@ public class CollectControlPanelController {
 			try {
 				server.stop();
 
-				waitUntilConditionIsVerifiedThenRun(() -> changeStatus(Status.IDLE), (Void) -> server.isRunning(),
-						1000);
+				waitUntil(() -> changeStatus(Status.IDLE), (Void) -> server.isRunning(), 1000);
 			} catch (Exception e) {
 				handleException(e);
 			}
@@ -193,7 +196,7 @@ public class CollectControlPanelController {
 			stop();
 			exit();
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Error shutting down Collect: " + e.getMessage());
+			JOptionPane.showMessageDialog(null, String.format(ERROR_SHUTTING_DOWN_MSG_FORMAT, e.getMessage()));
 			LOG.error(e);
 		}
 	}
@@ -202,7 +205,7 @@ public class CollectControlPanelController {
 		System.exit(0);
 	}
 
-	public void openBrowser() {
+	public void openCollectInBrowser() {
 		String url = server.getUrl();
 		try {
 			openWebpage(new URI(url));
@@ -238,14 +241,20 @@ public class CollectControlPanelController {
 //		dialogStage.showAndWait();
 //	}
 
-	public void onExit() {
-		int confirmResult = JOptionPane.showConfirmDialog(null, "Shutdown Collect?", "Confirm shutdown",
-				JOptionPane.YES_NO_OPTION);
-		if (confirmResult == JOptionPane.YES_OPTION) {
-			if (status == Status.RUNNING || status == Status.ERROR) {
-				shutdown();
-			} else {
-				exit();
+	public void handleExitAction() {
+		switch (status) {
+		case INITIALIZING:
+		case STARTING:
+			break;
+		default:
+			int confirmResult = JOptionPane.showConfirmDialog(null, "Shutdown Collect?", "Confirm",
+					JOptionPane.YES_NO_OPTION);
+			if (confirmResult == JOptionPane.YES_OPTION) {
+				if (status == Status.RUNNING || status == Status.ERROR) {
+					shutdown();
+				} else {
+					exit();
+				}
 			}
 		}
 	}
@@ -271,7 +280,7 @@ public class CollectControlPanelController {
 		boolean progressBarVisible = false;
 		String detailedErrorMessage = null;
 		String statusMessage = null;
-		String statusMessageClassName = "info";
+		Color statusMessageColor = Color.ORANGE;
 
 		switch (status) {
 		case INITIALIZING:
@@ -286,6 +295,7 @@ public class CollectControlPanelController {
 			statusMessage = "Running!";
 			runningAtUrlVisible = true;
 			shutdownBtnVisible = true;
+			statusMessageColor = Color.BLUE;
 			break;
 		case STOPPING:
 			statusMessage = "Shutting down...";
@@ -294,21 +304,19 @@ public class CollectControlPanelController {
 			break;
 		case ERROR:
 			statusMessage = "Error";
-			detailedErrorMessage = String.format("An error has occurred: %s\n" + "Open Log for more detals",
-					errorMessage);
+			detailedErrorMessage = String.format(ERROR_MSG_FORMAT, errorMessage);
 			errorMessageVisible = true;
+			statusMessageColor = Color.RED;
 			break;
 		default:
 			break;
 		}
-		statusMessageClassName = status.name().toLowerCase();
 		controlPanel.getRunningAtUrlBox().setVisible(runningAtUrlVisible);
 		controlPanel.getShutdownBtn().setVisible(shutdownBtnVisible);
 		controlPanel.getErrorMessageTxt().setText(detailedErrorMessage);
 		controlPanel.getErrorMessageTxt().setVisible(errorMessageVisible);
 		controlPanel.getStatusTxt().setText(statusMessage);
-//		controlPanel.getStatusTxt().getStyleClass().clear();
-//		controlPanel.getStatusTxt().getStyleClass().add(statusMessageClassName);
+		controlPanel.getStatusTxt().setForeground(statusMessageColor);
 		controlPanel.getProgressBar().setVisible(progressBarVisible);
 //		serverConsole.setVisible(logOpened);
 	}
@@ -319,8 +327,7 @@ public class CollectControlPanelController {
 		changeStatus(Status.ERROR);
 	}
 
-	private void waitUntilConditionIsVerifiedThenRun(Runnable runnable, Predicate<Void> sleepConditionVerifier,
-			int sleepInterval) {
+	private void waitUntil(Runnable runnable, Predicate<Void> sleepConditionVerifier, int sleepInterval) {
 		while (sleepConditionVerifier.test(null)) {
 			try {
 				Thread.sleep(sleepInterval);

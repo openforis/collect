@@ -5,17 +5,18 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 
-import org.openforis.collect.controlpanel.component.HyperlinkLabel;
+import org.openforis.collect.controlpanel.component.JHyperlinkLabel;
+import org.openforis.collect.controlpanel.component.JMultilineLabel;
 
 public interface ControlPanel {
 	
-	HyperlinkLabel getUrlHyperlink();
+	JHyperlinkLabel getUrlHyperlink();
 
 	JComponent getRunningAtUrlBox();
 
 	JButton getShutdownBtn();
 
-	JLabel getErrorMessageTxt();
+	JMultilineLabel getErrorMessageTxt();
 
 	JLabel getStatusTxt();
 
