@@ -12,7 +12,6 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -25,8 +24,10 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 
+import org.openforis.collect.controlpanel.component.AboutDialog;
 import org.openforis.collect.controlpanel.component.JHyperlinkLabel;
 import org.openforis.collect.controlpanel.component.JMultilineLabel;
+import org.openforis.utils.Browser;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
@@ -43,9 +44,11 @@ public class CollectControlPanel extends JFrame implements ControlPanel {
 	private static final String TITLE = "Open Foris Collect - Control Panel";
 	private static final String LOGO_PATH = "of-collect-logo.png";
 //	private static final String ERROR_DIALOG_TITLE = "Open Foris Collect - Error";
+	private static final String ONLINE_MANUAL_URL = "http://www.openforis.org/tools/collect.html";
+	private static final String CHANGELOG_URL = "https://github.com/openforis/collect/blob/master/CHANGELOG.md";
 
-	private static final Font ERROR_MSG_FONT = new Font(Font.SERIF, Font.PLAIN, 15);
-	private static final Font STATUS_MSG_FONT = new Font(Font.SERIF, Font.BOLD, 20);
+	private static final Font ERROR_MSG_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 15);
+	private static final Font STATUS_MSG_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 20);
 
 	private CollectControlPanelController controller;
 
@@ -87,7 +90,7 @@ public class CollectControlPanel extends JFrame implements ControlPanel {
 
 		createMenuBar();
 
-		Box box = new Box(BoxLayout.PAGE_AXIS);
+		Box box = Box.createVerticalBox();
 		int boxWidth = WIDTH - 20;
 		box.setSize(boxWidth, HEIGHT);
 		box.setAlignmentX(CENTER_ALIGNMENT);
@@ -99,9 +102,9 @@ public class CollectControlPanel extends JFrame implements ControlPanel {
 		addMargin(statusTxt);
 		box.add(statusTxt);
 
-		runningAtUrlBox = new Box(BoxLayout.X_AXIS);
+		runningAtUrlBox = Box.createHorizontalBox();
 		runningAtUrlBox.setSize(boxWidth, 30);
-		JLabel runningAtLabel = new JLabel("Running at URL: ");
+		JLabel runningAtLabel = new JLabel("Running at this address: ");
 		runningAtUrlBox.add(runningAtLabel);
 		urlHyperlink = new JHyperlinkLabel();
 		urlHyperlink.setMaximumSize(new Dimension(boxWidth, 30));
@@ -129,9 +132,7 @@ public class CollectControlPanel extends JFrame implements ControlPanel {
 
 		this.add(box);
 
-		controller = new CollectControlPanelController();
-
-		controller.setControlPanel(this);
+		controller = new CollectControlPanelController(this);
 		controller.init();
 		controller.startServer(() -> {
 			controller.openCollectInBrowser();
@@ -158,15 +159,44 @@ public class CollectControlPanel extends JFrame implements ControlPanel {
 
 	private void createMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
+
+		// File
 		JMenu fileMenu = new JMenu("File");
 		fileMenu.setMnemonic(KeyEvent.VK_F);
-
-		JMenuItem eMenuItem = new JMenuItem("Exit");
-		eMenuItem.setMnemonic(KeyEvent.VK_E);
-		eMenuItem.addActionListener((event) -> controller.handleExitAction());
-
-		fileMenu.add(eMenuItem);
+		{
+			// Exit
+			JMenuItem item = new JMenuItem("Exit");
+			item.setMnemonic(KeyEvent.VK_E);
+			item.addActionListener((event) -> controller.handleExitAction());
+			fileMenu.add(item);
+		}
 		menuBar.add(fileMenu);
+
+		// Help
+		JMenu helpMenu = new JMenu("Help");
+		helpMenu.setMnemonic(KeyEvent.VK_H);
+		{
+			// Online manual
+			JMenuItem item = new JMenuItem("Online manual");
+			item.setMnemonic(KeyEvent.VK_M);
+			item.addActionListener((event) -> Browser.openPage(ONLINE_MANUAL_URL));
+			helpMenu.add(item);
+		}
+		{
+			// Changelog
+			JMenuItem item = new JMenuItem("Changelog");
+			item.setMnemonic(KeyEvent.VK_C);
+			item.addActionListener((event) -> Browser.openPage(CHANGELOG_URL));
+			helpMenu.add(item);
+		}
+		{
+			// About
+			JMenuItem item = new JMenuItem("About");
+			item.setMnemonic(KeyEvent.VK_A);
+			item.addActionListener((event) -> new AboutDialog(this));
+			helpMenu.add(item);
+		}
+		menuBar.add(helpMenu);
 
 		setJMenuBar(menuBar);
 	}

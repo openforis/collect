@@ -1,12 +1,9 @@
 package org.openforis.collect.controlpanel;
 
 import java.awt.Color;
-import java.awt.Desktop;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.concurrent.Executors;
@@ -21,6 +18,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openforis.collect.controlpanel.server.CollectJettyServer;
+import org.openforis.utils.Browser;
 import org.openforis.utils.Files;
 import org.openforis.web.server.ApplicationServer;
 
@@ -31,10 +29,6 @@ public class CollectControlPanelController {
 	private static final String COLLECT_USER_HOME_LOCATION = Files.getLocation(Files.getUserHomeLocation(), "OpenForis",
 			"Collect");
 	private static final String COLLECT_DATA_FOLDER_NAME = "data";
-//	private static final String LOGS_LOCATION = Files.getLocation(Files.getCurrentLocation(), "logs");
-//	private static final String SERVER_LOG_FILE_LOCATION = Files.getLocation(LOGS_LOCATION, "collect_server.log");
-//	private static final String COLLECT_LOG_FILE_LOCATION = Files.getLocation(LOGS_LOCATION, "collect.log");
-//	private static final String SAIKU_LOG_FILE_LOCATION = Files.getLocation(LOGS_LOCATION, "saiku.log");
 	private static final String SETTINGS_FILENAME = "collect.properties";
 	private static final String SETTINGS_FILE_LOCATION = Files.getLocation(COLLECT_USER_HOME_LOCATION,
 			SETTINGS_FILENAME);
@@ -43,20 +37,8 @@ public class CollectControlPanelController {
 	private static final String DEFAULT_WEBAPPS_FOLDER_NAME = "webapps";
 	private static final String DEFAULT_WEBAPPS_LOCATION = Files.getLocation(Files.getCurrentLocation(),
 			DEFAULT_WEBAPPS_FOLDER_NAME);
-//	private static final int LOG_OPENED_WINDOW_HEIGHT = 580;
-//	private static final int LOG_CLOSED_WINDOW_HEIGHT = 260;
-//	private static final int LOG_TEXT_MAX_LENGTH = 20000;
 	private static final String CATALINA_BASE = "catalina.base";
-	private static final URI ONLINE_MANUAL_URI;
-	private static final URI CHANGELOG_URI;
-	static {
-		try {
-			ONLINE_MANUAL_URI = new URI("http://www.openforis.org/tools/collect.html");
-			CHANGELOG_URI = new URI("https://github.com/openforis/collect/blob/master/CHANGELOG.md");
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+
 	private static final String ERROR_MSG_FORMAT = "An error has occurred: %s\nOpen Log for more details";
 	private static final String ERROR_SHUTTING_DOWN_MSG_FORMAT = "Error shutting down Collect: %s";
 
@@ -64,7 +46,6 @@ public class CollectControlPanelController {
 		INITIALIZING, STARTING, RUNNING, STOPPING, ERROR, IDLE;
 	}
 
-	// ui elements
 	private ControlPanel controlPanel;
 	private ApplicationServer server;
 	private ScheduledExecutorService executorService;
@@ -72,11 +53,11 @@ public class CollectControlPanelController {
 	private String webappsLocation;
 	private Status status = Status.INITIALIZING;
 	private String errorMessage;
-//	private boolean logOpened = false;
-//	private ConsoleLogFileReader serverLogFileReader;
-//	private ConsoleLogFileReader collectLogFileReader;
-//	private ConsoleLogFileReader saikuLogFileReader;
 
+	public CollectControlPanelController(ControlPanel controlPanel) {
+		this.controlPanel = controlPanel;
+	}
+	
 	public void init() {
 		LOG.info("initializing control panel");
 		try {
@@ -97,9 +78,10 @@ public class CollectControlPanelController {
 
 			deleteBrokenTemporaryFiles();
 
-			// if running on a Jetty server, set catalina.base system property to current
-			// location
-			// to prevent Saiku from storing log files in a wrong location
+			/*
+			 * if running on a Jetty server, set catalina.base system property to current
+			 * location to prevent Saiku from storing log files in a wrong location
+			 */
 			if (System.getProperty(CATALINA_BASE) == null) {
 				System.setProperty(CATALINA_BASE, Files.getCurrentLocation());
 			}
@@ -108,9 +90,7 @@ public class CollectControlPanelController {
 					collectProperties.getCollectDataSourceConfiguration());
 			server.initialize();
 
-//			initLogFileReaders();
-
-			controlPanel.getUrlHyperlink().setUri(new URI(server.getUrl()));
+			controlPanel.getUrlHyperlink().setUrl(server.getUrl());
 		} catch (Exception e) {
 			LOG.error("error initializing Collect: " + e.getMessage(), e);
 			throw new RuntimeException(e);
@@ -122,26 +102,6 @@ public class CollectControlPanelController {
 		createFolder(collectHomeFolder);
 		createFolder(new File(collectHomeFolder, COLLECT_DATA_FOLDER_NAME));
 	}
-
-	/**
-	 * Use a rolling file output to log information
-	 * 
-	 * @throws IOException
-	 */
-//	private void initLogFileReaders() throws IOException {
-//		this.serverLogFileReader = new ConsoleLogFileReader(new File(SERVER_LOG_FILE_LOCATION), serverConsole);
-//		this.collectLogFileReader = new ConsoleLogFileReader(new File(COLLECT_LOG_FILE_LOCATION), collectConsole);
-//		this.saikuLogFileReader = new ConsoleLogFileReader(new File(SAIKU_LOG_FILE_LOCATION), saikuConsole);
-//
-//		// write logging info to console
-//		executorService.scheduleWithFixedDelay(() -> {
-//			Platform.runLater(() -> {
-//				serverLogFileReader.readFile();
-//				collectLogFileReader.readFile();
-//				saikuLogFileReader.readFile();
-//			});
-//		}, 3, 3, TimeUnit.SECONDS);
-//	}
 
 	public void startServer() {
 		startServer((Runnable) null);
@@ -206,40 +166,8 @@ public class CollectControlPanelController {
 	}
 
 	public void openCollectInBrowser() {
-		String url = server.getUrl();
-		try {
-			openWebpage(new URI(url));
-		} catch (Exception e) {
-			// ignore it
-		}
+		Browser.openPage(server.getUrl());
 	}
-
-//	@FXML
-//	public void toggleLog(MouseEvent event) {
-//		setLogVisible(!logOpened);
-//	}
-
-	public void handleShowOnlineManual() {
-		openWebpage(ONLINE_MANUAL_URI);
-	}
-
-	public void handleShowChangelog() {
-		openWebpage(CHANGELOG_URI);
-	}
-
-//	public void handleAboutAction(ActionEvent event) throws IOException {
-//		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("about_dialog.fxml"));
-//		Parent parent = fxmlLoader.load();
-//		AboutController aboutController = fxmlLoader.getController();
-//		aboutController.setHostServices(app.getHostServices());
-//
-//		Scene scene = new Scene(parent, 300, 200);
-//		Stage dialogStage = new Stage();
-//		dialogStage.setTitle("About");
-//		dialogStage.initModality(Modality.APPLICATION_MODAL);
-//		dialogStage.setScene(scene);
-//		dialogStage.showAndWait();
-//	}
 
 	public void handleExitAction() {
 		switch (status) {
@@ -259,21 +187,7 @@ public class CollectControlPanelController {
 		}
 	}
 
-//	public void closeLog() {
-//		setLogVisible(false);
-//	}
-
-//	private void setLogVisible(boolean visible) {
-//		logOpened = visible;
-//		logBtn.setText(visible ? "Hide Log" : "Show Log");
-//		updateUI();
-//	}
-
 	private void updateUI() {
-//		int windowHeight = this.logOpened ? LOG_OPENED_WINDOW_HEIGHT : LOG_CLOSED_WINDOW_HEIGHT;
-//		Window window = applicationPane.getScene().getWindow();
-//		window.setHeight(windowHeight);
-
 		boolean runningAtUrlVisible = false;
 		boolean errorMessageVisible = false;
 		boolean shutdownBtnVisible = false;
@@ -318,7 +232,6 @@ public class CollectControlPanelController {
 		controlPanel.getStatusTxt().setText(statusMessage);
 		controlPanel.getStatusTxt().setForeground(statusMessageColor);
 		controlPanel.getProgressBar().setVisible(progressBarVisible);
-//		serverConsole.setVisible(logOpened);
 	}
 
 	private void handleException(Exception e) {
@@ -384,45 +297,10 @@ public class CollectControlPanelController {
 		this.controlPanel = controlPanel;
 	}
 
-	static void closeQuietly(Closeable closeable) {
-		if (closeable != null) {
-			try {
-				closeable.close();
-			} catch (IOException e) {
-			}
-		}
-	}
-
 	private static void createFolder(File folder) {
 		if (!folder.mkdirs()) {
 			throw new RuntimeException(String.format("Cannot create folder: %s", folder.getAbsolutePath()));
 		}
 	}
 
-//	private static class ConsoleLogFileReader {
-//		private File file;
-//		private TextArea textArea;
-//
-//		public ConsoleLogFileReader(File file, TextArea textArea) {
-//			this.file = file;
-//			this.textArea = textArea;
-//		}
-//
-//		public void readFile() {
-//			String content = Files.tail(file, LOG_TEXT_MAX_LENGTH);
-//			String oldContent = textArea.getText();
-//			if (!content.equals(oldContent)) {
-//				textArea.setText(content);
-//				textArea.setScrollTop(Double.MAX_VALUE);
-//			}
-//		}
-//	}
-
-	public static void openWebpage(URI uri) {
-		try {
-			Desktop.getDesktop().browse(uri);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
 }

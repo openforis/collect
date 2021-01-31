@@ -2,20 +2,18 @@ package org.openforis.collect.controlpanel.component;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Desktop;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.net.URI;
 
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+
+import org.openforis.utils.Browser;
 
 public class JHyperlinkLabel extends JLabel {
 
 	private static final long serialVersionUID = 1L;
 
-	private URI uri;
+	private String url;
 	private String _text;
 	private boolean mouseEntered;
 
@@ -23,9 +21,9 @@ public class JHyperlinkLabel extends JLabel {
 		this(null, null);
 	}
 
-	public JHyperlinkLabel(URI uri, String text) {
+	public JHyperlinkLabel(String url, String text) {
 		super(text);
-		this.uri = uri;
+		this.url = url;
 		this._text = text;
 
 		this.setForeground(Color.BLUE.darker());
@@ -35,39 +33,38 @@ public class JHyperlinkLabel extends JLabel {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				try {
-					Desktop.getDesktop().browse(JHyperlinkLabel.this.getUri());
-				} catch (IOException ex) {
-					JOptionPane.showMessageDialog(null, "Error opening browser: " + ex.getMessage());
-				}
+				Browser.openPage(JHyperlinkLabel.this.getUrl());
 			}
 
 			@Override
 			public void mouseExited(MouseEvent e) {
-				JHyperlinkLabel.this.mouseEntered = false;
-				JHyperlinkLabel.this.updateText();
+				setMouseEntered(false);
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				JHyperlinkLabel.this.mouseEntered = true;
-				JHyperlinkLabel.this.updateText();
+				setMouseEntered(true);
 			}
-
 		});
 	}
 
-	private void updateText() {
-		this.setText(mouseEntered ? "<html><a href=''>" + _text + "</a></html>" : _text);
-	}
-	
-	public URI getUri() {
-		return uri;
+	private void setMouseEntered(boolean mouseEntered) {
+		this.mouseEntered = mouseEntered;
+		updateText();
 	}
 
-	public void setUri(URI uri) {
-		this.uri = uri;
-		this._text = uri == null ? null : uri.toString();
+	private void updateText() {
+//		this.setText(mouseEntered ? "<html><a href=''>" + _text + "</a></html>" : _text);
+		this.setText(_text);
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+		this._text = url == null ? null : url;
 		this.updateText();
 	}
 
