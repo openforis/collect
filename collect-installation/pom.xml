@@ -24,7 +24,7 @@
 		<installer-version-id>${buildNumber}</installer-version-id>
 		<installer.jre.version.major>1.8</installer.jre.version.major>
 		<installer.jre.version>1.8.0</installer.jre.version>
-		<installer.jre.version.full>1.8.0_121</installer.jre.version.full>
+		<installer.jre.version.full>1.8.0_232</installer.jre.version.full>
 	</properties>
 
 	<profiles>
