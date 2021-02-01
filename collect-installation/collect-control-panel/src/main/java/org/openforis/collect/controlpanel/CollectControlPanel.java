@@ -39,7 +39,7 @@ public class CollectControlPanel extends JFrame implements ControlPanel {
 	private static final long serialVersionUID = 1L;
 
 	private static final int WIDTH = 500;
-	private static final int HEIGHT = 300;
+	private static final int HEIGHT = 250;
 
 	private static final String TITLE = "Open Foris Collect - v" + Collect.VERSION.toString();
 	private static final String LOGO_PATH = "of-collect-logo.png";
@@ -91,11 +91,15 @@ public class CollectControlPanel extends JFrame implements ControlPanel {
 		int boxContentWidth = WIDTH - 20;
 		int boxContentItemMaxWidth = boxContentWidth - 30;
 
+		Box north = Box.createHorizontalBox();
+		
 		// icon & status message
 		statusTxt = new JLabel();
 		statusTxt.setIcon(new ImageIcon(LOGO_IMAGE));
 		statusTxt.setFont(STATUS_MSG_FONT);
-		pane.add(statusTxt, BorderLayout.NORTH);
+		north.add(statusTxt);
+
+		pane.add(north, BorderLayout.NORTH);
 
 		// running at box
 		runningAtUrlBox = Box.createHorizontalBox();
