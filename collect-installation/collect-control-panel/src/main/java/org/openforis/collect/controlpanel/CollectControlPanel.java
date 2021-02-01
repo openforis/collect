@@ -2,7 +2,6 @@ package org.openforis.collect.controlpanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -12,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -39,7 +39,7 @@ public class CollectControlPanel extends JFrame implements ControlPanel {
 	private static final long serialVersionUID = 1L;
 
 	private static final int WIDTH = 500;
-	private static final int HEIGHT = 250;
+	private static final int HEIGHT = 200;
 
 	private static final String TITLE = "Open Foris Collect - v" + Collect.VERSION.toString();
 	private static final String LOGO_PATH = "of-collect-logo.png";
@@ -50,6 +50,7 @@ public class CollectControlPanel extends JFrame implements ControlPanel {
 
 	private static final Font ERROR_MSG_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 15);
 	private static final Font STATUS_MSG_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 20);
+	private static final Font SHUTDOWN_BTN_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 15);
 
 	private CollectControlPanelController controller;
 
@@ -86,55 +87,63 @@ public class CollectControlPanel extends JFrame implements ControlPanel {
 
 		createMenuBar();
 
-		Container pane = this.getContentPane();
+		JComponent pane = (JComponent) this.getContentPane();
 
-		int boxContentWidth = WIDTH - 20;
-		int boxContentItemMaxWidth = boxContentWidth - 30;
+		pane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-		Box north = Box.createHorizontalBox();
-		
-		// icon & status message
+		Box center = Box.createHorizontalBox();
+
+		// icon
+		JLabel iconLabel = new JLabel();
+		iconLabel.setIcon(new ImageIcon(LOGO_IMAGE));
+		center.add(iconLabel);
+
+		Box centerInnerBox = Box.createVerticalBox();
+		centerInnerBox.setAlignmentX(CENTER_ALIGNMENT);
+
+		// status message
 		statusTxt = new JLabel();
-		statusTxt.setIcon(new ImageIcon(LOGO_IMAGE));
 		statusTxt.setFont(STATUS_MSG_FONT);
-		north.add(statusTxt);
+		centerInnerBox.add(statusTxt);
 
-		pane.add(north, BorderLayout.NORTH);
+		// progress bar
+		progressBar = new JProgressBar();
+		progressBar.setIndeterminate(true);
+		centerInnerBox.add(progressBar);
 
 		// running at box
 		runningAtUrlBox = Box.createHorizontalBox();
-		JLabel runningAtLabel = new JLabel("Running at: ");
-		runningAtUrlBox.add(runningAtLabel);
+		runningAtUrlBox.add(new JLabel("Running at: "));
 		urlHyperlink = new JHyperlinkLabel();
 		runningAtUrlBox.add(urlHyperlink);
 		addMargin(runningAtUrlBox);
-		pane.add(runningAtUrlBox, BorderLayout.CENTER);
-
-		Box south = Box.createVerticalBox();
-		
-		// shutdown button
-		shutdownBtn = new JButton("Shutdown");
-		shutdownBtn.setAlignmentX(CENTER_ALIGNMENT);
-		shutdownBtn.addActionListener(e -> controller.handleExitAction());
-		addMargin(shutdownBtn);
-		south.add(shutdownBtn);
+		centerInnerBox.add(runningAtUrlBox);
 
 		// error message
 		errorMessageTxt = new JMultilineLabel();
 		errorMessageTxt.setFont(ERROR_MSG_FONT);
 		errorMessageTxt.setForeground(Color.RED);
-		errorMessageTxt.setPreferredSize(new Dimension(boxContentItemMaxWidth, 100));
+		errorMessageTxt.setMaximumSize(new Dimension(400, 100));
 		addMargin(errorMessageTxt);
-		south.add(errorMessageTxt);
+		centerInnerBox.add(errorMessageTxt);
 
-		// progress bar
-		progressBar = new JProgressBar();
-		progressBar.setIndeterminate(true);
-		progressBar.setPreferredSize(new Dimension(boxContentItemMaxWidth, 20));
-		south.add(progressBar);
+		center.add(centerInnerBox);
+
+		pane.add(center, BorderLayout.CENTER);
+
+		Box south = Box.createVerticalBox();
+
+		// shutdown button
+		shutdownBtn = new JButton("Shutdown");
+		shutdownBtn.setFont(SHUTDOWN_BTN_FONT);
+		shutdownBtn.setAlignmentX(CENTER_ALIGNMENT);
+		shutdownBtn.addActionListener(e -> controller.handleExitAction());
+		addMargin(shutdownBtn);
+		south.add(shutdownBtn);
 
 		pane.add(south, BorderLayout.SOUTH);
 
+		// init and start controller
 		controller = new CollectControlPanelController(this);
 		controller.init();
 		controller.startServer(() -> {

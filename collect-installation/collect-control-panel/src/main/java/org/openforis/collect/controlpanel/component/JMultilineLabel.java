@@ -18,6 +18,6 @@ public class JMultilineLabel extends JTextArea {
 		setWrapStyleWord(true);
 		setLineWrap(true);
 		setBorder(new EmptyBorder(5, 5, 5, 5));
-		setAlignmentY(JLabel.CENTER_ALIGNMENT);
+//		setAlignmentY(JLabel.CENTER_ALIGNMENT);
 	}
 }
