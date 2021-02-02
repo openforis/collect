@@ -112,10 +112,6 @@ check_for_updates = 1
 		</component>
 	</componentList>
 	<preInstallationActionList>
-		<createTimeStamp>
-			<variable>timestamp</variable>
-			<format>%Y%m%d%H%M%S</format>
-		</createTimeStamp>
 		<setInstallerVariable name="installdir"
 			value=".." />
 		<setInstallerVariable name="server_http_port"
@@ -124,7 +120,7 @@ check_for_updates = 1
 			name="collect_root_user_dir"
 			value="${user_home_directory}/OpenForis/Collect" />
 		<setInstallerVariable name="backup_dir"
-			value="${collect_root_user_dir}/backup/${timestamp}" />
+			value="${collect_root_user_dir}/backup" />
 		<setInstallerVariable name="data_dir"
 			value="${collect_root_user_dir}/data" />
 		<setInstallerVariable name="webapps_dir"
@@ -149,6 +145,10 @@ check_for_updates = 1
 		</throwError>
 	</preInstallationActionList>
 	<readyToInstallActionList>
+		<!-- delete old backup dir -->
+		<deleteFile>
+			<path>${backup_dir}</path>
+		</deleteFile>
 		<createDirectory>
 			<path>${backup_dir}</path>
 		</createDirectory>
