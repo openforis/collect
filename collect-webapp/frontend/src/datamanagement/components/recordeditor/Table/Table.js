@@ -361,7 +361,7 @@ export default class Table extends EntityCollectionComponent {
     }
     return (
       <fieldset className="form-item-fieldset">
-        <legend>{itemDef.entityDefinition.label}</legend>
+        <legend>{itemDef.entityDefinition.labelOrName}</legend>
         {content}
       </fieldset>
     )

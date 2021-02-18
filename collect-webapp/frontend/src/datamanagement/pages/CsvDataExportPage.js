@@ -205,7 +205,7 @@ class CsvDataExportPage extends Component {
       const value = context.state[name]
       return (
         <FormGroup row key={name}>
-          <Label md={4}>{attr.label}</Label>
+          <Label md={4}>{attr.labelOrName}</Label>
           <Col md={8}>
             <Input
               name={name}
