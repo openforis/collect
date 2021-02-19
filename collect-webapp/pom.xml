@@ -12,8 +12,8 @@
 	<packaging>war</packaging>
 
 	<properties>
-		<node.version>v14.15.1</node.version>
-		<npm.version>6.14.9</npm.version>
+		<node.version>v14.15.5</node.version>
+		<npm.version>7.5.4</npm.version>
 	</properties>
 
 	<build>

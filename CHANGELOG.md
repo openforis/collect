@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Auto-updater: cleanup previous backup folder before updating;
 
 ### Fixed
-- Relevant multiple attribute column not shown in tables;
+- Tables: relevant multiple attribute column not shown;
+- Tables: column grouping layout when inner columns are not visible;
 
 ## [4.0.14] - 2021-01-28
 ### Fixed

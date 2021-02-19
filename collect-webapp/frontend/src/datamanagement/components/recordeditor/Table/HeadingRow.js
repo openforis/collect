@@ -53,7 +53,7 @@ const HeadingRow = ({
       ]
     : []),
   ...headingRow.map((headingComponent) => {
-    const { colSpan, col: colStart, row, rowSpan } = headingComponent
+    const { colSpan, row, rowSpan } = headingComponent
     const { nodeDefinition } = headingComponent
     const { id: nodeDefId } = nodeDefinition
     const col = columnCalculator(headingComponent)
