@@ -94,7 +94,13 @@ export class Entity extends Node {
     return this.childrenByDefinitionId[childDefId] || []
   }
 
-  getDescendantsByNodeDefHierarchy(descendantDefIds) {
+  _getDescendantParentDefIdsByNodeDefinition(nodeDef) {
+    const nodeDefAncestorIds = nodeDef.ancestorIds
+    const nodeDefAncestorIdsUpToThis = nodeDefAncestorIds.slice(0, nodeDefAncestorIds.indexOf(this.definition.id))
+    return [...nodeDefAncestorIdsUpToThis].reverse()
+  }
+
+  _getDescendantsByNodeDefHierarchy(descendantDefIds) {
     let currentEntity = this
     let descendants
     const schema = this.record.survey.schema
@@ -117,10 +123,9 @@ export class Entity extends Node {
   }
 
   getDescendantsByNodeDefinition(nodeDef) {
-    const nodeDefAncestorIds = nodeDef.ancestorIds
-    const nodeDefAncestorIdsUpToThis = nodeDefAncestorIds.slice(0, nodeDefAncestorIds.indexOf(this.definition.id))
-    const descendantDefIds = [...[...nodeDefAncestorIdsUpToThis].reverse(), nodeDef.id]
-    return descendantDefIds.length ? this.getDescendantsByNodeDefHierarchy(descendantDefIds) : []
+    const descendantParentDefIds = this._getDescendantParentDefIdsByNodeDefinition(nodeDef)
+    const descendantDefIds = [...descendantParentDefIds, nodeDef.id]
+    return descendantDefIds.length ? this._getDescendantsByNodeDefHierarchy(descendantDefIds) : []
   }
 
   getSingleChild(defId) {
@@ -173,7 +178,7 @@ export class Entity extends Node {
     })
   }
 
-  hasDescendant(predicate) {
+  _hasDescendant(predicate) {
     return this.definition.children.some((childDef) => {
       const children = this.getChildrenByDefinitionId(childDef.id)
       return children.some((child) => {
@@ -181,11 +186,18 @@ export class Entity extends Node {
           return true
         }
         if (child instanceof Entity) {
-          return child.hasDescendant(predicate)
+          return child._hasDescendant(predicate)
         }
         return false
       })
     })
+  }
+
+  _hasDescendantNodePointers({ nodeDefinition, predicate }) {
+    const descendantParentDefIds = this._getDescendantParentDefIdsByNodeDefinition(nodeDefinition)
+    const parentNodes =
+      descendantParentDefIds.length > 0 ? this._getDescendantsByNodeDefHierarchy(descendantParentDefIds) : [this]
+    return parentNodes.some((parentNode) => predicate(parentNode, nodeDefinition))
   }
 
   hasSomeDescendantNotEmpty({ nodeDefinition }) {
@@ -193,10 +205,17 @@ export class Entity extends Node {
   }
 
   hasSomeDescendantRelevant({ nodeDefinition }) {
-    return this.getDescendantsByNodeDefinition(nodeDefinition).some((node) => node.relevant)
+    return this._hasDescendantNodePointers({
+      nodeDefinition,
+      predicate: (parentNode, nodeDef) => parentNode.isChildRelevant(nodeDef),
+    })
   }
 
   isEmpty() {
-    return this.hasDescendant((descendant) => descendant.isEmpty())
+    return this._hasDescendant((descendant) => descendant.isEmpty())
+  }
+
+  isChildRelevant(childDef) {
+    return this.childrenRelevanceByDefinitionId[childDef.id]
   }
 }

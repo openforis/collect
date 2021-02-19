@@ -328,22 +328,21 @@ public class RecordUpdater {
 	
 	private NodeChangeSet afterAttributeInsertOrUpdate(NodeChangeMap changeMap, Attribute<?, ?> attribute) {
 		attribute.updateSummaryInfo();
-		return afterAttributeInsertOrUpdate(changeMap, new NodePointer(attribute));
-	}
-
-	private NodeChangeSet afterAttributeInsertOrUpdate(NodeChangeMap changeMap, NodePointer nodePointer) {
+		
+		NodePointer selfPointer = new NodePointer(attribute);
+		
 		List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?,?>>();
 		
-		List<NodePointer> ancestorsAndSelfPointers = getAncestorsAndSelfPointers(nodePointer);
+		List<NodePointer> ancestorsAndSelfPointers = getAncestorsAndSelfPointers(selfPointer);
 
 		// calculated attributes
-		List<Attribute<?, ?>> updatedCalculatedAttributes = recalculateDependentCalculatedAttributes(nodePointer);
+		List<Attribute<?, ?>> updatedCalculatedAttributes = recalculateDependentCalculatedAttributes(selfPointer);
 		updatedAttributes.addAll(updatedCalculatedAttributes);
 		changeMap.addValueChanges(updatedCalculatedAttributes);
 		
 		// dependent code attributes
-		if (nodePointer.getChildDefinition() instanceof CodeAttributeDefinition && clearDependentCodeAttributes) {
-			Set<CodeAttribute> updatedCodeAttributes = clearDependentCodeAttributes(nodePointer);
+		if (selfPointer.getChildDefinition() instanceof CodeAttributeDefinition && clearDependentCodeAttributes) {
+			Set<CodeAttribute> updatedCodeAttributes = clearDependentCodeAttributes(selfPointer);
 			updatedAttributes.addAll(updatedCodeAttributes);
 			changeMap.addValueChanges(updatedCodeAttributes);
 		}
@@ -354,7 +353,7 @@ public class RecordUpdater {
 			Set<Attribute<?, ?>> validationDependenciesToSelf = new HashSet<Attribute<?,?>>();
 			Set<NodePointer> relevanceDependenciesToSelf = new HashSet<NodePointer>();
 			
-			performValidationAfterUpdate(nodePointer, ancestorsAndSelfPointers, updatedAttributes,
+			performValidationAfterUpdate(selfPointer, ancestorsAndSelfPointers, updatedAttributes,
 					relevanceDependenciesToSelf, minCountDependenciesToSelf, maxCountDependenciesToSelf,
 					validationDependenciesToSelf, changeMap);
 		}
