@@ -1,6 +1,5 @@
 package org.openforis.collect.controlpanel.component;
 
-import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
@@ -8,8 +7,8 @@ import javax.swing.border.EmptyBorder;
 public class JMultilineLabel extends JTextArea {
 	private static final long serialVersionUID = 1L;
 
-	public JMultilineLabel() {
-		super();
+	public JMultilineLabel(String text) {
+		super(text);
 		setEditable(false);
 		setCursor(null);
 		setOpaque(false);
@@ -19,5 +18,9 @@ public class JMultilineLabel extends JTextArea {
 		setLineWrap(true);
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 //		setAlignmentY(JLabel.CENTER_ALIGNMENT);
+	}
+
+	public JMultilineLabel() {
+		this(null);
 	}
 }
