@@ -6,7 +6,6 @@ package org.openforis.collect.designer.form.validator;
 import static org.openforis.collect.designer.form.AttributeDefinitionFormObject.ATTRIBUTE_DEFAULTS_FIELD;
 import static org.openforis.collect.designer.form.AttributeDefinitionFormObject.CALCULATED_FIELD;
 import static org.openforis.collect.designer.form.AttributeDefinitionFormObject.CHECKS_FIELD;
-import static org.openforis.collect.designer.form.AttributeDefinitionFormObject.KEY_FIELD;
 import static org.openforis.collect.designer.form.AttributeDefinitionFormObject.REFERENCED_ATTRIBUTE_PATH_FIELD;
 import static org.openforis.collect.designer.form.NodeDefinitionFormObject.MULTIPLE_FIELD;
 
@@ -34,14 +33,18 @@ import org.zkoss.util.resource.Labels;
 public class AttributeDefinitionFormValidator extends NodeDefinitionFormValidator {
 
 	protected static final String KEY_ATTRIBUTE_CANNOT_BE_MULTIPLE_MESSAGE_KEY = "survey.validation.attribute.key_attribute_cannot_be_multiple";
+	private static final String KEY_CALCULATED_ATTRIBUTE_CAN_BE_ONLY_ONE_TIME_MESSAGE_KEY = "survey.validation.attribute.key_calculated_attribute_can_be_only_one_time";
 	private static final String REFERENCED_ATTRIBUTE_DELETED_MESSAGE_KEY = "survey.validation.attribute.referenced_attribute_deleted";
 
+	protected static final String CALCULATED_ONLY_ONE_TIME_FIELD = "calculatedOnlyOneTime";
+	
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
 		super.internalValidate(ctx);
 		validateChecks(ctx);
 		validateAttributeDefaults(ctx);
 		validateMultipleAndKey(ctx);
+		validateKeyAndCalculated(ctx);
 		validateReferencedAttribute(ctx);
 	}
 
@@ -51,6 +54,16 @@ public class AttributeDefinitionFormValidator extends NodeDefinitionFormValidato
 		if (key != null && key && multiple) {
 			addInvalidMessage(ctx, KEY_FIELD, Labels.getLabel(KEY_ATTRIBUTE_CANNOT_BE_MULTIPLE_MESSAGE_KEY));
 			addInvalidMessage(ctx, MULTIPLE_FIELD, Labels.getLabel(KEY_ATTRIBUTE_CANNOT_BE_MULTIPLE_MESSAGE_KEY));
+		}
+	}
+	
+	private void validateKeyAndCalculated(ValidationContext ctx) {
+		boolean key = getValueWithDefault(ctx, KEY_FIELD, false);
+		boolean calculated = getValueWithDefault(ctx, CALCULATED_FIELD, false);
+		boolean calculatedOnlyOneTime = getValueWithDefault(ctx, CALCULATED_ONLY_ONE_TIME_FIELD, false);
+
+		if (key && calculated && !calculatedOnlyOneTime) {
+			addInvalidMessage(ctx, CALCULATED_ONLY_ONE_TIME_FIELD, Labels.getLabel(KEY_CALCULATED_ATTRIBUTE_CAN_BE_ONLY_ONE_TIME_MESSAGE_KEY));
 		}
 	}
 

@@ -4,6 +4,7 @@ import static org.openforis.collect.designer.form.AttributeDefinitionFormObject.
 import static org.openforis.collect.designer.form.AttributeDefinitionFormObject.KEY_FIELD;
 import static org.openforis.collect.designer.form.AttributeDefinitionFormObject.MEASUREMENT_FIELD;
 import static org.openforis.collect.designer.form.NodeDefinitionFormObject.MULTIPLE_FIELD;
+import static org.openforis.collect.designer.form.NodeDefinitionFormObject.REQUIRENESS_FIELD;
 import static org.openforis.collect.designer.model.LabelKeys.CHECK_FLAG_ERROR;
 import static org.openforis.collect.designer.model.LabelKeys.CHECK_FLAG_WARNING;
 
@@ -19,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.AttributeDefinitionFormObject;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
+import org.openforis.collect.designer.form.NodeDefinitionFormObject.RequirenessType;
 import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.designer.model.CheckType;
 import org.openforis.collect.designer.util.MessageUtil;
@@ -166,30 +168,33 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	@Command
 	public void keyChanged(@ContextParam(ContextType.BINDER) Binder binder,
 			@BindingParam("key") boolean key ) {
-		if (! key) {
+		if (key) {
+			setTempFormObjectFieldValue(REQUIRENESS_FIELD, RequirenessType.ALWAYS_REQUIRED.name());
+		} else {
 			setTempFormObjectFieldValue(MEASUREMENT_FIELD, false);
 		}
 		dispatchApplyChangesCommand(binder);
 		dispatchKeyChangingCommand(key);
 	}
 
-	private void dispatchKeyChangingCommand(boolean key) {
+	private void dispatchKeyChangingCommand(Boolean key) {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("item", editedItem);
-		args.put("key", key);
+		if (key != null) {
+			args.put("key", key);
+		}
 		BindUtils.postGlobalCommand(null, null, EDITED_NODE_KEY_CHANGING_GLOBAL_COMMAND, args);
 	}
 	
 	@Command
 	public void calculatedChanged(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("changed") boolean changed) {
-		setTempFormObjectFieldValue(KEY_FIELD, false);
+		Boolean key = getTempFormObjectFieldValue(KEY_FIELD);
 		setTempFormObjectFieldValue(MULTIPLE_FIELD, false);
 		setTempFormObjectFieldValue("showInUI", true);
 		setTempFormObjectFieldValue("includeInDataExport", Annotation.INCLUDE_IN_DATA_EXPORT.getDefaultValue());
-		setTempFormObjectFieldValue("calculatedOnlyOneTime", Annotation.CALCULATED_ONLY_ONE_TIME.getDefaultValue());
+		setTempFormObjectFieldValue("calculatedOnlyOneTime", key);
 		setTempFormObjectFieldValue("editable", Annotation.EDITABLE.getDefaultValue());
 		setTempFormObjectFieldValue("phaseToApplyDefaultValue", ((Step) Annotation.PHASE_TO_APPLY_DEFAULT_VALUE.getDefaultValue()).name());
-		dispatchKeyChangingCommand(false);
 		dispatchCalculatedPropertyChangingCommand(changed);
 		dispatchApplyChangesCommand(binder);
 	}

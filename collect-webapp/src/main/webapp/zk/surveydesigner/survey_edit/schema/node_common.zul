@@ -71,7 +71,6 @@
 	    		<hbox spacing="20px">
 		    		<fieldErrorHandler message="@load(vmsgs['key'])">
 		    			<checkbox checked="@load(fx.key eq true) @save(fx.key)"
-		    				disabled="@load(fx.calculated)"
 		    				onCheck="@command('keyChanged', key=self.checked)" />
 		    		</fieldErrorHandler>
 		    		
@@ -255,7 +254,7 @@
 				</fieldErrorHandler>
   			</row>
   			<row
-  				visible="@load(not vm.rootEntity and not (vm.attribute and fx.calculated) and fx.multiple ne true)">
+  				visible="@load(not vm.rootEntity and not (vm.attribute and (fx.key or fx.calculated)) and fx.multiple ne true)">
   				<label value="${labels.survey.schema.node.required}:" />
 				<vlayout>
 	  				<fieldErrorHandler message="@load(vmsgs['requirenessType'])">

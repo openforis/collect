@@ -23,6 +23,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public static final String MULTIPLE_FIELD = "multiple";
 	public static final String REQUIRED_FIELD = "required";
+	public static final String REQUIRENESS_FIELD = "requirenessType";
 
 	public enum RequirenessType {
 		NOT_REQUIRED, ALWAYS_REQUIRED, REQUIRED_WHEN
@@ -250,6 +251,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			if (multiple) {
 				dest.setMinCountExpression(StringUtils.trimToNull(minCountExpression));
 				dest.setMaxCountExpression(StringUtils.trimToNull(maxCountExpression));
+			} else if (dest instanceof AttributeDefinition && key) {
+				dest.setAlwaysRequired();
 			} else {
 				RequirenessType requirenessTypeEnum = RequirenessType.valueOf(requirenessType);
 				switch(requirenessTypeEnum) {
