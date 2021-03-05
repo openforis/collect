@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>4.0.16-SNAPSHOT</version>
+		<version>4.0.18-SNAPSHOT</version>
 	</parent>
 
 	<name>Open Foris Collect Webapp module</name>
@@ -12,8 +12,8 @@
 	<packaging>war</packaging>
 
 	<properties>
-		<node.version>v14.15.5</node.version>
-		<npm.version>7.5.4</npm.version>
+		<node.version>v14.16.0</node.version>
+		<npm.version>7.6.0</npm.version>
 	</properties>
 
 	<build>
