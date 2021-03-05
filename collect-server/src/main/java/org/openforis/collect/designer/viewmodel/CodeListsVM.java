@@ -477,7 +477,6 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put(CodeListItemVM.ITEM_ARG, editedChildItem);
 		args.put(CodeListItemVM.PARENT_ITEM_ARG, editedChildItemParentItem);
-		args.put(CodeListItemVM.ENUMERATING_CODE_LIST_ARG, isSurveyPublished() && isEnumeratingCodeList());
 		codeListItemPopUp = openPopUp(Resources.Component.CODE_LIST_ITEM_EDIT_POP_UP.getLocation(), true, args);
 		Binder binder = ComponentUtil.getBinder(codeListItemPopUp);
 		validateForm(binder);

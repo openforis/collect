@@ -12,7 +12,10 @@ import org.openforis.collect.designer.form.CodeListItemFormObject;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.manager.CodeListManager;
+import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FileWrapper;
+import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
 import org.zkoss.bind.BindContext;
@@ -25,6 +28,7 @@ import org.zkoss.bind.annotation.Init;
 import org.zkoss.image.AImage;
 import org.zkoss.image.Image;
 import org.zkoss.util.media.Media;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 
@@ -37,10 +41,12 @@ public class CodeListItemVM extends SurveyObjectPopUpVM<CodeListItem> {
 
 	public static final String ITEM_ARG = "item";
 	public static final String PARENT_ITEM_ARG = "parentItem";
-	public static final String ENUMERATING_CODE_LIST_ARG = "enumeratingCodeList";
 	private static final int MAX_IMAGE_SIZE_KBYTES = 300;
 	private static final int MAX_IMAGE_SIZE_BYTES = 1024 * MAX_IMAGE_SIZE_KBYTES;
+	private static final String CANNOT_EDIT_CODE_MESSAGE_KEY = "survey.code_list.item.cannot_edit_code";
 
+	@WireVariable
+	private SurveyManager surveyManager;
 	@WireVariable
 	private CodeListManager codeListManager;
 
@@ -186,6 +192,23 @@ public class CodeListItemVM extends SurveyObjectPopUpVM<CodeListItem> {
 	
 	public CodeListManager getCodeListManager() {
 		return codeListManager;
+	}
+	
+	public boolean isCodeReadOnly() {
+		// code is editable if the survey is temporary or the code list is not an enumerating list.
+		// if the survey has been published, the code can be edited only for new items, not published yet
+		if (editedItem.getCodeList().isEnumeratingList() && survey.isPublished() && survey.getPublishedId() != null) {
+			CollectSurvey publishedSurvey = surveyManager.getById(survey.getPublishedId());
+			CodeList publishedCodeList = publishedSurvey.getCodeListById(editedItem.getCodeList().getId());
+			CodeListItem publishedItem = codeListManager.loadItem(publishedCodeList, editedItem.getId());
+			return publishedItem != null;
+		} else {
+			return false;
+		}
+	}
+	
+	public String getCodeTooltipText() {
+		return isCodeReadOnly() ? Labels.getLabel(CANNOT_EDIT_CODE_MESSAGE_KEY): null;
 	}
 	
 }
