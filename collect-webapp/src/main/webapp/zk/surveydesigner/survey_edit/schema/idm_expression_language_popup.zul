@@ -141,6 +141,20 @@
 			</dl>
 			<dl>
 				<dt>
+					<i>idm:distinct-values(attribute_set)</i>
+				</dt>
+				<dd>returns a set of distinct values among the specified attribute set.</dd>
+				<dd>e.g. idm:distinct-values(plot[1]/tree/species)</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>idm:count-distinct(attribute_set)</i>
+				</dt>
+				<dd>returns the count of distinct values in the specified attribute set.</dd>
+				<dd>e.g. idm:count-distinct(plot[1]/tree/species)</dd>
+			</dl>
+			<dl>
+				<dt>
 					<i>idm:contains(multiple_attribute, value)</i>
 				</dt>
 				<dd>returns true if the specified value is among the ones
