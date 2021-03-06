@@ -306,5 +306,50 @@
 			<artifactId>collect-control-panel</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>net.java.openjdk</groupId>
+			<artifactId>jre</artifactId>
+			<version>${installer.jre.version.full}</version>
+			<classifier>linux</classifier>
+			<type>zip</type>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/jre-${installer.jre.version.full}-linux.zip</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>net.java.openjdk</groupId>
+			<artifactId>jre</artifactId>
+			<version>${installer.jre.version.full}</version>
+			<classifier>linux-x64</classifier>
+			<type>zip</type>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/jre-${installer.jre.version.full}-linux-x64.zip</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>net.java.openjdk</groupId>
+			<artifactId>jre</artifactId>
+			<version>${installer.jre.version.full}</version>
+			<classifier>osx</classifier>
+			<type>zip</type>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/jre-${installer.jre.version.full}-osx.zip</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>net.java.openjdk</groupId>
+			<artifactId>jre</artifactId>
+			<version>${installer.jre.version.full}</version>
+			<classifier>windows-x64</classifier>
+			<type>zip</type>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/jre-${installer.jre.version.full}-windows-x64.zip</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>net.java.openjdk</groupId>
+			<artifactId>jre</artifactId>
+			<version>${installer.jre.version.full}</version>
+			<classifier>windows-i386</classifier>
+			<type>zip</type>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/jre-${installer.jre.version.full}-windows-i386.zip</systemPath>
+		</dependency>
 	</dependencies>
 </project>

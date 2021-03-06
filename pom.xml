@@ -422,24 +422,6 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
-		<repository>
-			<id>openforis-public</id>
-			<name>Open Foris Repository</name>
-			<url>http://www.openforis.org/nexus/content/groups/public/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-
-		<!-- GeoTools -->
-		<!-- <repository> -->
-		<!-- <id>osgeo</id> -->
-		<!-- <name>Open Source Geospatial Foundation Repository</name> -->
-		<!-- <url>http://download.osgeo.org/webdav/geotools/</url> -->
-		<!-- </repository> -->
 	</repositories>
 
 	<pluginRepositories>

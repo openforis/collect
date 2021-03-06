@@ -271,7 +271,8 @@
 			<artifactId>commons-jxpath</artifactId>
 			<version>1.4-20120215</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/commons-jxpath-1.4-20120215.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
