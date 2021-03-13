@@ -120,7 +120,23 @@
 							</execution>
 						</executions>
 					</plugin>
-
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<copy file="lib/saiku-webapp-full-2.6_b.war" tofile="${installer-build-path}/webapps/saiku.war" failonerror="true" />
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 					<!-- 3. replace application version into the InstallBuilder XML source 
 						file replace Java version into the InstallBuilder java.xml file -->
 					<plugin>
