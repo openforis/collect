@@ -46,16 +46,6 @@
 											<outputDirectory>${installer-build-path}/webapps</outputDirectory>
 											<destFileName>collect.war</destFileName>
 										</artifactItem>
-										<!-- Saiku WebApp -->
-										<artifactItem>
-											<groupId>meteorite.bi</groupId>
-											<artifactId>saiku-webapp-full</artifactId>
-											<version>2.6_b</version>
-											<type>war</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${installer-build-path}/webapps</outputDirectory>
-											<destFileName>saiku.war</destFileName>
-										</artifactItem>
 										<!-- JDBC Libraries -->
 										<artifactItem>
 											<groupId>com.h2database</groupId>
@@ -120,6 +110,7 @@
 							</execution>
 						</executions>
 					</plugin>
+					<!-- Copy Saiku webapp -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
