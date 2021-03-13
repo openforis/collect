@@ -194,25 +194,19 @@
 								</goals>
 								<configuration>
 									<pluginExecutors>
-										<!-- download and extract JRE -->
+										<!-- extract JRE -->
 										<pluginExecutor>
 											<plugin>
 												<groupId>org.apache.maven.plugins</groupId>
-												<artifactId>maven-dependency-plugin</artifactId>
+												<artifactId>maven-antrun-plugin</artifactId>
 											</plugin>
-											<goal>unpack</goal>
+											<goal>run</goal>
 											<configuration>
-												<artifactItems>
-													<artifactItem>
-														<groupId>net.java.openjdk</groupId>
-														<artifactId>jre</artifactId>
-														<version>${installer.jre.version.full}</version>
-														<classifier>${jre.classifier}</classifier>
-														<type>zip</type>
-														<overWrite>false</overWrite>
-														<outputDirectory>${installer-build-path}/jre_files</outputDirectory>
-													</artifactItem>
-												</artifactItems>
+												<skip>${installer.skip}</skip>
+												<tasks>
+													<echo message="extract JRE for ${jre.classifier}" />
+													<unzip src="lib/${installer.jre.version.full}-${jre.classifier}.zip" dest="${installer-build-path}/jre_files/" />
+												</tasks>
 											</configuration>
 										</pluginExecutor>
 										<!-- copy autoupdater artifacts -->
