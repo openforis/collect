@@ -351,5 +351,13 @@
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/jre-${installer.jre.version.full}-windows-i386.zip</systemPath>
 		</dependency>
+		<dependency>
+			<groupId>meteorite.bi</groupId>
+			<artifactId>saiku-webapp-full</artifactId>
+			<version>2.6_b</version>
+			<type>war</type>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/saiku-webapp-full-2.6_b.war</systemPath>
+		</dependency>
 	</dependencies>
 </project>
