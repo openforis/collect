@@ -96,6 +96,13 @@ public class SpeciesImportJobIntegrationTest extends CollectIntegrationTest {
 		assertTrue(job.isCompleted());
 		assertTrue(job.getSkippedRows().isEmpty());
 		{
+			String code = "OLE";
+			TaxonOccurrence occurrence = findByCode(code);
+			TaxonOccurrence expected = new TaxonOccurrence(3, code, "Oleaceae");
+			expected.setTaxonRank(TaxonRank.FAMILY);
+			assertEquals(expected, occurrence);
+		}
+		{
 			String code = "OLE/CAP/macrocarpa";
 			TaxonOccurrence occurrence = findByCode(code);
 			TaxonOccurrence expected = new TaxonOccurrence(5, code, "Olea capensis subsp. macrocarpa");
@@ -374,7 +381,6 @@ public class SpeciesImportJobIntegrationTest extends CollectIntegrationTest {
 		TaxonSearchParameters taxonSearchParameters = new TaxonSearchParameters();
 		List<TaxonOccurrence> occurrences = speciesManager.findByCode(taxonomy, code, 10, taxonSearchParameters);
 		assertNotNull(occurrences);
-		assertEquals(1, occurrences.size());
 		TaxonOccurrence occurrence = occurrences.get(0);
 		return occurrence;
 	}
