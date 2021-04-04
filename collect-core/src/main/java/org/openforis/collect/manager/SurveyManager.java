@@ -36,6 +36,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openforis.collect.Collect;
+import org.openforis.collect.application.CollectApplicationContext;
 import org.openforis.collect.datacleansing.manager.SurveyDataCleansingManager;
 import org.openforis.collect.event.EventQueue;
 import org.openforis.collect.event.SurveyUpdatedEvent;
@@ -69,7 +70,6 @@ import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.metamodel.xml.internal.marshal.SurveyMarshaller.SurveyMarshalParameters;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -103,7 +103,7 @@ public class SurveyManager {
 	@Autowired
 	private SurveyValidator surveyValidator;
 	@Autowired
-	private ApplicationContext applicationContext;
+	private CollectApplicationContext applicationContext;
 	@Autowired
 	private CollectSurveyIdmlBinder surveySerializer;
 	@Autowired(required=false)

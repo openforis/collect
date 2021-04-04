@@ -299,18 +299,6 @@ public class IDMFunctions extends CustomFunctions {
 			}
 		});
 		
-		//deprecated
-		register("distance", new CustomFunction(2) {
-			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
-				return GeoFunctions.distance(expressionContext, objects[0], objects[1]);
-			}
-			@Override
-			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
-					Expression[] arguments) {
-				return super.performArgumentValidation(contextNodeDef, arguments);
-			}
-		});
-		
 		register("datetime-diff", new CustomFunction(4) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return dateTimeDifference(expressionContext, (Integer) objects[0], (Integer) objects[1], 
@@ -330,8 +318,12 @@ public class IDMFunctions extends CustomFunctions {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return GeoFunctions.distance(expressionContext, objects[0], objects[1]);
 			}
+			@Override
+			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
+					Expression[] arguments) {
+				return super.performArgumentValidation(contextNodeDef, arguments);
+			}
 		});
-		
 		register("latlong", GeoFunctions.LAT_LONG_FUNCTION);
 	}
 
