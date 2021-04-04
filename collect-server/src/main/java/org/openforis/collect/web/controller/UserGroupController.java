@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.validation.Valid;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
@@ -39,6 +37,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
+
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/api/usergroup")
