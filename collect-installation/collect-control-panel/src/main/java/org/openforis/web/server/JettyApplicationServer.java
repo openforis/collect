@@ -14,11 +14,19 @@ import org.apache.commons.dbcp.BasicDataSourceFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.plus.jndi.Resource;
+import org.eclipse.jetty.plus.webapp.EnvConfiguration;
+import org.eclipse.jetty.plus.webapp.PlusConfiguration;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.Configuration.ClassList;
+import org.eclipse.jetty.webapp.FragmentConfiguration;
+import org.eclipse.jetty.webapp.JettyWebXmlConfiguration;
+import org.eclipse.jetty.webapp.MetaInfConfiguration;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.webapp.WebInfConfiguration;
+import org.eclipse.jetty.webapp.WebXmlConfiguration;
 
 import net.lingala.zip4j.ZipFile;
 
@@ -131,15 +139,17 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 	
 	private WebAppContext createWebapp(File warFile) {
 		WebAppContext webapp = new WebAppContext();
-		webapp.setConfigurationClasses(new String[]{
-			"org.eclipse.jetty.webapp.WebInfConfiguration",
-		    "org.eclipse.jetty.webapp.WebXmlConfiguration",
-		    "org.eclipse.jetty.webapp.MetaInfConfiguration",
-		    "org.eclipse.jetty.webapp.FragmentConfiguration",
-		    "org.eclipse.jetty.plus.webapp.EnvConfiguration",
-		    "org.eclipse.jetty.plus.webapp.PlusConfiguration",
-		    "org.eclipse.jetty.webapp.JettyWebXmlConfiguration"
-		});
+		
+		webapp.setConfigurations(new Configuration[] {
+//	            new AnnotationConfiguration(),
+	            new WebInfConfiguration(),
+	            new WebXmlConfiguration(),
+	            new MetaInfConfiguration(),
+	            new FragmentConfiguration(), 
+	            new EnvConfiguration(),
+	            new PlusConfiguration(),
+	            new JettyWebXmlConfiguration(),
+        });
 
 		webapp.setParentLoaderPriority(true);
 
