@@ -23,11 +23,7 @@ import org.openforis.collect.config.CollectConfiguration.ServiceConfiguration;
 import org.openforis.collect.persistence.DbInitializer;
 import org.openforis.collect.persistence.DbUtils;
 
-import io.sentry.DefaultSentryClientFactory;
 import io.sentry.Sentry;
-import io.sentry.context.ContextManager;
-import io.sentry.context.SingletonContextManager;
-import io.sentry.dsn.Dsn;
 
 public class ApplicationInitializerServletContextListener implements ServletContextListener {
 
@@ -46,9 +42,7 @@ public class ApplicationInitializerServletContextListener implements ServletCont
 	}
 
 	private void initSentry() {
-		Sentry.init(SENTRY_DSN, new SentryClientFactory()); //use a custom client factory to support extra tags
-		
-//		Sentry.getContext().addTag( "ReleaseDate", UpdateIniUtils.getVersionInstalled() );
+		Sentry.init(options -> options.setDsn(SENTRY_DSN));
 	}
 
 	private boolean determineIsDevelopmentMode(ServletContextEvent sce) {
@@ -107,13 +101,5 @@ public class ApplicationInitializerServletContextListener implements ServletCont
 	
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
-	}
-
-	private static class SentryClientFactory extends DefaultSentryClientFactory {
-
-		@Override
-		protected ContextManager getContextManager(Dsn dsn) {
-			return new SingletonContextManager();
-		}
 	}
 }

@@ -1,11 +1,11 @@
 package org.openforis.collect.datacleansing.form;
 
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.NotBlank;
 import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.commons.web.SimpleObjectForm;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * 

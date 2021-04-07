@@ -65,6 +65,9 @@
 		<property name="defaultSchema" value="collect" />
 	</bean>
 	
+	<!-- ApplicationContext -->
+	<bean id="collectApplicationContext" class="org.openforis.collect.application.SpringCollectApplicationContext" />
+	
 	<!-- DAOs -->
 	<bean id="applicationInfoDao" class="org.openforis.collect.persistence.ApplicationInfoDao"
 		lazy-init="false" depends-on="liquibase">

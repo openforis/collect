@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.openforis.collect.application.CollectApplicationContext;
 import org.openforis.collect.concurrency.SurveyLockingJob;
 import org.openforis.collect.datacleansing.io.DataCleansingExportTask;
 import org.openforis.collect.io.data.DataBackupError;
@@ -39,7 +40,6 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -101,7 +101,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	@Autowired
 	private BackupStorageManager backupStorageManager;
 	@Autowired
-	private ApplicationContext applicationContext;
+	private CollectApplicationContext applicationContext;
 	
 	//input
 	private boolean full;

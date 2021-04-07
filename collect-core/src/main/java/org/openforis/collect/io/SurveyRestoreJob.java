@@ -10,6 +10,7 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.openforis.collect.application.CollectApplicationContext;
 import org.openforis.collect.datacleansing.io.DataCleansingImportTask;
 import org.openforis.collect.io.internal.SurveyBackupInfoExtractorTask;
 import org.openforis.collect.io.metadata.CodeListImagesImportTask;
@@ -29,7 +30,6 @@ import org.openforis.concurrency.Worker;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -53,7 +53,7 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 	@Autowired
 	private transient CodeListManager codeListManager;
 	@Autowired
-	private transient ApplicationContext applicationContext;
+	private transient CollectApplicationContext applicationContext;
 	
 	//output
 	private SurveyBackupInfo backupInfo;

@@ -229,7 +229,7 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-			<version>1.14</version>
+			<version>1.15</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -253,10 +253,6 @@
 			<artifactId>spring-tx</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-jdbc</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>xmlpull</groupId>
 			<artifactId>xmlpull</artifactId>
 			<version>1.2.0</version>
@@ -266,11 +262,11 @@
 			<artifactId>kxml2</artifactId>
 			<version>2.3.0</version>
 		</dependency>
-<!-- Apache Commons-JXPath 1.4-SNAPSHOT 2020-05-26 -->
+		<!-- Apache Commons-JXPath 1.4-SNAPSHOT 2020-05-26 -->
 		<dependency>
 			<groupId>com.github.apache</groupId>
 			<artifactId>commons-jxpath</artifactId>
-			<version>master-192f4c9272-1</version>
+			<version>192f4c9272</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -327,11 +323,6 @@
 		
 		<!-- TEST DEPENDENCIES -->
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
@@ -339,6 +330,16 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

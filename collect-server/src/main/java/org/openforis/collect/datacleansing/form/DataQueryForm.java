@@ -1,9 +1,9 @@
 package org.openforis.collect.datacleansing.form;
 
-import javax.validation.constraints.NotNull;
-
 import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.datacleansing.DataQuery.ErrorSeverity;
+
+import jakarta.validation.constraints.NotNull;
 
 /**
  * 
