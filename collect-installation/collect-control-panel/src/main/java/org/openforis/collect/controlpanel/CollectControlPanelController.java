@@ -139,7 +139,7 @@ public class CollectControlPanelController {
 			try {
 				server.stop();
 
-				waitUntil(() -> changeStatus(Status.IDLE), (Void) -> server.isRunning(), 1000);
+				waitUntil(() -> {}, (Void) -> server.isRunning(), 1000);
 			} catch (Exception e) {
 				handleException(e);
 			}
@@ -213,6 +213,7 @@ public class CollectControlPanelController {
 			break;
 		case STOPPING:
 			statusMessage = "Shutting down...";
+			progressBarVisible = true;
 			break;
 		case IDLE:
 			break;
