@@ -89,11 +89,14 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 		
 		//Enable parsing of jndi-related parts of web.xml and jetty-env.xml
 	    ClassList classlist = ClassList.setServerDefault(server);
-		classlist.addAfter(
+		classlist.addAfter( 
 				"org.eclipse.jetty.webapp.FragmentConfiguration",
 				"org.eclipse.jetty.plus.webapp.EnvConfiguration", 
 				"org.eclipse.jetty.plus.webapp.PlusConfiguration"
 		);
+		classlist.addBefore(
+	            "org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
+	            "org.eclipse.jetty.annotations.AnnotationConfiguration");
 		
 		File[] webappsFiles = webappsFolder.listFiles();
 		
@@ -141,14 +144,13 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 		WebAppContext webapp = new WebAppContext();
 		
 		webapp.setConfigurations(new Configuration[] {
-//	            new AnnotationConfiguration(),
+	            new EnvConfiguration(),
+	            new FragmentConfiguration(), 
+	            new JettyWebXmlConfiguration(),
+	            new MetaInfConfiguration(),
+	            new PlusConfiguration(),
 	            new WebInfConfiguration(),
 	            new WebXmlConfiguration(),
-	            new MetaInfConfiguration(),
-	            new FragmentConfiguration(), 
-	            new EnvConfiguration(),
-	            new PlusConfiguration(),
-	            new JettyWebXmlConfiguration(),
         });
 
 		webapp.setParentLoaderPriority(true);
