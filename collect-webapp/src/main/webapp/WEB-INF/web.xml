@@ -43,11 +43,6 @@
 
 	<!-- ========== FILTERS ========== -->
 	<filter>
-		<filter-name>corsFilter</filter-name>
-		<filter-class>org.openforis.collect.web.filter.CollectCorsFilter</filter-class>
-		<async-supported>true</async-supported>
-	</filter>
-	<filter>
 		<filter-name>localizationFilter</filter-name>
 		<filter-class>org.springframework.web.filter.RequestContextFilter</filter-class>
 		<async-supported>true</async-supported>
@@ -67,10 +62,6 @@
 		<async-supported>true</async-supported>
 	</filter>
 
-	<filter-mapping>
-		<filter-name>corsFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
 	<filter-mapping>
 		<filter-name>localizationFilter</filter-name>
 		<url-pattern>/*</url-pattern>
