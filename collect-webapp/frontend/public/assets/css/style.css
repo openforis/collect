@@ -7709,7 +7709,7 @@ base-chart.chart {
           list-style: none; }
       .sidebar .nav .nav-item .nav-link, .sidebar .nav .nav-item .navbar .dropdown-toggle, .navbar .sidebar .nav .nav-item .dropdown-toggle {
         display: block;
-        padding: 0.75rem 1rem;
+        padding: 0.75rem 0.5rem;
         color: #fff;
         text-decoration: none;
         background: transparent; }
