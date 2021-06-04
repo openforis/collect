@@ -150,6 +150,8 @@ public class SurveyValidator {
 			"survey.validation.attribute.invalid_referenced_key_attribute";
 	private static final String KEY_ATTRIBUTE_CANNOT_BE_MULTIPLE_MESSAGE_KEY = 
 			"survey.validation.attribute.key_attribute_cannot_be_multiple";
+	private static final String KEY_ATTRIBUTE_CANNOT_BE_OF_TYPE_MESSAGE_KEY =
+			"survey.validation.attribute.key_attribute_cannot_be_of_type";
 	private static final String INVALID_TAXONOMY_MESSAGE_KEY = 
 			"survey.validation.attribute.taxon.invalid_taxonomy";
 	private static final String CHECK_UNIQUENESS_INVALID_UNIQUENESS_EXPRESSION_MESSAGE_KEY = 
@@ -556,13 +558,18 @@ public class SurveyValidator {
 		return new SurveyValidationResult();
 	}
 
-	protected SurveyValidationResult validateKeyAttribute(KeyAttributeDefinition keyDefn) {
-		if ( keyDefn.isKey() && ((NodeDefinition) keyDefn).isMultiple() ) {
-			return new SurveyValidationResult(((NodeDefinition) keyDefn).getPath(), 
-					KEY_ATTRIBUTE_CANNOT_BE_MULTIPLE_MESSAGE_KEY);
-		} else {
-			return new SurveyValidationResult();
+	protected SurveyValidationResult validateKeyAttribute(AttributeDefinition attrDefn) {
+		if (attrDefn.isKey()) {
+			if (!(attrDefn instanceof KeyAttributeDefinition)) {
+				return new SurveyValidationResult(((NodeDefinition) attrDefn).getPath(), 
+						KEY_ATTRIBUTE_CANNOT_BE_OF_TYPE_MESSAGE_KEY, attrDefn.getClass().getSimpleName());
+			}
+			if (attrDefn.isMultiple() ) {
+				return new SurveyValidationResult(((NodeDefinition) attrDefn).getPath(), 
+						KEY_ATTRIBUTE_CANNOT_BE_MULTIPLE_MESSAGE_KEY);
+			}
 		}
+		return new SurveyValidationResult();
 	}
 	
 	public SurveyValidationResult validateReferencedKeyAttribute(AttributeDefinition attrDef) {

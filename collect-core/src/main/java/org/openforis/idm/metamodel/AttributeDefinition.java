@@ -25,7 +25,7 @@ import org.openforis.idm.model.Value;
  * @author S. Ricci
  * 
  */
-public abstract class AttributeDefinition extends NodeDefinition implements Calculable, KeyAttributeDefinition {
+public abstract class AttributeDefinition extends NodeDefinition implements Calculable {
 	
 	private static final long serialVersionUID = 1L;
 

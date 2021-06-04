@@ -10,7 +10,7 @@ import org.openforis.commons.lang.Objects;
 /**
  * @author G. Miceli
  */
-public abstract class NumericAttributeDefinition extends AttributeDefinition {
+public abstract class NumericAttributeDefinition extends AttributeDefinition implements KeyAttributeDefinition {
 
 	private static final long serialVersionUID = 1L;
 

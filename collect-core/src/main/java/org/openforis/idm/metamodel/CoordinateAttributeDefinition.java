@@ -18,7 +18,7 @@ import org.openforis.idm.model.Value;
  * @author G. Miceli
  * @author M. Togna
  */
-public class CoordinateAttributeDefinition extends AttributeDefinition  {
+public class CoordinateAttributeDefinition extends AttributeDefinition implements KeyAttributeDefinition {
 
 	private static final long serialVersionUID = 1L;
 

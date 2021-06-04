@@ -62,7 +62,7 @@
       					onChange="@command('applyChanges')" />
       			</fieldErrorHandler>
       		</row>
-  			<row visible="${vm.attribute}">
+  			<row visible="${vm.keyAllowed}">
   				<fieldErrorHandler message="@load(vmsgs['key'])">
 	    			<label value="${labels.survey.schema.attribute.key.$}:" />
 					<image popup="keyInfoTooltip" style="cursor:pointer"

@@ -21,7 +21,7 @@ import org.openforis.idm.model.species.Taxon.TaxonRank;
  * @author S. Ricci
  * @author W. Eko
  */
-public class TaxonAttributeDefinition extends AttributeDefinition {
+public class TaxonAttributeDefinition extends AttributeDefinition implements KeyAttributeDefinition {
 
 	private static final long serialVersionUID = 1L;
 	

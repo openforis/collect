@@ -22,7 +22,7 @@ import org.openforis.idm.path.Path;
  * @author G. Miceli
  * @author M. Togna
  */
-public class CodeAttributeDefinition extends AttributeDefinition {
+public class CodeAttributeDefinition extends AttributeDefinition implements KeyAttributeDefinition {
 
 	private static final long serialVersionUID = 1L;
 	

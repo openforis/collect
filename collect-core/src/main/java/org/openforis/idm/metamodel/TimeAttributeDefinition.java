@@ -17,7 +17,7 @@ import org.openforis.idm.model.Value;
  * @author G. Miceli
  * @author M. Togna
  */
-public class TimeAttributeDefinition extends AttributeDefinition {
+public class TimeAttributeDefinition extends AttributeDefinition implements KeyAttributeDefinition {
 
 	private static final long serialVersionUID = 1L;
 	
