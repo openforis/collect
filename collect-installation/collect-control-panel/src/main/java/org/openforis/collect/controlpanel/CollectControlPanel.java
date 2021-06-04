@@ -62,7 +62,7 @@ public class CollectControlPanel extends JFrame implements ControlPanel {
 	private JProgressBar progressBar;
 
 	public static void main(String[] args) {
-		FlatLightLaf.install();
+		FlatLightLaf.setup();
 
 		EventQueue.invokeLater(() -> {
 			CollectControlPanel panel = new CollectControlPanel();

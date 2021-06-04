@@ -15,7 +15,7 @@ public class JHyperlinkLabel extends JLabel {
 
 	private String url;
 	private String _text;
-	private boolean mouseEntered;
+//	private boolean mouseEntered;
 
 	public JHyperlinkLabel() {
 		this(null, null);
@@ -49,7 +49,7 @@ public class JHyperlinkLabel extends JLabel {
 	}
 
 	private void setMouseEntered(boolean mouseEntered) {
-		this.mouseEntered = mouseEntered;
+//		this.mouseEntered = mouseEntered;
 		updateText();
 	}
 
