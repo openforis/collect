@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.metamodel.SchemaUpdater;
 import org.openforis.collect.designer.session.SessionStatus;
@@ -48,8 +49,6 @@ import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.databind.BindingListModelList;
-
-import liquibase.util.StringUtils;
 
 /**
  * 

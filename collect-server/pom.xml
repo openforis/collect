@@ -135,6 +135,12 @@
 			<groupId>org.openforis.collect</groupId>
 			<artifactId>collect-core</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.liquibase</groupId>
+					<artifactId>liquibase-core</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
@@ -182,7 +188,11 @@
 			<artifactId>repository-message-broker-xstream</artifactId>
 			<version>${repository-message-broker.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+			<version>4.4.1</version>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

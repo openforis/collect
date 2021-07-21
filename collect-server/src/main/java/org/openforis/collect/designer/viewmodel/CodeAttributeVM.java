@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.CodeAttributeDefinitionFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmParams;
@@ -35,8 +36,6 @@ import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zul.Window;
-
-import liquibase.util.StringUtils;
 
 /**
  * @author S. Ricci
