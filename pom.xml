@@ -219,7 +219,8 @@
 				<configuration>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<!-- During release:perform, enable these profiles -->
- 					<releaseProfiles>installer,publishupdater</releaseProfiles>
+ 					<!-- <releaseProfiles>installer,publishupdater</releaseProfiles> -->
+ 					<releaseProfiles>installer</releaseProfiles>
 				</configuration>
 			</plugin>
 			<!-- <plugin> -->
