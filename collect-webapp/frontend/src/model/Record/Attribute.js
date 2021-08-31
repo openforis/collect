@@ -59,7 +59,10 @@ export class Attribute extends Node {
   }
 
   get humanReadableValue() {
-    return this.fields && this.fields.length ? this.fields[0].value || '' : ''
+    if (!this.fields || this.fields.length === 0) return ''
+
+    const firstFieldValue = this.fields[0].value
+    return Objects.defaultIfNull(firstFieldValue, '')
   }
 
   set value(value) {
