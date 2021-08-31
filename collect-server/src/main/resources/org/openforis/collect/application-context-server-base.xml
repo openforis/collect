@@ -19,6 +19,7 @@
 	
 	<!-- ===================================== -->
 	<!-- Liquibase -->
+	<!-- (overrides liquibase bean definition in core, using Liquibase v4) -->
 	<!-- ===================================== -->
 	<bean id="liquibase" class="org.openforis.collect.persistence.liquibase.DatabaseAwareSpringLiquibase4"
 			lazy-init="false">

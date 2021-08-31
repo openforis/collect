@@ -55,6 +55,16 @@
     
     <!-- End of JOOQ configuration -->
 
+	<!-- ===================================== -->
+	<!-- Liquibase -->
+	<!-- ===================================== -->
+	<bean id="liquibase" class="org.openforis.collect.persistence.liquibase.DatabaseAwareSpringLiquibase"
+			lazy-init="false">
+		<property name="dataSource" ref="transactionAwareDataSource" />
+		<property name="changeLog" value="classpath:org/openforis/collect/db/changelog/db.changelog-DBMS_ID.xml" />
+		<property name="defaultSchema" value="collect" />
+	</bean>
+	
 	<!-- ApplicationContext -->
 	<bean id="collectApplicationContext" class="org.openforis.collect.application.SpringCollectApplicationContext" />
 	
