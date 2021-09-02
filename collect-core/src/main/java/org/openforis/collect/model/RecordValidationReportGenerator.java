@@ -57,7 +57,7 @@ public class RecordValidationReportGenerator {
 	
 	public List<RecordValidationReportItem> generateValidationItems(Locale locale, ValidationResultFlag level, boolean includeConfirmedErrors) {
 		List<RecordValidationReportItem> result = new ArrayList<RecordValidationReportItem>();
-		if ( level == ValidationResultFlag.ERROR ) {
+		if ( level.isError() || level.isWarning() ) {
 			List<RecordValidationReportItem> skippedValuesItems = extractSkippedValuesValidationResultItems(locale);
 			result.addAll(skippedValuesItems);
 		}
@@ -105,7 +105,7 @@ public class RecordValidationReportGenerator {
 			Locale locale, Entity entity, 
 			ValidationResultFlag level, boolean includeConfirmedErrors) {
 		List<RecordValidationReportItem> result = new ArrayList<RecordValidationReportItem>();
-		if ( level == ValidationResultFlag.ERROR ) {
+		if ( level.isError() || level.isWarning() ) {
 			List<RecordValidationReportItem> minCountErrorItems = createCardinalityValidationItems(
 					locale, entity, ValidationResultFlag.ERROR, true);
 			result.addAll(minCountErrorItems);
@@ -115,7 +115,8 @@ public class RecordValidationReportGenerator {
 			}
 			List<RecordValidationReportItem> maxCountErrorItems = createCardinalityValidationItems(locale, entity, ValidationResultFlag.ERROR, false);
 			result.addAll(maxCountErrorItems);
-		} else {
+		}
+		if ( level.isWarning() ) {
 			List<RecordValidationReportItem> minCountWarningItems = createCardinalityValidationItems(
 					locale, entity, ValidationResultFlag.WARNING, true);
 			result.addAll(minCountWarningItems);

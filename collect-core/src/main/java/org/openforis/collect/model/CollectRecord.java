@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.openforis.collect.Collect;
 import org.openforis.collect.event.RecordStep;
-import org.openforis.collect.utils.Numbers;
 import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -466,12 +465,7 @@ public class CollectRecord extends Record {
 	}
 
 	public int getTotalErrors() {
-		switch(step) {
-		case ENTRY:
-			return Numbers.sum(getErrors(), getSkipped());
-		default:
-			return Numbers.sum(getErrors(), getMissingErrors());
-		}
+		return getErrors() + getSkipped() + getMissingErrors();
 	}
 	
 	public int getErrors() {

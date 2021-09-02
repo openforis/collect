@@ -13,7 +13,6 @@ import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordValidationReportGenerator;
 import org.openforis.collect.model.RecordValidationReportItem;
@@ -28,6 +27,7 @@ import org.openforis.idm.path.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Scope(SCOPE_PROTOTYPE)
@@ -52,6 +52,15 @@ public class ValidationReportJob extends Job {
 	private OutputStream outputStream;
 	private File outputFile;
 
+	@Override
+	@Transactional(rollbackFor=RuntimeException.class)
+	public synchronized void run() {
+		super.run();
+		if (! isCompleted()) {
+			throw new RuntimeException("Error validating records");
+		}
+	}
+	
 	@Override
 	protected void initializeInternalVariables() throws Throwable {
 		super.initializeInternalVariables();
@@ -137,16 +146,11 @@ public class ValidationReportJob extends Job {
 		protected void execute() throws Throwable {
 			writeHeader();
 
-			CollectSurvey survey = input.recordFilter.getSurvey();
-
 			recordManager.visitSummaries(input.recordFilter, null, new Visitor<CollectRecordSummary>() {
 				public void visit(CollectRecordSummary summary) {
 					if (isRunning()) {
 						try {
-							Step step = summary.getStep();
-							Integer recordId = summary.getId();
-							CollectRecord record = recordManager.load(survey, recordId, step);
-							writeValidationReport(record);
+							writeValidationReport(summary);
 							incrementProcessedItems();
 						} catch (IOException e) {
 							throw new RuntimeException(e);
@@ -156,8 +160,16 @@ public class ValidationReportJob extends Job {
 			});
 		}
 
-		protected void writeValidationReport(CollectRecord record) throws IOException {
+		protected void writeValidationReport(CollectRecordSummary summary) throws IOException {
+			Step step = summary.getStep();
+			Integer recordId = summary.getId();
+			CollectRecord record = recordManager.load(summary.getSurvey(), recordId, step);
+
+			// update record validation
+			recordManager.validateAndSave(record);
+			
 			RecordValidationReportGenerator reportGenerator = new RecordValidationReportGenerator(record);
+			
 			Locale locale = input.locale == null ? new Locale(record.getSurvey().getDefaultLanguage()) : input.locale;
 			List<RecordValidationReportItem> validationItems = reportGenerator.generateValidationItems(locale,
 					ValidationResultFlag.WARNING, input.includeConfirmedErrors);
