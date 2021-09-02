@@ -213,7 +213,7 @@ public class RecordDao extends JooqDaoSupport {
 		}
 		return recordSummaries;
 	}
-
+	
 	public void visitSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields, 
 			Visitor<CollectRecordSummary> visitor) {
 		visitSummaries(filter, sortFields, visitor, false, null);

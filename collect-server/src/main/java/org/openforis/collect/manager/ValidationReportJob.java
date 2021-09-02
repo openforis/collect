@@ -143,9 +143,14 @@ public class ValidationReportJob extends Job {
 	private class ValidationReportTask extends Task {
 
 		@Override
+		protected long countTotalItems() {
+			return recordManager.countRecords(input.recordFilter);
+		}
+		
+		@Override
 		protected void execute() throws Throwable {
 			writeHeader();
-
+			
 			recordManager.visitSummaries(input.recordFilter, null, new Visitor<CollectRecordSummary>() {
 				public void visit(CollectRecordSummary summary) {
 					if (isRunning()) {
