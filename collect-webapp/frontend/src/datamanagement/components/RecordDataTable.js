@@ -90,7 +90,7 @@ class RecordDataTable extends Component {
       case 'summary_2':
         sortField = 'SUMMARY3'
         break
-      case 'errors':
+      case 'totalErrors':
         sortField = 'ERRORS'
         break
       case 'warnings':
@@ -408,15 +408,8 @@ const mapStateToProps = (state) => {
   const keyAttributes = rootEntityDef.keyAttributeDefinitions
   const attributeDefsShownInSummaryList = rootEntityDef.attributeDefinitionsShownInRecordSummaryList
 
-  const {
-    currentPage,
-    records,
-    totalSize,
-    recordsPerPage,
-    keyValues,
-    summaryValues,
-    availableOwners,
-  } = recordDataTableState
+  const { currentPage, records, totalSize, recordsPerPage, keyValues, summaryValues, availableOwners } =
+    recordDataTableState
 
   return {
     surveyId: survey ? survey.id : null,
