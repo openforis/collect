@@ -12,7 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 public class CollectCorsFilter extends OncePerRequestFilter {
 
-	private static final String ALLOWED_DEV_ORIGINS = "http://localhost:3000";
+	private static final String ALLOWED_DEV_ORIGINS = "http://127.0.0.1:3000/";
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

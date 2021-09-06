@@ -10,8 +10,10 @@
 	<websocket:message-broker
 		preserve-publish-order="true">
 		<websocket:stomp-endpoint path="/ws">
+			<!-- ENABLE THIS IN DEV -->
+			<!-- allowed-origins="http://127.0.0.1:3000/" -->
 			<websocket:sockjs
-				client-library-url="../assets/js/sockjs/1.5.1/sockjs.min.js" />
+				client-library-url="../assets/js/sockjs/1.5.2/sockjs.min.js" />
 		</websocket:stomp-endpoint>
 		<websocket:simple-broker />
 	</websocket:message-broker>

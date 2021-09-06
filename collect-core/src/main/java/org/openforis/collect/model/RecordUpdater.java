@@ -667,7 +667,7 @@ public class RecordUpdater {
 		
 		Collection<NodePointer> maxCountPointersToUpdate = record.determineMaxCountDependentNodes(pointersToCheckMaxCountFor);
 		Collection<NodePointer> updatedMaxCountPointers = updateMaxCount(maxCountPointersToUpdate);
-		changeMap.addMinCountChanges(updatedMaxCountPointers);
+		changeMap.addMaxCountChanges(updatedMaxCountPointers);
 		
 		Set<NodePointer> updatedCardinalityPointers = new HashSet<NodePointer>(updatedMinCountPointers);
 		updatedCardinalityPointers.addAll(updatedMaxCountPointers);
@@ -867,10 +867,10 @@ public class RecordUpdater {
 		NodeChangeMap changeMap = new NodeChangeMap();
 		changeMap.addEntityAddChange(entity);
 
-		List<NodePointer> entityDescendantPointers = getDescendantNodePointers(entity);
+		List<NodePointer> entityDescendantAndSelfPointers = getDescendantAndSelfNodePointers(entity);
 		
-		updateMinCount(entityDescendantPointers);
-		updateMaxCount(entityDescendantPointers);
+		updateMinCount(entityDescendantAndSelfPointers);
+		updateMaxCount(entityDescendantAndSelfPointers);
 
 		addEmptyNodes(entity);
 		
@@ -903,25 +903,24 @@ public class RecordUpdater {
 		
 		if (validateAfterUpdate) {
 			//recalculate descendant pointers after empty nodes have been added
-			entityDescendantPointers = getDescendantNodePointers(entity);
+			entityDescendantAndSelfPointers = getDescendantAndSelfNodePointers(entity);
 			//min/max count
 			//for root entity there is no node pointer so we iterate over its descendants
-			Collection<NodePointer> minCountDependentNodes = record.determineMinCountDependentNodes(entityDescendantPointers);
+			Collection<NodePointer> minCountDependentNodes = record.determineMinCountDependentNodes(entityDescendantAndSelfPointers);
 			Collection<NodePointer> updatedMinCountPointers = updateMinCount(minCountDependentNodes);
 			changeMap.addMinCountChanges(updatedMinCountPointers);
 			
-			Collection<NodePointer> maxCountDependentNodes = record.determineMaxCountDependentNodes(entityDescendantPointers);
+			Collection<NodePointer> maxCountDependentNodes = record.determineMaxCountDependentNodes(entityDescendantAndSelfPointers);
 			Collection<NodePointer> updatedMaxCountPointers = updateMaxCount(maxCountDependentNodes);
 			changeMap.addMaxCountChanges(updatedMaxCountPointers);
 			
-			Set<NodePointer> updatedCardinalityPointers = new HashSet<NodePointer>(updatedMinCountPointers);
+			Set<NodePointer> updatedCardinalityPointers = new HashSet<NodePointer>();
+			updatedCardinalityPointers.addAll(updatedMinCountPointers);
 			updatedCardinalityPointers.addAll(updatedMaxCountPointers);
 	
 			//cardinality
-			Collection<NodePointer> nodePointersToCheckCardinalityFor = new HashSet<NodePointer>(entityDescendantPointers);
-			if ( entity.getParent() != null ) {
-				nodePointersToCheckCardinalityFor.add(new NodePointer(entity));
-			}
+			Collection<NodePointer> nodePointersToCheckCardinalityFor = new HashSet<NodePointer>(entityDescendantAndSelfPointers);
+			nodePointersToCheckCardinalityFor.addAll(updatedCardinalityPointers);
 			validateCardinality(record, nodePointersToCheckCardinalityFor, changeMap);
 			
 			//validate attributes
@@ -1163,6 +1162,14 @@ public class RecordUpdater {
 					pointers.addAll(getDescendantNodePointers((Entity) childEntity));
 				}
 			}
+		}
+		return pointers;
+	}
+	
+	private List<NodePointer> getDescendantAndSelfNodePointers(Entity entity) {
+		List<NodePointer> pointers = new ArrayList<NodePointer>(getDescendantNodePointers(entity));
+		if (!entity.isRoot()) {
+			pointers.add(new NodePointer(entity));
 		}
 		return pointers;
 	}

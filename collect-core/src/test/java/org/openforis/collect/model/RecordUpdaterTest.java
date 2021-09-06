@@ -749,4 +749,120 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		assertEquals(ValidationResultFlag.OK, rootEntity.getMaxCountValidationResult(timeStudyDef));
 	}
 	
+	@Test
+	public void testMinCountUpdatedOnEntityAdd() {
+		record(
+			rootEntityDef(
+				entityDef("entity_1",
+						attributeDef("attribute_1").key()
+				).multiple(),
+				entityDef("entity_2",
+						attributeDef("attribute_2").key()
+				).minCount("count(entity_1)")
+			),
+			entity("entity_1", 
+				attribute("attribute_1")
+			)
+		);
+		NodeDefinition entity2Def = survey.getSchema().getDefinitionByPath("/root/entity_2");
+
+		// initial entity_2 min count = 1
+		Entity rootEntity = record.getRootEntity();
+		assertEquals(rootEntity.getMinCount(entity2Def), Integer.valueOf(1));
+
+		// insert a new entity_1
+		NodeChangeSet changeSet = updater.addEntity(rootEntity, "entity_1");
+		EntityChange rootEntityChange = (EntityChange) changeSet.getChange(rootEntity);
+		assertNotNull(rootEntityChange);
+		boolean minCountChanged = rootEntityChange.getMinCountByChildDefinitionId().containsKey(entity2Def.getId());
+		assertTrue(minCountChanged);
+		
+		// expected entity_2 min count = 2
+		assertEquals(rootEntity.getMinCount(entity2Def), Integer.valueOf(2));
+	}
+	
+	@Test
+	public void testMinCountUpdatedOnEntityDelete() {
+		record(
+			rootEntityDef(
+				entityDef("entity_1",
+						attributeDef("attribute_1").key()
+				).multiple(),
+				entityDef("entity_2",
+						attributeDef("attribute_2").key()
+				).multiple()
+				.minCount("count(entity_1)")
+			),
+			entity("entity_1", 
+				attribute("attribute_1", "1")
+			),
+			entity("entity_1", 
+				attribute("attribute_1", "2")
+			)
+		);
+		NodeDefinition entity2Def = survey.getSchema().getDefinitionByPath("/root/entity_2");
+
+		// initial entity_2 min count = 2
+		Entity rootEntity = record.getRootEntity();
+		assertEquals(rootEntity.getMinCount(entity2Def), Integer.valueOf(2));
+		// initial entity_2 min count validation = ERROR
+		assertEquals(rootEntity.getMinCountValidationResult(entity2Def), ValidationResultFlag.ERROR);
+		
+		// delete last entity_2
+		{
+			Entity lastEntity1 = rootEntity.getChild("entity_1", 1);
+			NodeChangeSet changeSet = updater.deleteNode(lastEntity1);
+			EntityChange rootEntityChange = (EntityChange) changeSet.getChange(rootEntity);
+			assertNotNull(rootEntityChange);
+			boolean minCountChanged = rootEntityChange.getMinCountByChildDefinitionId().containsKey(entity2Def.getId());
+			assertTrue(minCountChanged);
+			
+			// expected entity_2 min count = 1
+			assertEquals(rootEntity.getMinCount(entity2Def), Integer.valueOf(1));
+			assertEquals(rootEntity.getMinCountValidationResult(entity2Def), ValidationResultFlag.ERROR);
+		}
+		{
+			Entity lastEntity1b = rootEntity.getChild("entity_1", 0);
+			NodeChangeSet changeSet = updater.deleteNode(lastEntity1b);
+			EntityChange rootEntityChange = (EntityChange) changeSet.getChange(rootEntity);
+			assertNotNull(rootEntityChange);
+			boolean minCountValidationChanged = rootEntityChange.getChildrenMinCountValidation().containsKey(entity2Def.getId());
+			assertTrue(minCountValidationChanged);
+			assertEquals(rootEntity.getMinCount(entity2Def), Integer.valueOf(0));
+			assertEquals(rootEntity.getMinCountValidationResult(entity2Def), ValidationResultFlag.OK);
+		}
+	}
+	
+	@Test
+	public void testMaxCountUpdatedOnEntityAdd() {
+		record(
+			rootEntityDef(
+				entityDef("entity_1",
+						attributeDef("attribute_1").key()
+				).multiple(),
+				entityDef("entity_2",
+						attributeDef("attribute_2").key()
+				).maxCount("count(entity_1)")
+			),
+			entity("entity_1", 
+				attribute("attribute_1")
+			)
+		);
+		NodeDefinition entity2Def = survey.getSchema().getDefinitionByPath("/root/entity_2");
+
+		// initial entity_2 max count = 1
+		Entity rootEntity = record.getRootEntity();
+		assertEquals(rootEntity.getMaxCount(entity2Def), Integer.valueOf(1));
+
+		// insert a new entity_1
+		NodeChangeSet changeSet = updater.addEntity(rootEntity, "entity_1");
+		EntityChange rootEntityChange = (EntityChange) changeSet.getChange(rootEntity);
+		assertNotNull(rootEntityChange);
+		boolean maxCountChanged = rootEntityChange.getMaxCountByChildDefinitionId().containsKey(entity2Def.getId());
+		assertTrue(maxCountChanged);
+		
+		// expected entity_2 max count = 2
+		assertEquals(rootEntity.getMaxCount(entity2Def), Integer.valueOf(2));
+	}
+	
 }

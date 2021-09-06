@@ -1,5 +1,5 @@
 import ServiceFactory from 'services/ServiceFactory'
-import { EntityCreationCompletedEvent, EntityDeletedEvent } from 'model/event/RecordEvent'
+import { EntityCreationCompletedEvent, EntityDeletedEvent, NodeCountUpdatedEvent } from 'model/event/RecordEvent'
 import AbstractFormComponent from './AbstractFormComponent'
 
 export default class EntityCollectionComponent extends AbstractFormComponent {
@@ -47,7 +47,8 @@ export default class EntityCollectionComponent extends AbstractFormComponent {
 
     const { parentEntity, itemDef } = this.props
     if (
-      (event instanceof EntityCreationCompletedEvent || event instanceof EntityDeletedEvent) &&
+      (event instanceof EntityCreationCompletedEvent || event instanceof EntityDeletedEvent ||
+        event instanceof NodeCountUpdatedEvent) &&
       event.isRelativeToNodes({ parentEntity, nodeDefId: itemDef.entityDefinitionId })
     ) {
       this.updateState()
