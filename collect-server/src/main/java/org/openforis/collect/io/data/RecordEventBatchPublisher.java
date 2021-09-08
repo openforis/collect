@@ -2,7 +2,6 @@ package org.openforis.collect.io.data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import org.openforis.collect.event.EventListener;
 import org.openforis.collect.event.EventProducer;

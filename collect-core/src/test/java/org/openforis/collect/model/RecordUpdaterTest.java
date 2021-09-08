@@ -768,7 +768,7 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 
 		// initial entity_2 min count = 1
 		Entity rootEntity = record.getRootEntity();
-		assertEquals(rootEntity.getMinCount(entity2Def), Integer.valueOf(1));
+		assertEquals(Integer.valueOf(1), rootEntity.getMinCount(entity2Def));
 
 		// insert a new entity_1
 		NodeChangeSet changeSet = updater.addEntity(rootEntity, "entity_1");
@@ -778,7 +778,7 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		assertTrue(minCountChanged);
 		
 		// expected entity_2 min count = 2
-		assertEquals(rootEntity.getMinCount(entity2Def), Integer.valueOf(2));
+		assertEquals(Integer.valueOf(2), rootEntity.getMinCount(entity2Def));
 	}
 	
 	@Test
@@ -804,9 +804,9 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 
 		// initial entity_2 min count = 2
 		Entity rootEntity = record.getRootEntity();
-		assertEquals(rootEntity.getMinCount(entity2Def), Integer.valueOf(2));
+		assertEquals(Integer.valueOf(2), rootEntity.getMinCount(entity2Def));
 		// initial entity_2 min count validation = ERROR
-		assertEquals(rootEntity.getMinCountValidationResult(entity2Def), ValidationResultFlag.ERROR);
+		assertEquals(ValidationResultFlag.ERROR, rootEntity.getMinCountValidationResult(entity2Def));
 		
 		// delete last entity_2
 		{
@@ -818,8 +818,8 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 			assertTrue(minCountChanged);
 			
 			// expected entity_2 min count = 1
-			assertEquals(rootEntity.getMinCount(entity2Def), Integer.valueOf(1));
-			assertEquals(rootEntity.getMinCountValidationResult(entity2Def), ValidationResultFlag.ERROR);
+			assertEquals(Integer.valueOf(1), rootEntity.getMinCount(entity2Def));
+			assertEquals(ValidationResultFlag.ERROR, rootEntity.getMinCountValidationResult(entity2Def));
 		}
 		{
 			Entity lastEntity1b = rootEntity.getChild("entity_1", 0);
@@ -828,8 +828,8 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 			assertNotNull(rootEntityChange);
 			boolean minCountValidationChanged = rootEntityChange.getChildrenMinCountValidation().containsKey(entity2Def.getId());
 			assertTrue(minCountValidationChanged);
-			assertEquals(rootEntity.getMinCount(entity2Def), Integer.valueOf(0));
-			assertEquals(rootEntity.getMinCountValidationResult(entity2Def), ValidationResultFlag.OK);
+			assertEquals(Integer.valueOf(0), rootEntity.getMinCount(entity2Def));
+			assertEquals(ValidationResultFlag.OK, rootEntity.getMinCountValidationResult(entity2Def));
 		}
 	}
 	
@@ -852,7 +852,7 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 
 		// initial entity_2 max count = 1
 		Entity rootEntity = record.getRootEntity();
-		assertEquals(rootEntity.getMaxCount(entity2Def), Integer.valueOf(1));
+		assertEquals(Integer.valueOf(1), rootEntity.getMaxCount(entity2Def));
 
 		// insert a new entity_1
 		NodeChangeSet changeSet = updater.addEntity(rootEntity, "entity_1");
@@ -862,7 +862,7 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		assertTrue(maxCountChanged);
 		
 		// expected entity_2 max count = 2
-		assertEquals(rootEntity.getMaxCount(entity2Def), Integer.valueOf(2));
+		assertEquals(Integer.valueOf(2), rootEntity.getMaxCount(entity2Def));
 	}
 	
 }
