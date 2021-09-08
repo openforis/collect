@@ -22,10 +22,20 @@ const CodeFieldText = (props) => {
     values,
   } = props
 
-  const valuesString = values
-    .map((value) => {
-      const { code, qualifier } = value
-      return `${code}${qualifier ? `: ${qualifier}` : ''}`
+  const { showCode } = attributeDefinition
+
+  const valueLabelFunction = ({ item, value }) => {
+    const { code } = item
+    const { qualifier } = value
+    const label = itemLabelFunction(item)
+
+    return `${showCode && code !== label ? `${code} - ` : ''}${label}${qualifier ? `: ${qualifier}` : ''}`
+  }
+
+  const valuesString = selectedItems
+    .map((item, index) => {
+      const value = values[index]
+      return valueLabelFunction({ item, value })
     })
     .join('; ')
 
