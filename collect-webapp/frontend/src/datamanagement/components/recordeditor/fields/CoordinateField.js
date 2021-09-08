@@ -72,7 +72,7 @@ class CoordinateField extends AbstractField {
         const style = { width: COORDINATE_FIELD_WIDTH_PX }
 
         return srss.length === 1 ? (
-          <MuiTextField key="srs" variant="outlined" value={srss[0].label} readOnly style={style} />
+          <MuiTextField key="srs" variant="outlined" value={srss[0].label} disabled style={style} />
         ) : (
           <Select
             key="srs"
