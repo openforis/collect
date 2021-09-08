@@ -9,7 +9,7 @@
 
 	<websocket:message-broker
 		preserve-publish-order="true">
-		<websocket:stomp-endpoint path="/ws">
+		<websocket:stomp-endpoint path="/ws" allowed-origins="http://127.0.0.1:3000/" >
 			<!-- ENABLE THIS IN DEV -->
 			<!-- allowed-origins="http://127.0.0.1:3000/" -->
 			<websocket:sockjs
