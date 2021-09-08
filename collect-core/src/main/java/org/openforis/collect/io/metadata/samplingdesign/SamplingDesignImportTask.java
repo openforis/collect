@@ -129,7 +129,7 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 		} catch (Exception e) {
 			addParsingError(currentRowNumber, new ParsingError(ErrorType.IOERROR, e.getMessage()));
 			changeStatus(Status.FAILED);
-			log().error("Error importing species CSV file", e);
+			logError("Error importing species CSV file", e);
 		} finally {
 			IOUtils.closeQuietly(reader);
 		}

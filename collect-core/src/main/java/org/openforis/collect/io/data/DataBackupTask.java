@@ -147,7 +147,7 @@ public class DataBackupTask extends Task {
 			DataBackupError error = new DataBackupError(summary.getId(), summary.getRootEntityKeyValues(), 
 					summary.getStep(), e.getMessage());
 			errors.add(error);
-			log().error(error.toString(), e);
+			logError(error.toString(), e);
 		}
 	}
 

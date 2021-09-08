@@ -22,14 +22,10 @@ const CodeFieldText = (props) => {
     values,
   } = props
 
-  const { showCode } = attributeDefinition
-
   const valueLabelFunction = ({ item, value }) => {
-    const { code } = item
     const { qualifier } = value
-    const label = itemLabelFunction(item)
 
-    return `${showCode && code !== label ? `${code} - ` : ''}${label}${qualifier ? `: ${qualifier}` : ''}`
+    return `${itemLabelFunction(item)}${qualifier ? `: ${qualifier}` : ''}`
   }
 
   const valuesString = selectedItems

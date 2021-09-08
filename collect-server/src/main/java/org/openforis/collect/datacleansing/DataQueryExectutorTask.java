@@ -88,7 +88,7 @@ public class DataQueryExectutorTask extends Task {
 		try {
 			input.nodeProcessor.process(node);
 		} catch(Exception e) {
-			log().error(String.format("Error executing query %s", input.query.getId()), e);
+			logError(String.format("Error executing query %s", input.query.getId()), e);
 			CollectRecord record = (CollectRecord) node.getRecord();
 			errors.add(new DataQueryExecutorError(record.getRootEntityKeyValues(), record.getId(), node.getPath(), e.getMessage()));
 		}

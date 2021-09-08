@@ -48,7 +48,7 @@ public class CodeListImagesImportTask extends Task {
 						byte[] content = IOUtils.toByteArray(zipFile.getInputStream(entry));
 						codeListManager.saveImageContent((PersistedCodeListItem) item, new FileWrapper(content, codeListImageEntry.getFileName()));
 					} else {
-						log().warn("Error restoring code list image file : " + entry.getName());
+						logWarning("Error restoring code list image file : " + entry.getName());
 					}
 				}
 			}

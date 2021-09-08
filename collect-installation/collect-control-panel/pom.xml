@@ -11,8 +11,8 @@
 	<packaging>jar</packaging>
 	
 	<properties>
-		<jetty.version>9.4.39.v20210325</jetty.version>
-		<jetty-websocket.version>9.4.39.v20210325</jetty-websocket.version>
+		<jetty.version>9.4.43.v20210629</jetty.version>
+		<jetty-websocket.version>9.4.43.v20210629</jetty-websocket.version>
 	</properties>
 
 	<build>
@@ -89,7 +89,7 @@
 		<dependency>
 			<groupId>com.formdev</groupId>
 			<artifactId>flatlaf</artifactId>
-			<version>1.2</version>
+			<version>1.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.xerial</groupId>

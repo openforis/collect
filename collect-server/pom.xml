@@ -182,6 +182,23 @@
 			<artifactId>repository-message-broker-xstream</artifactId>
 			<version>${repository-message-broker.version}</version>
 		</dependency>
+		
+		<!-- TODO update xstream version in repository-message-broker-xstream -->
+		<dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.18</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xmlpull</groupId>
+                    <artifactId>xmlpull</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xpp3</groupId>
+                    <artifactId>xpp3_min</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
