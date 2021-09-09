@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.27] - 2021-09-09
+### Fixed
+- Map: polygon text attribute not selectable in map;
+
 ## [4.0.26] - 2021-09-08
 ### Fixed
 - Data entry: key code attribute label not appearing in enumerated entities;
