@@ -13,6 +13,7 @@ public class TextAttributeDefView extends AttributeDefView {
 
 	private Type textType;
 	private TextTransform textTransform;
+	private boolean geometry;
 
 	public TextAttributeDefView(int id, String name, String label, AttributeType type, List<String> fieldNames,
 			boolean key, boolean multiple) {
@@ -33,5 +34,13 @@ public class TextAttributeDefView extends AttributeDefView {
 
 	public void setTextTransform(TextTransform textTransform) {
 		this.textTransform = textTransform;
+	}
+	
+	public boolean isGeometry() {
+		return geometry;
+	}
+	
+	public void setGeometry(boolean geometry) {
+		this.geometry = geometry;
 	}
 }

@@ -291,28 +291,30 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 	
 	var dataLayers = new Array();
 	survey.traverse(function(nodeDef) {
-		if (nodeDef.type == 'ATTRIBUTE' && nodeDef.attributeType == 'COORDINATE') {
-			var dataLayer = new ol.layer.Vector({
-				title : OF.Strings.firstNotBlank(nodeDef.label, nodeDef.name),
-				visible : false,
-				type : 'coordinate_data',
-				survey : survey,
-				coordinate_attribute_def : nodeDef,
-				source : null,
-				style : $.proxy($this.coordinateAttributeLayerStyleFunction, $this)
-			});
-			dataLayers.push(dataLayer);
-		} else if (nodeDef.type == 'ATTRIBUTE' && nodeDef.geometry) {
-			var dataLayer = new ol.layer.Vector({
-				title : OF.Strings.firstNotBlank(nodeDef.label, nodeDef.name),
-				visible : false,
-				type : 'geometry_data',
-				survey : survey,
-				attribute_def : nodeDef,
-				source : null,
-				style : $this.geometryLayerStyleFunction
-			});
-			dataLayers.push(dataLayer);
+		if (nodeDef.type == 'ATTRIBUTE') {
+			if (nodeDef.attributeType == 'COORDINATE') {
+				var dataLayer = new ol.layer.Vector({
+					title : OF.Strings.firstNotBlank(nodeDef.label, nodeDef.name),
+					visible : false,
+					type : 'coordinate_data',
+					survey : survey,
+					coordinate_attribute_def : nodeDef,
+					source : null,
+					style : $.proxy($this.coordinateAttributeLayerStyleFunction, $this)
+				});
+				dataLayers.push(dataLayer);
+			} else if (nodeDef.geometry) {
+				var dataLayer = new ol.layer.Vector({
+					title : OF.Strings.firstNotBlank(nodeDef.label, nodeDef.name),
+					visible : false,
+					type : 'geometry_data',
+					survey : survey,
+					attribute_def : nodeDef,
+					source : null,
+					style : $this.geometryLayerStyleFunction
+				});
+				dataLayers.push(dataLayer);
+			}
 		}
 	});
 
@@ -616,7 +618,7 @@ Collect.DataManager.MapPanelComposer.prototype.createGeometryDataSource = functi
 			coordinates.forEach(function(lonLatStr) {
 				if (lonLatStr != null && lonLatStr != '') {
 					var lonLatArr = lonLatStr.split(',');
-					vertices.push(lonLatArr);
+					vertices.push(lonLatArr.map(Number));
 				}
 			});
 			return vertices;
@@ -631,6 +633,7 @@ Collect.DataManager.MapPanelComposer.prototype.createGeometryDataSource = functi
 				survey : survey,
 				geometry: polygon
 			});
+			polygonFeature.getGeometry().transform('EPSG:4326', 'EPSG:3857');
 			source.addFeature(polygonFeature);
 		};
 

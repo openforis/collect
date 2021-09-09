@@ -275,6 +275,7 @@ public class SurveyViewGenerator {
 			boolean autoUppercase = uiOptions.isAutoUppercase(textDef);
 			TextTransform textTransform = autoUppercase ? TextTransform.UPPERCASE : TextTransform.NONE;
 			attrDefView.setTextTransform(textTransform);
+			attrDefView.setGeometry(annotations.isGeometry(textDef));
 			view = attrDefView;
 		} else {
 			view = new AttributeDefView(id, name, label, attributeType, fieldNames, key, multiple);
