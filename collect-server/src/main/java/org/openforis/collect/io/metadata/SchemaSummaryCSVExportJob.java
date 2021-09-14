@@ -66,6 +66,9 @@ public class SchemaSummaryCSVExportJob extends Job {
 							// Instance labels
 							for (String lang : survey.getLanguages())
 								values.add(nodeDefn.getLabel(Type.INSTANCE, lang));
+							// Descriptions (tooltip text)
+							for (String lang : survey.getLanguages())
+								values.add(nodeDefn.getDescription(lang));
 							// Reporting labels
 							for (String lang : survey.getLanguages())
 								values.add(nodeDefn.getLabel(Type.REPORTING, lang));
@@ -103,6 +106,9 @@ public class SchemaSummaryCSVExportJob extends Job {
 		// Instance labels
 		for (String lang : survey.getLanguages())
 			headers.add("label_" + lang);
+		// Descriptions (tooltip text)
+		for (String lang : survey.getLanguages())
+			headers.add("description_" + lang);
 		// Reporting labels
 		for (String lang : survey.getLanguages())
 			headers.add("label_reporting_" + lang);
