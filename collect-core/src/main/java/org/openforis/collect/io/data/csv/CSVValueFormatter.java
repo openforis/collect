@@ -43,7 +43,7 @@ class CSVValueFormatter {
 			return value.toString();
 		} else if (value instanceof Date) {
 			Date date = (Date) value;
-			return String.format("%d/%d/%d", ((Date) value).getDay(), ((Date) value).getMonth(), date.getYear());
+			return String.format("%02d/%02d/%04d", ((Date) value).getDay(), ((Date) value).getMonth(), date.getYear());
 		} else if (value instanceof File) {
 			return ((File) value).getFilename();
 		} else if (value instanceof NumberValue) {
@@ -66,7 +66,7 @@ class CSVValueFormatter {
 			 return ((TextValue) value).getValue();
 		} else if (value instanceof Time) {
 			Time time = (Time) value;
-			return String.format("%d:%d", time.getHour(), time.getMinute());
+			return String.format("%02d:%02d", time.getHour(), time.getMinute());
 		} else throw new IllegalArgumentException("Unsupported attribute value type: " + value.getClass().getName());
 	}
 }
