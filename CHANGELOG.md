@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [4.0.29] - 2021-09-21
 ### Fixed
 - CSV data export: fixed date and time values formatting;
+- Survey Designer: fixed error importing labels' translation file;
 
 ## [4.0.28] - 2021-09-14
 ### Added
