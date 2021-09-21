@@ -33,6 +33,7 @@ import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
+import org.openforis.collect.manager.validation.CollectMobileSurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.metamodel.SurveyTarget;
@@ -91,6 +92,8 @@ public class SurveyExportParametersVM extends BaseVM {
 	private SurveyValidator surveyValidator;
 	@WireVariable
 	private CollectEarthSurveyValidator collectEarthSurveyValidator;
+	@WireVariable
+	private CollectMobileSurveyValidator collectMobileSurveyValidator;
 	
 	private SurveySummary surveySummary;
 	private SurveyExportParametersFormObject formObject;
@@ -154,7 +157,7 @@ public class SurveyExportParametersVM extends BaseVM {
 			startRDBSurveyExportJob(loadedSurvey, formObject);
 			break;
 		case MOBILE:
-			validateSurvey(loadedSurvey, surveyValidator, new SuccessHandler() {
+			validateSurvey(loadedSurvey, collectMobileSurveyValidator, new SuccessHandler() {
 				public void onSuccess() {
 					startCollectSurveyExportJob(loadedSurvey, formObject);
 				}

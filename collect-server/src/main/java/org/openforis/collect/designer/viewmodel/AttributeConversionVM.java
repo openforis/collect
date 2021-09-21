@@ -5,13 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.designer.metamodel.AttributeType;
+import org.openforis.collect.designer.metamodel.AttributeTypeUtils;
 import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.designer.model.CheckType;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.AttributeType;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.validation.Check;
 import org.zkoss.bind.BindContext;
@@ -59,7 +60,7 @@ public class AttributeConversionVM extends SurveyBaseVM {
 	public void convert(@ContextParam(ContextType.BIND_CONTEXT) BindContext ctx) {
 		if ( validateForm(ctx) ) {
 			String typeLabel = form.get("type");
-			AttributeType type = AttributeType.fromLabel(typeLabel);
+			AttributeType type = AttributeTypeUtils.fromLabel(typeLabel);
 			AttributeDefinition convertedAttribute = new AttributeConverter().convert(attributeDefinition, type);
 			dispatchNodeConvertedCommand(convertedAttribute);
 			Window popUp = ComponentUtil.getClosest(ctx.getComponent(), Window.class);
@@ -87,7 +88,7 @@ public class AttributeConversionVM extends SurveyBaseVM {
 		List<String> typeLabels = new ArrayList<String>(types.length);
 		for (AttributeType type : types) {
 			if (type != currentType) {
-				typeLabels.add(type.getLabel());
+				typeLabels.add(AttributeTypeUtils.getLabel(type));
 			}
 		}
 		return typeLabels;
@@ -102,7 +103,7 @@ public class AttributeConversionVM extends SurveyBaseVM {
 	}
 	
 	public String getOriginalAttributeTypeLabel() {
-		return originalAttributeType.getLabel();
+		return AttributeTypeUtils.getLabel(originalAttributeType);
 	}
 	
 	public AttributeDefinition getAttributeDefinition() {

@@ -1,9 +1,9 @@
 package org.openforis.collect.metamodel.uiconfiguration.view;
 
-import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.metamodel.ui.UIColumn;
 import org.openforis.collect.metamodel.view.ViewContext;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.AttributeType;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 

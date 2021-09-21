@@ -3,6 +3,7 @@ package org.openforis.collect.designer.metamodel;
 import java.util.Locale;
 
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.AttributeType;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -48,7 +49,7 @@ public enum NodeType {
 		case ATTRIBUTE:
 			messageKey = "survey.schema.node_detail_title.attribute";
 			AttributeType attrType = AttributeType.valueOf((AttributeDefinition) nodeDefn);
-			Object[] args = new String[]{attrType.getLabel()};
+			Object[] args = new String[]{AttributeTypeUtils.getLabel(attrType)};
 			nodeTypeLabel = Labels.getLabel(messageKey, args);
 			break;
 		}

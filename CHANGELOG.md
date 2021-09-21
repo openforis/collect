@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Survey Designer: fixed error importing labels' translation file;
 - Species import: validate extra info column names (cannot use reserved words);
 
+### Added
+- Survey export: validate that multiple attribute is supported before exporting to Collect Mobile;
+
 ## [4.0.28] - 2021-09-14
 ### Added
 - Survey designer: labels export/import - include tooltip texts;

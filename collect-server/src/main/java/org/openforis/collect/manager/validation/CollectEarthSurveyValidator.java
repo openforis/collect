@@ -5,12 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.openforis.collect.designer.metamodel.AttributeType;
+import org.openforis.collect.designer.metamodel.AttributeTypeUtils;
 import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.earth.app.EarthConstants;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.AttributeType;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
@@ -97,12 +98,11 @@ public class CollectEarthSurveyValidator extends SurveyValidator {
 				if (! field.getType().isAssignableFrom(foundFieldDef.getClass())) {
 					Class<? extends AttributeDefinition> type = field.getType();
 					AttributeType expectedAttributeType = AttributeType.valueOf(type);
-					String expectedType = expectedAttributeType.getLabel();
+					String expectedType = AttributeTypeUtils.getLabel(expectedAttributeType);
 					
 					String foundType;
 					if (foundFieldDef instanceof AttributeDefinition) {
-						AttributeType foundTypeEnum = AttributeType.valueOf((AttributeDefinition) foundFieldDef);
-						foundType = foundTypeEnum.getLabel();
+						foundType = AttributeTypeUtils.getLabel((AttributeDefinition) foundFieldDef);
 					} else {
 						foundType = NodeType.ENTITY.getLabel();
 					}

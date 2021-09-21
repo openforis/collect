@@ -37,7 +37,7 @@ public class DescendantNodeFilter implements NodeFilter {
 			return false;
 		}
 		Record record = node.getRecord();
-		SurveyContext surveyContext = record.getSurveyContext();
+		SurveyContext<?> surveyContext = record.getSurveyContext();
 		ExpressionEvaluator expressionEvaluator = surveyContext.getExpressionEvaluator();
 		List<Node<?>> attributes = record.findNodesByPath(descendantAttributeDefinition.getPath());
 		for (Node<?> attribute : attributes) {

@@ -8,12 +8,12 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.lowerCase;
-import static org.openforis.collect.designer.metamodel.AttributeType.BOOLEAN;
-import static org.openforis.collect.designer.metamodel.AttributeType.CODE;
-import static org.openforis.collect.designer.metamodel.AttributeType.DATE;
-import static org.openforis.collect.designer.metamodel.AttributeType.NUMBER;
-import static org.openforis.collect.designer.metamodel.AttributeType.TEXT;
-import static org.openforis.collect.designer.metamodel.AttributeType.TIME;
+import static org.openforis.idm.metamodel.AttributeType.BOOLEAN;
+import static org.openforis.idm.metamodel.AttributeType.CODE;
+import static org.openforis.idm.metamodel.AttributeType.DATE;
+import static org.openforis.idm.metamodel.AttributeType.NUMBER;
+import static org.openforis.idm.metamodel.AttributeType.TEXT;
+import static org.openforis.idm.metamodel.AttributeType.TIME;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ import org.openforis.collect.designer.component.SchemaTreeModelCreator;
 import org.openforis.collect.designer.component.SurveyObjectTreeModelCreator;
 import org.openforis.collect.designer.component.UITreeModelCreator;
 import org.openforis.collect.designer.form.FormObject;
-import org.openforis.collect.designer.metamodel.AttributeType;
+import org.openforis.collect.designer.metamodel.AttributeTypeUtils;
 import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.designer.util.ComponentUtil;
@@ -58,6 +58,7 @@ import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.web.service.SurveyService;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.AttributeType;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -1067,12 +1068,7 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	public String getAttributeTypeLabel(String typeValue) {
-		if (isNotBlank(typeValue)) {
-			AttributeType type = AttributeType.valueOf(typeValue);
-			return type.getLabel();
-		} else {
-			return null;
-		}
+		return AttributeTypeUtils.getLabel(typeValue);
 	}
 
 	public List<String> getAttributeTypeValues() {
@@ -1099,12 +1095,7 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	public String getAttributeTypeLabelFromDefinition(AttributeDefinition attrDefn) {
-		if (attrDefn != null) {
-			AttributeType type = AttributeType.valueOf(attrDefn);
-			return type.getLabel();
-		} else {
-			return null;
-		}
+		return AttributeTypeUtils.getLabel(attrDefn);
 	}
 
 	public String getAttributeInstanceLabel(AttributeDefinition attrDefn) {

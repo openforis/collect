@@ -5,6 +5,7 @@ package org.openforis.idm.model.expression;
 
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.openforis.idm.AbstractTest;
 import org.openforis.idm.metamodel.SurveyContext;
@@ -13,8 +14,6 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
-
-import junit.framework.Assert;
 
 /**
  * @author M. Togna

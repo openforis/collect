@@ -178,7 +178,7 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 	}
 	
 	private CodeListService getCodeListService() {
-		SurveyContext context = attributeDefinition.getSurvey().getContext();
+		SurveyContext<?> context = attributeDefinition.getSurvey().getContext();
 		CodeListService codeListService = context.getCodeListService();
 		return codeListService;
 	}

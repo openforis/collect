@@ -6,6 +6,7 @@ import static org.openforis.idm.testfixture.RecordBuilder.record;
 
 import java.util.GregorianCalendar;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
@@ -23,8 +24,6 @@ import org.openforis.idm.model.ModelSerializer;
 import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.Time;
 import org.openforis.idm.testfixture.RecordBuilder;
-
-import junit.framework.Assert;
 
 public class ModelSerializationTest extends CollectIntegrationTest {
 

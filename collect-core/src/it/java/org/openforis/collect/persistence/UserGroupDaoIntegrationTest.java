@@ -2,6 +2,7 @@ package org.openforis.collect.persistence;
 
 import java.sql.Timestamp;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.openforis.collect.CollectTest;
 import org.openforis.collect.manager.UserManager;
@@ -9,8 +10,6 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserGroup.Visibility;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import junit.framework.Assert;
 
 public class UserGroupDaoIntegrationTest extends CollectTest {
 

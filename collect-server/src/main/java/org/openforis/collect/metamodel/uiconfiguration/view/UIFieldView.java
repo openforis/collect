@@ -1,9 +1,9 @@
 package org.openforis.collect.metamodel.uiconfiguration.view;
 
-import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.metamodel.ui.UIField;
 import org.openforis.collect.metamodel.view.ViewContext;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.AttributeType;
 
 public class UIFieldView<O extends UIField> extends UIModelObjectView<O> implements UITabComponentView<O> {
 

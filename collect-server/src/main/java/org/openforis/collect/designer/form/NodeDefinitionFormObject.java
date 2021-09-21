@@ -1,13 +1,13 @@
 package org.openforis.collect.designer.form;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Orientation;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.AttributeType;
 import org.openforis.idm.metamodel.Calculable;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;

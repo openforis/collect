@@ -24,6 +24,7 @@ import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.designer.viewmodel.JobStatusPopUpVM.JobEndHandler;
+import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.OutputFormat;
 import org.openforis.collect.designer.viewmodel.SurveyValidationResultsVM.ConfirmEvent;
 import org.openforis.collect.io.data.CSVDataExportJob;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
@@ -31,6 +32,7 @@ import org.openforis.collect.io.metadata.SchemaSummaryCSVExportJob;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthGridTemplateGenerator;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
+import org.openforis.collect.manager.validation.CollectMobileSurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.manager.validation.SurveyValidator.ValidationParameters;
@@ -97,6 +99,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private SurveyValidator surveyValidator;
 	@WireVariable
 	private CollectEarthSurveyValidator collectEarthSurveyValidator;
+	@WireVariable
+	private CollectMobileSurveyValidator collectMobileSurveyValidator;
 	@WireVariable
 	private AppWS appWS;
 	
@@ -389,15 +393,29 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@Command
 	public void validate() {
-		checkValidity(false, () -> MessageUtil.showInfo("survey.successfully_validated"), null, false);
+		checkValidity(OutputFormat.DESKTOP);
+	}
+	
+	@Command
+	public void validateCollectMobile() {
+		checkValidity(OutputFormat.MOBILE);
+	}
+	
+	private boolean checkValidity(OutputFormat outputFormat) {
+		return checkValidity(outputFormat, false, () -> MessageUtil.showInfo("survey.successfully_validated"), null, false);
+	}
+
+	private boolean checkValidity(boolean showConfirm, final Runnable runIfValid, 
+			String confirmButtonLabel, boolean ignoreWarnings) {
+		return checkValidity(OutputFormat.DESKTOP, showConfirm, runIfValid, confirmButtonLabel, ignoreWarnings);
 	}
 	
 	/**
 	 * Returns true if the validation didn't give any errors, false if a confirm PopUp will be shown
 	 */
-	private boolean checkValidity(boolean showConfirm, final Runnable runIfValid, 
+	private boolean checkValidity(OutputFormat outuputFormat, boolean showConfirm, final Runnable runIfValid, 
 			String confirmButtonLabel, boolean ignoreWarnings) {
-		SurveyValidator surveyValidator = getSurveyValidator(survey);
+		SurveyValidator surveyValidator = getSurveyValidator(survey, outuputFormat);
 		ValidationParameters validationParameters = new ValidationParameters();
 		validationParameters.setWarningsIgnored(ignoreWarnings);
 		SurveyValidationResults results = surveyValidator.validate(survey, validationParameters);
@@ -635,8 +653,14 @@ public class SurveyEditVM extends SurveyBaseVM {
 		return url;
 	}
 
-	private SurveyValidator getSurveyValidator(CollectSurvey survey) {
-		return survey.getTarget() == SurveyTarget.COLLECT_EARTH ? collectEarthSurveyValidator : surveyValidator;
+	private SurveyValidator getSurveyValidator(CollectSurvey survey, OutputFormat outputFormat) {
+		if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
+			return collectEarthSurveyValidator;
+		}
+		if (outputFormat == OutputFormat.MOBILE) {
+			return collectMobileSurveyValidator;
+		}
+		return surveyValidator;
 	}
 
 }

@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.openforis.collect.designer.metamodel.AttributeType;
+import org.openforis.collect.designer.metamodel.AttributeTypeUtils;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.io.excel.ExcelFlatValuesWriter;
 import org.openforis.commons.io.flat.FlatDataWriter;
@@ -60,7 +60,7 @@ public class SchemaSummaryCSVExportJob extends Job {
 								values.addAll(Arrays.asList(
 										nodeDefn.getPath(),
 										nodeDefn instanceof EntityDefinition ? "entity": "attribute",
-										nodeDefn instanceof AttributeDefinition ? AttributeType.valueOf((AttributeDefinition) nodeDefn).getLabel(): ""
+										nodeDefn instanceof AttributeDefinition ? AttributeTypeUtils.getLabel((AttributeDefinition) nodeDefn): ""
 								));
 							}
 							// Instance labels

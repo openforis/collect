@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class UIOptionsMigratorTest extends CollectIntegrationTest {
 
 	@Autowired
-	private SurveyContext surveyContext;
+	private SurveyContext<?> surveyContext;
 	
 	private CollectSurvey survey;
 	private UIOptions uiOptions;

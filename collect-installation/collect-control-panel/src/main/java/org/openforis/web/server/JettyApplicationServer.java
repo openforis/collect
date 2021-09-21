@@ -11,6 +11,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSourceFactory;
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.plus.jndi.Resource;
@@ -164,10 +165,14 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 		
 		//unzip war file (if unzipped folder does not exist)
 		if (! webappFolder.exists()) {
+			ZipFile zipFile = null;
 			try {
-				new ZipFile(warFile).extractAll(webappFolder.getAbsolutePath());
+				zipFile = new ZipFile(warFile);
+				zipFile.extractAll(webappFolder.getAbsolutePath());
 			} catch(Exception e) {
 				throw new RuntimeException(e);
+			} finally {
+				IOUtils.closeQuietly(zipFile);
 			}
 		}
 		webapp.setExtractWAR(false);

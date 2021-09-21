@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
-import org.openforis.collect.designer.metamodel.AttributeType;
+import org.openforis.collect.designer.metamodel.AttributeTypeUtils;
 import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
@@ -21,6 +21,7 @@ import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.utils.SurveyObjects;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.AttributeType;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -243,12 +244,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	}
 
 	public String getAttributeTypeLabel(String typeValue) {
-		if ( StringUtils.isNotBlank(typeValue) ) {
-			AttributeType type = AttributeType.valueOf(typeValue);
-			return type.getLabel();
-		} else {
-			return null;
-		}
+		return AttributeTypeUtils.getLabel(typeValue);
 	}
 	
 	@DependsOn("editedItem")

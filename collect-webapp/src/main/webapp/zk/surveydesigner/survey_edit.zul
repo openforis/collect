@@ -108,8 +108,17 @@
 								image="/assets/images/settings-small.png">
 								<menupopup>
 									<menuitem
-										label="${labels.survey.validate}"
+										visible="@load(not vm.collectEarthSurvey)"
+										label="${labels.survey.validate_collect_desktop}"
 										onClick="@command('validate')" />
+									<menuitem
+										visible="@load(vm.collectEarthSurvey)"
+										label="${labels.survey.validate_collect_earth}"
+										onClick="@command('validate')" />
+									<menuitem
+										visible="@load(not vm.collectEarthSurvey)"
+										label="${labels.survey.validate_collect_mobile}"
+										onClick="@command('validateCollectMobile')" />
 									<menuseparator />
 									<menuitem
 										label="${labels.survey.export.$}"

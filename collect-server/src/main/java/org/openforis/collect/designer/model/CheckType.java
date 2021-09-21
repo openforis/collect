@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.openforis.collect.designer.metamodel.AttributeType;
+import org.openforis.idm.metamodel.AttributeType;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.ComparisonCheck;
 import org.openforis.idm.metamodel.validation.CustomCheck;

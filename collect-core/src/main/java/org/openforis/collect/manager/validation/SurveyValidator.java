@@ -916,7 +916,7 @@ public class SurveyValidator {
 		return null;
 	}
 	
-	private void addIfNotOk(List<SurveyValidationResult> results, SurveyValidationResult result) {
+	protected void addIfNotOk(List<SurveyValidationResult> results, SurveyValidationResult result) {
 		if (result != null && result.getFlag() != Flag.OK) {
 			results.add(result);
 		}

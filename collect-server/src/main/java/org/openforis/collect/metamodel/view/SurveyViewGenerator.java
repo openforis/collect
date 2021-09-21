@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.uiconfiguration.view.Views;
@@ -19,6 +18,7 @@ import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.collection.Predicate;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.AttributeDefinition.FieldLabel;
+import org.openforis.idm.metamodel.AttributeType;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
