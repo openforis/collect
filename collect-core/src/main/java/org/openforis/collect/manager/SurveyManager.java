@@ -1169,6 +1169,11 @@ public class SurveyManager {
 		surveyFileDao.delete(surveyFile.getId());
 	}
 	
+	public void deleteSurveyFiles(Set<SurveyFile> surveyFiles) {
+		List<Integer> ids = CollectionUtils.project(surveyFiles, "id");
+		surveyFileDao.deleteByIds(new HashSet<Integer>(ids));
+	}
+	
 	public void deleteSurveyFiles(CollectSurvey survey) {
 		surveyFileDao.deleteBySurvey(survey.getId());
 	}

@@ -1,7 +1,8 @@
 <zk>
   <vlayout>
     <listbox id="surveyFilesListBox" model="@load(vm.surveyFiles)"
-      selectedItem="@bind(vm.selectedSurveyFile)"
+      selectedItems="@bind(vm.selectedSurveyFiles)"
+      multiple="true"
       hflex="true"
       rows="3">
       <listhead>
@@ -25,16 +26,16 @@
         onClick="@command('addSurveyFile')" class="icon-button" />
       <menuitem tooltiptext="${labels.global.download}"
         image="/assets/images/download-small.png"
-        disabled="@load(empty vm.selectedSurveyFile)"
+        disabled="@load(not vm.singleSurveyFileSelected)"
         onClick="@command('downloadSelectedSurveyFile')" class="icon-button" />
       <menuitem tooltiptext="${labels.global.edit_item}"
         image="/assets/images/edit-small.png"
-        disabled="@load(empty vm.selectedSurveyFile)"
+        disabled="@load(not vm.singleSurveyFileSelected)"
         onClick="@command('editSelectedSurveyFile')" class="icon-button" />
       <menuitem tooltiptext="${labels.global.delete_item}"
         image="/assets/images/delete-small.png"
-        disabled="@load(empty vm.selectedSurveyFile)"
-        onClick="@command('deleteSelectedSurveyFile')"
+        disabled="@load(empty vm.selectedSurveyFiles)"
+        onClick="@command('deleteSelectedSurveyFiles')"
         class="icon-button" />
     </menubar>
   </vlayout>
