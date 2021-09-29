@@ -198,12 +198,16 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<Long, SamplingDesig
 	}
 	
 	public int countChildItems(int surveyId, List<String> parentKeys ) {
-		SelectQuery<Record> q = createSelectItemsSelectQuery(surveyId, parentKeys.toArray(new String[parentKeys.size()]));
+		SelectQuery<Record> q = createSelectItemsSelectQuery(surveyId, false, parentKeys.toArray(new String[parentKeys.size()]));
 		q.addSelect(DSL.count());
 		return q.fetchOne(0, Integer.class);
 	}
 	
 	private SelectQuery<Record> createSelectItemsSelectQuery(int surveyId, String... parentKeys) {
+		return createSelectItemsSelectQuery(surveyId, true, parentKeys);
+	}
+	
+	private SelectQuery<Record> createSelectItemsSelectQuery(int surveyId, boolean orderItems, String... parentKeys) {
 		SamplingDesignDSLContext dsl = dsl();
 		SelectQuery<Record> q = dsl.selectQuery();	
 		q.addFrom(OFC_SAMPLING_DESIGN);
@@ -217,7 +221,9 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<Long, SamplingDesig
 			q.addConditions(LEVEL_CODE_FIELDS[nextLevelIndex].isNotNull());
 			addLevelKeyNullConditions(q, nextLevelIndex + 1);
 		}
-		q.addOrderBy(OFC_SAMPLING_DESIGN.ID);
+		if (orderItems) {
+			q.addOrderBy(OFC_SAMPLING_DESIGN.ID);	
+		}
 		return q;
 	}
 
