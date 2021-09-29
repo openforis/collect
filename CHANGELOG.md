@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [4.0.30] - 2021-09-29
 ### Fixed
 - Records validation: fixed error validating hierarchical code attributes using sampling point data in PostgreSQL;
+- Survey Designer: fixed Boolean attribute type label not visible in Add Attribute dropdown;
 
 ## [4.0.29] - 2021-09-21
 ### Fixed
