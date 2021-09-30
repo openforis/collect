@@ -253,11 +253,6 @@
 			<artifactId>spring-tx</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>xmlpull</groupId>
-			<artifactId>xmlpull</artifactId>
-			<version>1.2.0</version>
-		</dependency>
-		<dependency>
 			<groupId>net.sf.kxml</groupId>
 			<artifactId>kxml2</artifactId>
 			<version>2.3.0</version>
