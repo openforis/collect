@@ -111,7 +111,7 @@ public class RecordFileRestoreTask extends Task {
 		} else if ( summaries.size() == 0 ) {
 			throw new RuntimeException(String.format("Record with keys %s not found", recordKeys.toString()));
 		} else {
-			throw new RuntimeException(String.format("Multiple records found with keys %s not found", recordKeys.toString()));
+			throw new RuntimeException(String.format("Multiple records found with keys %s", recordKeys.toString()));
 		}
 	}
 	

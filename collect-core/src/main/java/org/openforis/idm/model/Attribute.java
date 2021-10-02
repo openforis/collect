@@ -72,6 +72,12 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 	
 	public Field<?> getField(String name) {
 		int fieldIndex = definition.getFieldNames().indexOf(name);
+		if (fieldIndex < 0) {
+			throw new IllegalArgumentException(
+					String.format("Cannot find field '%s' in attribute %s: unexpected attribute type.", 
+							name, definition.getPath()
+				));
+		}
 		return getField(fieldIndex);
 	}
 
