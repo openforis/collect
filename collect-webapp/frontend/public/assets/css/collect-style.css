@@ -350,6 +350,10 @@ label.invalid {
   background-repeat: no-repeat;
 }
 
+.text-align-center {
+  text-align: center;
+}
+
 /**
 * SURVEY SELECTOR
 */
