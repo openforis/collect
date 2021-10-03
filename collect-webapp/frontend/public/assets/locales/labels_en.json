@@ -178,6 +178,14 @@
         "fileName": "File Name",
         "path": "Path",
         "messages": "Error Messages"
+      },
+      "filledValues": "Filled Values",
+      "recordImportability": {
+        "importSuggested": "Importing this record is suggested",
+        "importNotSuggested": "Importing this record is NOT suggested",
+        "recordAndConflictingRecordAreEqual": "Record to be imported and the conflicting (existing) one are equal",
+        "recordFilledValues": "Record filled values",
+        "conflictingRecordFilledValues": "Conflicting record (existing one) filled values"
       }
     },
     "export": {
