@@ -177,7 +177,9 @@
         "label": "Errors",
         "fileName": "File Name",
         "path": "Path",
-        "messages": "Error Messages"
+        "messages": "Error Messages",
+        "nodeDefinitionNotFound": "Node definition not found or internal ID changed",
+        "nodeDefinitionNotApplicableToRecordVersion": "Node definition not applicable to this record version"
       },
       "filledValues": "Filled Values",
       "recordImportability": {
@@ -281,6 +283,7 @@
         "analysis": "Analysis"
       }
     },
+    "owner": "Owner",
     "onlyMe": "Only me",
     "errors": "Errors",
     "warnings": "Warnings",

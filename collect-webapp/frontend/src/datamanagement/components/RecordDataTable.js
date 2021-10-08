@@ -337,7 +337,7 @@ class RecordDataTable extends Component {
         width="150"
         dataSort
       >
-        Owner
+        {L.l('dataManagement.owner')}
       </TableHeaderColumn>,
       <TableHeaderColumn
         key="lockedBy"

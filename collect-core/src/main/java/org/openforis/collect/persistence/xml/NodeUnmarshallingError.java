@@ -44,7 +44,7 @@ public class NodeUnmarshallingError {
 	
 	@Override
 	public String toString() {
-		return "Node: " + path + " message: " + message;
+		return "step: " + step + " - node: " + path + " - message: " + message;
 	}
 
 }

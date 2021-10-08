@@ -178,8 +178,7 @@ public class DataRestoreSummaryTask extends Task {
 	private void createParsingErrorSummary(int entryId, Step step,
 			ParseRecordResult parseRecordResult) {
 		String entryName = getEntryName(entryId, step);
-		List<NodeUnmarshallingError> failures = parseRecordResult.getFailures();
-		errorsByEntryName.put(entryName, failures);
+		errorsByEntryName.put(entryName, parseRecordResult.getFailures());
 		incrementSkippedItems();
 	}
 

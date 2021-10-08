@@ -249,6 +249,15 @@ span.equal-sign {
   background-size: 16px;
 }
 
+span.icons-wrapper.align-center {
+  display: flex;
+  justify-content: center;
+}
+
+span.icons-wrapper.align-center span {
+  width: 20px;
+}
+
 .info {
   color: #0069d9;
 }

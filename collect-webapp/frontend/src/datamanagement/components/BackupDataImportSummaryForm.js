@@ -11,7 +11,21 @@ const stepColumns = Workflow.STEP_CODES.map((s) => (
   <TableHeaderColumn
     key={s}
     dataField={s.toLowerCase() + 'DataPresent'}
-    dataFormat={Formatters.checkedIconFormatter}
+    dataFormat={(cell, row) => {
+      const { warnings } = row
+      const warningsInStep = warnings
+        .filter((warning) => warning.step == s)
+        .map((warning) => `${warning.path}: ${L.l(warning.message)}`)
+
+      const warningsTitle = [...new Set(warningsInStep)].join('\n')
+
+      return (
+        <span className="icons-wrapper align-center">
+          {warningsTitle && <span className="fa fa-exclamation-triangle warning" title={warningsTitle} />}
+          {cell && <span className="checked small" />}
+        </span>
+      )
+    }}
     width="50"
     row="1"
   >
@@ -280,13 +294,11 @@ const BackupDataImportSummaryForm = (props) => {
     handleAllConflictingRecordsSelect,
   } = props
 
-  const errorsFormatter = function (cell, row) {
-    return (
-      <div>
-        <span className="circle-red" />
-      </div>
-    )
-  }
+  const errorsFormatter = (_cell, _row) => (
+    <div>
+      <span className="circle-red" />
+    </div>
+  )
 
   const errorMessagesFormatter = function (cell, row) {
     const errorItems = row.errors.map((e) => {
