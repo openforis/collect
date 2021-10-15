@@ -2,3 +2,4 @@
 /build/
 /npm-debug.log
 *.code-workspace
+!.env.development.local

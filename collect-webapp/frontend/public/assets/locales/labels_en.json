@@ -177,7 +177,17 @@
         "label": "Errors",
         "fileName": "File Name",
         "path": "Path",
-        "messages": "Error Messages"
+        "messages": "Error Messages",
+        "nodeDefinitionNotFound": "Node definition not found or internal ID changed",
+        "nodeDefinitionNotApplicableToRecordVersion": "Node definition not applicable to this record version"
+      },
+      "filledValues": "Filled Values",
+      "recordImportability": {
+        "importSuggested": "Importing this record is suggested",
+        "importNotSuggested": "Importing this record is NOT suggested",
+        "recordAndConflictingRecordAreEqual": "Record to be imported and the conflicting (existing) one are equal",
+        "recordFilledValues": "Record filled values",
+        "conflictingRecordFilledValues": "Conflicting record (existing one) filled values"
       }
     },
     "export": {
@@ -273,6 +283,7 @@
         "analysis": "Analysis"
       }
     },
+    "owner": "Owner",
     "onlyMe": "Only me",
     "errors": "Errors",
     "warnings": "Warnings",

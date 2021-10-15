@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>4.0.30-SNAPSHOT</version>
+		<version>4.0.33-SNAPSHOT</version>
 	</parent>
 	<name>Open Foris Collect Server module</name>
 	<artifactId>collect-server</artifactId>
@@ -196,6 +196,10 @@
                 <exclusion>
                     <groupId>xpp3</groupId>
                     <artifactId>xpp3_min</artifactId>
+                </exclusion>
+                <exclusion>
+                	<groupId>io.github.x-stream</groupId>
+                	<artifactId>mxparser</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

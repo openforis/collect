@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>4.0.30-SNAPSHOT</version>
+		<version>4.0.33-SNAPSHOT</version>
 	</parent>
 
 	<name>Open Foris Collect Core module</name>
@@ -251,11 +251,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>xmlpull</groupId>
-			<artifactId>xmlpull</artifactId>
-			<version>1.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.kxml</groupId>

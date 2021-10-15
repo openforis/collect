@@ -28,6 +28,7 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserRole;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
+import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.concurrency.ProgressListener;
 
@@ -165,6 +166,13 @@ public class XMLParsingRecordProvider implements RecordProvider {
 			record.setStep(step);
 			record.setDataStep(step);
 			record.setState(null); //ignore rejected information
+		}
+		// set correct step in failures/warnings
+		for (NodeUnmarshallingError nodeUnmarshallingError : result.getWarnings()) {
+			nodeUnmarshallingError.setStep(step);
+		}
+		for (NodeUnmarshallingError nodeUnmarshallingError : result.getFailures()) {
+			nodeUnmarshallingError.setStep(step);
 		}
 		return result;
 	}
