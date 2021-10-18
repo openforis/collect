@@ -1,6 +1,6 @@
 package org.openforis.collect.designer.form.validator;
 
-import static org.openforis.collect.designer.form.SurveyFileFormObject.FILENAME_FIELD_NAME;
+import static org.openforis.collect.designer.form.SurveyFileFormObject.FILENAMES_FIELD_NAME;
 import static org.openforis.collect.designer.form.SurveyFileFormObject.TYPE_FIELD_NAME;
 
 import java.util.ArrayList;
@@ -41,8 +41,8 @@ public class SurveyFileFormValidator extends FormValidator {
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
 		if (validateTypeUniqueness(ctx)) {
-			if (validateFilename(ctx)) {
-				validateFilenameUniqueness(ctx);
+			if (validateFilenames(ctx)) {
+				validateFilenamesUniqueness(ctx);
 			}
 		}
 	}
@@ -66,29 +66,30 @@ public class SurveyFileFormValidator extends FormValidator {
 		}
 	}
 
-	private boolean validateFilename(ValidationContext ctx) {
-		if (validateRequired(ctx, FILENAME_FIELD_NAME)) { 
-			if (validateFilenamePattern(ctx)) {
-				return validateFilenameUniqueness(ctx);
-			} else {
-				return false;
+	private boolean validateFilenames(ValidationContext ctx) {
+		if (validateRequired(ctx, FILENAMES_FIELD_NAME)) { 
+			String filenames = getValue(ctx, FILENAMES_FIELD_NAME);
+			boolean valid = true;
+			for (String filename : filenames.split("\n")) {
+				if (!validateFilenamePattern(ctx, filename)) {
+					return false;
+				}
 			}
-		} else {
-			return false;
+			if (valid) {
+				return validateFilenamesUniqueness(ctx);
+			}
 		}
+		return false;
 	}
 	
-	private boolean validateFilenamePattern(ValidationContext ctx) {
-		if (validateRegEx(ctx, VALID_FILENAME_PATTERN, FILENAME_FIELD_NAME, "survey.file.error.invalid_filename")) {
-			String filename = getValue(ctx, FILENAME_FIELD_NAME);
+	private boolean validateFilenamePattern(ValidationContext ctx, String filename) {
+		if (validateRegEx(ctx, VALID_FILENAME_PATTERN, FILENAMES_FIELD_NAME, "survey.file.error.invalid_filename")) {
 			String typeName = getValue(ctx, TYPE_FIELD_NAME);
 			SurveyFileType type = SurveyFileType.valueOf(typeName);
 			switch (type) {
 			case COLLECT_EARTH_AREA_PER_ATTRIBUTE:
 				String expectedFileName = SurveyFileType.COLLECT_EARTH_AREA_PER_ATTRIBUTE.getFixedFilename();
-				if (expectedFileName.equals(filename)) {
-					return true;
-				} else {
+				if (!expectedFileName.equals(filename)) {
 					String message = Labels.getLabel("survey.file.error.unexpected_filename",
 							new String[] { expectedFileName });
 					addInvalidMessage(ctx, message);
@@ -99,13 +100,12 @@ public class SurveyFileFormValidator extends FormValidator {
 				if (! SAIKU_QUERY_FILE_EXTENSION.equalsIgnoreCase(extension)) {
 					String message = Labels.getLabel("survey.file.error.invalid_extension", 
 							new String[] { SAIKU_QUERY_FILE_EXTENSION, extension });
-					addInvalidMessage(ctx, FILENAME_FIELD_NAME, message);
+					addInvalidMessage(ctx, FILENAMES_FIELD_NAME, message);
 					return false;
 				}
-				
 			default:
 				if (RESERVED_FILENAMES.contains(filename)) {
-					addInvalidMessage(ctx, FILENAME_FIELD_NAME, Labels.getLabel("survey.file.error.reserved_filename"));
+					addInvalidMessage(ctx, FILENAMES_FIELD_NAME, Labels.getLabel("survey.file.error.reserved_filename"));
 					return false;
 				} else {
 					return true;
@@ -116,12 +116,13 @@ public class SurveyFileFormValidator extends FormValidator {
 		}
 	}
 
-	private boolean validateFilenameUniqueness(ValidationContext ctx) {
+	private boolean validateFilenamesUniqueness(ValidationContext ctx) {
 		List<SurveyFile> otherSurveyFiles = loadSurveyFilesDifferentFromThis(ctx);
-		String filename = getValue(ctx, FILENAME_FIELD_NAME);
+		String filenames = getValue(ctx, FILENAMES_FIELD_NAME);
+		List<String> filenamesList = Arrays.asList(filenames.split("\n"));
 		for (SurveyFile surveyFile : otherSurveyFiles) {
-			if (surveyFile.getFilename().equals(filename)) {
-				addInvalidMessage(ctx, FILENAME_FIELD_NAME, Labels.getLabel("survey.file.error.duplicate_filename"));
+			if (filenamesList.contains(surveyFile.getFilename())) {
+				addInvalidMessage(ctx, FILENAMES_FIELD_NAME, Labels.getLabel("survey.file.error.duplicate_filename"));
 				return false;
 			}
 		}

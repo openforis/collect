@@ -63,16 +63,18 @@
         <row>
           <label value="${labels.survey.file.file}:" />
           <cell>
-            <hbox hflex="1" visible="@load(newItem or not empty vm.uploadedFileName)">
+            <hbox hflex="1" visible="@load(not vm.multipleFilesUploaded and (newItem or not empty vm.uploadedFileName))">
               <hbox width="300px">
                 <label visible="@load(empty vm.uploadedFileName)" 
                 	value="${labels.global.file_not_selected}" />
-	            <a visible="@load(not (empty vm.uploadedFileName))" 
-	            	label="@load(vm.uploadedFileName)" tooltiptext="${labels.global.download}" 
+	            <a visible="@load(not vm.multipleFilesUploaded and not (empty vm.uploadedFileName))" 
+	            	label="@load(vm.uploadedFileName)" 
+	            	tooltiptext="${labels.global.download}" 
 	            	onClick="@command('downloadUploadedFile')" />
               </hbox>
               <button label="${labels.global.select_file_to_upload}"
-                	upload="true,maxsize=-1" onUpload="@command('fileUploaded')" />
+                	upload="true,maxsize=-1,multiple=true" 
+                	onUpload="@command('fileUploaded')" />
             </hbox>
             <hbox hflex="1" visible="@load(not newItem and empty vm.uploadedFileName)">
               <hbox width="300px">
@@ -82,16 +84,44 @@
               <button label="${labels.global.select_new_file_to_upload}"
                 	upload="true,maxsize=-1" onUpload="@command('fileUploaded')" />
             </hbox>
+            <!-- multiple files uploaded -->
+            <hbox hflex="1" visible="@load(vm.multipleFilesUploaded)">
+            	<listbox
+					model="@load(vm.uploadedFileNames)"
+					selectedItems="@load(vm.selectedUploadedFileNames)"
+					onSelect="@command('uploadedFileNamesSelected', filenames=self.selectedItems)"
+					multiple="true"
+					hflex="1" height="100px">
+					<template name="model">
+						<listitem label="@load(each)" value="@load(each)" />
+					</template>
+				</listbox>
+				<vbox vflex="1">
+					<button label="${labels.survey.file.select_other_files}"
+	                	upload="true,maxsize=-1,multiple=true" 
+	                	onUpload="@command('fileUploaded')" />
+	               	<button label="${labels.global.delete_items}"
+	               		visible="@load(not empty vm.selectedUploadedFileNames)"
+	                	onUpload="@command('deleteSelectedUploadedFiles')" />
+	            </vbox>
+            </hbox>
           </cell>
         </row>
-        <row>
-        	<fieldErrorHandler message="@load(vmsgs['filename'])">
+        <row visible="@load(not vm.multipleFilesUploaded)">
+        	<fieldErrorHandler message="@load(vmsgs['filenames'])">
         		<label value="${labels.survey.file.filename}:" />
           	</fieldErrorHandler>
-        	<fieldErrorHandler message="@load(vmsgs['filename'])">
-            	<textbox width="300px" value="@bind(fx.filename)"
+        	<fieldErrorHandler message="@load(vmsgs['filenames'])">
+            	<textbox
+           		  	visible="@load(not vm.multipleFilesUploaded)"
+            		width="300px" value="@bind(fx.filenames)"
+            		rows="4"
                 	onChange="@command('applyChanges')" 
-                	readonly="@load(fx.type eq 'COLLECT_EARTH_AREA_PER_ATTRIBUTE' or fx.type eq 'COLLECT_EARTH_EE_SCRIPT' or fx.type eq 'SURVEY_GUIDE')" />
+                	readonly="@load(
+                		fx.type eq 'COLLECT_EARTH_AREA_PER_ATTRIBUTE' 
+                		or fx.type eq 'COLLECT_EARTH_EE_SCRIPT' 
+                		or fx.type eq 'SURVEY_GUIDE'
+               		)" />
        		</fieldErrorHandler>
         </row>
       </rows>
