@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +42,7 @@ import org.zkoss.util.media.Media;
 import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Filedownload;
+import org.zkoss.zul.Listitem;
 
 /**
  * @author S. Ricci
@@ -213,8 +215,12 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	}
 	
 	@Command
-	public void uploadedFileNamesSelected(@BindingParam("filenames") Set<String> filenames) {
-		this.selectedUploadedFileNames = filenames;
+	public void uploadedFileNamesSelected(@BindingParam("filenames") Set<Listitem> filenameItems) {
+		Set<String> fileNames = new HashSet<>();;
+		for (Listitem listitem : filenameItems) {
+			fileNames.add(listitem.getValue());
+		}
+		this.selectedUploadedFileNames = fileNames;
 		notifyChange("selectedUploadedFileNames");
 	}
 	
@@ -249,6 +255,7 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 			}
 		}
 		setFormFieldValue(binder, SurveyFileFormObject.FILENAMES_FIELD_NAME, filename);
+		setFormFieldValue(binder, SurveyFileFormObject.MULTIPLE_FILES_UPLOADED_FIELD_NAME, isMultipleFilesUploaded());
 		dispatchApplyChangesCommand(binder);
 	}
 
