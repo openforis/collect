@@ -60,7 +60,7 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	private List<String> uploadedFileNames;
 
 	private Map<String, String> form = new HashMap<String, String>();
-	private Set<String> selectedUploadedFileNames;
+	private Set<String> selectedUploadedFileNames = new HashSet<>();
 
 	public SurveyFileVM() {
 		setCommitChangesOnApply(false);
@@ -177,14 +177,14 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
  		}
  		this.uploadedFiles = new ArrayList<>();
  		this.uploadedFileNames = new ArrayList<>();
- 		this.selectedUploadedFileNames = null;
+ 		this.selectedUploadedFileNames = new HashSet<>();
  		for (Media media : medias) {
  			File uploadedFile = MediaUtil.copyToTempFile(media);
  			this.uploadedFiles.add(uploadedFile);
  			this.uploadedFileNames.add(normalizeFilename(media.getName()));
 		}
  		updateForm(binder);
- 		notifyChange("uploadedFileNames", "multipleFilesUploaded", "selectedUploadedFileName");
+ 		notifyChange("uploadedFileName", "uploadedFileNames", "multipleFilesUploaded", "selectedUploadedFileName");
 	}
 	
 	@Command
@@ -225,14 +225,25 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	}
 	
 	@Command
+	public void deleteUploadedFile(@BindingParam("filename") String filename) {
+		_deleteSelectedUploadedFilename(filename);
+		selectedUploadedFileNames.remove(filename);
+		notifyChange("uploadedFiles", "uploadedFileNames", "selectedUploadedFileNames");
+	}
+	
+	@Command
 	public void deleteSelectedUploadedFiles() {
 		for (String selectedUploadedFileName : selectedUploadedFileNames) {
-			int index = uploadedFileNames.indexOf(selectedUploadedFileName);
-			uploadedFiles.remove(index);
-			uploadedFileNames.remove(index);
-			notifyChange("uploadedFiles", "uploadedFileNames", "selectedUploadedFileNames");
+			_deleteSelectedUploadedFilename(selectedUploadedFileName);
 		}
 		selectedUploadedFileNames = null;
+		notifyChange("uploadedFiles", "uploadedFileNames", "selectedUploadedFileNames");
+	}
+
+	private void _deleteSelectedUploadedFilename(String selectedUploadedFileName) {
+		int index = uploadedFileNames.indexOf(selectedUploadedFileName);
+		uploadedFiles.remove(index);
+		uploadedFileNames.remove(index);
 	}
 	
 	@Command
