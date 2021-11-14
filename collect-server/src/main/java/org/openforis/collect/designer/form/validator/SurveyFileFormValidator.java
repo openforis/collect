@@ -41,9 +41,30 @@ public class SurveyFileFormValidator extends FormValidator {
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
 		if (validateTypeUniqueness(ctx)) {
-			if (validateFilenames(ctx)) {
-				validateFilenamesUniqueness(ctx);
+			if (validateMultipleFilesAllowedForType(ctx)) {
+				if (validateFilenames(ctx)) {
+					validateFilenamesUniqueness(ctx);
+				}
 			}
+		}
+	}
+
+	private boolean validateMultipleFilesAllowedForType(ValidationContext ctx) {
+		String[] filenames = getFilenames(ctx);
+		if (filenames.length == 1) {
+			// single file uploaded
+			return true;
+		}
+		String typeName = getValue(ctx, TYPE_FIELD_NAME);
+		SurveyFileType type = SurveyFileType.valueOf(typeName);
+		switch (type) {
+		case SURVEY_GUIDE:
+		case COLLECT_EARTH_AREA_PER_ATTRIBUTE:
+		case COLLECT_EARTH_EE_SCRIPT:
+			addInvalidMessage(ctx, TYPE_FIELD_NAME, Labels.getLabel("survey.file.error.multiple_files_not_allowed_for_type"));
+			return false;
+		default:
+			return true;
 		}
 	}
 
@@ -65,25 +86,26 @@ public class SurveyFileFormValidator extends FormValidator {
 			return true;
 		}
 	}
+	
+	private String[] getFilenames(ValidationContext ctx) {
+		String filenamesStr = getValue(ctx, FILENAMES_FIELD_NAME);
+		return filenamesStr.split("\n");
+	}
 
 	private boolean validateFilenames(ValidationContext ctx) {
 		if (validateRequired(ctx, FILENAMES_FIELD_NAME)) { 
-			String filenames = getValue(ctx, FILENAMES_FIELD_NAME);
-			boolean valid = true;
-			for (String filename : filenames.split("\n")) {
+			for (String filename : getFilenames(ctx)) {
 				if (!validateFilenamePattern(ctx, filename)) {
 					return false;
 				}
 			}
-			if (valid) {
-				return validateFilenamesUniqueness(ctx);
-			}
+			return validateFilenamesUniqueness(ctx);
 		}
 		return false;
 	}
 	
 	private boolean validateFilenamePattern(ValidationContext ctx, String filename) {
-		if (validateRegEx(ctx, VALID_FILENAME_PATTERN, FILENAMES_FIELD_NAME, "survey.file.error.invalid_filename")) {
+		if (validateRegExValue(ctx, VALID_FILENAME_PATTERN, filename, FILENAMES_FIELD_NAME, "survey.file.error.invalid_filename")) {
 			String typeName = getValue(ctx, TYPE_FIELD_NAME);
 			SurveyFileType type = SurveyFileType.valueOf(typeName);
 			switch (type) {

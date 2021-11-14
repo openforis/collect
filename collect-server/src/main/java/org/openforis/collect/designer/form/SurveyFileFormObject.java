@@ -12,7 +12,6 @@ public class SurveyFileFormObject extends FormObject<SurveyFile> {
 	
 	public static final String FILENAMES_FIELD_NAME = "filenames";
 	public static final String TYPE_FIELD_NAME = "type";
-	public static final String MULTIPLE_FILES_UPLOADED_FIELD_NAME = "multipleFilesUploaded";
 
 	private String type;
 	private String filenames;

@@ -94,29 +94,32 @@
 						<!-- multiple files uploaded -->
 						<hbox hflex="1"
 							visible="@load(vm.multipleFilesUploaded)">
-							<listbox model="@load(vm.uploadedFileNames)"
-								selectedItems="@load(vm.selectedUploadedFileNames)"
-								onSelect="@command('uploadedFileNamesSelected', filenames=self.selectedItems)"
-								multiple="true" hflex="1" height="200px">
-								<listhead>
-									<listheader
-										label="${labels.survey.file.filename}" hflex="1" />
-									<listheader width="44px" />
-								</listhead>
-								<template name="model">
-									<listitem>
-										<listcell>
-											<label value="@bind(each)"
-												hflex="1" />
-										</listcell>
-										<listcell>
-											<button class="icon-button"
-												image="/assets/images/delete-small.png"
-												onClick="@command('deleteUploadedFile', filename=each)" />
-										</listcell>
-									</listitem>
-								</template>
-							</listbox>
+							<fieldErrorHandler
+								message="@load(vmsgs['filenames'])">
+								<listbox model="@load(vm.uploadedFileNames)"
+									selectedItems="@load(vm.selectedUploadedFileNames)"
+									onSelect="@command('uploadedFileNamesSelected', filenames=self.selectedItems)"
+									multiple="true" hflex="1" height="200px">
+									<listhead>
+										<listheader
+											label="${labels.survey.file.filename}" hflex="1" />
+										<listheader width="44px" />
+									</listhead>
+									<template name="model">
+										<listitem>
+											<listcell>
+												<label value="@bind(each)"
+													hflex="1" />
+											</listcell>
+											<listcell>
+												<button class="icon-button"
+													image="/assets/images/delete-small.png"
+													onClick="@command('deleteUploadedFile', filename=each)" />
+											</listcell>
+										</listitem>
+									</template>
+								</listbox>
+							</fieldErrorHandler>
 							<vbox vflex="1">
 								<button
 									label="${labels.survey.file.select_other_files}"

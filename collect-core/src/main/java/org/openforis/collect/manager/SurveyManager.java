@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -1116,6 +1117,19 @@ public class SurveyManager {
 			surveyFileDao.insert(file);
 			byte[] contentBytes = FileUtils.readFileToByteArray(content);
 			surveyFileDao.updateContent(file, contentBytes);
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
+	public void addSurveyFiles(CollectSurvey survey, List<SurveyFile> files, List<File> filesContent) {
+		try {
+			Iterator<File> filesContentIt = filesContent.iterator();
+			for (SurveyFile file : files) {
+				File fileContent = filesContentIt.next();
+				addSurveyFile(survey, file, fileContent);
+			}
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}

@@ -96,7 +96,18 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 
 	@Override
 	protected void addNewItemToSurvey() {
-		//surveyManager.addSurveyFile(survey, editedItem, uploadedFile);
+		if (isMultipleFilesUploaded()) {
+			List<SurveyFile> surveyFiles = new ArrayList<>(uploadedFiles.size());
+			for (String filename : uploadedFileNames) {
+				SurveyFile surveyFile = new SurveyFile(survey);
+				surveyFile.setType(editedItem.getType());
+				surveyFile.setFilename(filename);
+				surveyFiles.add(surveyFile);
+			}
+			surveyManager.addSurveyFiles(survey, surveyFiles, uploadedFiles);
+		} else {
+			surveyManager.addSurveyFile(survey, editedItem, uploadedFiles.get(0));			
+		}
 	}
 
 	@Override
@@ -255,18 +266,22 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	}
 	
 	private void updateForm(Binder binder) {
-		String typeName = getFormFieldValue(binder, SurveyFileFormObject.TYPE_FIELD_NAME);
-		SurveyFileType type = SurveyFileType.valueOf(typeName);
-		String filename = type.getFixedFilename();
-		if (filename == null) {
-			if (CollectionUtils.isNotEmpty(uploadedFiles)) {
-				filename = getUploadedFileName();
-			} else {
-				filename = getFormFieldValue(binder, SurveyFileFormObject.FILENAMES_FIELD_NAME);
+		String filename = null;
+		if (isMultipleFilesUploaded()) {
+			filename = getUploadedFileName();
+		} else {
+			String typeName = getFormFieldValue(binder, SurveyFileFormObject.TYPE_FIELD_NAME);
+			SurveyFileType type = SurveyFileType.valueOf(typeName);
+			filename = type.getFixedFilename();
+			if (filename == null) {
+				if (CollectionUtils.isNotEmpty(uploadedFiles)) {
+					filename = getUploadedFileName();
+				} else {
+					filename = getFormFieldValue(binder, SurveyFileFormObject.FILENAMES_FIELD_NAME);
+				}
 			}
 		}
 		setFormFieldValue(binder, SurveyFileFormObject.FILENAMES_FIELD_NAME, filename);
-		setFormFieldValue(binder, SurveyFileFormObject.MULTIPLE_FILES_UPLOADED_FIELD_NAME, isMultipleFilesUploaded());
 		dispatchApplyChangesCommand(binder);
 	}
 
