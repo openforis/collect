@@ -1,107 +1,163 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
-  <custom-attributes surveyFile="${arg.surveyFile}"/>
-  <custom-attributes newItem="${arg.newItem}"/>
-  <window
-    id="surveyFilePopUp"
-    title="${labels.survey.file.popup.title}"
-    width="600px" border="normal" position="center" closable="true"
-    sclass="form"
-    apply="org.zkoss.bind.BindComposer"
-    onClose="@command('close')"
-    viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyFileVM')"
-    validationMessages="@id('vmsgs')"
-    form="@id('fx') 
+	<custom-attributes surveyFile="${arg.surveyFile}" />
+	<custom-attributes newItem="${arg.newItem}" />
+	<window id="surveyFilePopUp"
+		title="${labels.survey.file.popup.title}" width="700px"
+		border="normal" position="center" closable="true" sclass="form"
+		apply="org.zkoss.bind.BindComposer" onClose="@command('close')"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyFileVM')"
+		validationMessages="@id('vmsgs')"
+		form="@id('fx') 
       @load(vm.formObject) 
       @save(vm.formObject, before={'validate','applyChanges'})
       @validator('org.openforis.collect.designer.form.validator.SurveyFileFormValidator', surveyManager=vm.surveyManager)">
-   
-   <zscript deferred="true"><![CDATA[
-     import org.zkoss.util.media.Media;
-  
-     Executions.getCurrent().getDesktop().setAttribute(
-             "org.zkoss.zul.Fileupload.target", surveyFilePopUp);
-   ]]></zscript>
-   
-    <grid>
-      <columns>
-        <column width="150px" />
-        <column />
-      </columns>
-      <rows>
-        <row>
-          <label value="${labels.survey.file.type.$}:" />
-          <fieldErrorHandler message="@load(vmsgs['type'])">
-	        	<listbox 
-	              id="typeListBox"
-	              selectedItem="@bind(fx.type)"
-	              mold="select" onSelect="@command('typeChanged')">
-	              <listitem selected="true"
-	                label="${labels.survey.file.type.generic}"
-	                value="GENERIC" />
-	              <listitem selected="true"
-	                label="${labels.survey.file.type.survey_guide}"
-	                value="SURVEY_GUIDE" />
-	              <listitem visible="@load(vm.collectEarthSurvey)"
-	                label="${labels.survey.file.type.collect_earth_area_per_attribute}"
-	                value="COLLECT_EARTH_AREA_PER_ATTRIBUTE" />
-	              <listitem visible="@load(vm.collectEarthSurvey)"
-	                label="${labels.survey.file.type.collect_earth_grid.$}"
-	                value="COLLECT_EARTH_GRID" />
-	              <listitem visible="@load(vm.collectEarthSurvey)"
-	                label="${labels.survey.file.type.collect_earth_ee_script}"
-	                value="COLLECT_EARTH_EE_SCRIPT" />
-	              <listitem visible="@load(vm.collectEarthSurvey)"
-	                label="${labels.survey.file.type.collect_earth_saiku_query}"
-	                value="COLLECT_EARTH_SAIKU_QUERY" />
-	          </listbox>
-	          <button label="${labels.survey.file.type.download_example}"
-	          		visible="@load(fx.type eq 'COLLECT_EARTH_GRID')"
-            		onClick="@command('downloadExampleFile', fileType=typeListBox.selectedItem.value)" />
-	      </fieldErrorHandler>
-        </row>
-        <row>
-          <label value="${labels.survey.file.file}:" />
-          <cell>
-            <hbox hflex="1" visible="@load(newItem or not empty vm.uploadedFileName)">
-              <hbox width="300px">
-                <label visible="@load(empty vm.uploadedFileName)" 
-                	value="${labels.global.file_not_selected}" />
-	            <a visible="@load(not (empty vm.uploadedFileName))" 
-	            	label="@load(vm.uploadedFileName)" tooltiptext="${labels.global.download}" 
-	            	onClick="@command('downloadUploadedFile')" />
-              </hbox>
-              <button label="${labels.global.select_file_to_upload}"
-                	upload="true,maxsize=-1" onUpload="@command('fileUploaded')" />
-            </hbox>
-            <hbox hflex="1" visible="@load(not newItem and empty vm.uploadedFileName)">
-              <hbox width="300px">
-       	          <a label="@load(vm.editedItemFilename)" tooltiptext="${labels.global.download}" 
-	            	onClick="@command('downloadFile')" />
-              </hbox>
-              <button label="${labels.global.select_new_file_to_upload}"
-                	upload="true,maxsize=-1" onUpload="@command('fileUploaded')" />
-            </hbox>
-          </cell>
-        </row>
-        <row>
-        	<fieldErrorHandler message="@load(vmsgs['filename'])">
-        		<label value="${labels.survey.file.filename}:" />
-          	</fieldErrorHandler>
-        	<fieldErrorHandler message="@load(vmsgs['filename'])">
-            	<textbox width="300px" value="@bind(fx.filename)"
-                	onChange="@command('applyChanges')" 
-                	readonly="@load(fx.type eq 'COLLECT_EARTH_AREA_PER_ATTRIBUTE' or fx.type eq 'COLLECT_EARTH_EE_SCRIPT' or fx.type eq 'SURVEY_GUIDE')" />
-       		</fieldErrorHandler>
-        </row>
-      </rows>
-    </grid>
-	<box width="100%" align="center">
-        <hbox>
-          <button label="${labels.global.apply}"
-            onClick="@command('commitChanges')" />
-        </hbox>
-      </box>
-  </window>
+
+		<zscript deferred="true"><![CDATA[
+	import org.zkoss.util.media.Media;
+	Executions.getCurrent().getDesktop().setAttribute("org.zkoss.zul.Fileupload.target", surveyFilePopUp);
+]]></zscript>
+
+		<grid>
+			<columns>
+				<column width="100px" />
+				<column />
+			</columns>
+			<rows>
+				<row>
+					<label value="${labels.survey.file.type.$}:" />
+					<fieldErrorHandler message="@load(vmsgs['type'])">
+						<listbox id="typeListBox"
+							selectedItem="@bind(fx.type)" mold="select"
+							onSelect="@command('typeChanged')">
+							<listitem selected="true"
+								label="${labels.survey.file.type.generic}" value="GENERIC" />
+							<listitem selected="true"
+								label="${labels.survey.file.type.survey_guide}"
+								value="SURVEY_GUIDE" />
+							<listitem
+								visible="@load(vm.collectEarthSurvey)"
+								label="${labels.survey.file.type.collect_earth_area_per_attribute}"
+								value="COLLECT_EARTH_AREA_PER_ATTRIBUTE" />
+							<listitem
+								visible="@load(vm.collectEarthSurvey)"
+								label="${labels.survey.file.type.collect_earth_grid.$}"
+								value="COLLECT_EARTH_GRID" />
+							<listitem
+								visible="@load(vm.collectEarthSurvey)"
+								label="${labels.survey.file.type.collect_earth_ee_script}"
+								value="COLLECT_EARTH_EE_SCRIPT" />
+							<listitem
+								visible="@load(vm.collectEarthSurvey)"
+								label="${labels.survey.file.type.collect_earth_saiku_query}"
+								value="COLLECT_EARTH_SAIKU_QUERY" />
+						</listbox>
+						<button
+							label="${labels.survey.file.type.download_example}"
+							visible="@load(fx.type eq 'COLLECT_EARTH_GRID')"
+							onClick="@command('downloadExampleFile', fileType=typeListBox.selectedItem.value)" />
+					</fieldErrorHandler>
+				</row>
+				<row>
+					<label value="${labels.survey.file.file}:" />
+					<cell>
+						<!-- new item or new file uploaded and not multiple files uploaded -->
+						<hbox hflex="1"
+							visible="@load((newItem or not empty vm.uploadedFileName) and not vm.multipleFilesUploaded)">
+							<hbox width="300px">
+								<label
+									visible="@load(empty vm.uploadedFileName)"
+									value="${labels.global.file_not_selected}" />
+								<a
+									visible="@load(not vm.multipleFilesUploaded and not (empty vm.uploadedFileName))"
+									label="@load(vm.uploadedFileName)"
+									tooltiptext="${labels.global.download}"
+									onClick="@command('downloadUploadedFile')" />
+							</hbox>
+							<button
+								label="${labels.global.select_file_to_upload}"
+								upload="true,maxsize=-1,multiple=true"
+								onUpload="@command('fileUploaded')" />
+						</hbox>
+						<!-- already existing item and new file not uploaded -->
+						<hbox hflex="1"
+							visible="@load(not newItem and empty vm.uploadedFileName)">
+							<hbox width="300px">
+								<a label="@load(vm.editedItemFilename)"
+									tooltiptext="${labels.global.download}"
+									onClick="@command('downloadFile')" />
+							</hbox>
+							<button
+								label="${labels.global.select_new_file_to_upload}"
+								upload="true,maxsize=-1" onUpload="@command('fileUploaded')" />
+						</hbox>
+						<!-- multiple files uploaded -->
+						<hbox hflex="1"
+							visible="@load(vm.multipleFilesUploaded)">
+							<fieldErrorHandler
+								message="@load(vmsgs['filenames'])">
+								<listbox model="@load(vm.uploadedFileNames)"
+									selectedItems="@load(vm.selectedUploadedFileNames)"
+									onSelect="@command('uploadedFileNamesSelected', filenames=self.selectedItems)"
+									multiple="true" hflex="1" height="200px">
+									<listhead>
+										<listheader
+											label="${labels.survey.file.filename}" hflex="1" />
+										<listheader width="44px" />
+									</listhead>
+									<template name="model">
+										<listitem>
+											<listcell>
+												<label value="@bind(each)"
+													hflex="1" />
+											</listcell>
+											<listcell>
+												<button class="icon-button"
+													image="/assets/images/delete-small.png"
+													onClick="@command('deleteUploadedFile', filename=each)" />
+											</listcell>
+										</listitem>
+									</template>
+								</listbox>
+							</fieldErrorHandler>
+							<vbox vflex="1">
+								<button
+									label="${labels.survey.file.select_other_files}"
+									upload="true,maxsize=-1,multiple=true"
+									onUpload="@command('fileUploaded')" />
+								<button
+									label="${labels.global.delete_selected_items}"
+									visible="@load(not empty vm.selectedUploadedFileNames)"
+									onClick="@command('deleteSelectedUploadedFiles')" />
+							</vbox>
+						</hbox>
+					</cell>
+				</row>
+				<!-- single file uploaded: file name textbox -->
+				<row visible="@load(not vm.multipleFilesUploaded)">
+					<fieldErrorHandler
+						message="@load(vmsgs['filenames'])">
+						<label value="${labels.survey.file.filename}:" />
+					</fieldErrorHandler>
+					<fieldErrorHandler
+						message="@load(vmsgs['filenames'])">
+						<textbox width="300px"
+							value="@bind(fx.filenames)" rows="4"
+							onChange="@command('applyChanges')"
+							readonly="@load(
+		                		fx.type eq 'COLLECT_EARTH_AREA_PER_ATTRIBUTE' 
+		                		or fx.type eq 'COLLECT_EARTH_EE_SCRIPT' 
+		                		or fx.type eq 'SURVEY_GUIDE'
+               		)" />
+					</fieldErrorHandler>
+				</row>
+			</rows>
+		</grid>
+		<box width="100%" align="center">
+			<hbox>
+				<button label="${labels.global.apply}"
+					onClick="@command('commitChanges')" />
+			</hbox>
+		</box>
+	</window>
 </zk>
-     

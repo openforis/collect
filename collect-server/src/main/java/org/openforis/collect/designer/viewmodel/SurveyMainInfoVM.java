@@ -5,9 +5,11 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.net.URLConnection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.SurveyMainInfoFormObject;
@@ -41,7 +43,7 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 	
 	private boolean editingNewSurveyFile;
 	private SurveyFile editedSurveyFile;
-	private SurveyFile selectedSurveyFile;
+	private Set<SurveyFile> selectedSurveyFiles = new HashSet<SurveyFile>();
 
 	private Window surveyFilePopUp;
 	
@@ -114,16 +116,20 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 	
 	@Command
 	public void editSelectedSurveyFile() {
-		if (selectedSurveyFile == null) {
+		if (!isSingleSurveyFileSelected()) {
 			return;
 		}
-		editedSurveyFile = selectedSurveyFile;
+		editedSurveyFile = selectedSurveyFiles.iterator().next();
 		editingNewSurveyFile = false;
 		openSurveyFileEditPopUp();
 	}
 	
 	@Command
 	public void downloadSelectedSurveyFile() {
+		if (!isSingleSurveyFileSelected()) {
+			return;
+		}
+		SurveyFile selectedSurveyFile = selectedSurveyFiles.iterator().next();
 		byte[] content = surveyManager.loadSurveyFileContent(selectedSurveyFile);
 		String fileName = selectedSurveyFile.getFilename();
 		String contentType = URLConnection.guessContentTypeFromName(fileName);
@@ -151,25 +157,36 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 	}
 	
 	@Command
-	public void deleteSelectedSurveyFile() {
-		if (selectedSurveyFile == null) {
+	public void deleteSelectedSurveyFiles() {
+		if (selectedSurveyFiles.isEmpty()) {
 			return;
 		}
+		String messageKey = isSingleSurveyFileSelected() ? 
+				"survey.file.delete.confirm" :
+				"survey.file.delete_multiple.confirm";
+		String[] messageArgs = isSingleSurveyFileSelected() ?
+				new String[]{selectedSurveyFiles.iterator().next().getFilename()}:
+				new String[]{Integer.toString(selectedSurveyFiles.size())};
 		MessageUtil.showConfirm(new ConfirmHandler() {
 			@Override
 			public void onOk() {
-				surveyManager.deleteSurveyFile(selectedSurveyFile);
-				notifyChange("surveyFiles");
+				surveyManager.deleteSurveyFiles(selectedSurveyFiles);
+				setSelectedSurveyFiles(new HashSet<>()); 
+				notifyChange("surveyFiles", "selectedSurveyFiles");
 			}
-		}, "survey.file.delete.confirm", new String[]{selectedSurveyFile.getFilename()});
+		}, messageKey, messageArgs);
 	}
 	
-	public SurveyFile getSelectedSurveyFile() {
-		return selectedSurveyFile;
-	}
-
-	public void setSelectedSurveyFile(SurveyFile selectedSurveyFile) {
-		this.selectedSurveyFile = selectedSurveyFile;
+	public boolean isSingleSurveyFileSelected() {
+		return selectedSurveyFiles.size() == 1;
 	}
 	
+	public Set<SurveyFile> getSelectedSurveyFiles() {
+		return selectedSurveyFiles;
+	}
+	
+	public void setSelectedSurveyFiles(Set<SurveyFile> selectedSurveyFiles) {
+		this.selectedSurveyFiles = selectedSurveyFiles;
+		notifyChange("singleSurveyFileSelected");
+	}
 }
