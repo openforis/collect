@@ -4,15 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.0.32] - NOT RELEASED YET
+## [4.0.33] - NOT RELEASED YET
+### Added
+- Survey Designer / Survey files: allow importing multiple files;
+
+## [4.0.32] - 2021-10-04
 ### Added
 - Data Management / Data Import Summary: added record import warnings icon;
 
-## [4.0.31] - 2021-10-05
+## [4.0.31] - 2021-09-30
 ### Added
 - Data Management / Data Import Summary: added Filled Values column and importability tooltips;
 
-## [4.0.31] - 2021-09-30
 ### Fixed
 - Internal changes: removed dependencies giving conflicts;
 
