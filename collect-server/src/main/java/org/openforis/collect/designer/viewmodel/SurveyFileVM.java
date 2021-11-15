@@ -128,14 +128,16 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	public void commitChanges(@ContextParam(ContextType.BINDER) Binder binder) {
 		dispatchApplyChangesCommand(binder);
 		if ( checkCanLeaveForm() ) {
-			if (newItem && uploadedFiles == null || uploadedFiles.isEmpty()) {
+			if (newItem && (uploadedFiles == null || uploadedFiles.isEmpty())) {
 				MessageUtil.showError("global.file_not_selected");
 			} else {
 				if (uploadedFiles == null || validateFileContent(binder)) {
 					boolean wasNewItem = newItem;
 					super.commitChanges(binder);
 					if (! wasNewItem) {
-//						surveyManager.updateSurveyFile(survey, editedItem, uploadedFile);
+						// update is allowed only for single files
+						File uploadedFile = uploadedFiles != null && !uploadedFiles.isEmpty() ? uploadedFiles.get(0) : null;
+						surveyManager.updateSurveyFile(survey, editedItem, uploadedFile);
 					}
 					BindUtils.postGlobalCommand(null, null, APPLY_CHANGES_TO_EDITED_SURVEY_FILE_GLOBAL_COMMAND, null);
 				}

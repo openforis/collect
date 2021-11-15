@@ -15,29 +15,23 @@ public class SurveyFileFormObject extends FormObject<SurveyFile> {
 
 	private String type;
 	private String filenames;
-	private boolean multipleFilesUploaded;
 
 	@Override
 	public void loadFrom(SurveyFile source, String language) {
 		type = source.getType().name();
 		filenames = source.getFilename();
-		multipleFilesUploaded = false;
 	}
 	
 	@Override
 	public void saveTo(SurveyFile dest, String language) {
-		if (multipleFilesUploaded) {
-		} else {
-			dest.setType(SurveyFileType.valueOf(type));
-			dest.setFilename(filenames);
-		}
+		dest.setType(SurveyFileType.valueOf(type));
+		dest.setFilename(filenames);
 	}
 	
 	@Override
 	protected void reset() {
 		type = SurveyFileType.GENERIC.name();
 		filenames = "";
-		multipleFilesUploaded = false;
 	}
 
 	public String getType() {
@@ -54,14 +48,6 @@ public class SurveyFileFormObject extends FormObject<SurveyFile> {
 	
 	public void setFilenames(String filenames) {
 		this.filenames = filenames;
-	}
-	
-	public boolean isMultipleFilesUploaded() {
-		return multipleFilesUploaded;
-	}
-	
-	public void setMultipleFilesUploaded(boolean multipleFilesUploaded) {
-		this.multipleFilesUploaded = multipleFilesUploaded;
 	}
 	
 }
