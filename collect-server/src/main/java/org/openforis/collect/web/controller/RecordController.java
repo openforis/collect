@@ -28,6 +28,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.compress.utils.Sets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.ProxyContext;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.event.EventListenerToList;
@@ -579,6 +580,39 @@ public class RecordController extends BasicController implements Serializable {
 				MediaTypes.ZIP_CONTENT_TYPE);
 	}
 
+	@RequestMapping(value = "survey/{survey_id}/data/records/{record_id}/content/collect/data.collect-data", method = GET, produces = MediaTypes.ZIP_CONTENT_TYPE)
+	public void exportRecordToCollectFormat(@PathVariable(value = "survey_id") int surveyId,
+			@PathVariable(value = "record_id") int recordId, HttpServletResponse response) throws RecordPersistenceException, IOException {
+		User user = sessionManager.getLoggedUser();
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		
+		RecordFilter filter = createRecordFilter(survey, user, userGroupManager);
+		filter.setRecordId(recordId);
+		
+		// check that record exists
+		List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter);
+		if (summaries.isEmpty()) {
+			throw new IllegalArgumentException(String.format("Could not find record with id %d", recordId));
+		}
+		CollectRecordSummary recordSummary = summaries.get(0);
+
+		// start export job
+		SurveyBackupJob job = jobManager.createJob(SurveyBackupJob.class);
+		job.setRecordFilter(filter);
+		job.setSurvey(survey);
+		job.setIncludeData(true);
+		job.setIncludeRecordFiles(true);
+		jobManager.start(job, false);
+		
+		// write generated file to response
+		File file = job.getOutputFile();
+		String surveyName = survey.getName();
+		String recordKeys = StringUtils.join(recordSummary.getRootEntityKeyValues(), '-');
+		String outputFileName = String.format("%s-record-%s-%s.collect-data", surveyName, recordKeys,
+				Dates.formatLocalDateTime(new Date()));
+		Controllers.writeFileToResponse(response, file, outputFileName, MediaTypes.ZIP_CONTENT_TYPE);
+	}
+
 	@RequestMapping(value = "survey/{surveyId}/data/records/stats", method = GET)
 	public @ResponseBody RecordsStats generateStats(@PathVariable("surveyId") int surveyId) {
 		Date[] period = recordManager.findWorkingPeriod(surveyId);
@@ -896,6 +930,11 @@ public class RecordController extends BasicController implements Serializable {
 			this.rootEntityKeyValues = rootEntityKeyValues;
 		}
 	}
+	
+	private static RecordFilter createRecordFilter(CollectSurvey survey, User user, UserGroupManager userGroupManager) {
+		return createRecordFilter(survey, user, userGroupManager, null, false);
+	}
+
 
 	private static RecordFilter createRecordFilter(CollectSurvey survey, User user, UserGroupManager userGroupManager,
 			Integer rootEntityId, boolean onlyOwnedRecords) {

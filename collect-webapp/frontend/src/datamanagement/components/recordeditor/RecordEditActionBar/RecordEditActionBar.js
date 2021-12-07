@@ -48,6 +48,7 @@ const RecordEditActionBar = (props) => {
   const prevStepLabel = prevStep ? L.l(`dataManagement.workflow.step.${prevStep.toLocaleLowerCase()}`) : null
 
   const onExportToExcel = () => ServiceFactory.recordService.exportRecordToExcel(record)
+  const onExportToCollectFormat = () => ServiceFactory.recordService.exportRecordToCollectFormat(record)
 
   const onPromote = () => {
     const performPromote = async () => {
@@ -106,6 +107,9 @@ const RecordEditActionBar = (props) => {
           <>
             <IconButton title={L.l('common.exportToExcel')} onClick={onExportToExcel}>
               <Icon className="fa fa-file-excel" color="primary" />
+            </IconButton>
+            <IconButton title={L.l('dataManagement.export.exportToCollectFormat')} onClick={onExportToCollectFormat}>
+              <Icon className="fa fa-file-archive" color="primary" />
             </IconButton>
             {!inPopUp && (
               <>

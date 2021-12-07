@@ -74,6 +74,12 @@ export default class RecordService extends AbstractService {
     )
   }
 
+  exportRecordToCollectFormat(record) {
+    const { survey, id: recordId } = record
+    const { id: surveyId } = survey
+    this.downloadFile(`${this.BASE_URL}survey/${surveyId}/data/records/${recordId}/content/collect/data.collect-data`)
+  }
+
   startBackupDataExport(surveyId, parameters) {
     return this.postJson('survey/' + surveyId + '/data/records/startbackupexport', parameters)
   }

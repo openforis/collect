@@ -207,6 +207,7 @@
         "title": "Exporting data",
         "downloadExportedFile": "Download exported file"
       },
+      "exportToCollectFormat": "Export to Collect Format",
       "filter": "Filter",
       "mode": {
         "label": "Export mode",
