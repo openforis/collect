@@ -591,9 +591,10 @@ public class RecordController extends BasicController implements Serializable {
 		
 		// check that record exists
 		List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter);
-		if (summaries.isEmpty()) {
-			throw new IllegalArgumentException(String.format("Could not find record with id %d", recordId));
+		if (summaries.size() != 1) {
+			throw new IllegalArgumentException(String.format("Could not find record with id %d or multiple records found", recordId));
 		}
+		
 		CollectRecordSummary recordSummary = summaries.get(0);
 
 		// start export job
