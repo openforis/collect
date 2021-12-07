@@ -36,7 +36,6 @@ import org.openforis.collect.utils.ZipFiles;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.concurrency.Task;
 import org.openforis.concurrency.Worker;
-import org.openforis.idm.metamodel.EntityDefinition;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -279,16 +278,14 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	}
 	
 	private void addRecordFilesBackupTask() {
-		for (EntityDefinition rootEntity : survey.getSchema().getRootEntityDefinitions()) {
-			RecordFileBackupTask task = createTask(RecordFileBackupTask.class);
-			task.setWeight(5);
-			task.setRecordManager(recordManager);
-			task.setRecordFileManager(recordFileManager);
-			task.setZipOutputStream(zipOutputStream);
-			task.setSurvey(survey);
-			task.setRootEntityName(rootEntity.getName());
-			addTask(task);
-		}
+		RecordFileBackupTask task = createTask(RecordFileBackupTask.class);
+		task.setWeight(5);
+		task.setRecordManager(recordManager);
+		task.setRecordFileManager(recordFileManager);
+		task.setZipOutputStream(zipOutputStream);
+		task.setRecordFilter(recordFilter);
+		task.setSurvey(survey);
+		addTask(task);
 	}
 	
 	private void addCollectMobileBackupConverterTask() {
