@@ -608,10 +608,9 @@ public class RecordController extends BasicController implements Serializable {
 		File file = job.getOutputFile();
 		String surveyName = survey.getName();
 		String recordKeys = StringUtils.join(recordSummary.getRootEntityKeyValues(), '-');
-		
-		Controllers.writeFileToResponse(response, file,
-		String.format("%s-record-%s-%s.collect-data", surveyName, recordKeys, Dates.formatLocalDateTime(new Date())),
-			MediaTypes.ZIP_CONTENT_TYPE);
+		String outputFileName = String.format("%s-record-%s-%s.collect-data", surveyName, recordKeys,
+				Dates.formatLocalDateTime(new Date()));
+		Controllers.writeFileToResponse(response, file, outputFileName, MediaTypes.ZIP_CONTENT_TYPE);
 	}
 
 	@RequestMapping(value = "survey/{surveyId}/data/records/stats", method = GET)
