@@ -15,7 +15,7 @@
 	<properties>
 		<jooq.version>3.6.2</jooq.version> <!-- Version 3.7 requires Java 7 (not compatible with Collect Mobile) -->
 		<jooq-codegen.version>3.6.2</jooq-codegen.version>
-		<protostuff.version>1.2.1</protostuff.version>
+		<protostuff.version>1.2.2</protostuff.version>
 	</properties>
 
 	<build>
