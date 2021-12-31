@@ -76,6 +76,8 @@ import org.openforis.idm.model.ModelSerializer;
 @SuppressWarnings("rawtypes")
 public class RecordDao extends JooqDaoSupport {
 	
+	private static final int SQLITE_VALUE_MAX_SIZE = 600000; // 600KB
+
 	private static final TableField[] RECORD_KEY_FIELDS = 
 		{OFC_RECORD.KEY1, OFC_RECORD.KEY2, OFC_RECORD.KEY3};
 	
@@ -928,13 +930,43 @@ public class RecordDao extends JooqDaoSupport {
 		return s;
 	}
 	
+	private boolean queryExceedsMaxSize(Query query) {
+		if (!dsl().isSQLite()) return false;
+		
+		List<Object> bindValues = query.getBindValues();
+		for (Object bindValue : bindValues) {
+			if (bindValue != null && 
+					(bindValue instanceof String && 
+						((String) bindValue).length() > SQLITE_VALUE_MAX_SIZE
+							||
+					bindValue.getClass().isArray() && bindValue instanceof byte[] && 
+						((byte[]) bindValue).length > SQLITE_VALUE_MAX_SIZE)
+					) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public void execute(List<CollectStoreQuery> queries) {
 		List<Query> internalQueries = new ArrayList<Query>(queries.size());
+		boolean exceedsBatchMaxSize = false;
 		for (CollectStoreQuery recordStoreQuery : queries) {
-			internalQueries.add(recordStoreQuery.getInternalQuery());
+			Query internalQuery = recordStoreQuery.getInternalQuery();
+			if (queryExceedsMaxSize(internalQuery)) {
+				exceedsBatchMaxSize = true;
+			}
+			internalQueries.add(internalQuery);
 		}
-		Batch batch = dsl().batch(internalQueries);
-		batch.execute();
+		if (exceedsBatchMaxSize) {
+			// execute queries sequentially
+			for (Query internalQuery : internalQueries) {
+				dsl().execute(internalQuery);
+			}
+		} else {
+			Batch batch = dsl().batch(internalQueries);
+			batch.execute();
+		}
 	}
 	
 	public void delete(int id) {
