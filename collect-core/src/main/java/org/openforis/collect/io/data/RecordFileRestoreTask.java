@@ -104,6 +104,7 @@ public class RecordFileRestoreTask extends Task {
 		RecordFilter filter = new RecordFilter(survey);
 		filter.setRootEntityId(record.getRootEntityDefinitionId());
 		filter.setKeyValues(recordKeys);
+		filter.setIncludeNullConditionsForKeyValues(true);
 		List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter);
 		if ( summaries.size() == 1 ) {
 			CollectRecordSummary summary = summaries.get(0);

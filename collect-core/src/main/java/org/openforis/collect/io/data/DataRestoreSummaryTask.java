@@ -302,6 +302,7 @@ public class DataRestoreSummaryTask extends Task {
 		RecordFilter filter = new RecordFilter(survey);
 		filter.setRootEntityId(rootEntityDefId);
 		filter.setKeyValues(keyValues);
+		filter.setIncludeNullConditionsForKeyValues(true);
 		List<CollectRecordSummary> oldRecordSummaries = recordManager.loadSummaries(filter);
 		if ( oldRecordSummaries == null || oldRecordSummaries.isEmpty() ) {
 			return null;
