@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jooq.Batch;
 import org.jooq.Query;
 import org.jooq.exception.DataAccessException;
 
@@ -22,7 +23,8 @@ public abstract class JooqDaoSupport {
 
 	private static final String CONSTRAINT_VIOLATION_CODE = "23";
 	private static final String CONSTRAINT_VIOLATION_MESSAGE = "constraint violation";
-	
+	private static final int SQLITE_VALUE_MAX_SIZE = 500000; // 500KB
+
 	protected CollectDSLContext dsl;
 	   
 	public static boolean isConstraintViolation(DataAccessException e) {
@@ -38,10 +40,6 @@ public abstract class JooqDaoSupport {
 		}
 	}
 	
-	protected Logger getLog() {
-		return log;
-	}
-	
 	// TODO Move to MappingJooqFactory
 	protected static Timestamp toTimestamp(Date date) {
 		if ( date == null ) {
@@ -51,6 +49,49 @@ public abstract class JooqDaoSupport {
 		}
 	}
 
+	private boolean queryExceedsMaxSizeForBatch(Query query) {
+		if (!dsl().isSQLite()) return false;
+		
+		List<Object> bindValues = query.getBindValues();
+		for (Object bindValue : bindValues) {
+			if (bindValue != null && 
+					(bindValue instanceof String && 
+						((String) bindValue).length() > SQLITE_VALUE_MAX_SIZE
+							||
+					bindValue.getClass().isArray() && bindValue instanceof byte[] && 
+						((byte[]) bindValue).length > SQLITE_VALUE_MAX_SIZE)
+					) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void executeInBatch(List<Query> queries) {
+		List<Query> queriesToBeExecutedSequentially = new ArrayList<Query>();
+		List<Query> queriesToBeExecutedInBatch = new ArrayList<Query>();
+		for (Query query : queries) {
+			if (queryExceedsMaxSizeForBatch(query)) {
+				queriesToBeExecutedSequentially.add(query);
+			} else {
+				queriesToBeExecutedInBatch.add(query);
+			}
+		}
+		if (!queriesToBeExecutedSequentially.isEmpty()) {
+			for (Query query : queriesToBeExecutedSequentially) {
+				dsl().execute(query);
+			}
+		}
+		if (!queriesToBeExecutedInBatch.isEmpty()) {
+			Batch batch = dsl().batch(queriesToBeExecutedInBatch);
+			batch.execute();
+		}
+	}
+	
+	protected Logger getLog() {
+		return log;
+	}
+	
 	protected CollectDSLContext dsl() {
 		return dsl;
 	}

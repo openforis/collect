@@ -483,7 +483,9 @@ public class RecordManager {
 		Set<User> owners = new HashSet<User>(ownerIds.size());
 		for (Integer ownerId : ownerIds) {
 			User owner = userManager.loadById(ownerId);
-			owners.add(owner);
+			if (owner != null) {
+				owners.add(owner);
+			}
 		}
 		return owners;
 	}
