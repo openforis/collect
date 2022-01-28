@@ -1,13 +1,11 @@
-import 'react-datepicker/dist/react-datepicker.css'
-
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Line } from 'react-chartjs-2'
-import DatePicker from 'react-datepicker'
 
 import Dates from 'utils/Dates'
 import L from 'utils/Labels'
 import ServiceFactory from 'services/ServiceFactory'
+import { DatePicker } from 'common/components/DatePicker'
 
 //const DAYS_OF_WEEK_ABBREVIATED = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 const MONTHS = [
@@ -421,18 +419,16 @@ class DashboardPage extends Component {
                   <form className="form-inline">
                     <label>From: </label>
                     <DatePicker
-                      dateFormat={DATE_PICKER_DATE_FORMAT}
-                      selected={periodFrom}
                       minDate={minPeriodFrom}
                       maxDate={maxPeriodTo}
+                      value={periodFrom}
                       onChange={this.handlePeriodFromChange}
                     />
                     <label>To: </label>
                     <DatePicker
-                      dateFormat={DATE_PICKER_DATE_FORMAT}
-                      selected={periodTo}
                       minDate={minPeriodFrom}
                       maxDate={maxPeriodTo}
+                      value={periodFrom}
                       onChange={this.handlePeriodToChange}
                     />
                   </form>
