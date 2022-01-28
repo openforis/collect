@@ -23,7 +23,7 @@
 	<repositories>
 		<repository>
 			<id>zk repository</id>
-			<url>http://mavensync.zkoss.org/maven2</url>
+			<url>https://mavensync.zkoss.org/maven2</url>
 		</repository>
 	</repositories>
 
