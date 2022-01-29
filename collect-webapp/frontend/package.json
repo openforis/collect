@@ -45,7 +45,7 @@
     "react-stomp": "^5.1.0",
     "react-truncate": "^2.4.0",
     "react-virtualized": "^9.22.3",
-    "reactstrap": "^8.9.0",
+    "reactstrap": "^9.0.1",
     "redux": "^4.1.2",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.4.1",
