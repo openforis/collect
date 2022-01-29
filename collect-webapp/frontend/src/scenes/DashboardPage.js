@@ -1,11 +1,23 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js'
 import { Line } from 'react-chartjs-2'
 
 import Dates from 'utils/Dates'
 import L from 'utils/Labels'
 import ServiceFactory from 'services/ServiceFactory'
 import { DatePicker } from 'common/components/DatePicker'
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 //const DAYS_OF_WEEK_ABBREVIATED = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 const MONTHS = [
@@ -27,8 +39,6 @@ const createdRecordsLineColor = '#993300'
 const modifiedRecordsLineColor = '#63c2de'
 const enteredRecordsLineColor = '#FF9900'
 const cleansedRecordsLineColor = '#009900'
-
-const DATE_PICKER_DATE_FORMAT = 'dd/MM/yyyy'
 
 const Period = {
   DAY: 'DAY',
@@ -287,22 +297,22 @@ class DashboardPage extends Component {
       legend: {
         display: false,
       },
-      scales: {
-        xAxes: [
-          {
-            gridLines: {
-              drawOnChartArea: false,
-            },
-          },
-        ],
-        yAxes: [
-          {
-            ticks: {
-              suggestedMax: Math.max(maxCreatedRecords, maxModifiedRecords, maxEnteredRecords) + 20,
-            },
-          },
-        ],
-      },
+      // scales: {
+      //   xAxes: [
+      //     {
+      //       gridLines: {
+      //         drawOnChartArea: false,
+      //       },
+      //     },
+      //   ],
+      //   yAxes: [
+      //     {
+      //       ticks: {
+      //         suggestedMax: Math.max(maxCreatedRecords, maxModifiedRecords, maxEnteredRecords) + 20,
+      //       },
+      //     },
+      //   ],
+      // },
       elements: {
         point: {
           radius: 0,
@@ -329,10 +339,10 @@ class DashboardPage extends Component {
 
     return {
       data: {
-        labels: labels,
-        datasets: datasets,
+        labels,
+        datasets,
       },
-      opts: opts,
+      opts,
     }
   }
 
@@ -428,7 +438,7 @@ class DashboardPage extends Component {
                     <DatePicker
                       minDate={minPeriodFrom}
                       maxDate={maxPeriodTo}
-                      value={periodFrom}
+                      value={periodTo}
                       onChange={this.handlePeriodToChange}
                     />
                   </form>
