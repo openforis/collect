@@ -1775,7 +1775,7 @@ select.form-control-lg:not([size]):not([multiple]), .input-group-lg > select.for
       margin-bottom: 0; }
     .form-inline .form-control {
       display: inline-block;
-      width: auto;
+      /* width: auto; */
       vertical-align: middle; }
     .form-inline .form-control-static {
       display: inline-block; }
