@@ -50,7 +50,7 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.4.1",
     "sockjs-client": "^1.5.2",
-    "superagent": "^6.1.0",
+    "superagent": "^7.1.1",
     "throttle-debounce": "^3.0.1"
   },
   "scripts": {
