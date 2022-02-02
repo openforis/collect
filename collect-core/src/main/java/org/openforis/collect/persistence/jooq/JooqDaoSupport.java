@@ -23,7 +23,7 @@ public abstract class JooqDaoSupport {
 
 	private static final String CONSTRAINT_VIOLATION_CODE = "23";
 	private static final String CONSTRAINT_VIOLATION_MESSAGE = "constraint violation";
-	private static final int SQLITE_VALUE_MAX_SIZE = 500000; // 500KB
+	private static final int SQLITE_VALUE_MAX_SIZE = 400000; // 400KB
 
 	protected CollectDSLContext dsl;
 	   

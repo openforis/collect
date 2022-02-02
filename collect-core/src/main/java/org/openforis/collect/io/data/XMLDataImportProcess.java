@@ -14,8 +14,6 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.zip.ZipException;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -109,7 +107,6 @@ public class XMLDataImportProcess implements Callable<Void>, Closeable {
 	private NewBackupFileExtractor backupFileExtractor;
 	private RecordUserLoader recordUserLoader;
 
-	@PostConstruct
 	public void init() {
 		this.state = new DataImportState();
 		this.recordUserLoader = new RecordUserLoader(userManager, userManager.loadAdminUser(), true);
