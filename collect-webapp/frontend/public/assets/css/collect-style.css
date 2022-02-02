@@ -162,23 +162,29 @@ header .breadcrumb {
 }
 
 fieldset {
-  border: 1px solid #c0c0c0;
   margin: 0 2px !important;
   padding: .35em 1.625em .75em !important;
 }
 
 fieldset legend {
+  float: inherit;
   width: auto;
   font-size: 1.2em;
   padding-top: 2px;
 }
 
+fieldset, 
 .card fieldset {
+  border: 1px solid #c0c0c0 !important;
   margin-left: 20px !important;
 }
 
-.main .jumbotron {
-  background-color: #6699cc;
+.MuiOutlinedInput-root fieldset {
+  margin: auto !important;
+}
+
+.main .home-page.jumbotron {
+  background-color: #6699cc !important;
   color: white;
 }
 

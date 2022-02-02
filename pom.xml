@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>4.0.40-SNAPSHOT</version>
+	<version>4.0.42-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Open Foris Collect</name>
@@ -681,7 +681,7 @@
 			<dependency>
 				<groupId>com.h2database</groupId>
 				<artifactId>h2</artifactId>
-				<version>2.0.204</version>
+				<version>2.1.210</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>

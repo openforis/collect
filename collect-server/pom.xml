@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>4.0.40-SNAPSHOT</version>
+		<version>4.0.42-SNAPSHOT</version>
 	</parent>
 	<name>Open Foris Collect Server module</name>
 	<artifactId>collect-server</artifactId>
@@ -23,7 +23,7 @@
 	<repositories>
 		<repository>
 			<id>zk repository</id>
-			<url>http://mavensync.zkoss.org/maven2</url>
+			<url>https://mavensync.zkoss.org/maven2</url>
 		</repository>
 	</repositories>
 
@@ -187,7 +187,7 @@
 		<dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
-            <version>1.4.18</version>
+            <version>1.4.19</version>
             <exclusions>
                 <exclusion>
                     <groupId>xmlpull</groupId>
