@@ -141,9 +141,15 @@ public class RecordFileBackupTask extends Task {
 	private void writeFile(File file, String entryName) throws IOException {
 		ZipEntry entry = new ZipEntry(entryName);
 		zipOutputStream.putNextEntry(entry);
-		IOUtils.copy(new FileInputStream(file), zipOutputStream);
-		zipOutputStream.closeEntry();
-		zipOutputStream.flush();
+		FileInputStream fileIs = null;
+		try {
+			fileIs = new FileInputStream(file);
+			IOUtils.copy(fileIs, zipOutputStream);
+			zipOutputStream.closeEntry();
+			zipOutputStream.flush();
+		} finally {
+			IOUtils.closeQuietly(fileIs);
+		}
 	}
 
 	public RecordManager getRecordManager() {
