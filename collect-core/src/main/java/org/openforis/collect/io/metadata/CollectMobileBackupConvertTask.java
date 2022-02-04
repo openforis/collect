@@ -114,6 +114,8 @@ public class CollectMobileBackupConvertTask extends Task {
 	private void createOutpuFile() throws IOException, FileNotFoundException {
 		ZipOutputStream zipOutputStream = null;
 		BackupFileExtractor backupFileExtractor = null;
+		FileInputStream dbFileIS = null;
+		FileInputStream infoFileIS = null;
 		try {
 			backupFileExtractor = new BackupFileExtractor(collectBackupFile);
 
@@ -122,18 +124,21 @@ public class CollectMobileBackupConvertTask extends Task {
 
 			// include collect.db file
 			zipOutputStream.putNextEntry(new ZipEntry(COLLECT_DB_FILE_NAME));
-			FileInputStream dbFileIS = new FileInputStream(outputDbFile);
+			dbFileIS = new FileInputStream(outputDbFile);
 			IOUtils.copy(dbFileIS, zipOutputStream);
 			zipOutputStream.closeEntry();
 
 			// include info.properties file
 			File infoFile = backupFileExtractor.extract(SurveyBackupJob.INFO_FILE_NAME);
 			zipOutputStream.putNextEntry(new ZipEntry(SurveyBackupJob.INFO_FILE_NAME));
-			IOUtils.copy(new FileInputStream(infoFile), zipOutputStream);
+			infoFileIS = new FileInputStream(infoFile);
+			IOUtils.copy(infoFileIS, zipOutputStream);
 			zipOutputStream.closeEntry();
 		} finally {
 			IOUtils.closeQuietly(backupFileExtractor);
 			IOUtils.closeQuietly(zipOutputStream);
+			IOUtils.closeQuietly(dbFileIS);
+			IOUtils.closeQuietly(infoFileIS);
 		}
 	}
 
