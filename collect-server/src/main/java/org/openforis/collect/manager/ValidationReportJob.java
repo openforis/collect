@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
@@ -18,6 +17,7 @@ import org.openforis.collect.model.RecordValidationReportGenerator;
 import org.openforis.collect.model.RecordValidationReportItem;
 import org.openforis.collect.model.validation.ValidationMessageBuilder;
 import org.openforis.commons.collection.Visitor;
+import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
@@ -70,7 +70,7 @@ public class ValidationReportJob extends Job {
 		outputStream = new FileOutputStream(outputFile);
 
 		if (input.reportType == ReportType.CSV) {
-			csvWriter = new CsvWriter(outputStream, IOUtils.UTF_8, ',', '"');
+			csvWriter = new CsvWriter(outputStream, OpenForisIOUtils.UTF_8, ',', '"');
 		}
 	}
 

@@ -38,6 +38,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.util.Version;
+import org.apache.poi.util.IOUtils;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecordSummary;
@@ -334,8 +335,9 @@ public class RecordIndexManager extends BaseStorageManager {
 	}
 
 	protected IndexSearcher createIndexSearcher() throws RecordIndexException {
+		IndexReader indexReader = null;
 		try {
-	        IndexReader indexReader = IndexReader.open(indexDirectory);
+	        indexReader = IndexReader.open(indexDirectory);
 			int numDocs = indexReader.numDocs();
 			if ( numDocs > 0 ) {
 		        IndexSearcher indexSearcher = new IndexSearcher(indexReader);
@@ -345,6 +347,8 @@ public class RecordIndexManager extends BaseStorageManager {
 			}
 		} catch (IOException e) {
 			throw new RecordIndexException(e.getMessage(), e);
+		} finally {
+			IOUtils.closeQuietly(indexReader);
 		}
     }
 	

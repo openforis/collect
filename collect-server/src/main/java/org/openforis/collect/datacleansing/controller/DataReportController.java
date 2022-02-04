@@ -16,7 +16,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.datacleansing.DataQuery.ErrorSeverity;
 import org.openforis.collect.datacleansing.DataQueryGroup;
@@ -37,6 +36,7 @@ import org.openforis.collect.utils.MediaTypes;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.controller.PaginatedResponse;
+import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.commons.lang.Objects;
 import org.openforis.commons.web.HttpResponses;
@@ -198,7 +198,7 @@ public class DataReportController extends AbstractSurveyObjectEditFormController
 		
 		public void init() throws Exception {
 			tempFile = File.createTempFile("collect-data-report", ".csv");
-			csvWriter = new CsvWriter(new FileOutputStream(tempFile), IOUtils.UTF_8, ',', '"');
+			csvWriter = new CsvWriter(new FileOutputStream(tempFile), OpenForisIOUtils.UTF_8, ',', '"');
 			writeCSVHeader();
 		}
 		
