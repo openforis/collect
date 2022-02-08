@@ -65,8 +65,7 @@ public class CollectInfoService {
 	}
 
 	private Version latestRelease() {
-		try {
-			CloseableHttpClient client = HttpClients.createDefault();
+		try (CloseableHttpClient client = HttpClients.createDefault()) {
 			HttpGet request = new HttpGet(LATEST_RELEASE_METADATA_URL);
 			request.setConfig(RequestConfig.custom().setConnectTimeout(RELEASE_FETCH_TIMEOUT).build());
 
