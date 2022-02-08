@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.openforis.collect.earth.app.server.AbstractPlacemarkDataController;
 import org.openforis.collect.earth.app.server.PlacemarkUpdateRequest;
-import org.openforis.collect.earth.app.service.EarthSurveyService;
 import org.openforis.collect.io.metadata.collectearth.balloon.CollectEarthBalloonGenerator;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
@@ -23,8 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class CollectEarthBalloonPreviewController extends AbstractPlacemarkDataController {
 
-	@Autowired
-	private EarthSurveyService earthSurveyService;
 	@Autowired
 	@Qualifier("sessionManager")
 	private SessionManager sessionManager;
