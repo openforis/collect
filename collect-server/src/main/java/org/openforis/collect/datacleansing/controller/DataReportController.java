@@ -481,27 +481,31 @@ public class DataReportController extends AbstractSurveyObjectEditFormController
 			@Override
 			protected void execute() throws Throwable {
 				EntityDefinition rootEntityDefinition = survey.getSchema().getFirstRootEntityDefinition();
-				CSVWriterDataReportItemProcessor itemProcessor = Objects.newInstance(itemProcessorType, 
-						rootEntityDefinition);
-				itemProcessor.init();
-				long total = getTotalItems();
-				int itemsPerPage = 200;
-				int pages = Double.valueOf(Math.ceil((double) total / itemsPerPage)).intValue();
-				for (int page = 1; page <= pages ; page++) {
-					if (! isRunning()) {
-						break;
-					}
-					List<DataReportItem> items = reportManager.loadItems(report, (page - 1) * itemsPerPage, itemsPerPage);
-					for (DataReportItem item : items) {
+				CSVWriterDataReportItemProcessor itemProcessor = null;
+				try {
+					itemProcessor = Objects.newInstance(itemProcessorType, 
+							rootEntityDefinition);
+					itemProcessor.init();
+					long total = getTotalItems();
+					int itemsPerPage = 200;
+					int pages = Double.valueOf(Math.ceil((double) total / itemsPerPage)).intValue();
+					for (int page = 1; page <= pages ; page++) {
 						if (! isRunning()) {
 							break;
 						}
-						itemProcessor.process(item);
-						incrementProcessedItems();
+						List<DataReportItem> items = reportManager.loadItems(report, (page - 1) * itemsPerPage, itemsPerPage);
+						for (DataReportItem item : items) {
+							if (! isRunning()) {
+								break;
+							}
+							itemProcessor.process(item);
+							incrementProcessedItems();
+						}
 					}
+					outputFile = itemProcessor.getOutputFile();
+				} finally {
+					itemProcessor.close();
 				}
-				itemProcessor.close();
-				outputFile = itemProcessor.getOutputFile();
 			}
 			
 		}
