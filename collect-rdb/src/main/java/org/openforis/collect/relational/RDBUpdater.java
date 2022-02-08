@@ -1,5 +1,6 @@
 package org.openforis.collect.relational;
 
+import java.io.Closeable;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import org.openforis.concurrency.ProgressListener;
 /**
  * @author S. Ricci
  */
-public interface RDBUpdater {
+public interface RDBUpdater extends Closeable {
 	
 	void insertEntity(int recordId, 
 			Integer parentId, int entityId,
