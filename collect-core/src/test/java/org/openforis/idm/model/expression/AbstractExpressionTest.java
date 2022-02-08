@@ -10,7 +10,7 @@ import org.openforis.idm.model.Node;
  * @author S. Ricci
  *
  */
-public class AbstractExpressionTest extends AbstractTest {
+public abstract class AbstractExpressionTest extends AbstractTest {
 
 	
 	protected Object evaluateExpression(Node<?> context, Node<?> thisNode, String expr) throws InvalidExpressionException {
