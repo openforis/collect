@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.openforis.collect.designer.metamodel.AttributeTypeUtils;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.io.excel.ExcelFlatValuesWriter;
@@ -45,9 +44,9 @@ public class SchemaSummaryCSVExportJob extends Job {
 		Task task = new Task() {
 			@Override
 			protected void execute() throws Throwable {
-				FileOutputStream out = new FileOutputStream(outputFile);
-				final FlatDataWriter csvWriter = new ExcelFlatValuesWriter(out);
-				try {
+				try (
+						FileOutputStream out = new FileOutputStream(outputFile); 
+						final FlatDataWriter csvWriter = new ExcelFlatValuesWriter(out)) {
 					writeHeaders(csvWriter);
 					
 					Schema schema = survey.getSchema();
@@ -86,12 +85,8 @@ public class SchemaSummaryCSVExportJob extends Job {
 							csvWriter.writeNext(values);
 						}
 					});
-				} finally {
-					IOUtils.closeQuietly(csvWriter);
 				}
 			}
-
-			
 		};
 		addTask(task);
 	}
