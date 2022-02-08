@@ -63,8 +63,7 @@ public class DbInitializer {
 	 *         not supported
 	 */
 	private boolean createSchemaIfNotExists(Connection conn) {
-		try {
-			Statement stmt = conn.createStatement();
+		try (Statement stmt = conn.createStatement()) {
 			stmt.execute(String.format("CREATE SCHEMA IF NOT EXISTS %s", DbUtils.SCHEMA_NAME));
 			return true;
 		} catch (Exception e) {
@@ -82,8 +81,7 @@ public class DbInitializer {
 	 * @return 'true' if the schema is created, false if it already exists
 	 */
 	private boolean createSchema(Connection conn) {
-		try {
-			Statement stmt = conn.createStatement();
+		try (Statement stmt = conn.createStatement()) {
 			stmt.execute(String.format("CREATE SCHEMA %s", DbUtils.SCHEMA_NAME));
 			return true;
 		} catch (Exception e) {
