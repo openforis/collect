@@ -1,4 +1,5 @@
 .*
 target
 !.gitignore
+!.sonarcloud.properties
 dev.properties
