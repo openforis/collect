@@ -15,6 +15,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.datacleansing.DataQuery.ErrorSeverity;
@@ -229,7 +230,7 @@ public class DataReportController extends AbstractSurveyObjectEditFormController
 
 		@Override
 		public void close() throws IOException {
-			csvWriter.close();
+			IOUtils.closeQuietly(csvWriter);
 		}
 
 		public File getOutputFile() {
@@ -504,7 +505,7 @@ public class DataReportController extends AbstractSurveyObjectEditFormController
 					}
 					outputFile = itemProcessor.getOutputFile();
 				} finally {
-					itemProcessor.close();
+					IOUtils.closeQuietly(itemProcessor);
 				}
 			}
 			
