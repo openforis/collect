@@ -3,7 +3,6 @@ package org.openforis.collect.relational.sql;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.jooq.SQLDialect;
@@ -11,6 +10,7 @@ import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.relational.RelationalSchemaCreator;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.print.RDBPrintJob.RdbDialect;
+import org.openforis.collect.relational.util.DBUtils;
 
 public class SQLRelationalSchemaCreator implements RelationalSchemaCreator {
 
@@ -29,11 +29,7 @@ public class SQLRelationalSchemaCreator implements RelationalSchemaCreator {
 		} catch (Throwable e) {
 			throw new RuntimeException(String.format("Error generating schema on db for rdb schema %s", schema.getName()), e);
 		} finally {
-			try {
-				stmt.close();
-			} catch (SQLException e) {
-				// ignore it
-			}
+			DBUtils.closeQuietly(stmt);
 		}
 	}
 
@@ -49,7 +45,7 @@ public class SQLRelationalSchemaCreator implements RelationalSchemaCreator {
 		}
 		return rdbDialect;
 	}
-
+	
 	@Override
 	public void addConstraints(RelationalSchema schema, Connection conn) {
 		throw new UnsupportedOperationException();
