@@ -22,7 +22,6 @@ import org.openforis.collect.datacleansing.manager.DataQueryManager;
 import org.openforis.collect.io.data.CSVDataExportJob;
 import org.openforis.collect.io.data.DescendantNodeFilter;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
-import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -58,8 +57,6 @@ import org.springframework.web.context.WebApplicationContext;
 public class DataQueryController extends AbstractSurveyObjectEditFormController<Integer, DataQuery, DataQueryForm, DataQueryManager> {
 
 	private static final int TEST_MAX_RECORDS = 100;
-	@Autowired
-	protected SessionManager sessionManager;
 	@Autowired
 	private CollectJobManager collectJobManager;
 	@Autowired

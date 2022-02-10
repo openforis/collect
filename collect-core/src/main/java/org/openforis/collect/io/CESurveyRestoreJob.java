@@ -2,12 +2,15 @@ package org.openforis.collect.io;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.io.metadata.IdmlImportTask;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
@@ -120,8 +123,7 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 
 		@Override
 		protected void execute() throws Throwable {
-			Properties p = new Properties();
-			p.load(new FileInputStream(file));
+			Properties p = loadPropertiesFromFile();
 			CollectAnnotations annotations = survey.getAnnotations();
 			annotations.setBingMapsKey((String) p.get("bing_maps_key"));
 			annotations.setBingMapsEnabled(Boolean.parseBoolean(p.getProperty("open_bing_maps")));
@@ -138,6 +140,18 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 			annotations.setCollectEarthSamplePoints(getIntegerProperty(p, "number_of_sampling_points_in_plot", 9));
 			annotations.setCollectEarthPlotArea(calculatePlotArea(p));
 			surveyManager.save(survey);
+		}
+
+		private Properties loadPropertiesFromFile() throws FileNotFoundException, IOException {
+			Properties p = new Properties();
+			FileInputStream is = null;
+			try {
+				is = new FileInputStream(file);
+				p.load(is);
+			} finally {
+				IOUtils.closeQuietly(is);
+			}
+			return p;
 		}
 
 		private double calculatePlotArea(Properties p) {

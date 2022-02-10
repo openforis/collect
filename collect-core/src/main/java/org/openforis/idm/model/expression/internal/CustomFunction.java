@@ -49,8 +49,8 @@ public abstract class CustomFunction implements Function {
 			return performArgumentValidation(contextNodeDef, arguments);
 		} else {
 			return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR,
-					String.format("Invalid number of arguments: found %d but %d expected", 
-							arguments.length, getSupportedArgumentCounts()));
+					String.format("Invalid number of arguments: found %d %s expected", 
+							arguments.length, getSupportedArgumentCounts().toString()));
 		}
 	}
 	

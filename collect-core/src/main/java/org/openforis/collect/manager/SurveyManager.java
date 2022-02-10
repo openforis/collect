@@ -887,6 +887,7 @@ public class SurveyManager {
 		}
 	}
 	
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public SurveySummary updateUserGroup(String surveyName, int userGroupId) throws SurveyStoreException {
 		UserGroup userGroup = userGroupManager.loadById(userGroupId);
 		SurveySummary surveySummary = loadSummaryByName(surveyName);
