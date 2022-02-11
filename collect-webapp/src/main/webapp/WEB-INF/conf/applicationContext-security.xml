@@ -34,6 +34,7 @@
 		<intercept-url access="permitAll" pattern="/assets/**" />
 		<intercept-url access="permitAll" pattern="/earthFiles/**"  />
 		<intercept-url access="permitAll" pattern="/images/**" />
+		<intercept-url access="permitAll" pattern="/js/**" />
 		<intercept-url access="permitAll" pattern="/locales/**" />
 		<intercept-url access="permitAll" pattern="/downloadLogo.htm" />
 		<intercept-url access="permitAll" pattern="/login.html" />

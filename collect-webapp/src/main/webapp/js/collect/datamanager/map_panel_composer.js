@@ -467,7 +467,7 @@ Collect.DataManager.MapPanelComposer.prototype.createBaseMapsLayer = function() 
 		source : new ol.source.XYZ({
 			attributions : 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, ' +
 					'AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-			url : 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+			url : 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 		})
 	});
 
