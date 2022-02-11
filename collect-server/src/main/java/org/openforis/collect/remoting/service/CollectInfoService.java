@@ -74,6 +74,8 @@ public class CollectInfoService {
 				HttpEntity entity = response.getEntity();
 				InputStream is = entity.getContent();
 				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+				// completely disable DOCTYPE declaration to avoid access to external entities in XML parsing
+				dbFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 				DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 				Document doc = dBuilder.parse(is);
 				doc.getDocumentElement().normalize();
