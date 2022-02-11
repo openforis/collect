@@ -8,10 +8,10 @@
 
 	<name>Open Foris Collect</name>
 	<description>Open Foris Collect is the main entry point for data collected in field-based inventories. It provides a fast, easy, flexible way to set up a survey with a user-friendly interface. Collect handles multiple data types and complex validation rules, all in a multilanguage environment.</description>
-	<url>http://www.openforis.org/tools/collect.html</url>
+	<url>https://www.openforis.org/tools/collect.html</url>
 	<organization>
 		<name>Open Foris</name>
-		<url>www.openforis.org</url>
+		<url>https://www.openforis.org</url>
 	</organization>
 
 	<modules>
