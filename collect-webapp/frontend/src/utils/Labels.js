@@ -36,6 +36,7 @@ export default class Labels {
         .then((texts) => {
           callback(texts)
         })
+        .catch(() => callback({}))
     }
 
     const filePrefixes = ['labels', ...Object.values(LanguagesKeys.LABELS_PREFIX_BY_LANGUAGE_CODE_STANDARD)].map(

@@ -1,11 +1,11 @@
 import { useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { connect } from 'react-redux'
 
 import ServiceFactory from 'services/ServiceFactory'
 import RouterUtils from 'utils/RouterUtils'
 
-const checkShouldNavigateToRecordEditPage = async ({ user, history }) => {
+const checkShouldNavigateToRecordEditPage = async ({ user, navigate }) => {
   const surveySummaries = await ServiceFactory.surveyService.fetchAllSummaries()
   const publishedSurveys = surveySummaries.filter((surveySummary) => surveySummary.published)
   if (publishedSurveys.length === 1) {
@@ -26,7 +26,7 @@ const checkShouldNavigateToRecordEditPage = async ({ user, history }) => {
     const { count, records } = recordsRes
     if (count === 1) {
       const recordId = records[0].id
-      RouterUtils.navigateToRecordEditPage(history, recordId)
+      RouterUtils.navigateToRecordEditPage(navigate, recordId)
     }
   }
 }
@@ -34,10 +34,10 @@ const checkShouldNavigateToRecordEditPage = async ({ user, history }) => {
 const NavigationController = (props) => {
   const { user } = props
 
-  const history = useHistory()
+  const navigate = useNavigate()
 
   useEffect(() => {
-    checkShouldNavigateToRecordEditPage({ user, history })
+    checkShouldNavigateToRecordEditPage({ user, navigate })
   }, [])
 
   return null

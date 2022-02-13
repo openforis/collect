@@ -1,5 +1,5 @@
 import React from 'react'
-import { NavLink, useHistory } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap'
 import classnames from 'classnames'
@@ -16,11 +16,11 @@ const Sidebar = () => {
   const isFetchingLoggedUser = loggedUser === null
 
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const isNavItemOpen = (id) => Boolean(openNavItems[id])
 
-  const handleChangePasswordClick = () => RouterUtils.navigateToPasswordChangePage(history)
+  const handleChangePasswordClick = () => RouterUtils.navigateToPasswordChangePage(navigate)
 
   const handleLogoutClick = () => dispatch(SessionActions.logout())
 
@@ -62,7 +62,7 @@ const Sidebar = () => {
               </a>
               <ul className="nav-dropdown-items">
                 <li className="nav-item">
-                  <NavLink to={'/surveydesigner'} exact className="nav-link" activeClassName="active">
+                  <NavLink to={'/surveydesigner'} className="nav-link" activeClassName="active">
                     <i className="fa fa-list" aria-hidden="true"></i> List of surveys
                   </NavLink>
                 </li>

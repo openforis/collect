@@ -16,15 +16,11 @@ export default class Constants {
   static API_BASE_URL = Constants.BASE_URL + 'api/'
 
   static determineBaseURL() {
-    if (Constants.isDevEnvironment()) {
-      return DEV_BASE_URL
-    } else {
-      return getWindowLocationBaseUrl()
-    }
+    return Constants.isDevEnvironment() ? DEV_BASE_URL : getWindowLocationBaseUrl()
   }
 
   static determineBaseAssetsURL() {
-    return `${getWindowLocationBaseUrl()}assets/`
+    return `${Constants.isDevEnvironment() ? window.location.origin : getWindowLocationBaseUrl()}assets/`
   }
 
   static isDevEnvironment() {
