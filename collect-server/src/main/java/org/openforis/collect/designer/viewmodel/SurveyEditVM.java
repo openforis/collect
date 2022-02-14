@@ -637,22 +637,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 		return changed;
 	}
 	
-	@DependsOn({"surveyId","surveyPublished"})
-	public String getSamplingDesignImportModuleUrl() {
-		Map<String, String> queryParams = createBasicModuleParameters();
-		queryParams.put("sampling_design_import", "true");
-		String url = ComponentUtil.createUrl(Resources.Page.COLLECT_SWF.getLocation(), queryParams);
-		return url;
-	}
-
-	@DependsOn({"surveyId","surveyPublished"})
-	public String getSpeciesImportModuleUrl() {
-		Map<String, String> queryParams = createBasicModuleParameters();
-		queryParams.put("species_import", "true");
-		String url = ComponentUtil.createUrl(Resources.Page.COLLECT_SWF.getLocation(), queryParams);
-		return url;
-	}
-
 	private SurveyValidator getSurveyValidator(CollectSurvey survey, OutputFormat outputFormat) {
 		if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
 			return collectEarthSurveyValidator;

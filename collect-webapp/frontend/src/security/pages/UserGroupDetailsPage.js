@@ -18,7 +18,7 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table'
 
 import User from '../../model/User'
 import * as UserGroupActions from 'actions/usergroups'
-import { withNavigate } from 'common/hooks'
+import { withNavigate, withParams } from 'common/hooks'
 import AbstractItemDetailsPage from 'common/components/AbstractItemDetailsPage'
 import UserGroupService from 'services/UserGroupService'
 import UserRoleDropdownEditor from '../components/UserRoleDropdownEditor'
@@ -58,7 +58,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
       })
     } else {
       const loggedUser = this.props.loggedUser
-      let idParam = props.match.params.id
+      let idParam = props.params.id
       let userGroup
       if (idParam === 'new') {
         userGroup = {
@@ -624,4 +624,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps)(withNavigate(UserGroupDetailsPage))
+export default connect(mapStateToProps)(withNavigate(withParams(UserGroupDetailsPage)))

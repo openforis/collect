@@ -36,7 +36,6 @@ public class PreviewPopUpVM extends SurveyBaseVM {
 		super.init();
 				
 		URIBuilder uriBuilderParams = new URIBuilder()
-				.addParameter("preview", "true")
 				.addParameter("rootEntityId", rootEntityId)
 				.addParameter("locale", locale);
 		if (StringUtils.isNotBlank(versionId)) {

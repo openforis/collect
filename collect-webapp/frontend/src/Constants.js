@@ -20,7 +20,7 @@ export default class Constants {
   }
 
   static determineBaseAssetsURL() {
-    return `${Constants.isDevEnvironment() ? window.location.origin : getWindowLocationBaseUrl()}assets/`
+    return `${Constants.isDevEnvironment() ? `${window.location.origin}/` : getWindowLocationBaseUrl()}assets/`
   }
 
   static isDevEnvironment() {

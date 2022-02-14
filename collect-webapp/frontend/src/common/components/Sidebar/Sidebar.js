@@ -10,6 +10,13 @@ import VersionInfo from 'common/components/VersionInfo'
 import L from 'utils/Labels'
 import RouterUtils from 'utils/RouterUtils'
 
+const Link = ({ to, iconClassName, label }) => (
+  <NavLink to={to} className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
+    <i className={`fa ${iconClassName}`} />
+    {label}
+  </NavLink>
+)
+
 const Sidebar = () => {
   const { loggedUser } = useSelector((state) => state.session)
   const { openNavItems } = useSelector((state) => state.sidebar)
@@ -40,15 +47,11 @@ const Sidebar = () => {
         <ul className="nav">
           {loggedUser.canAccessDashboard && (
             <li className="nav-item">
-              <NavLink to={'/dashboard'} className="nav-link" activeClassName="active">
-                <i className="fa fa-tachometer-alt"></i>Dashboard
-              </NavLink>
+              <Link to="/dashboard" iconClassName="fa-tachometer-alt" label="Dashboard" />
             </li>
           )}
           <li className="nav-item">
-            <NavLink to={'/datamanagement'} className="nav-link" activeClassName="active">
-              <i className="fa fa-database"></i>Data Management
-            </NavLink>
+            <Link to="/datamanagement" iconClassName="fa-database" label="Data Management" />
           </li>
           {loggedUser.canAccessSurveyDesigner && (
             <li
@@ -62,42 +65,30 @@ const Sidebar = () => {
               </a>
               <ul className="nav-dropdown-items">
                 <li className="nav-item">
-                  <NavLink to={'/surveydesigner'} className="nav-link" activeClassName="active">
-                    <i className="fa fa-list" aria-hidden="true"></i> List of surveys
-                  </NavLink>
+                  <Link to="/surveydesigner" iconClassName="fa-list" label="List of surveys" />
                 </li>
                 <li className="nav-item">
-                  <NavLink to={'/surveydesigner/new'} className="nav-link" activeClassName="active">
-                    <i className="fa fa-file" aria-hidden="true"></i> New survey
-                  </NavLink>
+                  <Link to="/surveydesigner/new" iconClassName="fa-file" label="New survey" />
                 </li>
                 <li className="nav-item">
-                  <NavLink to={'/surveydesigner/surveyimport'} className="nav-link" activeClassName="active">
-                    <i className="fa fa-upload" aria-hidden="true"></i> Import survey
-                  </NavLink>
+                  <Link to="/surveydesigner/surveyimport" iconClassName="fa-upload" label="Import survey" />
                 </li>
               </ul>
             </li>
           )}
           {loggedUser.canAccessDataCleansing && (
             <li className="nav-item">
-              <NavLink to={'/datacleansing'} className="nav-link" activeClassName="active">
-                <i className="fa fa-gem"></i>Data Cleansing
-              </NavLink>
+              <Link to="/datacleansing" iconClassName="fa-gem" label="Data Cleansing" />
             </li>
           )}
           {loggedUser.canAccessMap && (
             <li className="nav-item">
-              <NavLink to={'/map'} className="nav-link" activeClassName="active">
-                <i className="fa fa-map"></i>Map
-              </NavLink>
+              <Link to="/map" iconClassName="fa-map" label="Map" />
             </li>
           )}
           {loggedUser.canAccessSaiku && (
             <li className="nav-item">
-              <NavLink to={'/saiku'} className="nav-link" activeClassName="active">
-                <i className="fa fa-chart-bar"></i>Saiku
-              </NavLink>
+              <Link to="/saiku" iconClassName="fa-chart-bar" label="Saiku" />
             </li>
           )}
           {loggedUser.canAccessBackupRestore ? (
@@ -113,14 +104,10 @@ const Sidebar = () => {
               </a>
               <ul className="nav-dropdown-items">
                 <li className="nav-item">
-                  <NavLink to={'/backup'} className="nav-link" activeClassName="active">
-                    <i className="fa fa-save"></i> {L.l('backup')}
-                  </NavLink>
+                  <Link to="/backup" iconClassName="fa-save" label={L.l('backup')} />
                 </li>
                 <li className="nav-item">
-                  <NavLink to={'/restore'} className="nav-link" activeClassName="active">
-                    <i className="fa fa-upload"></i> {L.l('restore')}
-                  </NavLink>
+                  <Link to="/restore" iconClassName="fa-upload" label={L.l('restore')} />
                 </li>
               </ul>
             </li>
@@ -140,14 +127,10 @@ const Sidebar = () => {
               </a>
               <ul className="nav-dropdown-items">
                 <li className="nav-item">
-                  <NavLink to={'/users'} className="nav-link" activeClassName="active">
-                    <i className="fa fa-user"></i> Users
-                  </NavLink>
+                  <Link to="/users" iconClassName="fa-user" label="Users" />
                 </li>
                 <li className="nav-item">
-                  <NavLink to={'/usergroups'} className="nav-link" activeClassName="active">
-                    <i className="fa fa-users"></i> Groups
-                  </NavLink>
+                  <Link to="/usergroups" iconClassName="fa-users" label="Groups" />
                 </li>
               </ul>
             </li>
@@ -181,7 +164,7 @@ const Sidebar = () => {
             <a href="http://www.openforis.org" target="_blank" rel="noopener noreferrer">
               Open Foris
             </a>{' '}
-            &copy; 2010-2021
+            &copy; 2010-2022
           </span>
         </div>
       </nav>
