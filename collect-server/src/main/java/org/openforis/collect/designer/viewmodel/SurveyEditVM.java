@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.designer.session.SessionStatus;
-import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
@@ -56,7 +55,6 @@ import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
-import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
@@ -197,7 +195,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 			@BindingParam(SELECTED_CODE_LIST_PARAM) CodeList selectedCodeList) {
 		if ( codeListsPopUp == null ) { 
 			dispatchCurrentFormValidatedCommand(true);
-			Map<String, Object> args = new HashMap<String, Object>();
+			Map<String, Object> args = new HashMap<>();
 			args.put(EDITING_ATTRIBUTE_PARAM, editingAttribute);
 			CodeList selectedCodeListInPopUp = selectedCodeList == survey.getSamplingDesignCodeList() ? null: selectedCodeList;
 			args.put(SELECTED_CODE_LIST_PARAM, selectedCodeListInPopUp);
@@ -218,7 +216,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 
 	public void dispatchCodeListsPopUpClosedCommand(Boolean editingAttribute, CodeList selectedCodeList) {
-		Map<String, Object> args = new HashMap<String, Object>();
+		Map<String, Object> args = new HashMap<>();
 		args.put(EDITING_ATTRIBUTE_PARAM, editingAttribute);
 		args.put(SELECTED_CODE_LIST_PARAM, selectedCodeList);
 		BindUtils.postGlobalCommand(null, null, CODE_LISTS_POP_UP_CLOSED_COMMAND, args);
@@ -261,12 +259,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@Command
 	public void backToSurveysList() {
 		if ( changed ) {
-			MessageUtil.ConfirmParams params = new MessageUtil.ConfirmParams(new MessageUtil.ConfirmHandler() {
-				@Override
-				public void onOk() {
-					performBackToSurveysList();
-				}
-			}, "survey.edit.leave_page_with_unsaved_changes");
+			MessageUtil.ConfirmParams params = new MessageUtil.ConfirmParams(() -> performBackToSurveysList(),
+					"survey.edit.leave_page_with_unsaved_changes");
 			params.setTitleKey("global.unsaved_changes");
 			params.setOkLabelKey("global.continue_and_loose_changes");
 			params.setCancelLabelKey("global.stay_on_this_page");
@@ -294,11 +288,11 @@ public class SurveyEditVM extends SurveyBaseVM {
 	public List<String> getAvailableLanguages() {
 		CollectSurvey survey = getSurvey();
 		if ( survey == null ) {
-			//TODO session expired?
+			// session could be expired
 			return null;
 		} else {
 			List<String> languages = survey.getLanguages();
-			return new BindingListModelList<String>(languages, false);
+			return new BindingListModelList<>(languages, false);
 		}
 	}
 
@@ -306,13 +300,10 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@NotifyChange({"currentLanguageCode"})
 	public void languageCodeSelected(@BindingParam("code") final String selectedLanguageCode) {
 		final SessionStatus sessionStatus = getSessionStatus();
-		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
-			@Override
-			public void onOk(boolean confirmed) {
-				sessionStatus.setCurrentLanguageCode(selectedLanguageCode);
-				BindUtils.postGlobalCommand(null, null, SurveyLanguageVM.CURRENT_LANGUAGE_CHANGED_COMMAND, null);
-				currentLanguageCode = sessionStatus.getCurrentLanguageCode();
-			}
+		checkCanLeaveForm(confirmed -> {
+			sessionStatus.setCurrentLanguageCode(selectedLanguageCode);
+			BindUtils.postGlobalCommand(null, null, SurveyLanguageVM.CURRENT_LANGUAGE_CHANGED_COMMAND, null);
+			currentLanguageCode = sessionStatus.getCurrentLanguageCode();
 		});
 	}
 
@@ -321,7 +312,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	 */
 	@Command
 	public boolean save(@ContextParam(ContextType.BINDER) Binder binder, 
-			final Runnable runAfterSave) throws SurveyStoreException {
+			final Runnable runAfterSave) {
 		dispatchValidateAllCommand();
 		if ( checkCanSave() ) {
 			return checkValidity(true, () -> {
@@ -341,7 +332,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@GlobalCommand
 	public void backgroundSurveySave() throws SurveyStoreException {
-		//survey.refreshSurveyDependencies();
 		surveyManager.save(survey);
 		BindUtils.postNotifyChange(null, null, survey, "id");
 		BindUtils.postNotifyChange(null, null, survey, "published");
@@ -357,13 +347,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 
 	protected boolean checkCanSave() {
 		if ( checkCanLeaveForm() ) {
-			if ( ! checkSurveyNameUniqueness() ) {
-				return false;
-			} else if ( ! checkSurveyUriUniqueness() ) {
-				return false;
-			} else {
-				return true;
-			}
+			return checkSurveyNameUniqueness() && checkSurveyUriUniqueness();
 		} else {
 			return false;
 		}
@@ -415,10 +399,10 @@ public class SurveyEditVM extends SurveyBaseVM {
 	 */
 	private boolean checkValidity(OutputFormat outuputFormat, boolean showConfirm, final Runnable runIfValid, 
 			String confirmButtonLabel, boolean ignoreWarnings) {
-		SurveyValidator surveyValidator = getSurveyValidator(survey, outuputFormat);
+		SurveyValidator validator = getSurveyValidator(survey, outuputFormat);
 		ValidationParameters validationParameters = new ValidationParameters();
 		validationParameters.setWarningsIgnored(ignoreWarnings);
-		SurveyValidationResults results = surveyValidator.validate(survey, validationParameters);
+		SurveyValidationResults results = validator.validate(survey, validationParameters);
 		if ( results.hasErrors() || results.hasWarnings() ) {
 			final Window validationResultsPopUp = SurveyValidationResultsVM.showPopUp(results, showConfirm, 
 					confirmButtonLabel);
@@ -447,7 +431,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 			public void onJobEnd(SchemaSummaryCSVExportJob job) {
 				closePopUp(jobStatusPopUp);
 				jobStatusPopUp = null;
-				File file = ((SchemaSummaryCSVExportJob) job).getOutputFile();
+				File file = job.getOutputFile();
 				String surveyName = survey.getName();
 				String dateStr = Dates.formatLocalDateTime(new Date());
 				String fileName = String.format(SCHEMA_SUMMARY_FILE_NAME_PATTERN, surveyName, dateStr, Files.EXCEL_FILE_EXTENSION);

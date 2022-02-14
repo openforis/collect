@@ -10,7 +10,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SessionRecordFileManager;
-import org.openforis.collect.persistence.RecordUnlockedException;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
@@ -45,18 +44,12 @@ public class PreviewPopUpVM extends SurveyBaseVM {
 		this.uri = Resources.Page.PREVIEW_PATH.getLocation() + surveyId + uriBuilderParams.build().toString();
 	}
 
-	public String getContentUrl() throws URISyntaxException {
+	public String getContentUrl() {
 		return uri;
 	}
 
 	@Command
 	public void close() {
-		// TODO check if release record is necessary
-		try {
-			sessionManager.releaseRecord();
-		} catch (RecordUnlockedException e) {
-			// Ignore it
-		}
 		sessionRecordFileManager.deleteAllTempFiles();
 	}
 }
