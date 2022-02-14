@@ -69,6 +69,7 @@ const DefaultLayoutRoutes = () => (
             <Route path="/users/changepassword" name="ChangePassword" element={<PasswordChangePage />} />
             <Route path="/usergroups" name="User Groups" element={<UserGroupsPage />} />
             <Route path="/usergroups/:id" name="User Group" element={<UserGroupDetailsPage />} />
+            <Route path="*" name="Not found" element={<>Not found</>} />
           </Routes>
         </div>
       </main>
