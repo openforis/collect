@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, HashRouter, Route, Routes } from 'react-router-dom'
 import thunkMiddleware from 'redux-thunk'
 import { createStore, applyMiddleware, compose } from 'redux'
 import { Provider } from 'react-redux'
@@ -37,7 +37,7 @@ Labels.initialize(() => {
     <Provider store={store}>
       <SessionTimeoutVerifier>
         <Startup>
-          <BrowserRouter>
+          <HashRouter>
             <Routes>
               <Route path="/signin" name="Signin Page" element={<Signin />} />
               <Route path="/register" name="Register Page" element={<Register />} />
@@ -45,7 +45,7 @@ Labels.initialize(() => {
               <Route path="/500" name="Page 500" element={<Page500 />} />
               <Route path="*" name="Home" element={<App />} />
             </Routes>
-          </BrowserRouter>
+          </HashRouter>
         </Startup>
       </SessionTimeoutVerifier>
     </Provider>,
