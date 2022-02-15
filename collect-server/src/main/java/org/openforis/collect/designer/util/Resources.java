@@ -15,7 +15,7 @@ public class Resources {
 		INDEX("/"),
 		DESIGNER("designer.htm"),
 		SURVEY_EDIT(COMPONENTS_BASE_PATH + "survey_edit.zul"),
-		PREVIEW_PATH("surveypreview/");
+		PREVIEW_PATH("#/surveypreview/");
 		
 		private String location;
 	
