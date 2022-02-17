@@ -2,7 +2,7 @@ import './RecordEditActionBar.scss'
 
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import { Button, Icon, IconButton } from '@material-ui/core'
 import { ThumbDown, ThumbUp } from '@material-ui/icons'
 
@@ -23,7 +23,7 @@ const RecordEditActionBar = (props) => {
   const { definition } = rootEntity
 
   const user = useSelector((state) => state.session.loggedUser)
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const [rootEntitySummary, setRootEntitySummary] = useState(rootEntity.summaryValues)
 
@@ -57,7 +57,7 @@ const RecordEditActionBar = (props) => {
         L.l('dataManagement.dataEntry.promoteCompleteTitle'),
         L.l('dataManagement.dataEntry.promoteCompleteMessage', [rootEntity.summaryValues, nextStepLabel])
       )
-      RouterUtils.navigateToDataManagementHomePage(history)
+      RouterUtils.navigateToDataManagementHomePage(navigate)
     }
 
     if (record.errors) {
@@ -86,7 +86,7 @@ const RecordEditActionBar = (props) => {
         L.l('dataManagement.dataEntry.demoteCompleteTitle'),
         L.l('dataManagement.dataEntry.demoteCompleteMessage', [rootEntity.summaryValues, prevStepLabel])
       )
-      RouterUtils.navigateToDataManagementHomePage(history)
+      RouterUtils.navigateToDataManagementHomePage(navigate)
     }
     Dialogs.confirm(
       L.l('dataManagement.dataEntry.demote'),

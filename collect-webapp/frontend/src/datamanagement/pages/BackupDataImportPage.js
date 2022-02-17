@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Button, Form, FormGroup, Row, Col } from 'reactstrap'
 import { connect } from 'react-redux'
 
+import { withNavigate } from 'common/hooks'
 import Dialogs from 'common/components/Dialogs'
 import Dropzone from 'common/components/Dropzone'
 import UploadFileButton from 'common/components/UploadFileButton'
@@ -189,7 +190,7 @@ class BackupDataImportPage extends Component {
 
   handleDataImportCompleteOkButtonClick() {
     this.props.dispatch(UserActions.fetchUsers())
-    RouterUtils.navigateToDataManagementHomePage(this.props.history)
+    RouterUtils.navigateToDataManagementHomePage(this.props.navigate)
   }
 
   render() {
@@ -277,4 +278,4 @@ const mapStateToProps = (state) => {
   return { survey }
 }
 
-export default connect(mapStateToProps)(BackupDataImportPage)
+export default connect(mapStateToProps)(withNavigate(BackupDataImportPage))

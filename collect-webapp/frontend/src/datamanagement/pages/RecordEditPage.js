@@ -6,6 +6,7 @@ import ServiceFactory from 'services/ServiceFactory'
 
 import RecordEditForm from '../components/RecordEditForm'
 import RouterUtils from 'utils/RouterUtils'
+import { withLocation, withParams } from 'common/hooks'
 
 class RecordEditPage extends Component {
   recordUpdater = null
@@ -20,8 +21,8 @@ class RecordEditPage extends Component {
   }
 
   async componentDidMount() {
-    const { match, language: languageProps, loggedUser, location } = this.props
-    const { id: idParam } = match.params
+    const { params, language: languageProps, loggedUser, location } = this.props
+    const { id: idParam } = params
 
     const recordId = Number(idParam)
 
@@ -60,6 +61,7 @@ class RecordEditPage extends Component {
     return <RecordEditForm record={record} inPopUp={inPopUp} />
   }
 }
+
 const mapStateToProps = (state) => {
   const { activeSurvey, session } = state
   const { survey, language } = activeSurvey
@@ -68,4 +70,4 @@ const mapStateToProps = (state) => {
   return { survey, loggedUser, language }
 }
 
-export default connect(mapStateToProps)(RecordEditPage)
+export default connect(mapStateToProps)(withLocation(withParams(RecordEditPage)))

@@ -1,3 +1,4 @@
+import { withLocation, withParams } from 'common/hooks'
 import React, { Component } from 'react'
 import RecordEditForm from '../../datamanagement/components/RecordEditForm'
 import { Record } from '../../model/Record'
@@ -6,7 +7,7 @@ import { RecordUpdater } from '../../model/RecordUpdater'
 import Workflow from '../../model/Workflow'
 import ServiceFactory from '../../services/ServiceFactory'
 
-export default class SurveyDataEntryPreviewPage extends Component {
+class SurveyDataEntryPreviewPage extends Component {
   recordUpdater = null
 
   constructor() {
@@ -17,8 +18,8 @@ export default class SurveyDataEntryPreviewPage extends Component {
   }
 
   componentDidMount() {
-    const { match, location } = this.props
-    const { id: surveyIdParam } = match.params
+    const { params, location } = this.props
+    const { id: surveyIdParam } = params
 
     const urlSearchParams = new URLSearchParams(location.search)
     const versionId = urlSearchParams.get('versionId')
@@ -47,3 +48,5 @@ export default class SurveyDataEntryPreviewPage extends Component {
     return <RecordEditForm record={record} />
   }
 }
+
+export default withLocation(withParams(SurveyDataEntryPreviewPage))

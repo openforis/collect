@@ -221,7 +221,9 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 			var surveyGroup = $this.createSurveyLayerGroup(survey);
 			surveysOverlayGroup.getLayers().push(surveyGroup);
 		});
-	}, function() {}, collect.loggedUser.id);
+	}, function() {
+		// ignore errors
+	}, collect.loggedUser.id);
 
 	$this.initialized = true;
 
@@ -531,7 +533,7 @@ Collect.DataManager.MapPanelComposer.prototype.onTileVisibleChange = function(ev
 };
 
 Collect.DataManager.MapPanelComposer.prototype.zoomToLayer = function(tile) {
-	$this = this;
+	var $this = this;
 	if (tile.getSource && tile.getSource() != null) {
 		var extent = tile.getSource().getExtent();
 		if (extent.length > 0 && isFinite(extent[0])) {
@@ -632,7 +634,7 @@ Collect.DataManager.MapPanelComposer.prototype.createGeometryDataSource = functi
 		};
 
 		var processGeometries = function(geometries) {
-			for (i = 0; i < geometries.length; i++) {
+			for (let i = 0; i < geometries.length; i++) {
 				processGeometry(geometries[i]);
 			}
 			
@@ -749,7 +751,7 @@ function stringToColor(s) {
 	return "#" + this.intToRGB(OF.Strings.hashCode(s));
 }
 
-function getRandomColor(minimum, maximum) {
+function getRandomColor(min, max) {
 	if (! min) {
 		min = '#000000';
 	}
@@ -796,9 +798,6 @@ Collect.DataManager.MapPanelComposer.prototype.onPanelShow = function() {
 	}
 }
 
-Collect.DataManager.MapPanelComposer.prototype.onSurveyChanged = function() {
-}
-
 Collect.DataManager.MapPanelComposer.prototype.resizeMapContainer = function() {
 	$("#map").height($(window).height());
 	$("#map").width($(window).width() - this.horizontalPadding);
@@ -829,7 +828,7 @@ Collect.DataManager.MapPanelComposer.openRecordEditPopUp = function(surveyId, re
 
 	modalContainer
 		.on('show.bs.modal', function() {
-			iframe.attr("src", "#/record_fullscreen/" + recordId + "?"
+			iframe.attr("src", "record_fullscreen/" + recordId + "?"
 				+ "inPopUp=true"
 				+ "&locale=" + OF.i18n.currentLocale());
 			$(this).find('.modal-body').css({
@@ -837,7 +836,9 @@ Collect.DataManager.MapPanelComposer.openRecordEditPopUp = function(surveyId, re
 			});
 		})
 		.on('hide.bs.modal', function() {
-			collect.sessionService.clearActiveRecord(function() {});
+			collect.sessionService.clearActiveRecord(function() {
+				// do nothing
+			});
 		});
 	
 	var options = {
