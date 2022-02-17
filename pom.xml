@@ -3,15 +3,15 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>4.0.23-SNAPSHOT</version>
+	<version>4.0.43-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Open Foris Collect</name>
 	<description>Open Foris Collect is the main entry point for data collected in field-based inventories. It provides a fast, easy, flexible way to set up a survey with a user-friendly interface. Collect handles multiple data types and complex validation rules, all in a multilanguage environment.</description>
-	<url>http://www.openforis.org/tools/collect.html</url>
+	<url>https://www.openforis.org/tools/collect.html</url>
 	<organization>
 		<name>Open Foris</name>
-		<url>www.openforis.org</url>
+		<url>https://www.openforis.org</url>
 	</organization>
 
 	<modules>
@@ -25,12 +25,15 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<openforis.commons.version>0.1.29</openforis.commons.version>
-		<spring.version>5.3.7</spring.version>
-		<spring-security.version>5.5.0</spring-security.version>
+		<openforis.commons.version>0.1.31</openforis.commons.version>
+		<spring.version>5.3.14</spring.version>
+		<spring-security.version>5.6.1</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>
-		<log4j.version>2.14.1</log4j.version>
-		<slf4j.version>1.7.30</slf4j.version>
+		<log4j.version>2.17.1</log4j.version>
+		<slf4j.version>1.7.32</slf4j.version>
+		<sonar.language>java</sonar.language>
+		<sonar.organization>openforis</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 
 	<distributionManagement>
@@ -205,7 +208,7 @@
 				<executions>
 					<execution>
 						<id>sign-artifacts</id>
-						<phase>verify</phase>
+						<phase>install</phase>
 						<goals>
 							<goal>sign</goal>
 						</goals>
@@ -219,7 +222,8 @@
 				<configuration>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<!-- During release:perform, enable these profiles -->
- 					<releaseProfiles>installer,publishupdater</releaseProfiles>
+ 					<!-- <releaseProfiles>installer,publishupdater</releaseProfiles> -->
+ 					<releaseProfiles>installer</releaseProfiles>
 				</configuration>
 			</plugin>
 			<!-- <plugin> -->
@@ -291,7 +295,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>3.2.0</version>
+					<version>3.3.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -469,7 +473,7 @@
 			<dependency>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>3.3.1</version>
+				<version>3.3.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.commons</groupId>
@@ -569,14 +573,15 @@
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
-				<!--with 3.10+ Collect Mobile won't compile (not compatible with Android
-					6) -->
+				<!-- with 3.10+ Collect Mobile won't compile -->
+				<!-- (not compatible with Android 6) -->
 				<version>(,3.9]</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>(,2.5]</version> <!-- 2.6 requires JDK 1.7+, Collect Mobile won't compile -->
+				<!-- 2.6 requires JDK 1.7+, Collect Mobile won't compile -->
+				<version>(,2.5]</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-fileupload</groupId>
@@ -586,7 +591,7 @@
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-vfs2</artifactId>
-				<version>2.8.0</version>
+				<version>2.9.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
@@ -651,7 +656,7 @@
 			<dependency>
 				<groupId>net.lingala.zip4j</groupId>
 				<artifactId>zip4j</artifactId>
-				<version>2.8.0</version>
+				<version>2.9.1</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-dbcp</groupId>
@@ -666,17 +671,17 @@
 			<dependency>
 				<groupId>org.xerial</groupId>
 				<artifactId>sqlite-jdbc</artifactId>
-				<version>3.36.0.1</version>
+				<version>3.36.0.3</version>
 			</dependency>
 			<dependency>
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>
-				<version>9.4.1212</version>
+				<version>42.3.3</version>
 			</dependency>
 			<dependency>
 				<groupId>com.h2database</groupId>
 				<artifactId>h2</artifactId>
-				<version>1.4.200</version>
+				<version>2.1.210</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>

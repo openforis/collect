@@ -4,18 +4,18 @@
 	<parent>
 		<artifactId>collect</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>4.0.23-SNAPSHOT</version>
+		<version>4.0.43-SNAPSHOT</version>
 	</parent>
 	<name>Open Foris Collect Server module</name>
 	<artifactId>collect-server</artifactId>
 	<packaging>jar</packaging>
 
 	<properties>
-		<collectearth.version>1.13.0</collectearth.version>
+		<collectearth.version>1.14.5</collectearth.version>
 		<repository-message-broker.version>0.1.3</repository-message-broker.version>
-		<geotools.version>25.1</geotools.version>
-		<aspectj.version>1.9.6</aspectj.version>
-		<jackson.version>2.12.3</jackson.version>
+		<geotools.version>26.1</geotools.version>
+		<aspectj.version>1.9.7</aspectj.version>
+		<jackson.version>2.13.1</jackson.version>
 		<zk.version>6.5.1.1</zk.version>
 		<zk.spring.version>3.1.1</zk.spring.version>
 	</properties>
@@ -23,7 +23,7 @@
 	<repositories>
 		<repository>
 			<id>zk repository</id>
-			<url>http://mavensync.zkoss.org/maven2</url>
+			<url>https://mavensync.zkoss.org/maven2</url>
 		</repository>
 	</repositories>
 
@@ -191,8 +191,30 @@
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
-			<version>4.4.1</version>
+			<version>4.7.1</version>
 		</dependency>
+		
+		<!-- TODO update xstream version in repository-message-broker-xstream -->
+		<dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.19</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xmlpull</groupId>
+                    <artifactId>xmlpull</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xpp3</groupId>
+                    <artifactId>xpp3_min</artifactId>
+                </exclusion>
+                <exclusion>
+                	<groupId>io.github.x-stream</groupId>
+                	<artifactId>mxparser</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -272,12 +294,12 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.8.0</version><!--$NO-MVN-MAN-VER$-->
+			<version>2.11.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.12.0</version><!--$NO-MVN-MAN-VER$-->
+			<version>3.12.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -292,7 +314,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
-			<version>1.20</version>
+			<version>1.21</version>
 		</dependency>
 
 		<!-- ZK dependencies -->
@@ -433,7 +455,7 @@
 		<dependency>
 			<groupId>net.coobird</groupId>
 			<artifactId>thumbnailator</artifactId>
-			<version>0.4.14</version>
+			<version>0.4.15</version>
 		</dependency>
 		<dependency>
 			<groupId>de.micromata.jak</groupId>
@@ -443,7 +465,7 @@
 		<dependency>
 			<groupId>io.sentry</groupId>
 			<artifactId>sentry-log4j2</artifactId>
-			<version>4.3.0</version>
+			<version>5.5.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.xerial</groupId>

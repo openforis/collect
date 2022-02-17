@@ -11,7 +11,8 @@ public class ParsingError {
 
 	public enum ErrorType {
 		MISSING_REQUIRED_COLUMNS, 
-		WRONG_COLUMN_NAME, 
+		WRONG_COLUMN_NAME,
+		RESERVED_COLUMN_NAME,
 		EMPTY, 
 		INVALID_VALUE, 
 		DUPLICATE_VALUE, 

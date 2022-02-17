@@ -14,6 +14,7 @@ import {
 import FormControl from '@material-ui/core/FormControl'
 import FormHelperText from '@material-ui/core/FormHelperText'
 
+import { withNavigate } from 'common/hooks'
 import MaxAvailableSpaceContainer from 'common/components/MaxAvailableSpaceContainer'
 import TableResizeOnWindowResizeComponent from 'common/components/TableResizeOnWindowResizeComponent'
 import Workflow from 'model/Workflow'
@@ -132,13 +133,13 @@ class DataManagementPage extends React.Component {
   }
 
   navigateToItemEditView(itemId) {
-    RouterUtils.navigateToRecordEditPage(this.props.history, itemId)
+    RouterUtils.navigateToRecordEditPage(this.props.navigate, itemId)
   }
 
   handleRowDoubleClick(record) {
     const { loggedUser, survey } = this.props
     const { userInGroupRole, userGroup } = survey
-    
+
     if (loggedUser.canEditRecords(userInGroupRole)) {
       if (record.lockedBy && !loggedUser.canUnlockRecords()) {
         Dialogs.alert(
@@ -176,19 +177,19 @@ class DataManagementPage extends React.Component {
   }
 
   handleExportToCsvButtonClick() {
-    RouterUtils.navigateToRecordCsvExportPage(this.props.history)
+    RouterUtils.navigateToRecordCsvExportPage(this.props.navigate)
   }
 
   handleBackupButtonClick() {
-    RouterUtils.navigateToRecordBackupPage(this.props.history)
+    RouterUtils.navigateToRecordBackupPage(this.props.navigate)
   }
 
   handleBackupImportButtonClick() {
-    RouterUtils.navigateToRecordBackupImportPage(this.props.history)
+    RouterUtils.navigateToRecordBackupImportPage(this.props.navigate)
   }
 
   handleCsvImportButtonClick() {
-    RouterUtils.navigateToRecordCsvImportPage(this.props.history)
+    RouterUtils.navigateToRecordCsvImportPage(this.props.navigate)
   }
 
   handleValidationReportButtonClick() {
@@ -426,4 +427,4 @@ export default connect(mapStateToProps, {
   startJobMonitor,
   selectActiveSurveyLanguage,
   fetchRecordSummaries,
-})(DataManagementPage)
+})(withNavigate(DataManagementPage))

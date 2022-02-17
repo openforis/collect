@@ -13,9 +13,9 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.io.data.DataExportStatus.Format;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.data.csv.DataTransformation;
@@ -79,6 +79,7 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	
 	private void exportData() throws Exception {
 		BufferedOutputStream bufferedOutputStream = null;
+		FileOutputStream fileOutputStream = null;
 		ZipOutputStream zipOS = null;
 		if ( outputFile.exists() ) {
 			outputFile.delete();
@@ -86,7 +87,7 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		}
 		try {
 			status.setTotal(calculateTotal());
-			FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+			fileOutputStream = new FileOutputStream(outputFile);
 			bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
 			
 			Collection<EntityDefinition> entities = getEntitiesToExport();
@@ -113,9 +114,9 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 			LOG.error(e.getMessage(), e);
 			throw e;
 		} finally {
-			IOUtils.close(zipOS);
-			IOUtils.close(bufferedOutputStream);
-
+			IOUtils.closeQuietly(zipOS);
+			IOUtils.closeQuietly(bufferedOutputStream);
+			IOUtils.closeQuietly(fileOutputStream);
 		}
 		//System.out.println("Exported "+rowsCount+" rows from "+read+" records in "+(duration/1000)+"s ("+(duration/rowsCount)+"ms/row).");
 	}

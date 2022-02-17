@@ -1,7 +1,7 @@
 import './App.scss'
 
 import React, { useEffect } from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import { connect, useDispatch } from 'react-redux'
 
 import Header from 'common/components/Header'
@@ -38,27 +38,43 @@ import PasswordChangePage from 'security/pages/PasswordChangePage'
 
 import NavigationController from 'NavigationController'
 
-export const DefaultRoute = ({ component: Component, ...rest }) => (
-  <Route
-    {...rest}
-    component={(props) => (
-      <div className="app">
-        <Header />
-        <div className="app-body">
-          <Sidebar />
-          <main className="main">
-            <div className="main-content-wrapper">
-              <Component {...props} />
-            </div>
-          </main>
+const DefaultLayoutRoutes = () => (
+  <div className="app">
+    <Header />
+    <div className="app-body">
+      <Sidebar />
+      <main className="main">
+        <div className="main-content-wrapper">
+          <Routes>
+            <Route path="/" name="HomePage" element={<HomePage />} />
+            <Route path="/backup" name="Backup" element={<BackupPage />} />
+            <Route path="/dashboard" name="Dashboard" element={<DashboardPage />} />
+            <Route path="/datamanagement" name="DataManagement" element={<DataManagementPage />} />
+            <Route path="/datamanagement/csvexport" name="CsvDataExport" element={<CsvDataExportPage />} />
+            <Route path="/datamanagement/backup" name="BackupDataExport" element={<BackupDataExportPage />} />
+            <Route path="/datamanagement/backupimport" name="BackupDataImport" element={<BackupDataImportPage />} />
+            <Route path="/datamanagement/csvimport" name="CsvDataImport" element={<CsvDataImportPage />} />
+            <Route path="/datamanagement/:id" name="RecordEdit" element={<RecordEditPage />} />
+            <Route path="/datacleansing" name="DataCleansing" element={<DataCleansingPage />} />
+            <Route path="/map" name="Map" element={<MapPage />} />
+            <Route path="/restore" name="Restore" element={<RestorePage />} />
+            <Route path="/saiku" name="Saiku" element={<SaikuPage />} />
+            <Route path="/surveydesigner" name="SurveysList" element={<SurveysListPage />} />
+            <Route path="/surveydesigner/new" name="NewSurvey" element={<NewSurveyPage />} />
+            <Route path="/surveydesigner/surveyimport" name="SurveyImport" element={<SurveyImportPage />} />
+            <Route path="/surveydesigner/:id" name="SurveyEdit" element={<SurveyEditPage />} />
+            <Route path="/surveydesigner/export/:id" name="SurveyExport" element={<SurveyExportPage />} />
+            <Route path="/surveydesigner/clone/:surveyName" name="SurveyClone" element={<SurveyClonePage />} />
+            <Route path="/users" name="Users" element={<UsersPage />} />
+            <Route path="/users/changepassword" name="ChangePassword" element={<PasswordChangePage />} />
+            <Route path="/usergroups" name="User Groups" element={<UserGroupsPage />} />
+            <Route path="/usergroups/:id" name="User Group" element={<UserGroupDetailsPage />} />
+            <Route path="*" name="Not found" element={<>Not found</>} />
+          </Routes>
         </div>
-      </div>
-    )}
-  />
-)
-
-export const FullScreenRoute = ({ component: Component, ...rest }) => (
-  <Route {...rest} component={(props) => <Component {...props} />} />
+      </main>
+    </div>
+  </div>
 )
 
 const App = (props) => {
@@ -73,44 +89,11 @@ const App = (props) => {
 
   return (
     <>
-      <Switch>
-        <DefaultRoute path="/" exact name="HomePage" component={HomePage} />
-        <DefaultRoute path="/backup" exact name="Backup" component={BackupPage} />
-        <DefaultRoute path="/dashboard" exact name="Dashboard" component={DashboardPage} />
-        <DefaultRoute path="/datamanagement" exact name="DataManagement" component={DataManagementPage} />
-        <DefaultRoute path="/datamanagement/csvexport" exact name="CsvDataExport" component={CsvDataExportPage} />
-        <DefaultRoute path="/datamanagement/backup" exact name="BackupDataExport" component={BackupDataExportPage} />
-        <DefaultRoute
-          path="/datamanagement/backupimport"
-          exact
-          name="BackupDataImport"
-          component={BackupDataImportPage}
-        />
-        <DefaultRoute path="/datamanagement/csvimport" exact name="CsvDataImport" component={CsvDataImportPage} />
-        <DefaultRoute path="/datamanagement/:id" name="RecordEdit" component={RecordEditPage} />
-        <DefaultRoute path="/datacleansing" exact name="DataCleansing" component={DataCleansingPage} />
-        <DefaultRoute path="/map" exact name="Map" component={MapPage} />
-        <DefaultRoute path="/restore" exact name="Restore" component={RestorePage} />
-        <DefaultRoute path="/saiku" exact name="Saiku" component={SaikuPage} />
-        <DefaultRoute path="/surveydesigner" exact name="SurveysList" component={SurveysListPage} />
-        <DefaultRoute path="/surveydesigner/new" exact name="NewSurvey" component={NewSurveyPage} />
-        <DefaultRoute path="/surveydesigner/surveyimport" exact name="SurveyImport" component={SurveyImportPage} />
-        <DefaultRoute path="/surveydesigner/:id" exact name="SurveyEdit" component={SurveyEditPage} />
-        <DefaultRoute path="/surveydesigner/export/:id" exact name="SurveyExport" component={SurveyExportPage} />
-        <DefaultRoute path="/surveydesigner/clone/:surveyName" exact name="SurveyClone" component={SurveyClonePage} />
-        <DefaultRoute path="/users" exact name="Users" component={UsersPage} />
-        <DefaultRoute path="/users/changepassword" exact name="ChangePassword" component={PasswordChangePage} />
-        <DefaultRoute path="/usergroups" exact name="User Groups" component={UserGroupsPage} />
-        <DefaultRoute path="/usergroups/:id" name="User Group" component={UserGroupDetailsPage} />
-
-        <FullScreenRoute
-          path="/surveypreview/:id"
-          exact
-          name="SurveyDataEntryPreview"
-          component={SurveyDataEntryPreviewPage}
-        />
-        <FullScreenRoute path="/record_fullscreen/:id" exact name="RecordEditFullScreen" component={RecordEditPage} />
-      </Switch>
+      <Routes>
+        <Route path="surveypreview/:id" name="SurveyDataEntryPreview" element={<SurveyDataEntryPreviewPage />} />
+        <Route path="record_fullscreen/:id" name="RecordEditFullScreen" element={<RecordEditPage />} />
+        <Route path="*" element={<DefaultLayoutRoutes />} />
+      </Routes>
 
       <NavigationController />
 

@@ -126,6 +126,7 @@ public class RecordOperationGenerator {
 		RecordFilter filter = new RecordFilter(survey);
 		filter.setRootEntityId(parsedRecord.getRootEntityDefinitionId());
 		filter.setKeyValues(parsedRecord.getRootEntityKeyValues());
+		filter.setIncludeNullConditionsForKeyValues(true);
 		List<CollectRecordSummary> summaries = recordManager.loadFullSummaries(filter, null);
 		switch(summaries.size()) {
 		case 0:

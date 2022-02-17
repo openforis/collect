@@ -1,11 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import classNames from 'classnames'
-import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers'
 import DateFnsUtils from '@date-io/date-fns'
 
-import Dates from 'utils/Dates'
 import L from 'utils/Labels'
+import { DatePicker } from 'common/components/DatePicker'
 
 import AbstractField from './AbstractField'
 import * as FieldSizes from './FieldsSizes'
@@ -58,20 +57,12 @@ class DateField extends AbstractField {
 
     return (
       <div ref={this.datePickerWrapperRef}>
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-          <KeyboardDatePicker
-            variant="dialog"
-            inputVariant="outlined"
-            format={Dates.DATE_FORMAT}
-            margin="none"
-            minDate={null}
-            maxDate={null}
-            value={selectedDate}
-            disabled={readOnly}
-            onChange={this.onChange}
-            style={{ width: `${FieldSizes.getWidth({ fieldDef, inTable })}px` }}
-          />
-        </MuiPickersUtilsProvider>
+        <DatePicker
+          value={selectedDate}
+          onChange={this.onChange}
+          disabled={readOnly}
+          style={{ width: `${FieldSizes.getWidth({ fieldDef, inTable })}px` }}
+        />
         {dirty && <DirtyFieldSpinner />}
       </div>
     )

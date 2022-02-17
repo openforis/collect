@@ -1,6 +1,6 @@
 package org.openforis.collect.designer.form.validator;
 
-import static org.openforis.collect.designer.form.SurveyFileFormObject.FILENAME_FIELD_NAME;
+import static org.openforis.collect.designer.form.SurveyFileFormObject.FILENAMES_FIELD_NAME;
 import static org.openforis.collect.designer.form.SurveyFileFormObject.TYPE_FIELD_NAME;
 
 import java.util.ArrayList;
@@ -41,9 +41,30 @@ public class SurveyFileFormValidator extends FormValidator {
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
 		if (validateTypeUniqueness(ctx)) {
-			if (validateFilename(ctx)) {
-				validateFilenameUniqueness(ctx);
+			if (validateMultipleFilesAllowedForType(ctx)) {
+				if (validateFilenames(ctx)) {
+					validateFilenamesUniqueness(ctx);
+				}
 			}
+		}
+	}
+
+	private boolean validateMultipleFilesAllowedForType(ValidationContext ctx) {
+		String[] filenames = getFilenames(ctx);
+		if (filenames.length == 1) {
+			// single file uploaded
+			return true;
+		}
+		String typeName = getValue(ctx, TYPE_FIELD_NAME);
+		SurveyFileType type = SurveyFileType.valueOf(typeName);
+		switch (type) {
+		case SURVEY_GUIDE:
+		case COLLECT_EARTH_AREA_PER_ATTRIBUTE:
+		case COLLECT_EARTH_EE_SCRIPT:
+			addInvalidMessage(ctx, TYPE_FIELD_NAME, Labels.getLabel("survey.file.error.multiple_files_not_allowed_for_type"));
+			return false;
+		default:
+			return true;
 		}
 	}
 
@@ -65,63 +86,67 @@ public class SurveyFileFormValidator extends FormValidator {
 			return true;
 		}
 	}
+	
+	private String[] getFilenames(ValidationContext ctx) {
+		String filenamesStr = getValue(ctx, FILENAMES_FIELD_NAME);
+		return filenamesStr.split("\n");
+	}
 
-	private boolean validateFilename(ValidationContext ctx) {
-		if (validateRequired(ctx, FILENAME_FIELD_NAME)) { 
-			if (validateFilenamePattern(ctx)) {
-				return validateFilenameUniqueness(ctx);
-			} else {
-				return false;
+	private boolean validateFilenames(ValidationContext ctx) {
+		if (validateRequired(ctx, FILENAMES_FIELD_NAME)) { 
+			for (String filename : getFilenames(ctx)) {
+				if (!validateFilenamePattern(ctx, filename)) {
+					return false;
+				}
 			}
-		} else {
-			return false;
+			return validateFilenamesUniqueness(ctx);
 		}
+		return false;
 	}
 	
-	private boolean validateFilenamePattern(ValidationContext ctx) {
-		if (validateRegEx(ctx, VALID_FILENAME_PATTERN, FILENAME_FIELD_NAME, "survey.file.error.invalid_filename")) {
-			String filename = getValue(ctx, FILENAME_FIELD_NAME);
-			String typeName = getValue(ctx, TYPE_FIELD_NAME);
-			SurveyFileType type = SurveyFileType.valueOf(typeName);
-			switch (type) {
-			case COLLECT_EARTH_AREA_PER_ATTRIBUTE:
-				String expectedFileName = SurveyFileType.COLLECT_EARTH_AREA_PER_ATTRIBUTE.getFixedFilename();
-				if (expectedFileName.equals(filename)) {
-					return true;
-				} else {
-					String message = Labels.getLabel("survey.file.error.unexpected_filename",
-							new String[] { expectedFileName });
-					addInvalidMessage(ctx, message);
-					return false;
-				}
-			case COLLECT_EARTH_SAIKU_QUERY:
-				String extension = FilenameUtils.getExtension(filename);
-				if (! SAIKU_QUERY_FILE_EXTENSION.equalsIgnoreCase(extension)) {
-					String message = Labels.getLabel("survey.file.error.invalid_extension", 
-							new String[] { SAIKU_QUERY_FILE_EXTENSION, extension });
-					addInvalidMessage(ctx, FILENAME_FIELD_NAME, message);
-					return false;
-				}
-				
-			default:
-				if (RESERVED_FILENAMES.contains(filename)) {
-					addInvalidMessage(ctx, FILENAME_FIELD_NAME, Labels.getLabel("survey.file.error.reserved_filename"));
-					return false;
-				} else {
-					return true;
-				}
-			}
-		} else {
+	private boolean validateFilenamePattern(ValidationContext ctx, String filename) {
+		if (!validateRegExValue(ctx, VALID_FILENAME_PATTERN, filename, FILENAMES_FIELD_NAME, "survey.file.error.invalid_filename")) {
 			return false;
+		}
+		String typeName = getValue(ctx, TYPE_FIELD_NAME);
+		SurveyFileType type = SurveyFileType.valueOf(typeName);
+		switch (type) {
+		case COLLECT_EARTH_AREA_PER_ATTRIBUTE: {
+			String expectedFileName = SurveyFileType.COLLECT_EARTH_AREA_PER_ATTRIBUTE.getFixedFilename();
+			if (expectedFileName.equals(filename)) {
+				return true;
+			}
+			String message = Labels.getLabel("survey.file.error.unexpected_filename",
+					new String[] { expectedFileName });
+			addInvalidMessage(ctx, message);
+			return false;
+		}
+		case COLLECT_EARTH_SAIKU_QUERY: {
+			String extension = FilenameUtils.getExtension(filename);
+			if (SAIKU_QUERY_FILE_EXTENSION.equalsIgnoreCase(extension)) {
+				return true;
+			}
+			String message = Labels.getLabel("survey.file.error.invalid_extension",
+					new String[] { SAIKU_QUERY_FILE_EXTENSION, extension });
+			addInvalidMessage(ctx, FILENAMES_FIELD_NAME, message);
+			return false;
+		}
+		default:
+			if (RESERVED_FILENAMES.contains(filename)) {
+				addInvalidMessage(ctx, FILENAMES_FIELD_NAME, Labels.getLabel("survey.file.error.reserved_filename"));
+				return false;
+			}
+			return true;
 		}
 	}
 
-	private boolean validateFilenameUniqueness(ValidationContext ctx) {
+	private boolean validateFilenamesUniqueness(ValidationContext ctx) {
 		List<SurveyFile> otherSurveyFiles = loadSurveyFilesDifferentFromThis(ctx);
-		String filename = getValue(ctx, FILENAME_FIELD_NAME);
+		String filenames = getValue(ctx, FILENAMES_FIELD_NAME);
+		List<String> filenamesList = Arrays.asList(filenames.split("\n"));
 		for (SurveyFile surveyFile : otherSurveyFiles) {
-			if (surveyFile.getFilename().equals(filename)) {
-				addInvalidMessage(ctx, FILENAME_FIELD_NAME, Labels.getLabel("survey.file.error.duplicate_filename"));
+			if (filenamesList.contains(surveyFile.getFilename())) {
+				addInvalidMessage(ctx, FILENAMES_FIELD_NAME, Labels.getLabel("survey.file.error.duplicate_filename"));
 				return false;
 			}
 		}

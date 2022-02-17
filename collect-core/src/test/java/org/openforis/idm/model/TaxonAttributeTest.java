@@ -1,5 +1,7 @@
 package org.openforis.idm.model;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.openforis.idm.AbstractTest;
 
@@ -16,6 +18,8 @@ public class TaxonAttributeTest extends AbstractTest {
 		Entity tree = EntityBuilder.addEntity(plot, "tree");
 		TaxonOccurrence taxonOccurrence = new TaxonOccurrence("JUG/REG", "Juglans regia", "Noce bianco", "ita", "");
 		EntityBuilder.addValue(tree, "species", taxonOccurrence);
+		TaxonAttribute species = tree.getChild("species");
+		assertEquals(species.getValue(), taxonOccurrence);
 	}
 
 	@Test(expected=TaxonAttribute.LanguageCodeNotSupportedException.class)

@@ -3,8 +3,8 @@ package org.openforis.collect.metamodel.view;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.designer.metamodel.NodeType;
+import org.openforis.idm.metamodel.AttributeType;
 
 public class AttributeDefView extends NodeDefView {
 

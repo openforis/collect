@@ -2,7 +2,7 @@ package org.openforis.collect.metamodel.view;
 
 import java.util.List;
 
-import org.openforis.collect.designer.metamodel.AttributeType;
+import org.openforis.idm.metamodel.AttributeType;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 
 public abstract class NumericAttributeDefView extends AttributeDefView {

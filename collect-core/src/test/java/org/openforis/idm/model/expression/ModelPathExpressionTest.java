@@ -5,8 +5,7 @@ package org.openforis.idm.model.expression;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.openforis.idm.AbstractTest;
 import org.openforis.idm.model.Code;

@@ -1,68 +1,68 @@
 import Constants from 'Constants'
 
 class RouterUtils {
-  static navigateToHomePage(history) {
-    if (history) {
-      RouterUtils._navigateToUrl(history, '')
+  static navigateToHomePage(navigate) {
+    if (navigate) {
+      RouterUtils._navigateToUrl(navigate, '')
     } else {
       window.location.assign(Constants.BASE_URL)
     }
   }
 
-  static navigateToLoginPage(logout = false) {
+  static navigateToLoginPage(_logout = false) {
     window.location.assign(Constants.BASE_URL + 'login.html?logout=true')
   }
 
-  static navigateToPasswordChangePage(history) {
-    RouterUtils._navigateToUrl(history, '/users/changepassword')
+  static navigateToPasswordChangePage(navigate) {
+    RouterUtils._navigateToUrl(navigate, '/users/changepassword')
   }
 
-  static navigateToDataManagementHomePage(history) {
-    RouterUtils._navigateToUrl(history, '/datamanagement')
+  static navigateToDataManagementHomePage(navigate) {
+    RouterUtils._navigateToUrl(navigate, '/datamanagement')
   }
 
-  static navigateToRecordEditPage(history, recordId) {
-    RouterUtils._navigateToUrl(history, `/datamanagement/${recordId}`)
+  static navigateToRecordEditPage(navigate, recordId) {
+    RouterUtils._navigateToUrl(navigate, `/datamanagement/${recordId}`)
   }
 
-  static navigateToRecordCsvExportPage(history) {
-    RouterUtils._navigateToUrl(history, '/datamanagement/csvexport')
+  static navigateToRecordCsvExportPage(navigate) {
+    RouterUtils._navigateToUrl(navigate, '/datamanagement/csvexport')
   }
 
-  static navigateToRecordBackupPage(history) {
-    RouterUtils._navigateToUrl(history, '/datamanagement/backup')
+  static navigateToRecordBackupPage(navigate) {
+    RouterUtils._navigateToUrl(navigate, '/datamanagement/backup')
   }
 
-  static navigateToRecordBackupImportPage(history) {
-    RouterUtils._navigateToUrl(history, '/datamanagement/backupimport')
+  static navigateToRecordBackupImportPage(navigate) {
+    RouterUtils._navigateToUrl(navigate, '/datamanagement/backupimport')
   }
 
-  static navigateToRecordCsvImportPage(history) {
-    RouterUtils._navigateToUrl(history, '/datamanagement/csvimport')
+  static navigateToRecordCsvImportPage(navigate) {
+    RouterUtils._navigateToUrl(navigate, '/datamanagement/csvimport')
   }
 
-  static navigateToNewSurveyPage(history) {
-    RouterUtils._navigateToUrl(history, '/surveydesigner/new')
+  static navigateToNewSurveyPage(navigate) {
+    RouterUtils._navigateToUrl(navigate, '/surveydesigner/new')
   }
 
-  static navigateToSurveyEditPage(history, surveyId) {
-    RouterUtils._navigateToUrl(history, '/surveydesigner/' + surveyId)
+  static navigateToSurveyEditPage(navigate, surveyId) {
+    RouterUtils._navigateToUrl(navigate, '/surveydesigner/' + surveyId)
   }
 
-  static navigateToSurveyExportPage(history, surveyId) {
-    RouterUtils._navigateToUrl(history, '/surveydesigner/export/' + surveyId)
+  static navigateToSurveyExportPage(navigate, surveyId) {
+    RouterUtils._navigateToUrl(navigate, '/surveydesigner/export/' + surveyId)
   }
 
-  static navigateToSurveyClonePage(history, surveyName) {
-    RouterUtils._navigateToUrl(history, '/surveydesigner/clone/' + surveyName)
+  static navigateToSurveyClonePage(navigate, surveyName) {
+    RouterUtils._navigateToUrl(navigate, '/surveydesigner/clone/' + surveyName)
   }
 
-  static navigateToUserGroupEditPage(history, userGroupId) {
-    RouterUtils._navigateToUrl(history, '/usergroups/' + userGroupId)
+  static navigateToUserGroupEditPage(navigate, userGroupId) {
+    RouterUtils._navigateToUrl(navigate, '/usergroups/' + userGroupId)
   }
 
-  static _navigateToUrl(history, url) {
-    history.push(url)
+  static _navigateToUrl(navigate, url) {
+    navigate(url)
   }
 
   static reloadPage() {

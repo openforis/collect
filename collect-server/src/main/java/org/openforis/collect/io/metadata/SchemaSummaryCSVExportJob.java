@@ -6,8 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
-import org.openforis.collect.designer.metamodel.AttributeType;
+import org.openforis.collect.designer.metamodel.AttributeTypeUtils;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.io.excel.ExcelFlatValuesWriter;
 import org.openforis.commons.io.flat.FlatDataWriter;
@@ -45,9 +44,9 @@ public class SchemaSummaryCSVExportJob extends Job {
 		Task task = new Task() {
 			@Override
 			protected void execute() throws Throwable {
-				FileOutputStream out = new FileOutputStream(outputFile);
-				final FlatDataWriter csvWriter = new ExcelFlatValuesWriter(out);
-				try {
+				try (
+						FileOutputStream out = new FileOutputStream(outputFile); 
+						final FlatDataWriter csvWriter = new ExcelFlatValuesWriter(out)) {
 					writeHeaders(csvWriter);
 					
 					Schema schema = survey.getSchema();
@@ -60,12 +59,15 @@ public class SchemaSummaryCSVExportJob extends Job {
 								values.addAll(Arrays.asList(
 										nodeDefn.getPath(),
 										nodeDefn instanceof EntityDefinition ? "entity": "attribute",
-										nodeDefn instanceof AttributeDefinition ? AttributeType.valueOf((AttributeDefinition) nodeDefn).getLabel(): ""
+										nodeDefn instanceof AttributeDefinition ? AttributeTypeUtils.getLabel((AttributeDefinition) nodeDefn): ""
 								));
 							}
 							// Instance labels
 							for (String lang : survey.getLanguages())
 								values.add(nodeDefn.getLabel(Type.INSTANCE, lang));
+							// Descriptions (tooltip text)
+							for (String lang : survey.getLanguages())
+								values.add(nodeDefn.getDescription(lang));
 							// Reporting labels
 							for (String lang : survey.getLanguages())
 								values.add(nodeDefn.getLabel(Type.REPORTING, lang));
@@ -83,12 +85,8 @@ public class SchemaSummaryCSVExportJob extends Job {
 							csvWriter.writeNext(values);
 						}
 					});
-				} finally {
-					IOUtils.closeQuietly(csvWriter);
 				}
 			}
-
-			
 		};
 		addTask(task);
 	}
@@ -103,6 +101,9 @@ public class SchemaSummaryCSVExportJob extends Job {
 		// Instance labels
 		for (String lang : survey.getLanguages())
 			headers.add("label_" + lang);
+		// Descriptions (tooltip text)
+		for (String lang : survey.getLanguages())
+			headers.add("description_" + lang);
 		// Reporting labels
 		for (String lang : survey.getLanguages())
 			headers.add("label_reporting_" + lang);

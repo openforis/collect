@@ -309,7 +309,9 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	}
 
 	public void removeDescription(String language) {
-		descriptions.remove(language);
+		if (descriptions != null) {
+			descriptions.remove(language);
+		}
 	}
 	
 	public String getPath() {

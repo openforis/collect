@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;
@@ -33,6 +34,7 @@ import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
+import org.openforis.collect.manager.validation.CollectMobileSurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.metamodel.SurveyTarget;
@@ -91,6 +93,8 @@ public class SurveyExportParametersVM extends BaseVM {
 	private SurveyValidator surveyValidator;
 	@WireVariable
 	private CollectEarthSurveyValidator collectEarthSurveyValidator;
+	@WireVariable
+	private CollectMobileSurveyValidator collectMobileSurveyValidator;
 	
 	private SurveySummary surveySummary;
 	private SurveyExportParametersFormObject formObject;
@@ -154,7 +158,7 @@ public class SurveyExportParametersVM extends BaseVM {
 			startRDBSurveyExportJob(loadedSurvey, formObject);
 			break;
 		case MOBILE:
-			validateSurvey(loadedSurvey, surveyValidator, new SuccessHandler() {
+			validateSurvey(loadedSurvey, collectMobileSurveyValidator, new SuccessHandler() {
 				public void onSuccess() {
 					startCollectSurveyExportJob(loadedSurvey, formObject);
 				}
@@ -215,6 +219,7 @@ public class SurveyExportParametersVM extends BaseVM {
 
 	private void exportCollectEarthSurvey(final CollectSurvey survey,
 			final SurveyExportParametersFormObject parameters) {
+		FileInputStream is = null;
 		try {
 			CollectEarthProjectFileCreatorImpl creatorImpl = (CollectEarthProjectFileCreatorImpl) COLLECT_EARTH_PROJECT_FILE_CREATOR;
 			creatorImpl.setCodeListManager(codeListManager);
@@ -222,7 +227,7 @@ public class SurveyExportParametersVM extends BaseVM {
 			String languageCode = parameters.getLanguageCode();
 			File file = COLLECT_EARTH_PROJECT_FILE_CREATOR.create(survey, languageCode);
 			String contentType = URLConnection.guessContentTypeFromName(file.getName());
-			FileInputStream is = new FileInputStream(file);
+			is = new FileInputStream(file);
 			String outputFileName = String.format("%s_%s_%s.%s", 
 					survey.getName(), 
 					languageCode,
@@ -232,6 +237,8 @@ public class SurveyExportParametersVM extends BaseVM {
 		} catch(Exception e) {
 			LOG.error(e);
 			MessageUtil.showError("survey.export.error_generating_collect_earth_project_file", e.getMessage());
+		} finally {
+			IOUtils.closeQuietly(is);
 		}
 	}
 

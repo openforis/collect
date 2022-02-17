@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -886,6 +887,7 @@ public class SurveyManager {
 		}
 	}
 	
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public SurveySummary updateUserGroup(String surveyName, int userGroupId) throws SurveyStoreException {
 		UserGroup userGroup = userGroupManager.loadById(userGroupId);
 		SurveySummary surveySummary = loadSummaryByName(surveyName);
@@ -1122,6 +1124,19 @@ public class SurveyManager {
 	}
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
+	public void addSurveyFiles(CollectSurvey survey, List<SurveyFile> files, List<File> filesContent) {
+		try {
+			Iterator<File> filesContentIt = filesContent.iterator();
+			for (SurveyFile file : files) {
+				File fileContent = filesContentIt.next();
+				addSurveyFile(survey, file, fileContent);
+			}
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void updateSurveyFile(CollectSurvey survey, SurveyFile file, File content) {
 		try {
 			surveyFileDao.update(file);
@@ -1167,6 +1182,11 @@ public class SurveyManager {
 	
 	public void deleteSurveyFile(SurveyFile surveyFile) {
 		surveyFileDao.delete(surveyFile.getId());
+	}
+	
+	public void deleteSurveyFiles(Set<SurveyFile> surveyFiles) {
+		List<Integer> ids = CollectionUtils.project(surveyFiles, "id");
+		surveyFileDao.deleteByIds(new HashSet<Integer>(ids));
 	}
 	
 	public void deleteSurveyFiles(CollectSurvey survey) {

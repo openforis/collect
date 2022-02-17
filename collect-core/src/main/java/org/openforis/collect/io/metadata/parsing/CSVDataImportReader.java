@@ -77,6 +77,9 @@ public abstract class CSVDataImportReader<T extends Line> extends DataImportRead
 	public T readNextLine() throws ParsingException {
 		try {
 			currentCSVLine = csvReader.readNextLine();
+			if (currentCSVLine != null) {
+				currentCSVLine.setNaAsNull(false);
+			}
 			currentLine = parseCurrentLine();
 			return currentLine;
 		} catch (IOException e) {

@@ -142,7 +142,7 @@ public class DataCleansingChainExectutorTask extends Task {
 		try {
 			return input.nodeProcessor.process(step, node);
 		} catch(Exception e) {
-			log().error(String.format("Error executing cleansing step %s", step.getId()), e);
+			logError(String.format("Error executing cleansing step %s", step.getId()), e);
 			CollectRecord record = (CollectRecord) node.getRecord();
 			errors.add(new DataQueryExecutorError(record.getRootEntityKeyValues(), record.getId(), node.getPath(), e.getMessage()));
 			return null;

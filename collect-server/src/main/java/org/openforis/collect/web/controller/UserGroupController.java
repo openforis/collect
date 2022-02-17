@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserGroupManager;
@@ -45,6 +46,8 @@ import jakarta.validation.Valid;
 @Scope(WebApplicationContext.SCOPE_SESSION)
 public class UserGroupController extends AbstractPersistedObjectEditFormController<Integer, UserGroup, UserGroupForm, UserGroupManager> {
 
+	private static final String RESOURCE_TYPE_REGEX = "[a-z][a-z0-9_]*";
+	
 	@Autowired
 	private UserGroupValidator userGroupValidator;
 	@Autowired
@@ -82,6 +85,9 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 			@PathVariable int userGroupId, 
 			@PathVariable String resourceType,
 			@PathVariable String resourceId) {
+		if (StringUtils.isBlank(resourceType) || !resourceType.matches(RESOURCE_TYPE_REGEX)) {
+			throw new IllegalArgumentException("Invalid resource type specified");
+		}
 		itemManager.associateResource(userGroupId, resourceType, resourceId);
 		return new Response();
 	}

@@ -4,7 +4,100 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.0.23] - NOT-RELEASED-YET
+## [4.0.43] - NOT-RELEASED-YET
+### Fixed
+- Bug fixes;
+
+## [4.0.42] - 2022-02-04
+### Fixed
+- Fixed error importing collect-data files;
+
+## [4.0.41] - 2022-02-02
+### Fixed
+- Bug fixes; Fixed blank page opening Data Management and Survey Designer;
+
+## [4.0.40] - 2022-02-01
+### Fixed
+- Bug fixes;
+
+## [4.0.39] - 2022-01-04
+### Fixed
+- Prevent runtime errors importing records with "null" keys;
+- Error importing big records using in SQLite DB;
+
+## [4.0.38] - 2021-12-31
+### Fixed
+- Error importing big records using in SQLite DB;
+
+## [4.0.37] - 2021-12-29
+### Changed
+- Updated dependencies;
+
+## [4.0.36] - 2021-12-09
+### Fixed
+- Survey Designer / Survey files: fixed error adding CE area_per_attribute.csv file;
+
+## [4.0.35] - 2021-12-08
+### Fixed
+- Data management / Single record export: fixed exported record files filter;
+
+## [4.0.34] - 2021-12-07
+### Added
+- Data management / Record edit: added current record "Export to Collect format" button;
+
+## [4.0.33] - 2021-11-18
+### Added
+- Survey Designer / Survey files: allow importing multiple files;
+
+## [4.0.32] - 2021-10-04
+### Added
+- Data Management / Data Import Summary: added record import warnings icon;
+
+## [4.0.31] - 2021-09-30
+### Added
+- Data Management / Data Import Summary: added Filled Values column and importability tooltips;
+
+### Fixed
+- Internal changes: removed dependencies giving conflicts;
+
+## [4.0.30] - 2021-09-29
+### Fixed
+- Records validation: fixed error validating hierarchical code attributes using sampling point data in PostgreSQL;
+- Survey Designer: fixed Boolean attribute type label not visible in Add Attribute dropdown;
+
+## [4.0.29] - 2021-09-21
+### Fixed
+- CSV data export: fixed date and time values formatting;
+- Survey Designer: fixed error importing labels' translation file;
+- Species import: validate extra info column names (cannot use reserved words);
+
+### Added
+- Survey export: validate that multiple attribute is supported before exporting to Collect Mobile;
+
+## [4.0.28] - 2021-09-14
+### Added
+- Survey designer: labels export/import - include tooltip texts;
+
+## [4.0.27] - 2021-09-09
+### Fixed
+- Map: polygon text attribute not selectable in map;
+
+## [4.0.26] - 2021-09-08
+### Fixed
+- Data entry: key code attribute label not appearing in enumerated entities;
+
+## [4.0.25] - 2021-09-07
+### Fixed
+- Data entry: min/max not recalculated properly when expression is used;
+
+## [4.0.24] - 2021-09-01
+### Fixed
+- Validation report not including missing values;
+
+## [4.0.23] - 2021-08-31
+### Fixed
+- Data entry: multiple entities (forms) selector showing "empty" for key attributes with value '0';
+
 ### Added
 - Survey Designer: avoid marking file attribute definitions as "key";
 

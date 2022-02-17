@@ -483,7 +483,9 @@ public class RecordManager {
 		Set<User> owners = new HashSet<User>(ownerIds.size());
 		for (Integer ownerId : ownerIds) {
 			User owner = userManager.loadById(ownerId);
-			owners.add(owner);
+			if (owner != null) {
+				owners.add(owner);
+			}
 		}
 		return owners;
 	}
@@ -714,6 +716,12 @@ public class RecordManager {
 	}
 	
 	@Transactional(readOnly=false, propagation=REQUIRED)
+	public void validateAndSave(CollectRecord record) {
+		validate(record);
+		recordDao.updateSummary(record);
+	}
+	
+	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void validateAndSave(CollectSurvey survey, User user, String sessionId, int recordId, Step step) throws RecordLockedException, MultipleEditException {
 		if ( isLockingEnabled() ) {
 			lockManager.isLockAllowed(user, recordId, sessionId, true);
@@ -721,9 +729,8 @@ public class RecordManager {
 		}
 		CollectRecord record = recordDao.load(survey, recordId, step);
 
-		validate(record);
-		
-		recordDao.update(record);
+		validateAndSave(record);
+
 		if ( isLockingEnabled() ) {
 			lockManager.releaseLock(recordId);
 		}

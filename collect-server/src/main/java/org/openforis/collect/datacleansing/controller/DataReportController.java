@@ -15,8 +15,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.datacleansing.DataQuery.ErrorSeverity;
 import org.openforis.collect.datacleansing.DataQueryGroup;
@@ -37,6 +37,7 @@ import org.openforis.collect.utils.MediaTypes;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.controller.PaginatedResponse;
+import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.commons.lang.Objects;
 import org.openforis.commons.web.HttpResponses;
@@ -198,7 +199,7 @@ public class DataReportController extends AbstractSurveyObjectEditFormController
 		
 		public void init() throws Exception {
 			tempFile = File.createTempFile("collect-data-report", ".csv");
-			csvWriter = new CsvWriter(new FileOutputStream(tempFile), IOUtils.UTF_8, ',', '"');
+			csvWriter = new CsvWriter(new FileOutputStream(tempFile), OpenForisIOUtils.UTF_8, ',', '"');
 			writeCSVHeader();
 		}
 		
@@ -229,7 +230,7 @@ public class DataReportController extends AbstractSurveyObjectEditFormController
 
 		@Override
 		public void close() throws IOException {
-			csvWriter.close();
+			IOUtils.closeQuietly(csvWriter);
 		}
 
 		public File getOutputFile() {
@@ -481,27 +482,31 @@ public class DataReportController extends AbstractSurveyObjectEditFormController
 			@Override
 			protected void execute() throws Throwable {
 				EntityDefinition rootEntityDefinition = survey.getSchema().getFirstRootEntityDefinition();
-				CSVWriterDataReportItemProcessor itemProcessor = Objects.newInstance(itemProcessorType, 
-						rootEntityDefinition);
-				itemProcessor.init();
-				long total = getTotalItems();
-				int itemsPerPage = 200;
-				int pages = Double.valueOf(Math.ceil((double) total / itemsPerPage)).intValue();
-				for (int page = 1; page <= pages ; page++) {
-					if (! isRunning()) {
-						break;
-					}
-					List<DataReportItem> items = reportManager.loadItems(report, (page - 1) * itemsPerPage, itemsPerPage);
-					for (DataReportItem item : items) {
+				CSVWriterDataReportItemProcessor itemProcessor = null;
+				try {
+					itemProcessor = Objects.newInstance(itemProcessorType, 
+							rootEntityDefinition);
+					itemProcessor.init();
+					long total = getTotalItems();
+					int itemsPerPage = 200;
+					int pages = Double.valueOf(Math.ceil((double) total / itemsPerPage)).intValue();
+					for (int page = 1; page <= pages ; page++) {
 						if (! isRunning()) {
 							break;
 						}
-						itemProcessor.process(item);
-						incrementProcessedItems();
+						List<DataReportItem> items = reportManager.loadItems(report, (page - 1) * itemsPerPage, itemsPerPage);
+						for (DataReportItem item : items) {
+							if (! isRunning()) {
+								break;
+							}
+							itemProcessor.process(item);
+							incrementProcessedItems();
+						}
 					}
+					outputFile = itemProcessor.getOutputFile();
+				} finally {
+					IOUtils.closeQuietly(itemProcessor);
 				}
-				itemProcessor.close();
-				outputFile = itemProcessor.getOutputFile();
 			}
 			
 		}

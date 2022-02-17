@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.openforis.idm.metamodel.DefaultSurveyContext;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -14,8 +15,6 @@ import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
-
-import junit.framework.Assert;
 
 /**
  * 
@@ -102,7 +101,7 @@ public class ProtostuffSerializationTest  {
 	private Survey getTestSurvey() throws IOException, IdmlParseException {
 		URL idm = ClassLoader.getSystemResource("test.idm.xml");
 		InputStream is = idm.openStream();
-		SurveyContext surveyContext = new DefaultSurveyContext();
+		SurveyContext<?> surveyContext = new DefaultSurveyContext();
 		SurveyIdmlBinder parser = new SurveyIdmlBinder(surveyContext);
 		return parser.unmarshal(is);
 	}

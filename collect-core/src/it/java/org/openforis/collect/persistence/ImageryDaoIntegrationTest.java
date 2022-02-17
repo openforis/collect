@@ -5,7 +5,7 @@ import org.openforis.collect.CollectTest;
 import org.openforis.collect.model.Imagery;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class ImageryDaoIntegrationTest extends CollectTest {
 

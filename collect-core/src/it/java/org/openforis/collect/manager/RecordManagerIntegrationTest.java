@@ -1,6 +1,6 @@
 package org.openforis.collect.manager;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.openforis.idm.testfixture.NodeBuilder.attribute;
 import static org.openforis.idm.testfixture.NodeBuilder.entity;
 import static org.openforis.idm.testfixture.RecordBuilder.record;

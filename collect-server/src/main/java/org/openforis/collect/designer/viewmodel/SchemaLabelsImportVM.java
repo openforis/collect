@@ -8,10 +8,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +24,7 @@ import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.Files;
 import org.openforis.commons.io.csv.CsvReader;
 import org.openforis.commons.io.flat.FlatRecord;
+import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.NodeLabel.Type;
@@ -106,11 +109,11 @@ public class SchemaLabelsImportVM extends BaseSurveyFileImportVM {
 	@Command
 	public void startImport(@ContextParam(ContextType.BIND_CONTEXT) BindContext ctx) {
 		if (validateForm(ctx)) {
-			Map<Integer, List<NodeLabel>> labelsByNodeDefId = new LabelsExtractor(uploadedFile, survey)
+			Map<Integer, NodeDefLabels> labelsByNodeDefId = new LabelsExtractor(uploadedFile, survey)
 					.extractLabelsByNodeDefId();
-
+			
 			if (labelsByNodeDefId != null) {
-				new LabelsImporter(labelsByNodeDefId, survey).importLabels();
+				new LabelsImporter(survey, labelsByNodeDefId).importLabels();
 
 				MessageUtil.showInfo(IMPORT_COMPLETE_MESSAGE_KEY, labelsByNodeDefId.size());
 				dispatchSchemaChangedCommand();
@@ -126,22 +129,23 @@ public class SchemaLabelsImportVM extends BaseSurveyFileImportVM {
 
 	private static class LabelsImporter {
 
-		private Map<Integer, List<NodeLabel>> labelsByNodeDefId = new HashMap<>();
 		private Survey survey;
+		private Map<Integer, NodeDefLabels> labelsByNodeDefId = new HashMap<>();
 
-		public LabelsImporter(Map<Integer, List<NodeLabel>> labelsByNodeDefId, Survey survey) {
+		public LabelsImporter(Survey survey, Map<Integer, NodeDefLabels> labelsByNodeDefId) {
 			super();
-			this.labelsByNodeDefId = labelsByNodeDefId;
 			this.survey = survey;
+			this.labelsByNodeDefId = labelsByNodeDefId;
 		}
 
 		public void importLabels() {
 			Schema schema = survey.getSchema();
-			for (Entry<Integer, List<NodeLabel>> entry : labelsByNodeDefId.entrySet()) {
+			for (Entry<Integer, NodeDefLabels> entry : labelsByNodeDefId.entrySet()) {
 				int nodeDefId = entry.getKey();
 				NodeDefinition nodeDef = schema.getDefinitionById(nodeDefId);
-				List<NodeLabel> labels = entry.getValue();
-				for (NodeLabel nodeLabel : labels) {
+				// labels
+				NodeDefLabels nodeDefLabels = entry.getValue();
+				for (NodeLabel nodeLabel : nodeDefLabels.getNodeLabels()) {
 					String text = StringUtils.trimToNull(nodeLabel.getText());
 					Type type = nodeLabel.getType();
 					String language = nodeLabel.getLanguage();
@@ -151,6 +155,15 @@ public class SchemaLabelsImportVM extends BaseSurveyFileImportVM {
 						nodeDef.setLabel(type, language, text);
 					}
 				}
+				for (LanguageSpecificText description: nodeDefLabels.getDescriptions()) {
+					String language = description.getLanguage();
+					String text = StringUtils.trimToNull(description.getText());
+					if (text == null) {
+						nodeDef.removeDescription(language);
+					} else {
+						nodeDef.setDescription(language, text);
+					}
+				}
 			}
 		}
 
@@ -158,16 +171,21 @@ public class SchemaLabelsImportVM extends BaseSurveyFileImportVM {
 
 	private static class LabelsExtractor {
 
+		private static final String LABEL_COL_PREFIX = "label";
+		private static final String DESCRIPTION_COL_PREFIX = "description";
+		
 		private File file;
 		private Survey survey;
+		private Set<String> possibleColumnNames;
 
 		public LabelsExtractor(File file, Survey survey) {
 			super();
 			this.file = file;
 			this.survey = survey;
+			this.possibleColumnNames = determinePossibleColumnNames(survey);
 		}
 
-		public Map<Integer, List<NodeLabel>> extractLabelsByNodeDefId() {
+		public Map<Integer, NodeDefLabels> extractLabelsByNodeDefId() {
 			CsvReader reader = null;
 			try {
 				// init CSV reader
@@ -180,25 +198,37 @@ public class SchemaLabelsImportVM extends BaseSurveyFileImportVM {
 					return null;
 				}
 				// parse rows
-				Map<Integer, List<NodeLabel>> result = new HashMap<Integer, List<NodeLabel>>();
+				Map<Integer, NodeDefLabels> result = new HashMap<Integer, NodeDefLabels>();
 				FlatRecord row = reader.nextRecord();
 				while (row != null && !row.isEmpty()) {
 					if (!validateRow(reader.getLinesRead() + 1, row, survey.getDefaultLanguage())) {
 						return null;
 					}
-					List<NodeLabel> labels = new ArrayList<>();
-					List<String> languages = survey.getLanguages();
 					Integer nodeDefId = row.getValue("id", Integer.class);
+					List<String> languages = survey.getLanguages();
+
+					// extract labels
+					List<NodeLabel> labels = new ArrayList<>();
 					for (Type type : LABEL_TYPES) {
 						for (String lang : languages) {
-							String labelColName = getColumnPrefix(type) + "_" + lang;
+							String labelColName = getLabelColumnPrefix(type) + "_" + lang;
 							if (columnNames.contains(labelColName)) {
 								String text = row.getValue(labelColName, String.class);
 								labels.add(new NodeLabel(type, lang, text));
 							}
 						}
 					}
-					result.put(nodeDefId, labels);
+					// extract descriptions
+					List<LanguageSpecificText> descriptions = new ArrayList<>();
+					for (String lang : languages) {
+						String descriptionColName = DESCRIPTION_COL_PREFIX + "_" + lang;
+						if (columnNames.contains(descriptionColName)) {
+							String text = row.getValue(descriptionColName, String.class);
+							descriptions.add(new LanguageSpecificText(lang, text));
+						}
+						
+					}
+					result.put(nodeDefId, new NodeDefLabels(labels, descriptions));
 
 					row = reader.nextRecord();
 				}
@@ -214,7 +244,7 @@ public class SchemaLabelsImportVM extends BaseSurveyFileImportVM {
 			// determine required column names
 			List<String> requiredColumnNames = new ArrayList<>();
 			requiredColumnNames.add("id");
-			requiredColumnNames.add(getColumnPrefix(Type.INSTANCE) + "_" + survey.getDefaultLanguage());
+			requiredColumnNames.add(getLabelColumnPrefix(Type.INSTANCE) + "_" + survey.getDefaultLanguage());
 
 			// validate column names
 			for (String colName : columnNames) {
@@ -235,54 +265,79 @@ public class SchemaLabelsImportVM extends BaseSurveyFileImportVM {
 		}
 
 		private boolean validateColumnName(String colName) {
-			if ("id".equalsIgnoreCase(colName)) {
-				return true;
-			}
-			List<String> languages = survey.getLanguages();
-			for (Type type : LABEL_TYPES) {
-				for (String lang : languages) {
-					String expectedColName = getColumnPrefix(type) + "_" + lang;
-					if (expectedColName.equalsIgnoreCase(colName)) {
-						return true;
-					}
-				}
-			}
-			return false;
+			return possibleColumnNames.contains(colName);
 		}
 
 		private boolean validateRow(long rowNumber, FlatRecord row, String defaultLanguage) {
+			// missing id
 			Integer nodeDefId = row.getValue("id", Integer.class);
 			if (nodeDefId == null) {
 				handleError(MISSING_NODE_DEF_ID_MESSAGE_KEY, new Long[] { rowNumber });
 				return false;
 			}
+			// missing node def
 			if (!survey.getSchema().containsDefinitionWithId(nodeDefId)) {
 				handleError(MISSING_NODE_DEF_MESSAGE_KEY, new Object[] { nodeDefId, rowNumber });
 				return false;
 			}
-			String defaultLangLabelColName = getColumnPrefix(Type.INSTANCE) + "_" + defaultLanguage;
+			// labels
+			String defaultLangLabelColName = getLabelColumnPrefix(Type.INSTANCE) + "_" + defaultLanguage;
 			String defaultLangLabel = row.getValue(defaultLangLabelColName, String.class);
 			if (StringUtils.isBlank(defaultLangLabel)) {
 				handleError(MISSING_LABEL_DEFAULT_LANG_MESSAGE_KEY,
 						new Object[] { rowNumber, defaultLangLabelColName });
 				return false;
 			}
+			
 			return true;
-		}
-
-		private static String getColumnPrefix(Type type) {
-			switch (type) {
-			case INSTANCE:
-				return "label";
-			default:
-				return "label_" + type.name().toLowerCase(Locale.ENGLISH);
-			}
 		}
 
 		private void handleError(String messageKey, Object[] args) {
 			MessageUtil.showError(messageKey, args);
 		}
 
+		private static String getLabelColumnPrefix(Type type) {
+			switch (type) {
+			case INSTANCE:
+				return LABEL_COL_PREFIX;
+			default:
+				return LABEL_COL_PREFIX + "_" + type.name().toLowerCase(Locale.ENGLISH);
+			}
+		}
+		
+		private static Set<String> determinePossibleColumnNames(Survey survey) {
+			Set<String> possibleColumnNames = new HashSet<>();
+			possibleColumnNames.add("id");
+			List<String> languages = survey.getLanguages();
+			for (Type type : LABEL_TYPES) {
+				for (String lang : languages) {
+					possibleColumnNames.add(getLabelColumnPrefix(type) + "_" + lang);
+					possibleColumnNames.add(DESCRIPTION_COL_PREFIX + "_" + lang);
+					
+				}
+			}
+			return possibleColumnNames;
+		}
+
+	}
+	
+	private static class NodeDefLabels {
+		List<NodeLabel> nodeLabels;
+		List<LanguageSpecificText> descriptions;
+		
+		public NodeDefLabels(List<NodeLabel> nodeLabels, List<LanguageSpecificText> descriptions) {
+			super();
+			this.nodeLabels = nodeLabels;
+			this.descriptions = descriptions;
+		}
+
+		public List<NodeLabel> getNodeLabels() {
+			return nodeLabels;
+		}
+		
+		public List<LanguageSpecificText> getDescriptions() {
+			return descriptions;
+		}
 	}
 
 }

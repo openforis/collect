@@ -59,7 +59,6 @@ public class BackupRestoreController {
 	private CollectJobManager jobManager;
 	
 	private SurveyBackupJob backupJob;
-	
 
 	@RequestMapping(value = "survey/{surveyId}/backup/latest/info", method=GET)
 	public @ResponseBody BackupInfo getLatestBackupInfo(@PathVariable("surveyId") int surveyId) {
@@ -72,6 +71,7 @@ public class BackupRestoreController {
 	}
 	
 	@RequestMapping(value = "survey/{surveyId}/backup/start", method=POST)
+	@Transactional
 	public @ResponseBody JobProxy startBackup(@PathVariable("surveyId") int surveyId) {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		return startFullExport(survey, true, false, null, true);

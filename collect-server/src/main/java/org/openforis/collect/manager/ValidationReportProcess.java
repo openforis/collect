@@ -8,7 +8,6 @@ import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.process.ProcessStatus;
 import org.openforis.collect.model.CollectRecord;
@@ -19,6 +18,7 @@ import org.openforis.collect.model.RecordValidationReportGenerator;
 import org.openforis.collect.model.RecordValidationReportItem;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.validation.ValidationMessageBuilder;
+import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
@@ -119,7 +119,7 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 	protected void initWriter() throws UnsupportedEncodingException {
 		switch (reportType) {
 		case CSV:
-			csvWriter = new CsvWriter(outputStream, IOUtils.UTF_8, ',', '"');
+			csvWriter = new CsvWriter(outputStream, OpenForisIOUtils.UTF_8, ',', '"');
 			break;
 		}
 	}

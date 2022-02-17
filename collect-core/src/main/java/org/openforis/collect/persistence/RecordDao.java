@@ -26,7 +26,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.jooq.Batch;
 import org.jooq.Condition;
 import org.jooq.Cursor;
 import org.jooq.Field;
@@ -213,7 +212,7 @@ public class RecordDao extends JooqDaoSupport {
 		}
 		return recordSummaries;
 	}
-
+	
 	public void visitSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields, 
 			Visitor<CollectRecordSummary> visitor) {
 		visitSummaries(filter, sortFields, visitor, false, null);
@@ -860,10 +859,11 @@ public class RecordDao extends JooqDaoSupport {
 		stepSummary.setWarnings(r.getValue(OFC_RECORD.WARNINGS));
 		stepSummary.setSkipped(r.getValue(OFC_RECORD.SKIPPED));
 		stepSummary.setMissing(r.getValue(OFC_RECORD.MISSING));
-		int totalErrors = step == Step.ENTRY ? 
-				Numbers.sum(stepSummary.getErrors(), stepSummary.getSkipped())
-				: Numbers.sum(stepSummary.getErrors(), stepSummary.getMissingErrors());
-		stepSummary.setTotalErrors(totalErrors);
+		stepSummary.setTotalErrors(Numbers.sum(
+				stepSummary.getErrors(), 
+				stepSummary.getSkipped(), 
+				stepSummary.getMissing())
+		);
 		
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDef = schema.getRootEntityDefinition(rootEntityDefId);
@@ -926,14 +926,14 @@ public class RecordDao extends JooqDaoSupport {
 		
 		return s;
 	}
-	
+
 	public void execute(List<CollectStoreQuery> queries) {
 		List<Query> internalQueries = new ArrayList<Query>(queries.size());
 		for (CollectStoreQuery recordStoreQuery : queries) {
-			internalQueries.add(recordStoreQuery.getInternalQuery());
+			Query internalQuery = recordStoreQuery.getInternalQuery();
+			internalQueries.add(internalQuery);
 		}
-		Batch batch = dsl().batch(internalQueries);
-		batch.execute();
+		executeInBatch(internalQueries);
 	}
 	
 	public void delete(int id) {

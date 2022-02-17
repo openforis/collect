@@ -3,7 +3,6 @@
  */
 package org.openforis.collect.io.data;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -156,16 +155,9 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		if (storeRestoredFile) {
 			restoredBackupStorageManager.moveToFinalFolder(surveyName, tempFile);
 		}
+		IOUtils.closeQuietly(recordProvider);
 	}
 	
-	@Override
-	protected void onEnd() {
-		super.onEnd();
-		if (recordProvider instanceof Closeable) {
-			IOUtils.closeQuietly((Closeable) recordProvider);
-		}
-	}
-
 	public RecordManager getRecordManager() {
 		return recordManager;
 	}

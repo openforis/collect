@@ -104,6 +104,7 @@ public class RecordFileRestoreTask extends Task {
 		RecordFilter filter = new RecordFilter(survey);
 		filter.setRootEntityId(record.getRootEntityDefinitionId());
 		filter.setKeyValues(recordKeys);
+		filter.setIncludeNullConditionsForKeyValues(true);
 		List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter);
 		if ( summaries.size() == 1 ) {
 			CollectRecordSummary summary = summaries.get(0);
@@ -111,7 +112,7 @@ public class RecordFileRestoreTask extends Task {
 		} else if ( summaries.size() == 0 ) {
 			throw new RuntimeException(String.format("Record with keys %s not found", recordKeys.toString()));
 		} else {
-			throw new RuntimeException(String.format("Multiple records found with keys %s not found", recordKeys.toString()));
+			throw new RuntimeException(String.format("Multiple records found with keys %s", recordKeys.toString()));
 		}
 	}
 	

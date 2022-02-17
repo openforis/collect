@@ -19,7 +19,7 @@ Collect.AbstractService.prototype.duplicate = function(itemId, onSuccess, onErro
 };
 
 Collect.AbstractService.prototype.validate = function(data, onSuccess, onError) {
-	this.send("/validate.json", data, "POST", onSuccess, onError);
+	this.send("/validate", data, "POST", onSuccess, onError);
 };
 
 Collect.AbstractService.prototype.remove = function(id, onSuccess, onError) {

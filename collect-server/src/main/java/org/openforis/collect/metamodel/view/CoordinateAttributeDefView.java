@@ -2,8 +2,8 @@ package org.openforis.collect.metamodel.view;
 
 import java.util.List;
 
-import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.metamodel.ui.UIOptions.CoordinateAttributeFieldsOrder;
+import org.openforis.idm.metamodel.AttributeType;
 
 public class CoordinateAttributeDefView extends AttributeDefView {
 

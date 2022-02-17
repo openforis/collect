@@ -3,13 +3,12 @@
  */
 package org.openforis.idm.model.expression;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.openforis.idm.AbstractTest;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.RealAttribute;
-
-import junit.framework.Assert;
 
 /**
  * @author M. Togna

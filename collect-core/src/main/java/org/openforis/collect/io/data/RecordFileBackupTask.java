@@ -51,18 +51,17 @@ public class RecordFileBackupTask extends Task {
 	//input
 	private ZipOutputStream zipOutputStream;
 	private CollectSurvey survey;
-	private String rootEntityName;
+	private RecordFilter recordFilter;
 	
 	//output
 	private List<CollectRecordSummary> skippedRecords = new ArrayList<CollectRecordSummary>();
 	private List<MissingRecordFileError> missingRecordFiles = new ArrayList<MissingRecordFileError>();
+
 	
 	@Override
 	protected long countTotalItems() {
 		if (hasFileAttributeDefinitions()) {
-			RecordFilter filter = new RecordFilter(survey);
-			filter.setRootEntityId(survey.getSchema().getRootEntityDefinition(rootEntityName).getId());
-			int count = recordManager.countRecords(filter);
+			int count = recordManager.countRecords(recordFilter);
 			return count;
 		} else {
 			return 0;
@@ -74,10 +73,7 @@ public class RecordFileBackupTask extends Task {
 		if (! hasFileAttributeDefinitions()) {
 			return;
 		}
-		
-		RecordFilter filter = new RecordFilter(survey);
-		filter.setRootEntityId(survey.getSchema().getRootEntityDefinition(rootEntityName).getId());
-		recordManager.visitSummaries(filter, new Visitor<CollectRecordSummary>() {
+		recordManager.visitSummaries(recordFilter, new Visitor<CollectRecordSummary>() {
 			public void visit(CollectRecordSummary summary) {
 				try {
 					backup(summary);
@@ -145,9 +141,15 @@ public class RecordFileBackupTask extends Task {
 	private void writeFile(File file, String entryName) throws IOException {
 		ZipEntry entry = new ZipEntry(entryName);
 		zipOutputStream.putNextEntry(entry);
-		IOUtils.copy(new FileInputStream(file), zipOutputStream);
-		zipOutputStream.closeEntry();
-		zipOutputStream.flush();
+		FileInputStream fileIs = null;
+		try {
+			fileIs = new FileInputStream(file);
+			IOUtils.copy(fileIs, zipOutputStream);
+			zipOutputStream.closeEntry();
+			zipOutputStream.flush();
+		} finally {
+			IOUtils.closeQuietly(fileIs);
+		}
 	}
 
 	public RecordManager getRecordManager() {
@@ -174,14 +176,14 @@ public class RecordFileBackupTask extends Task {
 		this.survey = survey;
 	}
 	
-	public String getRootEntityName() {
-		return rootEntityName;
+	public RecordFilter getRecordFilter() {
+		return recordFilter;
 	}
 	
-	public void setRootEntityName(String rootEntityName) {
-		this.rootEntityName = rootEntityName;
+	public void setRecordFilter(RecordFilter recordFilter) {
+		this.recordFilter = recordFilter;
 	}
-	
+
 	public ZipOutputStream getZipOutputStream() {
 		return zipOutputStream;
 	}
@@ -223,4 +225,5 @@ public class RecordFileBackupTask extends Task {
 			return filePath;
 		}
 	}
+
 }

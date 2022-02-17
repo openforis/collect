@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>4.0.23-SNAPSHOT</version>
+		<version>4.0.43-SNAPSHOT</version>
 	</parent>
 
 	<name>Open Foris Collect Webapp module</name>
@@ -12,8 +12,8 @@
 	<packaging>war</packaging>
 
 	<properties>
-		<node.version>v14.17.0</node.version>
-		<npm.version>7.14.0</npm.version>
+		<node.version>v14.18.2</node.version>
+		<npm.version>8.2.0</npm.version>
 	</properties>
 
 	<build>
@@ -31,7 +31,7 @@
 			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
-				<version>1.10.0</version>
+				<version>1.12.0</version>
 
 				<configuration>
 					<nodeVersion>${node.version}</nodeVersion>
@@ -74,7 +74,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
-        		<version>3.3.1</version>
+				<version>3.3.2</version>
 				<executions>
 					<execution>
 						<id>prepare-war</id>
@@ -180,7 +180,7 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jcl-over-slf4j</artifactId>
-			<version>1.7.30</version>
+			<version>1.7.32</version>
 		</dependency>
 		<!-- Provided by the application server -->
 		<dependency>
@@ -198,7 +198,7 @@
 		<dependency>
 			<groupId>org.mitre.dsmiley.httpproxy</groupId>
 			<artifactId>smiley-http-proxy-servlet</artifactId>
-			<version>1.12</version>
+			<version>1.12.1</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>

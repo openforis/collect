@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.SchemaFactory;
@@ -77,7 +78,6 @@ public class SurveyValidator {
 	public static final int MAX_NODE_NAME_LENGTH = 63;
 	public static final int MAX_KEY_ATTRIBUTE_DEFINITION_COUNT = 3;
 	
-	private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 	private static final String XML_XSD_FILE_NAME = "xml.xsd";
 	private static final String IDML_XSD_FILE_NAME = "idml3.xsd";
 	private static final String IDML_XSD_3_1_5_FILE_NAME = "idml3.1.5.xsd";
@@ -874,7 +874,7 @@ public class SurveyValidator {
 	
 	public void validateAgainstSchema(InputStream is, Version version) throws SurveyValidationException {
 	    try {
-	    	SchemaFactory factory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
+	    	SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 	    	String[] schemaFileNames = getSchemaFileNames(version);
 	    	Source[] schemas = getSourcesFromClassPath(schemaFileNames);
 	    	javax.xml.validation.Schema schema = factory.newSchema(schemas);
@@ -916,7 +916,7 @@ public class SurveyValidator {
 		return null;
 	}
 	
-	private void addIfNotOk(List<SurveyValidationResult> results, SurveyValidationResult result) {
+	protected void addIfNotOk(List<SurveyValidationResult> results, SurveyValidationResult result) {
 		if (result != null && result.getFlag() != Flag.OK) {
 			results.add(result);
 		}

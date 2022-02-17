@@ -60,10 +60,10 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 	private Date creationDate;
 	private Date modifiedDate;
 
-	private transient SurveyContext surveyContext;
+	private transient SurveyContext<?> surveyContext;
 	private transient SurveyDependencies surveyDependencies;
 	
-	protected Survey(SurveyContext surveyContext) {
+	protected Survey(SurveyContext<?> surveyContext) {
 		this.surveyContext = surveyContext;
 		this.schema = new Schema(this);
 		this.referenceDataSchema = new ReferenceDataSchema();

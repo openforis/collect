@@ -255,10 +255,15 @@ public class RDBReportingRepositories implements ReportingRepositories {
 
 		withConnection(survey.getName(), step, new Callback() {
 			public void execute(Connection connection) {
-				RDBUpdater rdbUpdater = createRDBUpdater(rdbSchema, connection);
-				for (RecordEvent recordEvent : recordTransaction.getEvents()) {
-					EventHandler handler = new EventHandler(recordEvent, rdbSchema, survey, rdbUpdater);
-					handler.handle();
+				RDBUpdater rdbUpdater = null;
+				try {
+					rdbUpdater = createRDBUpdater(rdbSchema, connection);
+					for (RecordEvent recordEvent : recordTransaction.getEvents()) {
+						EventHandler handler = new EventHandler(recordEvent, rdbSchema, survey, rdbUpdater);
+						handler.handle();
+					}
+				} finally {
+					IOUtils.closeQuietly(rdbUpdater);
 				}
 			}
 		});

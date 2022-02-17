@@ -178,8 +178,7 @@ public class DataRestoreSummaryTask extends Task {
 	private void createParsingErrorSummary(int entryId, Step step,
 			ParseRecordResult parseRecordResult) {
 		String entryName = getEntryName(entryId, step);
-		List<NodeUnmarshallingError> failures = parseRecordResult.getFailures();
-		errorsByEntryName.put(entryName, failures);
+		errorsByEntryName.put(entryName, parseRecordResult.getFailures());
 		incrementSkippedItems();
 	}
 
@@ -303,6 +302,7 @@ public class DataRestoreSummaryTask extends Task {
 		RecordFilter filter = new RecordFilter(survey);
 		filter.setRootEntityId(rootEntityDefId);
 		filter.setKeyValues(keyValues);
+		filter.setIncludeNullConditionsForKeyValues(true);
 		List<CollectRecordSummary> oldRecordSummaries = recordManager.loadSummaries(filter);
 		if ( oldRecordSummaries == null || oldRecordSummaries.isEmpty() ) {
 			return null;

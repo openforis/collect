@@ -65,6 +65,7 @@ public class CSVDataExportJob extends SurveyLockingJob {
 	
 	@Override
 	protected void buildTasks() throws Throwable {
+		logError("building tasks", null);
 		addTask(new CSVDataExportTask());
 	}
 

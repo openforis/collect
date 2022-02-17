@@ -6,6 +6,7 @@ package org.openforis.collect.manager.speciesimport;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -346,6 +347,8 @@ public class SpeciesCSVReader extends CSVReferenceDataImportReader<SpeciesLine> 
 	
 	class Validator {
 		
+		private final List<String> RESERVED_COL_NAMES = Arrays.asList("id", "parent_id", "rank");
+
 		public void validate() throws ParsingException {
 			validateHeaders();
 		}
@@ -358,6 +361,14 @@ public class SpeciesCSVReader extends CSVReferenceDataImportReader<SpeciesLine> 
 					ParsingError error = new ParsingError(ErrorType.MISSING_REQUIRED_COLUMNS, 1, (String) null);
 					String messageArg = StringUtils.join(requiredColumnNames, ", ");
 					error.setMessageArgs(new String[]{messageArg});
+					throw new ParsingException(error);
+				}
+			}
+			
+			// validate extra info column names
+			for (String colName : colNames) {
+				if (RESERVED_COL_NAMES.contains(colName.toLowerCase(Locale.ENGLISH))) {
+					ParsingError error = new ParsingError(ErrorType.RESERVED_COLUMN_NAME, 1, colName);
 					throw new ParsingException(error);
 				}
 			}

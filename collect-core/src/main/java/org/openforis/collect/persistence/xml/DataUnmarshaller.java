@@ -281,7 +281,7 @@ public class DataUnmarshaller {
 			Entity entity = (Entity) node;
 			NodeDefinition childDefn = getNodeDefinition(entity, localName);
 			if ( childDefn == null ) {
-				warn(localName, "Undefined node");
+				warn(localName, "dataManagement.backupDataImport.errors.nodeDefinitionNotFound");
 				pushIgnore();
 			} else {
 				ModelVersion version = record.getVersion();
@@ -294,7 +294,7 @@ public class DataUnmarshaller {
 					}
 					this.node = newNode;
 				} else {
-					warn(localName, "Node definition is not applicable to the record version");
+					warn(localName, "dataManagement.backupDataImport.errors.nodeDefinitionNotApplicableToRecordVersion");
 					pushIgnore();
 				}
 			}
@@ -326,15 +326,13 @@ public class DataUnmarshaller {
 
 		protected void warn(String localName, String msg) {
 			String path = getPath() + "/" + localName;
-			NodeUnmarshallingError nodeErrorItem = new NodeUnmarshallingError(record.getStep(), path, msg);
-			warnings.add(nodeErrorItem);
+			warnings.add(new NodeUnmarshallingError(record.getStep(), path, msg));
 		}
 
 		protected void fail(String msg) {
 			String path = getPath();
 			Step step = record == null ? null : record.getStep();
-			NodeUnmarshallingError nodeErrorItem = new NodeUnmarshallingError(step, path, msg);
-			failures.add(nodeErrorItem);
+			failures.add(new NodeUnmarshallingError(step, path, msg));
 			failed = true;
 		}
 		

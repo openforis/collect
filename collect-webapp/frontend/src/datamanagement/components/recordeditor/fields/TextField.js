@@ -49,7 +49,7 @@ class TextField extends AbstractField {
     const { dirty, value: valueState } = this.state
     const { record } = parentEntity
     const { value } = valueState || {}
-    const text = value || ''
+    const text = Objects.defaultIfNull(value, '')
     const { attributeDefinition } = fieldDef
     const { textType } = attributeDefinition
     const readOnly = !user.canEditRecordAttribute({ record, attributeDefinition })

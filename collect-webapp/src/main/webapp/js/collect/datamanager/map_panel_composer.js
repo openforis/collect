@@ -137,7 +137,7 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 		const { pixel, coordinate } = evt;
 		// get feature with single point (if any)
 		const features = $this.map.getFeaturesAtPixel(pixel)
-		const featuresOfFeaturesArr = features.map(feature => feature.get('features'))
+		const featuresOfFeaturesArr = features.map(feature => feature.get('features') || [feature])
 		const feature = OF.Arrays.head(OF.Arrays.head(
 			featuresOfFeaturesArr
 				// get only features with only one feature
@@ -182,8 +182,8 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 						, printLevelCodes(levelCodes), lonLat[1], lonLat[0]);
 				break;
 			case 'coordinate_attribute_value':
-				const point = feature.get('point');
-				infoContent = $this.createNodeInfoBalloon(survey, point);
+			case 'polygon':
+				infoContent = $this.createNodeInfoBalloon(survey, feature.get('nodeInfo'));
 				break;
 			}
 		} else if (features.length > 0) {
@@ -221,7 +221,9 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 			var surveyGroup = $this.createSurveyLayerGroup(survey);
 			surveysOverlayGroup.getLayers().push(surveyGroup);
 		});
-	}, function() {}, collect.loggedUser.id);
+	}, function() {
+		// ignore errors
+	}, collect.loggedUser.id);
 
 	$this.initialized = true;
 
@@ -231,57 +233,48 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 }
 
 Collect.DataManager.MapPanelComposer.prototype.createNodeInfoBalloon = function(survey, nodeInfo) {
-	var lonLat = [nodeInfo.x, nodeInfo.y];
+	const { x, y, recordData, attrDefId, recId, recStep, recKeys, distance } = nodeInfo
+	const hasLocation = Boolean(x) && Boolean(y);
 	
 	var dynamicPart = "";
-	var data = nodeInfo.recordData;
+	var data = recordData;
 	data.forEach(function(item) {
 		var def = survey.getDefinition(item.definitionId);
 		dynamicPart += "<label>" + def.label + "</label>: " + (item.value == null ? "-": item.value);
 		dynamicPart += "<br/>";
 	});
 
-	var result = OF.Strings.format(
-		"<b>{0}</b>"
-		+ "<br>"
-		+ "<label>Record</label>: {1}"
-		+ "<br>"
-		+ "<label>Phase</label>: {2}"
-		+ "<br>"
-		+ "<div class='accordion' style='width: 300px; height: 200px; padding: 0.5em'>"
-		+ "   <h3>"
-		+ "     <span>Data</span>"
-		+ "     <span class='data info-icon-button' style='float: right;' />"
-		+ "   </h3>"
-		+ "   <div style='min-height: 135px; max-height: 135px; overflow-y: auto; padding: 0.5em'>"
-		+ "      <p>{3}</p>"
-		+ "   </div>"
-		+ "   <h3>Location</h3>"
-		+ "   <div style='min-height: 135px; padding: 0.5em'>"
-		+ "      <p>"
-		+ "         <label>Latitude:</label> {4}" 
-		+ "         <br>"
-		+ "         <label>Longitude</label>: {5}"
-		+ "         <br>" 
-		+ "         {6}"
-		+ "      </p>"
-		+ "   </div>"
-		+ "</div>"
-		+ "<br>" 
-		+ "<a href=\"javascript:void(0);\" "
-		+ "onclick=\"Collect.DataManager.MapPanelComposer.openRecordEditPopUp({7}, {8}, '{9}')\">Edit Record</a>"
-		+ "</div>"
-	, survey.getDefinition(nodeInfo.attrDefId).label
-	, nodeInfo.recKeys
-	, nodeInfo.recStep
-	, dynamicPart
-	, lonLat[1]
-	, lonLat[0]
-	, (isNaN(nodeInfo.distance) ? "" : "<label>Dist. to expected loc.</label>: " +
-			Math.round(nodeInfo.distance) + "m")
-	, survey.id
-	, nodeInfo.recId
-	, nodeInfo.recKeys);
+	const locationContent = `<h3>Location</h3>
+		   <div style="min-height: 135px; padding: 0.5em">
+		      <p>
+		         <label>Latitude:</label> ${y} 
+		         <br>
+		         <label>Longitude</label>: ${x}
+		         <br>
+		         ${isNaN(distance) ? "" : `<label>Dist. to expected loc.</label>: ${Math.round(distance)} m`}
+		      </p>
+		   </div>`;
+	
+	const result = `
+		<b>${survey.getDefinition(attrDefId).label}</b>
+		<br>
+		<label>Record</label>: ${recKeys}
+		<br>
+	 	<label>Phase</label>: ${recStep}
+		<br>
+		<div class='accordion' style='width: 300px; height: 200px; padding: 0.5em'>
+		   <h3>
+		     <span>Data</span>
+		     <span class='data info-icon-button' style='float: right;' />
+		   </h3>
+		   <div style='min-height: 135px; max-height: 135px; overflow-y: auto; padding: 0.5em'>
+		      <p>${dynamicPart}</p>
+		   </div>
+		  ${hasLocation ? locationContent : ''}
+		</div>
+		<br>
+		<a href="javascript:void(0);" onclick="Collect.DataManager.MapPanelComposer.openRecordEditPopUp(${survey.id}, ${recId}, '${recKeys}')">Edit Record</a>
+		</div>`;
 	
 	return result;
 };
@@ -291,28 +284,30 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 	
 	var dataLayers = new Array();
 	survey.traverse(function(nodeDef) {
-		if (nodeDef.type == 'ATTRIBUTE' && nodeDef.attributeType == 'COORDINATE') {
-			var dataLayer = new ol.layer.Vector({
-				title : OF.Strings.firstNotBlank(nodeDef.label, nodeDef.name),
-				visible : false,
-				type : 'coordinate_data',
-				survey : survey,
-				coordinate_attribute_def : nodeDef,
-				source : null,
-				style : $.proxy($this.coordinateAttributeLayerStyleFunction, $this)
-			});
-			dataLayers.push(dataLayer);
-		} else if (nodeDef.type == 'ATTRIBUTE' && nodeDef.geometry) {
-			var dataLayer = new ol.layer.Vector({
-				title : OF.Strings.firstNotBlank(nodeDef.label, nodeDef.name),
-				visible : false,
-				type : 'geometry_data',
-				survey : survey,
-				attribute_def : nodeDef,
-				source : null,
-				style : $this.geometryLayerStyleFunction
-			});
-			dataLayers.push(dataLayer);
+		if (nodeDef.type == 'ATTRIBUTE') {
+			if (nodeDef.attributeType == 'COORDINATE') {
+				var dataLayer = new ol.layer.Vector({
+					title : OF.Strings.firstNotBlank(nodeDef.label, nodeDef.name),
+					visible : false,
+					type : 'coordinate_data',
+					survey : survey,
+					coordinate_attribute_def : nodeDef,
+					source : null,
+					style : $.proxy($this.coordinateAttributeLayerStyleFunction, $this)
+				});
+				dataLayers.push(dataLayer);
+			} else if (nodeDef.geometry) {
+				var dataLayer = new ol.layer.Vector({
+					title : OF.Strings.firstNotBlank(nodeDef.label, nodeDef.name),
+					visible : false,
+					type : 'geometry_data',
+					survey : survey,
+					attribute_def : nodeDef,
+					source : null,
+					style : $this.geometryLayerStyleFunction
+				});
+				dataLayers.push(dataLayer);
+			}
 		}
 	});
 
@@ -379,7 +374,7 @@ Collect.DataManager.MapPanelComposer.prototype.coordinateAttributeLayerStyleFunc
 	var size = layer.get('features').length;
 	if (size == 1) {
 		var feature = layer.get('features')[0];
-		var point = feature.get('point');
+		var point = feature.get('nodeInfo');
 		var step = point.recStep;
 		var color;
 		switch (step) {
@@ -474,7 +469,7 @@ Collect.DataManager.MapPanelComposer.prototype.createBaseMapsLayer = function() 
 		source : new ol.source.XYZ({
 			attributions : 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, ' +
 					'AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-			url : 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+			url : 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 		})
 	});
 
@@ -538,7 +533,7 @@ Collect.DataManager.MapPanelComposer.prototype.onTileVisibleChange = function(ev
 };
 
 Collect.DataManager.MapPanelComposer.prototype.zoomToLayer = function(tile) {
-	$this = this;
+	var $this = this;
 	if (tile.getSource && tile.getSource() != null) {
 		var extent = tile.getSource().getExtent();
 		if (extent.length > 0 && isFinite(extent[0])) {
@@ -616,26 +611,30 @@ Collect.DataManager.MapPanelComposer.prototype.createGeometryDataSource = functi
 			coordinates.forEach(function(lonLatStr) {
 				if (lonLatStr != null && lonLatStr != '') {
 					var lonLatArr = lonLatStr.split(',');
-					vertices.push(lonLatArr);
+					vertices.push(lonLatArr.map(Number));
 				}
 			});
 			return vertices;
 		}
 		
 		var processGeometry = function(nodeInfo) {
-			var vertices = extractVerticesFromKml(nodeInfo.geometry);
+			const { geometry, ...otherInfo } = nodeInfo
+			var vertices = extractVerticesFromKml(geometry);
 			
 			var polygon = new ol.geom.Polygon([vertices]);
 			
 			var polygonFeature = new ol.Feature({
+				type : 'polygon',
+				nodeInfo : otherInfo,
 				survey : survey,
 				geometry: polygon
 			});
+			polygonFeature.getGeometry().transform('EPSG:4326', 'EPSG:3857');
 			source.addFeature(polygonFeature);
 		};
 
 		var processGeometries = function(geometries) {
-			for (i = 0; i < geometries.length; i++) {
+			for (let i = 0; i < geometries.length; i++) {
 				processGeometry(geometries[i]);
 			}
 			
@@ -697,7 +696,7 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 			
 			var coordinateFeature = new ol.Feature({
 				type : "coordinate_attribute_value",
-				point : coordinateAttributePoint,
+				nodeInfo : coordinateAttributePoint,
 				survey : survey,
 				geometry : new ol.geom.Point(xyCoord, 'XY')
 			});
@@ -752,7 +751,7 @@ function stringToColor(s) {
 	return "#" + this.intToRGB(OF.Strings.hashCode(s));
 }
 
-function getRandomColor(minimum, maximum) {
+function getRandomColor(min, max) {
 	if (! min) {
 		min = '#000000';
 	}
@@ -799,9 +798,6 @@ Collect.DataManager.MapPanelComposer.prototype.onPanelShow = function() {
 	}
 }
 
-Collect.DataManager.MapPanelComposer.prototype.onSurveyChanged = function() {
-}
-
 Collect.DataManager.MapPanelComposer.prototype.resizeMapContainer = function() {
 	$("#map").height($(window).height());
 	$("#map").width($(window).width() - this.horizontalPadding);
@@ -832,7 +828,7 @@ Collect.DataManager.MapPanelComposer.openRecordEditPopUp = function(surveyId, re
 
 	modalContainer
 		.on('show.bs.modal', function() {
-			iframe.attr("src", "#/record_fullscreen/" + recordId + "?"
+			iframe.attr("src", "record_fullscreen/" + recordId + "?"
 				+ "inPopUp=true"
 				+ "&locale=" + OF.i18n.currentLocale());
 			$(this).find('.modal-body').css({
@@ -840,7 +836,9 @@ Collect.DataManager.MapPanelComposer.openRecordEditPopUp = function(surveyId, re
 			});
 		})
 		.on('hide.bs.modal', function() {
-			collect.sessionService.clearActiveRecord(function() {});
+			collect.sessionService.clearActiveRecord(function() {
+				// do nothing
+			});
 		});
 	
 	var options = {

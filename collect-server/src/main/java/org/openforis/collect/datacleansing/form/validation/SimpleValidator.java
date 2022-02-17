@@ -72,7 +72,7 @@ public abstract class SimpleValidator<F> implements Validator {
 	protected boolean validateRequiredFields(Errors errors, String... fields) {
 		boolean result = true;
 		for (String field : fields) {
-			result = result & validateRequiredField(errors, field);
+			result = result && validateRequiredField(errors, field);
 		}
 		return result;
 	}

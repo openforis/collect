@@ -18,12 +18,12 @@ import java.util.Map;
 
 import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.designer.session.SessionStatus;
-import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.designer.viewmodel.JobStatusPopUpVM.JobEndHandler;
+import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.OutputFormat;
 import org.openforis.collect.designer.viewmodel.SurveyValidationResultsVM.ConfirmEvent;
 import org.openforis.collect.io.data.CSVDataExportJob;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
@@ -31,6 +31,7 @@ import org.openforis.collect.io.metadata.SchemaSummaryCSVExportJob;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthGridTemplateGenerator;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
+import org.openforis.collect.manager.validation.CollectMobileSurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.manager.validation.SurveyValidator.ValidationParameters;
@@ -54,7 +55,6 @@ import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
-import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
@@ -97,6 +97,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private SurveyValidator surveyValidator;
 	@WireVariable
 	private CollectEarthSurveyValidator collectEarthSurveyValidator;
+	@WireVariable
+	private CollectMobileSurveyValidator collectMobileSurveyValidator;
 	@WireVariable
 	private AppWS appWS;
 	
@@ -193,7 +195,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 			@BindingParam(SELECTED_CODE_LIST_PARAM) CodeList selectedCodeList) {
 		if ( codeListsPopUp == null ) { 
 			dispatchCurrentFormValidatedCommand(true);
-			Map<String, Object> args = new HashMap<String, Object>();
+			Map<String, Object> args = new HashMap<>();
 			args.put(EDITING_ATTRIBUTE_PARAM, editingAttribute);
 			CodeList selectedCodeListInPopUp = selectedCodeList == survey.getSamplingDesignCodeList() ? null: selectedCodeList;
 			args.put(SELECTED_CODE_LIST_PARAM, selectedCodeListInPopUp);
@@ -214,7 +216,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 
 	public void dispatchCodeListsPopUpClosedCommand(Boolean editingAttribute, CodeList selectedCodeList) {
-		Map<String, Object> args = new HashMap<String, Object>();
+		Map<String, Object> args = new HashMap<>();
 		args.put(EDITING_ATTRIBUTE_PARAM, editingAttribute);
 		args.put(SELECTED_CODE_LIST_PARAM, selectedCodeList);
 		BindUtils.postGlobalCommand(null, null, CODE_LISTS_POP_UP_CLOSED_COMMAND, args);
@@ -257,12 +259,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@Command
 	public void backToSurveysList() {
 		if ( changed ) {
-			MessageUtil.ConfirmParams params = new MessageUtil.ConfirmParams(new MessageUtil.ConfirmHandler() {
-				@Override
-				public void onOk() {
-					performBackToSurveysList();
-				}
-			}, "survey.edit.leave_page_with_unsaved_changes");
+			MessageUtil.ConfirmParams params = new MessageUtil.ConfirmParams(() -> performBackToSurveysList(),
+					"survey.edit.leave_page_with_unsaved_changes");
 			params.setTitleKey("global.unsaved_changes");
 			params.setOkLabelKey("global.continue_and_loose_changes");
 			params.setCancelLabelKey("global.stay_on_this_page");
@@ -290,11 +288,11 @@ public class SurveyEditVM extends SurveyBaseVM {
 	public List<String> getAvailableLanguages() {
 		CollectSurvey survey = getSurvey();
 		if ( survey == null ) {
-			//TODO session expired?
+			// session could be expired
 			return null;
 		} else {
 			List<String> languages = survey.getLanguages();
-			return new BindingListModelList<String>(languages, false);
+			return new BindingListModelList<>(languages, false);
 		}
 	}
 
@@ -302,13 +300,10 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@NotifyChange({"currentLanguageCode"})
 	public void languageCodeSelected(@BindingParam("code") final String selectedLanguageCode) {
 		final SessionStatus sessionStatus = getSessionStatus();
-		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
-			@Override
-			public void onOk(boolean confirmed) {
-				sessionStatus.setCurrentLanguageCode(selectedLanguageCode);
-				BindUtils.postGlobalCommand(null, null, SurveyLanguageVM.CURRENT_LANGUAGE_CHANGED_COMMAND, null);
-				currentLanguageCode = sessionStatus.getCurrentLanguageCode();
-			}
+		checkCanLeaveForm(confirmed -> {
+			sessionStatus.setCurrentLanguageCode(selectedLanguageCode);
+			BindUtils.postGlobalCommand(null, null, SurveyLanguageVM.CURRENT_LANGUAGE_CHANGED_COMMAND, null);
+			currentLanguageCode = sessionStatus.getCurrentLanguageCode();
 		});
 	}
 
@@ -317,7 +312,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	 */
 	@Command
 	public boolean save(@ContextParam(ContextType.BINDER) Binder binder, 
-			final Runnable runAfterSave) throws SurveyStoreException {
+			final Runnable runAfterSave) {
 		dispatchValidateAllCommand();
 		if ( checkCanSave() ) {
 			return checkValidity(true, () -> {
@@ -337,7 +332,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@GlobalCommand
 	public void backgroundSurveySave() throws SurveyStoreException {
-		//survey.refreshSurveyDependencies();
 		surveyManager.save(survey);
 		BindUtils.postNotifyChange(null, null, survey, "id");
 		BindUtils.postNotifyChange(null, null, survey, "published");
@@ -353,13 +347,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 
 	protected boolean checkCanSave() {
 		if ( checkCanLeaveForm() ) {
-			if ( ! checkSurveyNameUniqueness() ) {
-				return false;
-			} else if ( ! checkSurveyUriUniqueness() ) {
-				return false;
-			} else {
-				return true;
-			}
+			return checkSurveyNameUniqueness() && checkSurveyUriUniqueness();
 		} else {
 			return false;
 		}
@@ -389,18 +377,32 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@Command
 	public void validate() {
-		checkValidity(false, () -> MessageUtil.showInfo("survey.successfully_validated"), null, false);
+		checkValidity(OutputFormat.DESKTOP);
+	}
+	
+	@Command
+	public void validateCollectMobile() {
+		checkValidity(OutputFormat.MOBILE);
+	}
+	
+	private boolean checkValidity(OutputFormat outputFormat) {
+		return checkValidity(outputFormat, false, () -> MessageUtil.showInfo("survey.successfully_validated"), null, false);
+	}
+
+	private boolean checkValidity(boolean showConfirm, final Runnable runIfValid, 
+			String confirmButtonLabel, boolean ignoreWarnings) {
+		return checkValidity(OutputFormat.DESKTOP, showConfirm, runIfValid, confirmButtonLabel, ignoreWarnings);
 	}
 	
 	/**
 	 * Returns true if the validation didn't give any errors, false if a confirm PopUp will be shown
 	 */
-	private boolean checkValidity(boolean showConfirm, final Runnable runIfValid, 
+	private boolean checkValidity(OutputFormat outuputFormat, boolean showConfirm, final Runnable runIfValid, 
 			String confirmButtonLabel, boolean ignoreWarnings) {
-		SurveyValidator surveyValidator = getSurveyValidator(survey);
+		SurveyValidator validator = getSurveyValidator(survey, outuputFormat);
 		ValidationParameters validationParameters = new ValidationParameters();
 		validationParameters.setWarningsIgnored(ignoreWarnings);
-		SurveyValidationResults results = surveyValidator.validate(survey, validationParameters);
+		SurveyValidationResults results = validator.validate(survey, validationParameters);
 		if ( results.hasErrors() || results.hasWarnings() ) {
 			final Window validationResultsPopUp = SurveyValidationResultsVM.showPopUp(results, showConfirm, 
 					confirmButtonLabel);
@@ -429,7 +431,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 			public void onJobEnd(SchemaSummaryCSVExportJob job) {
 				closePopUp(jobStatusPopUp);
 				jobStatusPopUp = null;
-				File file = ((SchemaSummaryCSVExportJob) job).getOutputFile();
+				File file = job.getOutputFile();
 				String surveyName = survey.getName();
 				String dateStr = Dates.formatLocalDateTime(new Date());
 				String fileName = String.format(SCHEMA_SUMMARY_FILE_NAME_PATTERN, surveyName, dateStr, Files.EXCEL_FILE_EXTENSION);
@@ -619,24 +621,14 @@ public class SurveyEditVM extends SurveyBaseVM {
 		return changed;
 	}
 	
-	@DependsOn({"surveyId","surveyPublished"})
-	public String getSamplingDesignImportModuleUrl() {
-		Map<String, String> queryParams = createBasicModuleParameters();
-		queryParams.put("sampling_design_import", "true");
-		String url = ComponentUtil.createUrl(Resources.Page.COLLECT_SWF.getLocation(), queryParams);
-		return url;
-	}
-
-	@DependsOn({"surveyId","surveyPublished"})
-	public String getSpeciesImportModuleUrl() {
-		Map<String, String> queryParams = createBasicModuleParameters();
-		queryParams.put("species_import", "true");
-		String url = ComponentUtil.createUrl(Resources.Page.COLLECT_SWF.getLocation(), queryParams);
-		return url;
-	}
-
-	private SurveyValidator getSurveyValidator(CollectSurvey survey) {
-		return survey.getTarget() == SurveyTarget.COLLECT_EARTH ? collectEarthSurveyValidator : surveyValidator;
+	private SurveyValidator getSurveyValidator(CollectSurvey survey, OutputFormat outputFormat) {
+		if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
+			return collectEarthSurveyValidator;
+		}
+		if (outputFormat == OutputFormat.MOBILE) {
+			return collectMobileSurveyValidator;
+		}
+		return surveyValidator;
 	}
 
 }
