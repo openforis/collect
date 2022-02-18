@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -14,12 +14,7 @@ import org.openforis.commons.versioning.Version;
 
 public class BeforeMigrationsSQLite implements Migration {
 
-	private LinkedHashMap<String, Migration> migrationsByVersion = new LinkedHashMap<String, Migration>() {
-		private static final long serialVersionUID = 1L;
-		{
-			put("4.0.23", new BeforeMigration_001_FixSurveyUsergroupFK());
-		}
-	};
+	private Map<String, Migration> migrationsByVersion = Map.of("4.0.23", new BeforeMigration001FixSurveyUsergroupFK());
 
 	private Version readVersionFromDb(Connection c) {
 		String query = "SELECT \"version\" FROM ofc_application_info";

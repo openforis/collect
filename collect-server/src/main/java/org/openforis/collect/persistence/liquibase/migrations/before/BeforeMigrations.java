@@ -1,6 +1,6 @@
 package org.openforis.collect.persistence.liquibase.migrations.before;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import org.openforis.collect.persistence.liquibase.migrations.Migration;
 import org.openforis.collect.persistence.liquibase.migrations.Migrations;
@@ -8,13 +8,10 @@ import org.openforis.collect.persistence.liquibase.migrations.before.sqlite.Befo
 
 public class BeforeMigrations extends Migrations {
 
+	private static final Map<String, Migration> BEFORE_MIGRATIONS = Map.of("sqlite", new BeforeMigrationsSQLite());
+
 	public BeforeMigrations() {
-		super(new HashMap<String, Migration>() {
-			private static final long serialVersionUID = 1L;
-			{
-				put("sqlite", new BeforeMigrationsSQLite());
-			}
-		});
+		super(BEFORE_MIGRATIONS);
 	}
 
 }

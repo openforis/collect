@@ -9,7 +9,7 @@ public abstract class Migrations {
 	
 	private Map<String, Migration> migrationByDBProductName;
 	
-	public Migrations(Map<String, Migration> migrationByDBProductName) {
+	protected Migrations(Map<String, Migration> migrationByDBProductName) {
 		this.migrationByDBProductName = migrationByDBProductName;
 	}
 	

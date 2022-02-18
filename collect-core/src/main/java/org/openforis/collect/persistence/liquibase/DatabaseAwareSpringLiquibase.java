@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.openforis.collect.persistence.liquibase;
 
 import java.sql.Connection;
@@ -69,7 +66,7 @@ public class DatabaseAwareSpringLiquibase extends SpringLiquibase {
 	@Override
 	protected Liquibase createLiquibase(Connection c) throws LiquibaseException {
 		Database database = createDatabase(c);
-		String changeLog = getChangeLog().replaceAll(DBMS_PLACEHOLDER, getMigrationDialect(database));
+		String changeLog = getChangeLog().replace(DBMS_PLACEHOLDER, getMigrationDialect(database));
 		Liquibase liquibase = new Liquibase(changeLog, createResourceOpener(), database);
 		if (isDropFirst()) {
 			liquibase.dropAll();

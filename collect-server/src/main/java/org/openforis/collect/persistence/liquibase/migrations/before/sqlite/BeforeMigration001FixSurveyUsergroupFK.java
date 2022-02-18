@@ -6,7 +6,7 @@ import java.sql.Statement;
 
 import org.openforis.collect.persistence.liquibase.migrations.Migration;
 
-public class BeforeMigration_001_FixSurveyUsergroupFK implements Migration {
+public class BeforeMigration001FixSurveyUsergroupFK implements Migration {
 
 	public void execute(Connection c) throws SQLException {
 		String sql = "PRAGMA foreign_keys=off;\n"
