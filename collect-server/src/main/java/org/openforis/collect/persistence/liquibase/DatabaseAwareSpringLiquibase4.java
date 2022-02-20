@@ -77,7 +77,7 @@ public class DatabaseAwareSpringLiquibase4 extends SpringLiquibase {
 		SpringResourceAccessor resourceAccessor = createResourceOpener();
 		Database database = createDatabase(c, resourceAccessor);
 		
-		String changeLog = getChangeLog().replaceAll(DBMS_PLACEHOLDER, getMigrationDialect(database));
+		String changeLog = getChangeLog().replace(DBMS_PLACEHOLDER, getMigrationDialect(database));
 		Liquibase liquibase = new Liquibase(changeLog, resourceAccessor, database);
 		if (parameters != null) {
 			for (Map.Entry<String, String> entry : parameters.entrySet()) {
@@ -94,10 +94,13 @@ public class DatabaseAwareSpringLiquibase4 extends SpringLiquibase {
 	protected void performUpdate(Liquibase liquibase) throws LiquibaseException {
 		try {
 			String dbProductName = liquibase.getDatabase().getDatabaseProductName();
+
+			// before running Liquibase
 			new BeforeMigrations().execute(getDataSource().getConnection(), dbProductName);
 
 			super.performUpdate(liquibase);
 			
+			// after running Liquibase
 			new AfterMigrations().execute(getDataSource().getConnection(), dbProductName);
 		} catch (Exception e) {
 			throw new LiquibaseException(e);
