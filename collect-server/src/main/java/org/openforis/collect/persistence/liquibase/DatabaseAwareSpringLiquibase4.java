@@ -29,27 +29,27 @@ public class DatabaseAwareSpringLiquibase4 extends SpringLiquibase {
 	private static final String DBMS_PLACEHOLDER = "DBMS_ID";
 
 	enum CustomDialectDatabase {
-		
-		POSTGRESQL("PostgreSQL", "postgresql"),
+
+		POSTGRESQL("PostgreSQL", "postgresql"), 
 		SQLITE("SQLite", "sqlite"),
 		SQLITE_ANDROID("SQLite for Android", "sqlite");
-		
+
 		private String productName;
 		private String liquibaseDbms;
-		
+
 		CustomDialectDatabase(String productName, String liquibaseDbms) {
 			this.productName = productName;
 			this.liquibaseDbms = liquibaseDbms;
 		}
-		
+
 		public String getProductName() {
 			return productName;
 		}
-		
+
 		public String getLiquibaseDbms() {
 			return liquibaseDbms;
 		}
-		
+
 		public static CustomDialectDatabase findByProductName(String productName) {
 			for (CustomDialectDatabase db : values()) {
 				if (db.productName.equalsIgnoreCase(productName))
@@ -59,12 +59,12 @@ public class DatabaseAwareSpringLiquibase4 extends SpringLiquibase {
 		}
 
 	}
-	
+
 	@Override
 	protected Database createDatabase(Connection c, ResourceAccessor resourceAccessor) throws DatabaseException {
 		Database database = getDatabase(c);
-		if (CustomDialectDatabase.SQLITE.getProductName().equals(database.getDatabaseProductName()) ||
-			CustomDialectDatabase.SQLITE_ANDROID.getProductName().equals(database.getDatabaseProductName())) {
+		if (CustomDialectDatabase.SQLITE.getProductName().equals(database.getDatabaseProductName())
+				|| CustomDialectDatabase.SQLITE_ANDROID.getProductName().equals(database.getDatabaseProductName())) {
 			// schemas are not supported
 			return database;
 		} else {
@@ -76,7 +76,7 @@ public class DatabaseAwareSpringLiquibase4 extends SpringLiquibase {
 	protected Liquibase createLiquibase(Connection c) throws LiquibaseException {
 		SpringResourceAccessor resourceAccessor = createResourceOpener();
 		Database database = createDatabase(c, resourceAccessor);
-		
+
 		String changeLog = getChangeLog().replace(DBMS_PLACEHOLDER, getMigrationDialect(database));
 		Liquibase liquibase = new Liquibase(changeLog, resourceAccessor, database);
 		if (parameters != null) {
@@ -89,7 +89,7 @@ public class DatabaseAwareSpringLiquibase4 extends SpringLiquibase {
 		}
 		return liquibase;
 	}
-	
+
 	@Override
 	protected void performUpdate(Liquibase liquibase) throws LiquibaseException {
 		try {
@@ -99,7 +99,7 @@ public class DatabaseAwareSpringLiquibase4 extends SpringLiquibase {
 			new BeforeMigrations().execute(getDataSource().getConnection(), dbProductName);
 
 			super.performUpdate(liquibase);
-			
+
 			// after running Liquibase
 			new AfterMigrations().execute(getDataSource().getConnection(), dbProductName);
 		} catch (Exception e) {
