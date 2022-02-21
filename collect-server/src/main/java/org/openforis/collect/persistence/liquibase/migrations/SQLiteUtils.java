@@ -6,7 +6,7 @@ import java.sql.Statement;
 
 import org.openforis.commons.versioning.Version;
 
-public abstract class SQLiteUtils {
+public interface SQLiteUtils {
 
 	public static Version readVersionFromDb(Connection c) {
 		String query = "SELECT \"version\" FROM ofc_application_info";
