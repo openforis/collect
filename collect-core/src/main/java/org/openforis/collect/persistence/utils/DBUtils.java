@@ -1,4 +1,4 @@
-package org.openforis.collect.relational.util;
+package org.openforis.collect.persistence.utils;
 
 import java.sql.SQLException;
 import java.sql.Statement;

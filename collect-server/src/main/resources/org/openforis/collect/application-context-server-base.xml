@@ -16,17 +16,6 @@
 
 	<import
 		resource="classpath:org/openforis/collect/application-context-core.xml" />
-	
-	<!-- ===================================== -->
-	<!-- Liquibase -->
-	<!-- (overrides liquibase bean definition in core, using Liquibase v4) -->
-	<!-- ===================================== -->
-	<bean id="liquibase" class="org.openforis.collect.persistence.liquibase.DatabaseAwareSpringLiquibase4"
-			lazy-init="false">
-		<property name="dataSource" ref="transactionAwareDataSource" />
-		<property name="changeLog" value="classpath:org/openforis/collect/db/changelog/db.changelog-DBMS_ID.xml" />
-		<property name="defaultSchema" value="collect" />
-	</bean>
 
 	<bean name="messageSource"
 		class="org.springframework.context.support.ResourceBundleMessageSource">

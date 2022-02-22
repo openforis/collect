@@ -270,11 +270,10 @@
 			<artifactId>lucene-core</artifactId>
 			<version>3.6.1</version>
 		</dependency>
-		<!-- Keep version 2 in core because version 4 doesn't work in Android -->
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
-			<version>2.0.5</version>
+			<version>4.7.1</version>
 		</dependency>
 		<!-- Protostuff -->
 		<dependency>
