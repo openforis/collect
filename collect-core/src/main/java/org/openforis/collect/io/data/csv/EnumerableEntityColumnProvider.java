@@ -55,13 +55,11 @@ public class EnumerableEntityColumnProvider extends ColumnProviderChain {
 
 	private static class EnumeratedCodeItemColumnProvider extends AutomaticColumnProvider {
 
-		private EntityDefinition entityDefinition;
 		private String keyName;
 		private String code;
 
 		public EnumeratedCodeItemColumnProvider(CSVDataExportParameters config, EntityDefinition defn, String keyName, String code) {
 			super(config, code + "_", defn);
-			this.entityDefinition = defn;
 			this.keyName = keyName;
 			this.code = code;
 		}

@@ -334,8 +334,9 @@ public class RecordIndexManager extends BaseStorageManager {
 	}
 
 	protected IndexSearcher createIndexSearcher() throws RecordIndexException {
+		IndexReader indexReader = null;
 		try {
-	        IndexReader indexReader = IndexReader.open(indexDirectory);
+			indexReader = IndexReader.open(indexDirectory);
 			int numDocs = indexReader.numDocs();
 			if ( numDocs > 0 ) {
 		        IndexSearcher indexSearcher = new IndexSearcher(indexReader);
@@ -344,6 +345,7 @@ public class RecordIndexManager extends BaseStorageManager {
 				return null;
 			}
 		} catch (IOException e) {
+			close(indexReader);
 			throw new RecordIndexException(e.getMessage(), e);
 		}
     }

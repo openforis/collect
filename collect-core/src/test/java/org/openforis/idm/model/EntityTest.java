@@ -1,5 +1,7 @@
 package org.openforis.idm.model;
 
+import static org.junit.Assert.assertNull;
+
 import org.junit.Test;
 import org.openforis.idm.AbstractTest;
 
@@ -13,6 +15,8 @@ public class EntityTest extends AbstractTest {
 	public void testAddNullCode() {
 		Entity cluster = getRootEntity();
 		EntityBuilder.addValue(cluster, "id", (Code) null);
+		CodeAttribute clusterId = cluster.getChild("id");
+		assertNull(clusterId.getValue().getCode());
 	}
 
 	@Test(expected = IllegalArgumentException.class)

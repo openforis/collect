@@ -103,10 +103,11 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private File getFileFromResouces( String pathToResource ) throws URISyntaxException {
 		InputStream readmeContents = this.getClass().getClassLoader().getResourceAsStream( pathToResource );
 		File tempFile = null;
+		FileOutputStream fos = null;
 		try {
 			tempFile = File.createTempFile("readme", "txt");
 			tempFile.deleteOnExit();
-			FileOutputStream fos = new FileOutputStream(tempFile);
+			fos = new FileOutputStream(tempFile);
 			IOUtils.copy(readmeContents,fos);
 			readmeContents.close();
 			fos.close();
@@ -114,6 +115,8 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 			logger.error("Error finding file " + pathToResource, e);
 		} catch (IOException e) {
 			logger.error("Error copying file " + pathToResource, e);
+		} finally {
+			IOUtils.closeQuietly(fos);
 		}
 		return tempFile;
 	}
@@ -143,36 +146,38 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	}
 
 	private File generateProjectProperties(CollectSurvey survey, String language) throws IOException {
-		Properties p = new Properties();
-		p.put("survey_name", survey.getName());
-		p.put("balloon", "${project_path}/balloon.html");
-		p.put("metadata_file", "${project_path}/" + PLACEMARK_FILE_NAME);
-		p.put("template", "${project_path}/kml_template.fmt");
-		p.put("csv", "${project_path}/" + determineSelectedGridFileName(survey));
-		p.put("sample_shape", "SQUARE");
-		p.put("distance_between_sample_points", String.valueOf(calculateDistanceBetweenSamplePoints(survey)));
-		p.put("distance_to_plot_boundaries", String.valueOf(calculateFrameDistance(survey)));
-		p.put("number_of_sampling_points_in_plot", String.valueOf(survey.getAnnotations().getCollectEarthSamplePoints()));
-		p.put("inner_point_side", "2");
-		p.put("ui_language", language);
-		p.put("bing_maps_key", getBingMapsKey(survey));
-		p.put("open_bing_maps", isBingMapsEnabled(survey));
-		p.put("open_earth_map", isEarthMapEnabled(survey));
-//		p.put("planet_maps_key", getPlanetMapsKey(survey));
-		p.put("open_planet_maps", isPlanetMapsEnabled(survey));
-		p.put("open_yandex_maps", isYandexMapsEnabled(survey));
-		p.put("open_earth_engine", isGEEExplorerEnabled(survey));
-		p.put("open_gee_app", isGEEAppEnabled(survey));
-		p.put("open_maxar_securewatch", isSecureWatchEnabled(survey));
-		p.put("open_gee_playground", isGEECodeEditorEnabled(survey));
-		p.put("open_street_view", isStreetViewEnabled(survey));
-		p.put("extra_map_url", StringUtils.trimToEmpty(getExtraMapUrl(survey)));
-		p.put("coordinates_reference_system", getSRSUsed(survey));
-
 		File file = File.createTempFile("collect-earth-project", ".properties");
-		FileWriter writer = new FileWriter(file);
-		p.store(writer, null);
-		return file;
+		
+		try (FileWriter writer = new FileWriter(file)) {
+			Properties p = new Properties();
+			p.put("survey_name", survey.getName());
+			p.put("balloon", "${project_path}/balloon.html");
+			p.put("metadata_file", "${project_path}/" + PLACEMARK_FILE_NAME);
+			p.put("template", "${project_path}/kml_template.fmt");
+			p.put("csv", "${project_path}/" + determineSelectedGridFileName(survey));
+			p.put("sample_shape", "SQUARE");
+			p.put("distance_between_sample_points", String.valueOf(calculateDistanceBetweenSamplePoints(survey)));
+			p.put("distance_to_plot_boundaries", String.valueOf(calculateFrameDistance(survey)));
+			p.put("number_of_sampling_points_in_plot", String.valueOf(survey.getAnnotations().getCollectEarthSamplePoints()));
+			p.put("inner_point_side", "2");
+			p.put("ui_language", language);
+			p.put("bing_maps_key", getBingMapsKey(survey));
+			p.put("open_bing_maps", isBingMapsEnabled(survey));
+			p.put("open_earth_map", isEarthMapEnabled(survey));
+	//		p.put("planet_maps_key", getPlanetMapsKey(survey));
+			p.put("open_planet_maps", isPlanetMapsEnabled(survey));
+			p.put("open_yandex_maps", isYandexMapsEnabled(survey));
+			p.put("open_earth_engine", isGEEExplorerEnabled(survey));
+			p.put("open_gee_app", isGEEAppEnabled(survey));
+			p.put("open_maxar_securewatch", isSecureWatchEnabled(survey));
+			p.put("open_gee_playground", isGEECodeEditorEnabled(survey));
+			p.put("open_street_view", isStreetViewEnabled(survey));
+			p.put("extra_map_url", StringUtils.trimToEmpty(getExtraMapUrl(survey)));
+			p.put("coordinates_reference_system", getSRSUsed(survey));
+	
+			p.store(writer, null);
+			return file;
+		}
 	}
 
 	private String determineSelectedGridFileName(CollectSurvey survey) {
@@ -387,10 +392,10 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 
 	private File copyToTempFile(byte[] content, String fileName) throws IOException, FileNotFoundException {
 		File imageFile = File.createTempFile("collect-earth-project-file-creator", fileName);
-		FileOutputStream fos = new FileOutputStream(imageFile);
-		fos.write(content);
-		fos.close();
-		return imageFile;
+		try (FileOutputStream fos = new FileOutputStream(imageFile)) {
+			fos.write(content);
+			return imageFile;
+		}
 	}
 
 	public void setCodeListManager(CodeListManager codeListManager) {

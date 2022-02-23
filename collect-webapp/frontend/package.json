@@ -24,8 +24,6 @@
     "jquery": "^3.6.0",
     "prop-types": "^15.8.1",
     "react": "^17.0.2",
-    "react-addons-css-transition-group": "^15.6.2",
-    "react-addons-transition-group": "^15.6.2",
     "react-addons-update": "^15.6.3",
     "react-bootstrap": "^2.1.1",
     "react-bootstrap-table": "^4.3.1",
@@ -40,8 +38,7 @@
     "react-number-format": "^4.9.1",
     "react-popper": "^2.2.5",
     "react-redux": "^7.2.6",
-    "react-router": "^5.2.0",
-    "react-router-dom": "^5.2.0",
+    "react-router-dom": "^6.2.1",
     "react-stomp": "^5.1.0",
     "react-truncate": "^2.4.0",
     "react-virtualized": "^9.22.3",
@@ -50,7 +47,7 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.4.1",
     "sockjs-client": "^1.5.2",
-    "superagent": "^7.1.1",
+    "superagent": "^6.1.0",
     "throttle-debounce": "^3.0.1"
   },
   "scripts": {

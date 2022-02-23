@@ -4,7 +4,6 @@ import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSIO
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.datacleansing.form.validation.SimpleValidator;
-import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.User;
 import org.openforis.collect.web.controller.UserController.PasswordChangeParameters;
@@ -24,8 +23,6 @@ public class PasswordChangeValidator extends SimpleValidator<PasswordChangeParam
 	
 	@Autowired
 	private UserManager userManager;
-	@Autowired
-	private SessionManager sessionManager;
 	
 	@Override
 	public void validateForm(PasswordChangeParameters target, Errors errors) {

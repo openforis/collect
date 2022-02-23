@@ -84,6 +84,9 @@ public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	@Override
 	public void startProcessing() throws Exception {
 		super.startProcessing();
+		FileOutputStream fileOutputStream = null;
+		BufferedOutputStream bufferedOutputStream = null;
+		ZipOutputStream zipOutputStream = null;
 		try {
 			List<CollectRecordSummary> recordSummaries = loadAllSummaries();
 			if ( recordSummaries != null && steps != null && steps.length > 0 ) {
@@ -91,16 +94,19 @@ public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus
 					outputFile.delete();
 					outputFile.createNewFile();
 				}
-				FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
-				BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
-				ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+				fileOutputStream = new FileOutputStream(outputFile);
+				bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+				zipOutputStream = new ZipOutputStream(bufferedOutputStream);
 				backup(zipOutputStream, recordSummaries);
 				zipOutputStream.flush();
-				zipOutputStream.close();
 			}
 		} catch (Exception e) {
 			status.error();
 			LOG.error("Error during data export", e);
+		} finally {
+			IOUtils.closeQuietly(zipOutputStream);
+			IOUtils.closeQuietly(bufferedOutputStream);
+			IOUtils.closeQuietly(fileOutputStream);
 		}
 	}
 
@@ -212,14 +218,18 @@ public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	}
 
 	private void writeFile(ZipOutputStream zipOutputStream, File file, String entryName) {
+		FileInputStream fileIs = null;
 		try {
 			ZipEntry entry = new ZipEntry(entryName);
 			zipOutputStream.putNextEntry(entry);
-			IOUtils.copy(new FileInputStream(file), zipOutputStream);
+			fileIs = new FileInputStream(file);
+			IOUtils.copy(fileIs, zipOutputStream);
 			zipOutputStream.closeEntry();
 			zipOutputStream.flush();
 		} catch (IOException e) {
 			LOG.error(String.format("Error writing record file (fileName: %s)", entryName));
+		} finally {
+			IOUtils.closeQuietly(fileIs);
 		}
 	}
 

@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.datacleansing.DataQueryResultItem;
 import org.openforis.collect.datacleansing.controller.DataQueryController.AttributeQueryResultItemProcessor;
+import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -39,7 +39,7 @@ public class CSVWriterDataQueryResultItemProcessor extends AttributeQueryResultI
 	private void init() {
 		try {
 			tempFile = File.createTempFile("collect-data-cleansing-query", ".csv");
-			csvWriter = new CsvWriter(new FileOutputStream(tempFile), IOUtils.UTF_8, ',', '"');
+			csvWriter = new CsvWriter(new FileOutputStream(tempFile), OpenForisIOUtils.UTF_8, ',', '"');
 			writeCSVHeader();
 		} catch (Exception e) {
 			throw new RuntimeException(e);

@@ -5,7 +5,7 @@ Easy and flexible survey design and data management
 Open Foris Collect is the main entry point for data collected in field-based inventories. It provides a fast, easy, flexible way to set up a survey with a user-friendly interface.
 Collect handles multiple data types and complex validation rules, all in a multi-language environment.
 
-Developed under the [Open Foris Initiative](http://www.openforis.org)
+Developed under the [Open Foris Initiative](https://www.openforis.org)
 
 ## Key Features
 
@@ -22,12 +22,12 @@ Developed under the [Open Foris Initiative](http://www.openforis.org)
 ## Where to download the installer?
 
 If you are not interested in the code but rather on the Collect features you might want to run it right away!
-Go to our [website](http://www.openforis.org/tools/collect.html) and download the installer directly there. There are versions for Windows, Mac OS X and Linux 32-bit and 64-bit. 
+Go to our [website](https://www.openforis.org/tools/collect.html) and download the installer directly there. There are versions for Windows, Mac OS X and Linux 32-bit and 64-bit. 
 
 ## Do you have any questions?
 
-Please register into our [Community Support Forum](http://www.openforis.org/support) and raise your question or feature request there. 
+Please register into our [Community Support Forum](https://www.openforis.support) and raise your question or feature request there. 
 
 ## License
 
-Collect and the rest of the Open Foris tools follow the MIT License, meaning that you can do anything you want with the code! Of course we appreciate references to our project, [Open Foris](www.openforis.org)
+Collect and the rest of the Open Foris tools follow the MIT License, meaning that you can do anything you want with the code! Of course we appreciate references to our project, [Open Foris](https://www.openforis.org)

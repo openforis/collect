@@ -33,9 +33,8 @@ export default class Labels {
     const fetchLabelFile = function (filePrefix, langCode, callback) {
       fetch(Constants.BASE_ASSETS_URL + 'locales/' + filePrefix + langCode + '.json?_v=' + Constants.APP_VERSION)
         .then((res) => res.json())
-        .then((texts) => {
-          callback(texts)
-        })
+        .then((texts) => callback(texts))
+        .catch(() => callback({}))
     }
 
     const filePrefixes = ['labels', ...Object.values(LanguagesKeys.LABELS_PREFIX_BY_LANGUAGE_CODE_STANDARD)].map(

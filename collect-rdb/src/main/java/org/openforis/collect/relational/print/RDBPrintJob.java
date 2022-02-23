@@ -55,6 +55,8 @@ public class RDBPrintJob extends Job {
 	private File outputFile;
 
 	private transient RelationalSchema schema;
+	private transient FileOutputStream outputFileOutputStream;
+	private transient ZipOutputStream zipOut;
 	private transient Writer writer;
 
 	public RDBPrintJob() {
@@ -66,7 +68,8 @@ public class RDBPrintJob extends Job {
 		super.createInternalVariables();
 		outputFile = File.createTempFile("rdb", ".zip");
 		ZipEntry zipEntry = new ZipEntry(String.format("%s_rdb_%s.sql", survey.getName(), Dates.formatCompactNow()));
-		ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(outputFile));
+		outputFileOutputStream = new FileOutputStream(outputFile);
+		zipOut = new ZipOutputStream(outputFileOutputStream);
 		zipOut.putNextEntry(zipEntry);
 		writer = new OutputStreamWriter(zipOut);
 	}
@@ -116,6 +119,8 @@ public class RDBPrintJob extends Job {
 	protected void onEnd() {
 		super.onEnd();
 		IOUtils.closeQuietly(writer);
+		IOUtils.closeQuietly(zipOut);
+		IOUtils.closeQuietly(outputFileOutputStream);
 	}
 	
 	public CollectSurvey getSurvey() {

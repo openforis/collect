@@ -1,53 +1,46 @@
-import React from 'react';
-import { Route, Link } from 'react-router-dom';
-import { Breadcrumb, BreadcrumbItem } from 'reactstrap';
-import Routes from 'Routes';
+import React from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { Breadcrumb, BreadcrumbItem } from 'reactstrap'
+import Routes from 'Routes'
 
 const getPaths = (pathname) => {
-  const paths = ['/'];
+  const paths = ['/']
 
-  if (pathname === '/') return paths;
+  if (pathname === '/') return paths
 
   pathname.split('/').reduce((prev, curr, index) => {
-    const currPath = `${prev}/${curr}`;
-    paths.push(currPath);
-    return currPath;
-  });
-  return paths;
-};
+    const currPath = `${prev}/${curr}`
+    paths.push(currPath)
+    return currPath
+  })
+  return paths
+}
 
-const BreadcrumbsItem = ({ match, ...rest }) => {
-  const routeName = Routes.findRouteNameByPath(match.path);
-  if (routeName) {
-    return (
-      match.isExact ?
-      (
-        <BreadcrumbItem active>{routeName}</BreadcrumbItem>
-      ) :
-      (
-        <BreadcrumbItem>
-          <Link to={match.url || ''}>
-            {routeName}
-          </Link>
-        </BreadcrumbItem>
-      )
-    );
+const BreadcrumbsItem = (props) => {
+  const { pathPart } = props
+  const { pathname } = useLocation()
+
+  const route = Routes.findRouteByPath(pathPart)
+  if (route) {
+    return pathname === pathPart ? (
+      <BreadcrumbItem active>{route.name}</BreadcrumbItem>
+    ) : (
+      <BreadcrumbItem>
+        <Link to={route.path || ''}>{route.name}</Link>
+      </BreadcrumbItem>
+    )
   }
-  return null;
-};
+  return null
+}
 
-const Breadcrumbs = ({ location : { pathname }, match, ...rest }) => {
-  const paths = getPaths(pathname);
-  const items = paths.map((path, i) => <Route key={i} path={path} component={BreadcrumbsItem} />);
+export default () => {
+  const location = useLocation()
+  const paths = getPaths(location.pathname)
+  const items = paths.map((pathPart, i) => <BreadcrumbsItem key={String(i)} pathPart={pathPart} />)
+
   return (
-    <Breadcrumb>
-      {items}
-    </Breadcrumb>
-    );
-};
-
-export default props => (
-  <div>
-    <Route path="/:path" component={Breadcrumbs} {...props} />
-  </div>
-);
+    <div>
+      <Breadcrumb>{items}</Breadcrumb>
+    </div>
+  )
+}

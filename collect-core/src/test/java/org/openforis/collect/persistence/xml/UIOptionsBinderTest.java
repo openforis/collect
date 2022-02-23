@@ -19,6 +19,7 @@ import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurveyContext;
+import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.idm.metamodel.Survey;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -65,7 +66,8 @@ public class UIOptionsBinderTest extends CollectIntegrationTest {
 		new File("target/test/output").mkdirs();
 		FileOutputStream fos = new FileOutputStream("target/test/output/marshalled.uioptions.xml");
 		String marshalled = binder.marshal(uiOptions, survey.getDefaultLanguage());
-		IOUtils.write(marshalled, fos);
+		assertNotNull(marshalled);
+		IOUtils.write(marshalled, fos, OpenForisIOUtils.UTF_8);
 		fos.flush();
 		fos.close();
 	}
