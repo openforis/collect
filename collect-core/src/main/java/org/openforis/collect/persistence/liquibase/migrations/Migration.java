@@ -5,6 +5,6 @@ import java.sql.SQLException;
 
 public interface Migration {
 	
-	public void execute(Connection c) throws SQLException;
+	public void execute(Connection c, String schemaName) throws SQLException;
 
 }

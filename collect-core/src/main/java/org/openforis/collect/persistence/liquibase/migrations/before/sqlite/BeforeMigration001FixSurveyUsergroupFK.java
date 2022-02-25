@@ -17,7 +17,7 @@ public class BeforeMigration001FixSurveyUsergroupFK implements Migration {
 	private static final Logger LOG = LogManager.getLogger(BeforeMigration001FixSurveyUsergroupFK.class);
 	private static final String SQL_FILE_NAME = "before_migration_001_fix_survey_usergroup_fk.sql";
 
-	public void execute(Connection c) throws SQLException {
+	public void execute(Connection c, String schemaName) throws SQLException {
 		LOG.info("Running migration 001FixSurveyUsergroupFK...");
 		InputStream is = null;
 		Statement stmt = null;

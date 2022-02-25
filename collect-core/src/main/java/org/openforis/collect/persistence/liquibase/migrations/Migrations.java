@@ -13,10 +13,10 @@ public abstract class Migrations {
 		this.migrationByDBProductName = migrationByDBProductName;
 	}
 	
-	public void execute(Connection c, String databaseProductName) throws SQLException {
+	public void execute(Connection c, String databaseProductName, String schemaName) throws SQLException {
 		Migration migration = migrationByDBProductName.get(databaseProductName.toLowerCase(Locale.ENGLISH));
 		if (migration != null) {
-			migration.execute(c);
+			migration.execute(c, schemaName);
 		}
 	}
 }

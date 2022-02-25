@@ -28,43 +28,11 @@ public class DatabaseAwareSpringLiquibase extends SpringLiquibase {
 	private static final String STANDARD_DIALECT = "standard";
 	private static final String DBMS_PLACEHOLDER = "DBMS_ID";
 
-	enum CustomDialectDatabase {
-
-		POSTGRESQL("PostgreSQL", "postgresql"), 
-		SQLITE("SQLite", "sqlite"),
-		SQLITE_ANDROID("SQLite for Android", "sqlite");
-
-		private String productName;
-		private String liquibaseDbms;
-
-		CustomDialectDatabase(String productName, String liquibaseDbms) {
-			this.productName = productName;
-			this.liquibaseDbms = liquibaseDbms;
-		}
-
-		public String getProductName() {
-			return productName;
-		}
-
-		public String getLiquibaseDbms() {
-			return liquibaseDbms;
-		}
-
-		public static CustomDialectDatabase findByProductName(String productName) {
-			for (CustomDialectDatabase db : values()) {
-				if (db.productName.equalsIgnoreCase(productName))
-					return db;
-			}
-			return null;
-		}
-
-	}
-
 	@Override
 	protected Database createDatabase(Connection c, ResourceAccessor resourceAccessor) throws DatabaseException {
 		Database database = getDatabase(c);
-		if (CustomDialectDatabase.SQLITE.getProductName().equals(database.getDatabaseProductName())
-				|| CustomDialectDatabase.SQLITE_ANDROID.getProductName().equals(database.getDatabaseProductName())) {
+		if (LiquibaseSupportedDBMS.SQLITE.getProductName().equals(database.getDatabaseProductName())
+				|| LiquibaseSupportedDBMS.SQLITE_ANDROID.getProductName().equals(database.getDatabaseProductName())) {
 			// schemas are not supported
 			return database;
 		} else {
@@ -94,14 +62,15 @@ public class DatabaseAwareSpringLiquibase extends SpringLiquibase {
 	protected void performUpdate(Liquibase liquibase) throws LiquibaseException {
 		try {
 			String dbProductName = liquibase.getDatabase().getDatabaseProductName();
+			String schemaName = liquibase.getDatabase().getDefaultSchemaName();
 
 			// before running Liquibase
-			new BeforeMigrations().execute(getDataSource().getConnection(), dbProductName);
+			new BeforeMigrations().execute(getDataSource().getConnection(), dbProductName, schemaName);
 
 			super.performUpdate(liquibase);
 
 			// after running Liquibase
-			new AfterMigrations().execute(getDataSource().getConnection(), dbProductName);
+			new AfterMigrations().execute(getDataSource().getConnection(), dbProductName, schemaName);
 		} catch (Exception e) {
 			throw new LiquibaseException(e);
 		}
@@ -109,7 +78,7 @@ public class DatabaseAwareSpringLiquibase extends SpringLiquibase {
 
 	private String getMigrationDialect(Database database) {
 		String dbProductName = database.getDatabaseProductName();
-		CustomDialectDatabase customDialectDb = CustomDialectDatabase.findByProductName(dbProductName);
+		LiquibaseSupportedDBMS customDialectDb = LiquibaseSupportedDBMS.findByProductName(dbProductName);
 		return customDialectDb == null ? STANDARD_DIALECT : customDialectDb.getLiquibaseDbms();
 	}
 

@@ -1,4 +1,4 @@
-package org.openforis.collect.persistence.liquibase.migrations;
+package org.openforis.collect.persistence.liquibase.migrations.utils;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -7,10 +7,12 @@ import java.sql.Statement;
 import org.openforis.collect.persistence.utils.DBUtils;
 import org.openforis.commons.versioning.Version;
 
-public abstract class SQLiteUtils {
+public abstract class CollectDbUtils {
 
-	public static Version readVersionFromDb(Connection c) {
-		String query = "SELECT \"version\" FROM ofc_application_info";
+	public static Version readVersionFromDb(Connection c, String schemaName) {
+		String query = schemaName == null 
+				? "SELECT \"version\" FROM ofc_application_info"
+				: String.format("SELECT \"version\" FROM %s.ofc_application_info", schemaName);
 		Statement stmt = null;
 		try {
 			stmt = c.createStatement();

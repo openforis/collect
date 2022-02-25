@@ -11,7 +11,7 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openforis.collect.persistence.liquibase.migrations.Migration;
-import org.openforis.collect.persistence.liquibase.migrations.SQLiteUtils;
+import org.openforis.collect.persistence.liquibase.migrations.utils.CollectDbUtils;
 import org.openforis.commons.versioning.Version;
 
 public class BeforeMigrationsSQLite implements Migration {
@@ -22,14 +22,18 @@ public class BeforeMigrationsSQLite implements Migration {
 
 	public BeforeMigrationsSQLite() {
 		migrationsByVersion = new LinkedHashMap<String, Migration>(); // keep migrations ordered
-		migrationsByVersion.put("4.0.23", new BeforeMigration001FixSurveyUsergroupFK());
+		migrationsByVersion.put("4.0.43", new BeforeMigration001FixSurveyUsergroupFK());
 	}
 
 	@Override
-	public void execute(Connection c) throws SQLException {
+	public void execute(Connection c, String schemaName) throws SQLException {
 		LOG.info("Running DB migrations before executing Liquibase (SQLite DB)...");
-		Version dbVersion = SQLiteUtils.readVersionFromDb(c);
-		LOG.info(String.format("Application version found: %s", dbVersion == null ? "-" : dbVersion.toString()));
+		
+		Version dbVersion = CollectDbUtils.readVersionFromDb(c, schemaName);
+		
+		if (LOG.isInfoEnabled()) {
+			LOG.info(String.format("Application version found: %s", dbVersion == null ? "-" : dbVersion.toString()));
+		}
 		
 		if (dbVersion != null) {
 			Set<Entry<String, Migration>> entrySet = migrationsByVersion.entrySet();
@@ -38,8 +42,10 @@ public class BeforeMigrationsSQLite implements Migration {
 				Entry<String, Migration> entry = iterator.next();
 				Version migrationVersion = new Version(entry.getKey());
 				if (dbVersion.compareTo(migrationVersion) < 0) {
-					LOG.info(String.format("Version before %s; running migrations", migrationVersion.toString()));
-					entry.getValue().execute(c);
+					if (LOG.isInfoEnabled()) {
+						LOG.info(String.format("Version before %s; running migrations", migrationVersion.toString()));
+					}
+					entry.getValue().execute(c, schemaName);
 				}
 			}
 
