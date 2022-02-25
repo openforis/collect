@@ -8,6 +8,10 @@ import org.openforis.collect.persistence.utils.DBUtils;
 import org.openforis.commons.versioning.Version;
 
 public abstract class CollectDbUtils {
+	
+	private CollectDbUtils() {
+		throw new IllegalStateException("Only static function calls are allowed");
+	}
 
 	public static Version readVersionFromDb(Connection c, String schemaName) {
 		String query = schemaName == null 
