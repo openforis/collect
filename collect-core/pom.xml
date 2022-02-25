@@ -68,7 +68,6 @@
 							<pojos>true</pojos>
 							<relations>true</relations>
 							<deprecated>false</deprecated>
-							<generatedAnnotation>false</generatedAnnotation>
 						</generate>
 						<target>
 							<packageName>org.openforis.collect.persistence.jooq</packageName>
