@@ -877,6 +877,9 @@ public class SurveyValidator {
 	    	SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 	    	// completely disable DOCTYPE declaration (XML parsers should not be vulnerable to XXE attacks)
 	    	factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+	    	// prohibit the use of all protocols by external entities
+	    	factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+	    	factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 	    	String[] schemaFileNames = getSchemaFileNames(version);
 	    	Source[] schemas = getSourcesFromClassPath(schemaFileNames);
 	    	javax.xml.validation.Schema schema = factory.newSchema(schemas);
