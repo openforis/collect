@@ -7,10 +7,10 @@ import java.sql.Statement;
 
 import org.jooq.SQLDialect;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
+import org.openforis.collect.persistence.utils.DBUtils;
 import org.openforis.collect.relational.RelationalSchemaCreator;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.print.RDBPrintJob.RdbDialect;
-import org.openforis.collect.relational.util.DBUtils;
 
 public class SQLRelationalSchemaCreator implements RelationalSchemaCreator {
 

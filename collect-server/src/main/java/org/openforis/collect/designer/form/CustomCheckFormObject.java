@@ -1,8 +1,7 @@
 package org.openforis.collect.designer.form;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.validation.CustomCheck;
-
-import liquibase.util.StringUtils;
 
 /**
  * 

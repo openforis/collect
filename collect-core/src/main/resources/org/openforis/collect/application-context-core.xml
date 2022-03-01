@@ -54,8 +54,8 @@
 	</bean>
     
     <!-- End of JOOQ configuration -->
-	
-    <!-- ===================================== -->
+
+	<!-- ===================================== -->
 	<!-- Liquibase -->
 	<!-- ===================================== -->
 	<bean id="liquibase" class="org.openforis.collect.persistence.liquibase.DatabaseAwareSpringLiquibase"
