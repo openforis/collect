@@ -790,12 +790,13 @@ Used to link large code lists (e.g. cluster and plot ids or detailed lists of ad
 							</xs:sequence>
 						</xs:complexType>
 					</xs:element>
-					<xs:element name="taxon" minOccurs="0" maxOccurs="1">
+					<xs:element name="taxonomy" minOccurs="0" maxOccurs="1">
 						<xs:complexType>
 							<xs:sequence>
 								<xs:element name="attribute" type="referenceDataAttribute"
 									minOccurs="0" maxOccurs="unbounded" />
 							</xs:sequence>
+							<xs:attribute name="name" type="name" use="required" />
 						</xs:complexType>
 					</xs:element>
 				</xs:choice>
