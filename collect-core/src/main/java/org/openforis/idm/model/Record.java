@@ -142,7 +142,9 @@ public class Record implements DeepComparable {
 	public <N extends Node<?>> N getNodeByPath(String path) {
 		N node = findNodeByPath(path);
 		if (node == null) {
-			throw new IllegalArgumentException(String.format("Could not find node %s in survey %d record %d ", path, getSurvey().getId(), getId()));
+			throw new IllegalArgumentException(
+					String.format("Could not find node %s in survey %d record %d ", 
+							path, getSurvey().getId(), getId()));
 		}
 		return node;
 	}

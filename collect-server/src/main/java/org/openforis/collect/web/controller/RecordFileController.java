@@ -1,15 +1,12 @@
 package org.openforis.collect.web.controller;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.openforis.collect.manager.SessionRecordFileManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
@@ -44,8 +41,6 @@ public class RecordFileController extends BasicController implements Serializabl
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger LOG = LogManager.getLogger(RecordFileController.class);
-
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
@@ -61,7 +56,7 @@ public class RecordFileController extends BasicController implements Serializabl
 		CollectRecord record = recordProvider.provide(survey, recordId == 0 ? null : recordId, recordStep);
 		FileAttribute node = record.getNodeByPath(nodePath);
 		File file = getFile(node);
-		writeFileToResponse(response, file, surveyId, recordId, nodePath);
+		Controllers.writeFileToResponse(response, file);
 	}
 
 	@RequestMapping(value = "/survey/{surveyId}/data/records/{recordId}/{recordStep}/file-thumbnail", method = RequestMethod.GET)
@@ -81,7 +76,7 @@ public class RecordFileController extends BasicController implements Serializabl
 			return;
 		} catch (Exception e) {
 			// Try to write original file to response
-			writeFileToResponse(response, file, surveyId, recordId, nodePath);
+			Controllers.writeFileToResponse(response, file);
 		}
 	}
 
@@ -92,21 +87,6 @@ public class RecordFileController extends BasicController implements Serializabl
 					node.getPath(), node.getRecord().getId(), node.getSurvey().getId()));
 		}
 		return file;
-	}
-
-	private void writeFileToResponse(HttpServletResponse response, File file, int surveyId, int recordId,
-			String nodePath) throws IOException, Exception {
-
-		if (file != null && file.exists()) {
-			Controllers.writeFileToResponse(response, file);
-		} else {
-			String fileName = file == null ? null : file.getName();
-			Exception e = new Exception(
-					String.format("File not found: %s - survey id : %d - record id: %d - node path : %s", fileName,
-							surveyId, recordId, nodePath));
-			LOG.error(e);
-			throw e;
-		}
 	}
 
 }
