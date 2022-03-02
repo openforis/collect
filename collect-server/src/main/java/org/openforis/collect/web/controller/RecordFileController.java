@@ -1,6 +1,7 @@
 package org.openforis.collect.web.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,7 +52,7 @@ public class RecordFileController extends BasicController implements Serializabl
 	@RequestMapping(value = "/survey/{surveyId}/data/records/{recordId}/{recordStep}/file", method = RequestMethod.GET)
 	public void downloadFile(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable("surveyId") int surveyId, @PathVariable("recordId") int recordId,
-			@PathVariable("recordStep") Step recordStep, @RequestParam("nodePath") String nodePath) throws Exception {
+			@PathVariable("recordStep") Step recordStep, @RequestParam("nodePath") String nodePath) throws IOException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
 		CollectRecord record = recordProvider.provide(survey, recordId == 0 ? null : recordId, recordStep);
 		FileAttribute node = record.getNodeByPath(nodePath);
@@ -62,7 +63,7 @@ public class RecordFileController extends BasicController implements Serializabl
 	@RequestMapping(value = "/survey/{surveyId}/data/records/{recordId}/{recordStep}/file-thumbnail", method = RequestMethod.GET)
 	public void downloadThumbnail(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable("surveyId") int surveyId, @PathVariable("recordId") int recordId,
-			@PathVariable("recordStep") Step recordStep, @RequestParam("nodePath") String nodePath) throws Exception {
+			@PathVariable("recordStep") Step recordStep, @RequestParam("nodePath") String nodePath) throws IOException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
 		CollectRecord record = recordProvider.provide(survey, recordId == 0 ? null : recordId, recordStep);
 		FileAttribute node = record.getNodeByPath(nodePath);
