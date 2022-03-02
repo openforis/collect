@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect-installation</artifactId>
-		<version>4.0.43-SNAPSHOT</version>
+		<version>4.0.43</version>
 	</parent>
 	<artifactId>collect-assembly</artifactId>
 	<packaging>pom</packaging>
@@ -69,7 +69,7 @@
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
 			<artifactId>collect-webapp</artifactId>
-			<version>4.0.43-SNAPSHOT</version>
+			<version>4.0.43</version>
 			<type>war</type>
 		</dependency>
 		<dependency>
