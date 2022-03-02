@@ -22,6 +22,7 @@ import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.model.UserInGroup.UserGroupJoinRequestStatus;
 import org.openforis.collect.model.UserInGroup.UserGroupRole;
+import org.openforis.collect.utils.SurveyObjects;
 import org.openforis.collect.web.controller.UserGroupController.UserGroupForm;
 import org.openforis.collect.web.validator.UserGroupValidator;
 import org.openforis.commons.web.PersistedObjectForm;
@@ -88,7 +89,8 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 		if (StringUtils.isBlank(resourceType) || !resourceType.matches(RESOURCE_TYPE_REGEX)) {
 			throw new IllegalArgumentException("Invalid resource type specified");
 		}
-		itemManager.associateResource(userGroupId, resourceType, resourceId);
+		String resourceIdNormalized = SurveyObjects.adjustInternalName(resourceId);
+		itemManager.associateResource(userGroupId, resourceType, resourceIdNormalized);
 		return new Response();
 	}
 	
