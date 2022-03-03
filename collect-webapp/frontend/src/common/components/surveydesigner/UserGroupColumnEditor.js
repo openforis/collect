@@ -1,32 +1,28 @@
-import React, { Component } from 'react';
-import { Input } from 'reactstrap';
+import React from 'react'
+import { Input } from 'reactstrap'
 
-export default class UserGroupColumnEditor extends Component {
-    constructor(props) {
-        super(props)
-        
-        this.state = { userGroupId: props.row.userGroupId }
+const UserGroupColumnEditor = (props) => {
+  const { row, userGroups, onUpdate } = props
+  const { userGroupId } = row
 
-        this.handleInputChange = this.handleInputChange.bind(this)
-    }
+  const handleInputChange = (event) => {
+    const userGroupId = parseInt(event.target.value, 10)
+    onUpdate({ userGroupId })
+  }
 
-    focus() {
-        //this.refs.inputRef.focus()
-    }
+  const options = userGroups.map((u) => (
+    <option key={u.id} value={u.id}>
+      {u.systemDefined ? '---' + u.label + '---' : u.label}
+    </option>
+  ))
 
-    handleInputChange(event) {
-        const userGroupId = parseInt(event.target.value, 10)
-        this.props.onUpdate({userGroupId: userGroupId})
-    }
-
-    render() {
-        const options = this.props.userGroups.map(u => <option key={u.id} value={u.id}>{u.systemDefined ? '---' + u.label + '---': u.label}</option>)
-        return (
-            <span>
-                <Input ref="inputRef" type="select" value={this.state.userGroupId} onChange={this.handleInputChange}>
-                    {options}
-                </Input>
-            </span>
-        )
-    }
+  return (
+    <span>
+      <Input type="select" value={userGroupId} onChange={handleInputChange}>
+        {options}
+      </Input>
+    </span>
+  )
 }
+
+export default UserGroupColumnEditor

@@ -24,6 +24,7 @@ import Arrays from 'utils/Arrays'
 import RouterUtils from 'utils/RouterUtils'
 import { changeUserGroup, publishSurvey, unpublishSurvey, deleteSurvey } from 'actions/surveys'
 import SurveyValidationResultDialog from '../components/SurveyValidationResultDialog'
+import { DataGrid, DataGridCellRenderers, DataGridValueFormatters } from 'common/components/DataGrid'
 
 class SurveysListPage extends React.Component {
   constructor() {
@@ -38,6 +39,7 @@ class SurveysListPage extends React.Component {
     this.wrapperRef = React.createRef()
 
     this.handleCellEdit = this.handleCellEdit.bind(this)
+    this.handleUserGroupIdUpdate = this.handleUserGroupIdUpdate.bind(this)
     this.handleCloneButtonClick = this.handleCloneButtonClick.bind(this)
     this.handleDeleteButtonClick = this.handleDeleteButtonClick.bind(this)
     this.handleEditButtonClick = this.handleEditButtonClick.bind(this)
@@ -56,9 +58,13 @@ class SurveysListPage extends React.Component {
 
   handleCellEdit(row, fieldName, value) {
     if (fieldName === 'userGroupId') {
-      const { changeUserGroup, loggedUser } = this.props
-      changeUserGroup(row, value.userGroupId, loggedUser.id)
+      this.handleUserGroupIdUpdate({ row, userGroupId: value.userGroupId })
     }
+  }
+
+  handleUserGroupIdUpdate({ row, userGroupId }) {
+    const { changeUserGroup, loggedUser } = this.props
+    changeUserGroup(row, userGroupId, loggedUser.id)
   }
 
   handleNewButtonClick() {
@@ -236,6 +242,25 @@ class SurveysListPage extends React.Component {
       }
     }
 
+    const userGroupCellRenderer = ({ value: userGroupId, row: survey }) => {
+      if (!userGroupId) {
+        return ''
+      }
+      const userGroupLabel = survey.userGroup.label
+
+      if (loggedUser.canChangeSurveyUserGroup(survey.userInGroupRole)) {
+        return (
+          <span>
+            <i className="fa fa-edit" aria-hidden="true"></i>
+            &nbsp;
+            {userGroupLabel}
+          </span>
+        )
+      } else {
+        return userGroupLabel
+      }
+    }
+
     function targetFormatter(cell, row) {
       let logoClass, logoTooltip
       switch (cell) {
@@ -249,6 +274,29 @@ class SurveysListPage extends React.Component {
           logoTooltip = 'Collect Desktop'
       }
       let logoElId = 'survey_target_icon_' + row.id
+      return (
+        <span>
+          <span className={'logo small ' + logoClass} id={logoElId} />
+          <UncontrolledTooltip placement="right" target={logoElId}>
+            {logoTooltip}
+          </UncontrolledTooltip>
+        </span>
+      )
+    }
+
+    function targetCellRenderer({ value, row }) {
+      let logoClass, logoTooltip
+      switch (value) {
+        case 'COLLECT_EARTH':
+          logoClass = 'collect-earth'
+          logoTooltip = 'Collect Earth'
+          break
+        case 'COLLECT_DESKTOP':
+        default:
+          logoClass = 'collect-desktop'
+          logoTooltip = 'Collect Desktop'
+      }
+      const logoElId = 'survey_target_icon_' + row.id
       return (
         <span>
           <span className={'logo small ' + logoClass} id={logoElId} />
@@ -322,6 +370,53 @@ class SurveysListPage extends React.Component {
             </Col>
           )}
         </Row>
+        <DataGrid
+          columns={[
+            {
+              field: 'id',
+              hide: true,
+            },
+            { field: 'name', headerName: 'survey.name' },
+            { field: 'projectName', headerName: 'survey.projectName' },
+            {
+              field: 'modifiedDate',
+              headerName: 'survey.lastModified',
+              valueFormatter: DataGridValueFormatters.dateTime,
+              width: 140,
+            },
+            { field: 'target', headerName: 'survey.target', renderCell: targetCellRenderer, width: 80 },
+            {
+              field: 'temporary',
+              headerName: 'survey.unpublishedChanges',
+              renderCell: DataGridCellRenderers.bool,
+            },
+            { field: 'published', headerName: 'survey.published', renderCell: DataGridCellRenderers.bool },
+            {
+              field: 'userGroupId',
+              headerName: 'survey.userGroup',
+              renderCell: userGroupCellRenderer,
+              editable: true,
+              renderEditCell: ({ api, field, id, row }) => (
+                <UserGroupColumnEditor
+                  onUpdate={({ userGroupId }) => {
+                    this.handleUserGroupIdUpdate({ row, userGroupId })
+                    // close cell editor
+                    api.setCellMode(id, field, 'view')
+                  }}
+                  row={row}
+                  userGroups={userGroups}
+                />
+              ),
+            },
+          ]}
+          rows={combinedSummaries}
+          onSelectedIdsChange={(selectedIds) =>
+            this.handleSurveysSelection(
+              selectedIds.map((selectedId) => combinedSummaries.find((s) => s.id === selectedId))
+            )
+          }
+          onRowDoubleClick={({ row }) => this.handleRowDoubleClick(row)}
+        />
         <BootstrapTable
           data={combinedSummaries}
           striped
