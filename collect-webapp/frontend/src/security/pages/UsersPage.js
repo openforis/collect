@@ -109,7 +109,7 @@ class UsersPage extends AbstractItemsListPage {
       )
     }
     return (
-      <Container style={{ height: '100%' }}>
+      <Container>
         <Row>
           <Col>
             <Button color="success" onClick={this.handleNewButtonClick}>
@@ -122,14 +122,15 @@ class UsersPage extends AbstractItemsListPage {
             )}
           </Col>
         </Row>
-        <Row style={{ height: '100%' }}>
+        <Row>
           <Col>
             <DataGrid
+              className="users-data-grid"
               columns={[
                 { field: 'id', hide: true },
-                { field: 'username', headerName: 'Username', flex: 2, sortable: false },
-                { field: 'enabled', headerName: 'Enabled', flex: 1, sortable: false },
-                { field: 'role', headerName: 'Role', flex: 1, sortable: false },
+                { field: 'username', headerName: 'Username', flex: 2 },
+                { field: 'enabled', headerName: 'Enabled', flex: 1 },
+                { field: 'role', headerName: 'Role', flex: 1 },
               ]}
               rows={users}
               onSelectedIdsChange={(selectedIds) => this.handleItemsSelection(selectedIds.map(findById(users)))}
