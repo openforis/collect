@@ -95,11 +95,13 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 	}
 	
 	@RequestMapping(value="/{userGroupId}/resources/{resourceType}/{resourceId}", method=DELETE)
-	public @ResponseBody Response disassociateToResource(
+	public @ResponseBody Response disassociateResource(
 			@PathVariable int userGroupId, 
 			@PathVariable String resourceType,
 			@PathVariable String resourceId) {
-		itemManager.disassociateResource(userGroupId, resourceType, resourceId);
+		itemManager.disassociateResource(userGroupId, 
+				SurveyObjects.adjustInternalName(resourceType),
+				SurveyObjects.adjustInternalName(resourceId));
 		return new Response();
 	}
 	
