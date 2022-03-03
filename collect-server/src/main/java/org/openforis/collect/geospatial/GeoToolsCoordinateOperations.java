@@ -23,6 +23,7 @@ import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.referencing.crs.AbstractSingleCRS;
+import org.openforis.collect.utils.SurveyObjects;
 import org.openforis.idm.geospatial.CoordinateOperationException;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
@@ -277,7 +278,11 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 			DirectPosition src = new DirectPosition2D(x, y);
 			MathTransform transform = getOrCreateTransform(fromSrsId, toSrsId);
 			if (transform == null) {
-				LOG.error(String.format("Cannot find transform from %s to %s", fromSrsId, toSrsId));
+				if (LOG.isErrorEnabled()) {
+					String fromSRSIdCleaned = SurveyObjects.adjustInternalName(StringUtils.truncate(fromSrsId, 20));
+					String toSRSIdCleaned = SurveyObjects.adjustInternalName(StringUtils.truncate(toSrsId, 20));
+					LOG.error(String.format("Cannot find transform from %s to %s", fromSRSIdCleaned, toSRSIdCleaned));
+				}
 				return new DirectPosition2D(0, 0);
 			}
 			DirectPosition directPosition = transform.transform(src, null);
