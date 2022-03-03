@@ -1,4 +1,4 @@
-import update from 'react-addons-update'
+import update from 'immutability-helper'
 
 import Arrays from 'utils/Arrays'
 
@@ -6,7 +6,6 @@ import {
   REQUEST_SURVEY_SUMMARIES,
   RECEIVE_SURVEY_SUMMARIES,
   INVALIDATE_SURVEY_SUMMARIES,
-  SURVEY_USER_GROUP_CHANGED,
   SURVEY_CREATED,
   SURVEY_UPDATED,
   SURVEY_DELETED,
@@ -40,20 +39,6 @@ function surveysList(state = defaultState, action) {
         initialized: true,
         didInvalidate: false,
         items: action.summaries,
-        lastUpdated: action.receivedAt,
-      })
-    case SURVEY_USER_GROUP_CHANGED:
-      const oldItems = state.items
-      const itemIdx = oldItems.findIndex((s) => s.id === action.surveyId)
-      const oldItem = oldItems[itemIdx]
-      const newItem = Object.assign({}, oldItem, {
-        userGroupId: action.newUserGroupId,
-      })
-      const newItems = update(oldItems, {
-        $splice: [[itemIdx, 1, newItem]],
-      })
-      return Object.assign({}, state, {
-        items: newItems,
         lastUpdated: action.receivedAt,
       })
     case SURVEY_CREATED:

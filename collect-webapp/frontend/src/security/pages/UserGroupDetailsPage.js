@@ -218,9 +218,10 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
   updateStateFromResponse(res) {
     super.updateStateFromResponse(res)
     if (res.statusOk) {
+      this.props.dispatch(UserGroupActions.receiveUserGroup(res.form))
+
       const wasNewItem = this.state.newItem
       if (wasNewItem) {
-        this.props.dispatch(UserGroupActions.receiveUserGroup(res.form))
         const itemId = res.form.id
         RouterUtils.navigateToUserGroupEditPage(this.props.navigate, itemId)
       }
