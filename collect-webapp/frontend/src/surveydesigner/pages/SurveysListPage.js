@@ -1,3 +1,5 @@
+import './SurveysListPage.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 import {
@@ -294,6 +296,7 @@ class SurveysListPage extends React.Component {
           )}
         </Row>
         <DataGrid
+          className="surveys-list"
           columns={[
             {
               field: 'id',
