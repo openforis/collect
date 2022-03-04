@@ -6,8 +6,10 @@ import L from 'utils/Labels'
 
 export const DataGrid = (props) => {
   const {
+    checkboxSelection = true,
     className,
     columns,
+    disableSelectionOnClick,
     isCellEditable,
     onRowDoubleClick: onRowDoubleClickProp,
     onSelectedIdsChange,
@@ -36,6 +38,7 @@ export const DataGrid = (props) => {
           renderCell,
           renderEditCell,
           sortable = false,
+          valueFormatter,
           width,
           ...otherColProps
         } = col
@@ -52,11 +55,13 @@ export const DataGrid = (props) => {
           renderCell,
           renderEditCell,
           sortable,
+          valueFormatter,
           width,
         }
       })}
+      disableSelectionOnClick={disableSelectionOnClick}
       rows={rows}
-      checkboxSelection
+      checkboxSelection={checkboxSelection}
       isCellEditable={isCellEditable}
       onSelectionModelChange={onSelectedIdsChange}
       onCellClick={({ api, colDef, id, isEditable }) => {
