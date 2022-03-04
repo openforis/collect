@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table'
 import {
   Button,
   DropdownItem,
@@ -14,9 +13,7 @@ import {
 
 import { withNavigate } from 'common/hooks'
 import MaxAvailableSpaceContainer from 'common/components/MaxAvailableSpaceContainer'
-import TableResizeOnWindowResizeComponent from 'common/components/TableResizeOnWindowResizeComponent'
 import Dialogs from 'common/components/Dialogs'
-import * as Formatters from 'common/components/datatable/formatters'
 import UserGroupColumnEditor from 'common/components/surveydesigner/UserGroupColumnEditor'
 import ServiceFactory from 'services/ServiceFactory'
 import L from 'utils/Labels'
@@ -38,7 +35,6 @@ class SurveysListPage extends React.Component {
 
     this.wrapperRef = React.createRef()
 
-    this.handleCellEdit = this.handleCellEdit.bind(this)
     this.handleUserGroupIdUpdate = this.handleUserGroupIdUpdate.bind(this)
     this.handleCloneButtonClick = this.handleCloneButtonClick.bind(this)
     this.handleDeleteButtonClick = this.handleDeleteButtonClick.bind(this)
@@ -47,19 +43,10 @@ class SurveysListPage extends React.Component {
     this.handleNewButtonClick = this.handleNewButtonClick.bind(this)
     this.handlePublishButtonClick = this.handlePublishButtonClick.bind(this)
     this.handleRowDoubleClick = this.handleRowDoubleClick.bind(this)
-    this.handleRowSelect = this.handleRowSelect.bind(this)
     this.handleSurveysSelection = this.handleSurveysSelection.bind(this)
     this.handleUnpublishButtonClick = this.handleUnpublishButtonClick.bind(this)
     this.performSurveyDelete = this.performSurveyDelete.bind(this)
     this.resetSelection = this.resetSelection.bind(this)
-    this.handleRowClick = this.handleRowClick.bind(this)
-    this.handleFilterChange = this.handleFilterChange.bind(this)
-  }
-
-  handleCellEdit(row, fieldName, value) {
-    if (fieldName === 'userGroupId') {
-      this.handleUserGroupIdUpdate({ row, userGroupId: value.userGroupId })
-    }
   }
 
   handleUserGroupIdUpdate({ row, userGroupId }) {
@@ -169,15 +156,6 @@ class SurveysListPage extends React.Component {
     RouterUtils.navigateToSurveyClonePage(this.props.navigate, this.state.selectedSurvey.name)
   }
 
-  handleRowClick(row) {
-    this.handleRowSelect(row, true)
-  }
-
-  handleRowSelect(row, isSelected, e) {
-    const newSelectedSurveys = isSelected ? [row] : []
-    this.handleSurveysSelection(newSelectedSurveys)
-  }
-
   handleSurveysSelection(newSelectedSurveys) {
     this.setState({
       ...this.state,
@@ -185,10 +163,6 @@ class SurveysListPage extends React.Component {
       selectedSurveyIds: newSelectedSurveys.map((item) => item.id),
       selectedSurveys: newSelectedSurveys,
     })
-  }
-
-  handleFilterChange(filterObj) {
-    this.resetSelection()
   }
 
   render() {
@@ -217,31 +191,6 @@ class SurveysListPage extends React.Component {
 
     const selectedSurvey = this.state.selectedSurvey
 
-    const createUserGroupEditor = (onUpdate, props) => <UserGroupColumnEditor onUpdate={onUpdate} {...props} />
-
-    function userGroupFormatter(cell, row) {
-      const userGroupId = cell
-      const survey = row
-
-      if (userGroupId) {
-        const userGroupLabel = survey.userGroup.label
-
-        if (loggedUser.canChangeSurveyUserGroup(survey.userInGroupRole)) {
-          return (
-            <span>
-              <i className="fa fa-edit" aria-hidden="true"></i>
-              &nbsp;
-              {userGroupLabel}
-            </span>
-          )
-        } else {
-          return userGroupLabel
-        }
-      } else {
-        return ''
-      }
-    }
-
     const userGroupCellRenderer = ({ value: userGroupId, row: survey }) => {
       if (!userGroupId) {
         return ''
@@ -261,30 +210,7 @@ class SurveysListPage extends React.Component {
       }
     }
 
-    function targetFormatter(cell, row) {
-      let logoClass, logoTooltip
-      switch (cell) {
-        case 'COLLECT_EARTH':
-          logoClass = 'collect-earth'
-          logoTooltip = 'Collect Earth'
-          break
-        case 'COLLECT_DESKTOP':
-        default:
-          logoClass = 'collect-desktop'
-          logoTooltip = 'Collect Desktop'
-      }
-      let logoElId = 'survey_target_icon_' + row.id
-      return (
-        <span>
-          <span className={'logo small ' + logoClass} id={logoElId} />
-          <UncontrolledTooltip placement="right" target={logoElId}>
-            {logoTooltip}
-          </UncontrolledTooltip>
-        </span>
-      )
-    }
-
-    function targetCellRenderer({ value, row }) {
+    const targetCellRenderer = ({ value, row }) => {
       let logoClass, logoTooltip
       switch (value) {
         case 'COLLECT_EARTH':
@@ -307,11 +233,8 @@ class SurveysListPage extends React.Component {
       )
     }
 
-    const nonEditableRows = combinedSummaries.filter((s) => loggedUser.canChangeSurveyUserGroup(s.userInGroupRole))
-
     return (
       <MaxAvailableSpaceContainer ref={this.wrapperRef}>
-        <TableResizeOnWindowResizeComponent wrapperRef={this.wrapperRef} margin={108} />
         {validationResultShown && <SurveyValidationResultDialog />}
         <Row className="action-bar justify-content-between">
           <Col sm={3}>
@@ -376,27 +299,55 @@ class SurveysListPage extends React.Component {
               field: 'id',
               hide: true,
             },
-            { field: 'name', headerName: 'survey.name', sortable: true },
-            { field: 'projectName', headerName: 'survey.projectName', sortable: true },
+            {
+              field: 'name',
+              headerName: 'survey.name',
+              sortable: true,
+              flex: 1,
+              disableColumnMenu: false,
+              filterable: true,
+            },
+            {
+              field: 'projectName',
+              headerName: 'survey.projectName',
+              sortable: true,
+              flex: 1.5,
+              disableColumnMenu: false,
+              filterable: true,
+            },
             {
               field: 'modifiedDate',
               headerName: 'survey.lastModified',
               sortable: true,
               valueFormatter: DataGridValueFormatters.dateTime,
-              width: 140,
+              width: 150,
+              align: 'center',
             },
-            { field: 'target', headerName: 'survey.target', sortable: true, renderCell: targetCellRenderer, width: 80 },
+            {
+              field: 'target',
+              headerName: 'survey.target',
+              sortable: true,
+              renderCell: targetCellRenderer,
+              width: 120,
+              align: 'center',
+            },
             {
               field: 'temporary',
               headerName: 'survey.unpublishedChanges',
               sortable: true,
               renderCell: DataGridCellRenderers.bool,
+              width: 150,
+              type: 'boolean',
+              filterable: true,
             },
             {
               field: 'published',
               headerName: 'survey.published',
               sortable: true,
               renderCell: DataGridCellRenderers.bool,
+              width: 120,
+              type: 'boolean',
+              filterable: true,
             },
             {
               field: 'userGroupId',
@@ -415,120 +366,18 @@ class SurveysListPage extends React.Component {
                   userGroups={userGroups}
                 />
               ),
+              width: 200,
             },
           ]}
-          rows={combinedSummaries}
+          isCellEditable={({ row: survey }) => loggedUser.canChangeSurveyUserGroup(survey.userInGroupRole)}
           onSelectedIdsChange={(selectedIds) =>
             this.handleSurveysSelection(
               selectedIds.map((selectedId) => combinedSummaries.find((s) => s.id === selectedId))
             )
           }
           onRowDoubleClick={({ row }) => this.handleRowDoubleClick(row)}
+          rows={combinedSummaries}
         />
-        <BootstrapTable
-          data={combinedSummaries}
-          striped
-          hover
-          condensed
-          pagination
-          selectRow={{
-            mode: 'radio', // single select
-            bgColor: 'lightBlue',
-            hideSelectColumn: true,
-            onSelect: this.handleRowSelect,
-            selected: this.state.selectedSurveyIds,
-          }}
-          cellEdit={{
-            mode: 'click',
-            blurToSave: true,
-            nonEditableRows: () => nonEditableRows,
-          }}
-          options={{
-            onRowClick: this.handleRowClick,
-            onRowDoubleClick: this.handleRowDoubleClick,
-            onCellEdit: this.handleCellEdit,
-            onFilterChange: this.handleFilterChange,
-          }}
-        >
-          <TableHeaderColumn key="id" dataField="id" isKey hidden dataAlign="center">
-            Id
-          </TableHeaderColumn>
-          <TableHeaderColumn
-            key="name"
-            dataField="name"
-            editable={false}
-            filter={{ type: 'TextFilter' }}
-            dataSort
-            width="200"
-          >
-            {L.l('survey.name')}
-          </TableHeaderColumn>
-          <TableHeaderColumn
-            key="projectName"
-            dataField="projectName"
-            editable={false}
-            filter={{ type: 'TextFilter' }}
-            dataSort
-            width="250"
-          >
-            {L.l('survey.projectName')}
-          </TableHeaderColumn>
-          <TableHeaderColumn
-            key="modifiedDate"
-            dataField="modifiedDate"
-            dataFormat={Formatters.dateTimeFormatter}
-            dataAlign="center"
-            width="90"
-            editable={false}
-            dataSort
-          >
-            {L.l('survey.lastModified')}
-          </TableHeaderColumn>
-          <TableHeaderColumn
-            key="target"
-            dataField="target"
-            dataFormat={targetFormatter}
-            dataAlign="center"
-            width="60"
-            editable={false}
-            dataSort
-          >
-            {L.l('survey.target')}
-          </TableHeaderColumn>
-          <TableHeaderColumn
-            key="temporary"
-            dataField="temporary"
-            dataFormat={Formatters.checkedIconFormatter}
-            dataAlign="center"
-            width="80"
-            editable={false}
-            dataSort
-          >
-            {L.l('survey.unpublishedChanges')}
-          </TableHeaderColumn>
-          <TableHeaderColumn
-            key="published"
-            dataField="published"
-            dataFormat={Formatters.checkedIconFormatter}
-            dataAlign="center"
-            width="80"
-            editable={false}
-            dataSort
-          >
-            {L.l('survey.published')}
-          </TableHeaderColumn>
-          <TableHeaderColumn
-            key="userGroupId"
-            dataField="userGroupId"
-            dataFormat={userGroupFormatter}
-            customEditor={{ getElement: createUserGroupEditor, customEditorParameters: { userGroups: userGroups } }}
-            dataAlign="left"
-            width="150"
-            dataSort
-          >
-            {L.l('survey.userGroup')}
-          </TableHeaderColumn>
-        </BootstrapTable>
       </MaxAvailableSpaceContainer>
     )
   }
