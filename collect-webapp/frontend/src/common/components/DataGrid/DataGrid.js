@@ -10,6 +10,7 @@ export const DataGrid = (props) => {
     className,
     columns,
     disableSelectionOnClick,
+    getRowId,
     isCellEditable,
     onRowDoubleClick: onRowDoubleClickProp,
     onSelectedIdsChange,
@@ -26,6 +27,7 @@ export const DataGrid = (props) => {
 
   return (
     <MuiDataGrid
+      getRowId={getRowId}
       className={classNames('data-grid', className)}
       columns={columns.map((col) => {
         const {

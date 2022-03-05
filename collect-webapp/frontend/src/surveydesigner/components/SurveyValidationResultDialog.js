@@ -47,10 +47,6 @@ class SurveyValidationResultDialog extends Component {
             className="survey-validation-result-data-grid"
             checkboxSelection={false}
             columns={[
-              {
-                field: 'id',
-                hide: true,
-              },
               { field: 'flag', width: 120, sortable: true, headerName: 'validation.severity' },
               { field: 'path', width: 350, sortable: true, headerName: 'validation.path' },
               {
@@ -62,7 +58,8 @@ class SurveyValidationResultDialog extends Component {
               },
             ]}
             disableSelectionOnClick
-            rows={validationResult.results.map((row) => ({ ...row, id: row.path }))}
+            getRowId={(row) => row.path}
+            rows={validationResult.results}
           />
         </DialogContent>
         <DialogActions>
