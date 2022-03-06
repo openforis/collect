@@ -16,6 +16,7 @@ import {
 import { withNavigate } from 'common/hooks'
 import MaxAvailableSpaceContainer from 'common/components/MaxAvailableSpaceContainer'
 import Dialogs from 'common/components/Dialogs'
+import { DataGrid, DataGridCellRenderers, DataGridValueFormatters } from 'common/components/DataGrid'
 import UserGroupColumnEditor from 'common/components/surveydesigner/UserGroupColumnEditor'
 import ServiceFactory from 'services/ServiceFactory'
 import L from 'utils/Labels'
@@ -23,7 +24,6 @@ import Arrays from 'utils/Arrays'
 import RouterUtils from 'utils/RouterUtils'
 import { changeUserGroup, publishSurvey, unpublishSurvey, deleteSurvey } from 'actions/surveys'
 import SurveyValidationResultDialog from '../components/SurveyValidationResultDialog'
-import { DataGrid, DataGridCellRenderers, DataGridValueFormatters } from 'common/components/DataGrid'
 
 class SurveysListPage extends React.Component {
   constructor() {

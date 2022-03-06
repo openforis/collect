@@ -12,6 +12,7 @@ export const DataGrid = (props) => {
     disableMultipleSelection,
     disableSelectionOnClick,
     getRowId,
+    hideFooterPagination,
     isCellEditable,
     onRowDoubleClick: onRowDoubleClickProp,
     onSelectedIdsChange,
@@ -65,6 +66,7 @@ export const DataGrid = (props) => {
       })}
       disableMultipleSelection={disableMultipleSelection}
       disableSelectionOnClick={disableSelectionOnClick}
+      hideFooterPagination={hideFooterPagination}
       rows={rows}
       isCellEditable={isCellEditable}
       onSelectionModelChange={onSelectedIdsChange}
@@ -82,4 +84,5 @@ export const DataGrid = (props) => {
 DataGrid.defaultProps = {
   checkboxSelection: false,
   disableMultipleSelection: false,
+  hideFooterPagination: false,
 }
