@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import classNames from 'classnames'
-import { DataGrid as MuiDataGrid } from '@material-ui/data-grid'
+import { DataGrid as MuiDataGrid, GridToolbar } from '@material-ui/data-grid'
 
 import L from 'utils/Labels'
 
@@ -11,12 +11,14 @@ export const DataGrid = (props) => {
     columns,
     disableMultipleSelection,
     disableSelectionOnClick,
+    exportFileName,
     getRowId,
     hideFooterPagination,
     isCellEditable,
     onRowDoubleClick: onRowDoubleClickProp,
     onSelectedIdsChange,
     rows,
+    showToolbar,
   } = props
 
   const onCellDoubleClick = useCallback(
@@ -64,6 +66,8 @@ export const DataGrid = (props) => {
           width,
         }
       })}
+      components={{ Toolbar: showToolbar ? GridToolbar : null }}
+      componentsProps={{ ...(showToolbar ? { toolbar: { csvOptions: { fileName: exportFileName } } } : {}) }}
       disableMultipleSelection={disableMultipleSelection}
       disableSelectionOnClick={disableSelectionOnClick}
       hideFooterPagination={hideFooterPagination}
@@ -84,5 +88,7 @@ export const DataGrid = (props) => {
 DataGrid.defaultProps = {
   checkboxSelection: false,
   disableMultipleSelection: false,
+  exportFileName: null,
   hideFooterPagination: false,
+  showToolbar: false,
 }

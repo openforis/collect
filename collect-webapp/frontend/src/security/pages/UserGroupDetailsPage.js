@@ -19,14 +19,18 @@ import {
 
 import User from '../../model/User'
 import * as UserGroupActions from 'actions/usergroups'
-import { withNavigate, withParams } from 'common/hooks'
-import AbstractItemDetailsPage from 'common/components/AbstractItemDetailsPage'
-import UserGroupService from 'services/UserGroupService'
-import UserRoleDropdownEditor from '../components/UserRoleDropdownEditor'
+
 import Arrays from 'utils/Arrays'
 import L from 'utils/Labels'
 import RouterUtils from 'utils/RouterUtils'
+
+import UserGroupService from 'services/UserGroupService'
+
+import { withNavigate, withParams } from 'common/hooks'
+import AbstractItemDetailsPage from 'common/components/AbstractItemDetailsPage'
 import { DataGrid } from 'common/components/DataGrid'
+
+import UserRoleDropdownEditor from '../components/UserRoleDropdownEditor'
 
 class UserGroupDetailsPage extends AbstractItemDetailsPage {
   constructor(props) {
