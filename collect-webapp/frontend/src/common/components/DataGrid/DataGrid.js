@@ -6,9 +6,10 @@ import L from 'utils/Labels'
 
 export const DataGrid = (props) => {
   const {
-    checkboxSelection = true,
+    checkboxSelection,
     className,
     columns,
+    disableMultipleSelection,
     disableSelectionOnClick,
     getRowId,
     isCellEditable,
@@ -28,6 +29,7 @@ export const DataGrid = (props) => {
   return (
     <MuiDataGrid
       getRowId={getRowId}
+      checkboxSelection={checkboxSelection}
       className={classNames('data-grid', className)}
       columns={columns.map((col) => {
         const {
@@ -61,9 +63,9 @@ export const DataGrid = (props) => {
           width,
         }
       })}
+      disableMultipleSelection={disableMultipleSelection}
       disableSelectionOnClick={disableSelectionOnClick}
       rows={rows}
-      checkboxSelection={checkboxSelection}
       isCellEditable={isCellEditable}
       onSelectionModelChange={onSelectedIdsChange}
       onCellClick={({ api, colDef, id, isEditable }) => {
@@ -75,4 +77,9 @@ export const DataGrid = (props) => {
       onCellDoubleClick={onCellDoubleClick}
     />
   )
+}
+
+DataGrid.defaultProps = {
+  checkboxSelection: false,
+  disableMultipleSelection: false,
 }

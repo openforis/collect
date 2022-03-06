@@ -45,7 +45,6 @@ class SurveyValidationResultDialog extends Component {
         <DialogContent>
           <DataGrid
             className="survey-validation-result-data-grid"
-            checkboxSelection={false}
             columns={[
               { field: 'flag', width: 120, sortable: true, headerName: 'validation.severity' },
               { field: 'path', width: 350, sortable: true, headerName: 'validation.path' },

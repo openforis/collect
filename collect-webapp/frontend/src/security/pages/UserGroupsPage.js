@@ -93,6 +93,7 @@ class UserGroupsPage extends AbstractItemsListPage {
         <Row>
           <Col>
             <DataGrid
+              checkboxSelection
               className="user-groups-data-grid"
               columns={[
                 { field: 'id', hide: true },

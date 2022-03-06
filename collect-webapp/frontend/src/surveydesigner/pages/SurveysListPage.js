@@ -372,6 +372,7 @@ class SurveysListPage extends React.Component {
               width: 200,
             },
           ]}
+          disableMultipleSelection
           isCellEditable={({ row: survey }) => loggedUser.canChangeSurveyUserGroup(survey.userInGroupRole)}
           onSelectedIdsChange={(selectedIds) =>
             this.handleSurveysSelection(
