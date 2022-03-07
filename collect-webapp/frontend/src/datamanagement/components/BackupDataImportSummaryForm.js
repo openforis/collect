@@ -1,8 +1,11 @@
+import './BackupDataImportSummaryForm.scss'
+
 import React from 'react'
 import { FormGroup } from 'reactstrap'
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table'
 
 import * as Formatters from 'common/components/datatable/formatters'
+import { DataGrid } from 'common/components/DataGrid'
 import L from 'utils/Labels'
 import Strings from 'utils/Strings'
 import Workflow from 'model/Workflow'
@@ -294,28 +297,11 @@ const BackupDataImportSummaryForm = (props) => {
     handleAllConflictingRecordsSelect,
   } = props
 
-  const errorsFormatter = (_cell, _row) => (
-    <div>
-      <span className="circle-red" />
-    </div>
-  )
-
-  const errorMessagesFormatter = function (cell, row) {
-    const errorItems = row.errors.map((e) => {
-      let message = e.message
-      if (Strings.isNotBlank(e.path)) {
-        message += ' ' + L.l('dataManagement.backupDataImport.errors.path') + ': ' + e.path
-      }
-      return <li>{message}</li>
-    })
-    return <ul>{errorItems}</ul>
-  }
-
   return (
     <FormGroup tag="fieldset">
       <legend>{L.l('dataManagement.backupDataImport.dataImportSummary')}</legend>
 
-      {dataImportSummary.recordsToImport.length > 0 ? (
+      {dataImportSummary.recordsToImport.length > 0 && (
         <fieldset className="secondary">
           <legend>
             {L.l('dataManagement.backupDataImport.newRecordsToBeImported', [
@@ -331,10 +317,8 @@ const BackupDataImportSummaryForm = (props) => {
             handleRecordsToImportRowSelect={handleRecordsToImportRowSelect}
           />
         </fieldset>
-      ) : (
-        ''
       )}
-      {dataImportSummary.conflictingRecords.length > 0 ? (
+      {dataImportSummary.conflictingRecords.length > 0 && (
         <fieldset className="secondary">
           <legend>
             {L.l('dataManagement.backupDataImport.conflictingRecordsToBeImported', [
@@ -350,28 +334,38 @@ const BackupDataImportSummaryForm = (props) => {
             handleAllConflictingRecordsSelect={handleAllConflictingRecordsSelect}
           />
         </fieldset>
-      ) : (
-        ''
       )}
-      {dataImportSummary.skippedFileErrors.length > 0 ? (
+      {dataImportSummary.skippedFileErrors.length > 0 && (
         <fieldset className="secondary">
           <legend>
             {L.l('dataManagement.backupDataImport.errorsFound', [dataImportSummary.skippedFileErrors.length])}
           </legend>
-          <BootstrapTable data={dataImportSummary.skippedFileErrors} striped hover condensed height="300px">
-            <TableHeaderColumn dataField="fileName" isKey width="80">
-              {L.l('dataManagement.backupDataImport.errors.fileName')}
-            </TableHeaderColumn>
-            <TableHeaderColumn dataField="errors" dataFormat={errorsFormatter} width="40">
-              {L.l('dataManagement.backupDataImport.errors.label')}
-            </TableHeaderColumn>
-            <TableHeaderColumn dataField="errors" dataFormat={errorMessagesFormatter} width="600">
-              {L.l('dataManagement.backupDataImport.errors.messages')}
-            </TableHeaderColumn>
-          </BootstrapTable>
+          <DataGrid
+            className="data-import-errors-data-grid"
+            columns={[
+              { field: 'fileName', headerName: 'dataManagement.backupDataImport.errors.fileName', width: 200 },
+              {
+                field: 'errors',
+                headerName: 'dataManagement.backupDataImport.errors.messages',
+                renderCell: ({ row }) => (
+                  <ul className="errors-list">
+                    {row.errors.map((error) => {
+                      let message = error.message
+                      if (Strings.isNotBlank(error.path)) {
+                        message += ' ' + L.l('dataManagement.backupDataImport.errors.path') + ': ' + error.path
+                      }
+                      return <li>{message}</li>
+                    })}
+                  </ul>
+                ),
+                flex: 1,
+              },
+            ]}
+            getRowId={(row) => row.fileName}
+            hideFooterPagination
+            rows={dataImportSummary.skippedFileErrors}
+          />
         </fieldset>
-      ) : (
-        ''
       )}
     </FormGroup>
   )
