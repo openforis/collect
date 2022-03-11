@@ -237,8 +237,9 @@ public class SurveyExportParametersVM extends BaseVM {
 		} catch(Exception e) {
 			LOG.error(e);
 			MessageUtil.showError("survey.export.error_generating_collect_earth_project_file", e.getMessage());
-		} finally {
 			IOUtils.closeQuietly(is);
+		} finally {
+			// FileInputStream 'is' has been closed already by Filedownload.save
 		}
 	}
 
