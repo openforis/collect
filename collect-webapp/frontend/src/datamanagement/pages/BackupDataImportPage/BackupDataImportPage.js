@@ -7,15 +7,14 @@ import Dialogs from 'common/components/Dialogs'
 import Dropzone from 'common/components/Dropzone'
 import UploadFileButton from 'common/components/UploadFileButton'
 
-import BackupDataImportSummaryForm from 'datamanagement/components/BackupDataImportSummaryForm'
-
 import ServiceFactory from 'services/ServiceFactory'
-import Arrays from 'utils/Arrays'
 import RouterUtils from 'utils/RouterUtils'
 import L from 'utils/Labels'
 
 import * as JobActions from 'actions/job'
 import * as UserActions from 'actions/users'
+
+import BackupDataImportSummaryForm from './BackupDataImportSummaryForm'
 
 const importSteps = {
   selectParameters: 'selectParameters',
@@ -48,10 +47,8 @@ class BackupDataImportPage extends Component {
     this.handleRecordSummaryGenerationComplete = this.handleRecordSummaryGenerationComplete.bind(this)
     this.handleImportButtonClick = this.handleImportButtonClick.bind(this)
     this.handleDataImportCompleteOkButtonClick = this.handleDataImportCompleteOkButtonClick.bind(this)
-    this.handleRecordsToImportRowSelect = this.handleRecordsToImportRowSelect.bind(this)
-    this.handleAllRecordsToImportSelect = this.handleAllRecordsToImportSelect.bind(this)
-    this.handleConflictingRecordsRowSelect = this.handleConflictingRecordsRowSelect.bind(this)
-    this.handleAllConflictingRecordsSelect = this.handleAllConflictingRecordsSelect.bind(this)
+    this.handleRecordsToImportSelectedIdsChange = this.handleRecordsToImportSelectedIdsChange.bind(this)
+    this.handleConflictingRecordsSelectedIdsChange = this.handleConflictingRecordsSelectedIdsChange.bind(this)
   }
 
   componentDidUpdate(prevProps) {
@@ -135,37 +132,25 @@ class BackupDataImportPage extends Component {
     })
   }
 
-  handleRecordsToImportRowSelect(row, isSelected, e) {
-    let newSelectedRecordsToImport = Arrays.addOrRemoveItem(this.state.selectedRecordsToImport, row, !isSelected)
-    this.handleSelectedRecordsToImportChange(newSelectedRecordsToImport)
-  }
-
-  handleAllRecordsToImportSelect(isSelected, rows) {
-    const newSelectedRecordsToImport = isSelected ? this.state.dataImportSummary.recordsToImport : []
-    this.handleSelectedRecordsToImportChange(newSelectedRecordsToImport)
-  }
-
-  handleSelectedRecordsToImportChange(newSelectedRecordsToImport) {
+  handleRecordsToImportSelectedIdsChange(selectedIds) {
+    const newSelectedRecordsToImport = selectedIds.map((selectedId) =>
+      this.state.dataImportSummary.recordsToImport.find((recordToImport) => recordToImport.entryId === selectedId)
+    )
     this.setState({
       selectedRecordsToImport: newSelectedRecordsToImport,
-      selectedRecordsToImportIds: newSelectedRecordsToImport.map((item) => item.entryId),
+      selectedRecordsToImportIds: selectedIds,
     })
   }
 
-  handleConflictingRecordsRowSelect(row, isSelected, e) {
-    let newSelectedConflictingRecords = Arrays.addOrRemoveItem(this.state.selectedConflictingRecords, row, !isSelected)
-    this.handleConflictingRecordsToImportChange(newSelectedConflictingRecords)
-  }
-
-  handleAllConflictingRecordsSelect(isSelected, rows) {
-    const newSelectedConflictingRecords = isSelected ? this.state.dataImportSummary.conflictingRecords : []
-    this.handleConflictingRecordsToImportChange(newSelectedConflictingRecords)
-  }
-
-  handleConflictingRecordsToImportChange(newSelectedConflictingRecords) {
+  handleConflictingRecordsSelectedIdsChange(selectedIds) {
+    const newSelectedConflictingRecords = selectedIds.map((selectedId) =>
+      this.state.dataImportSummary.conflictingRecords.find(
+        (conflictingRecord) => conflictingRecord.entryId === selectedId
+      )
+    )
     this.setState({
       selectedConflictingRecords: newSelectedConflictingRecords,
-      selectedConflictingRecordsIds: newSelectedConflictingRecords.map((item) => item.entryId),
+      selectedConflictingRecordsIds: selectedIds,
     })
   }
 
@@ -251,9 +236,9 @@ class BackupDataImportPage extends Component {
               survey={survey}
               dataImportSummary={dataImportSummary}
               selectedRecordsToImportIds={selectedRecordsToImportIds}
-              handleAllRecordsToImportSelect={this.handleAllRecordsToImportSelect}
-              handleRecordsToImportRowSelect={this.handleRecordsToImportRowSelect}
+              handleRecordsToImportSelectedIdsChange={this.handleRecordsToImportSelectedIdsChange}
               selectedConflictingRecordsIds={selectedConflictingRecordsIds}
+              handleConflictingRecordsSelectedIdsChange={this.handleConflictingRecordsSelectedIdsChange}
               handleAllConflictingRecordsSelect={this.handleAllConflictingRecordsSelect}
               handleConflictingRecordsRowSelect={this.handleConflictingRecordsRowSelect}
             />

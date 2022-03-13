@@ -182,6 +182,9 @@
         "nodeDefinitionNotApplicableToRecordVersion": "Node definition not applicable to this record version"
       },
       "filledValues": "Filled Values",
+      "oldCreatedOn": "Old Created On",
+      "oldModifiedOn": "Old Modified On",
+      "oldStep": "Old Step",
       "recordImportability": {
         "importSuggested": "Importing this record is suggested",
         "importNotSuggested": "Importing this record is NOT suggested",

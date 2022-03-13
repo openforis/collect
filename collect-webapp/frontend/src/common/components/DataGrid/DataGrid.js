@@ -18,6 +18,7 @@ export const DataGrid = (props) => {
     onRowDoubleClick: onRowDoubleClickProp,
     onSelectedIdsChange,
     rows,
+    selectionModel,
     showToolbar,
   } = props
 
@@ -81,6 +82,7 @@ export const DataGrid = (props) => {
         }
       }}
       onCellDoubleClick={onCellDoubleClick}
+      selectionModel={selectionModel}
     />
   )
 }
@@ -90,5 +92,6 @@ DataGrid.defaultProps = {
   disableMultipleSelection: false,
   exportFileName: null,
   hideFooterPagination: false,
+  selectionModel: undefined,
   showToolbar: false,
 }
