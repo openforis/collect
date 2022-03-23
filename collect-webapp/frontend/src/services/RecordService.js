@@ -9,7 +9,7 @@ export default class RecordService extends AbstractService {
       rootEntityName,
       userId: userId,
       maxNumberOfRows: filterOptions.recordsPerPage,
-      offset: (filterOptions.page - 1) * filterOptions.recordsPerPage,
+      offset: filterOptions.page * filterOptions.recordsPerPage,
       keyValues: filterOptions.keyValues,
       summaryValues: filterOptions.summaryValues,
       ownerIds: filterOptions.ownerIds,

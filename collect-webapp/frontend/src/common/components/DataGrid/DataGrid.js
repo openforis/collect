@@ -15,8 +15,11 @@ export const DataGrid = (props) => {
     getRowId,
     hideFooterPagination,
     isCellEditable,
+    onPageChange,
     onRowDoubleClick: onRowDoubleClickProp,
     onSelectedIdsChange,
+    paginationMode,
+    rowCount,
     rows,
     selectionModel,
     showToolbar,
@@ -45,6 +48,7 @@ export const DataGrid = (props) => {
           headerName: headerNameProp,
           renderCell,
           renderEditCell,
+          renderHeader,
           sortable = false,
           valueFormatter,
           width,
@@ -62,6 +66,7 @@ export const DataGrid = (props) => {
           headerName,
           renderCell,
           renderEditCell,
+          renderHeader,
           sortable,
           valueFormatter,
           width,
@@ -82,6 +87,11 @@ export const DataGrid = (props) => {
         }
       }}
       onCellDoubleClick={onCellDoubleClick}
+      onPageChange={onPageChange}
+      pageSize={25}
+      paginationMode={paginationMode}
+      rowCount={rowCount}
+      rowsPerPageOptions={[25, 50, 100]}
       selectionModel={selectionModel}
     />
   )
@@ -92,6 +102,7 @@ DataGrid.defaultProps = {
   disableMultipleSelection: false,
   exportFileName: null,
   hideFooterPagination: false,
+  paginationMode: 'client',
   selectionModel: undefined,
   showToolbar: false,
 }

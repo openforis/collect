@@ -1,3 +1,5 @@
+import './RecordDataTable.scss'
+
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -19,6 +21,7 @@ import {
   updateRecordOwner,
 } from 'datamanagement/recordDataTable/actions'
 import { getRecordDataTableState } from 'datamanagement/recordDataTable/state'
+import { DataGrid, DataGridValueFormatters } from 'common/components/DataGrid'
 
 class RecordDataTable extends Component {
   constructor(props) {
@@ -174,8 +177,18 @@ class RecordDataTable extends Component {
       return row.rootEntityKeys[idx]
     }
 
+    const rootEntityKeyFormatterNew = ({ row, field }) => {
+      const idx = field.substring(3) - 1
+      return row.rootEntityKeys[idx]
+    }
+
     function shownInSummaryListFormatter(cell, row) {
       var idx = this.name.substring(this.name.indexOf('_') + 1)
+      return row.summaryValues[idx]
+    }
+
+    const shownInSummaryListFormatterNew = ({ row, field }) => {
+      const idx = field.substring(field.indexOf('_') + 1)
       return row.summaryValues[idx]
     }
 
@@ -199,6 +212,22 @@ class RecordDataTable extends Component {
       }
     }
 
+    const renderCellOwner = ({ value: owner }) => {
+      if (!owner) {
+        return ''
+      }
+      if (!userCanChangeRecordOwner) {
+        return owner.username
+      }
+      return (
+        <span>
+          <i className="fa fa-edit" aria-hidden="true"></i>
+          &nbsp;
+          {owner.username}
+        </span>
+      )
+    }
+
     const lockedByFormatter = (cell, row) => {
       if (!cell) {
         return ''
@@ -216,7 +245,28 @@ class RecordDataTable extends Component {
       )
     }
 
+    const renderCellLockedBy = ({ value, row }) => {
+      if (!value) {
+        return ''
+      }
+      const iconClass = value === loggedUser.username || loggedUser.canUnlockRecords() ? 'circle-orange' : 'circle-red'
+
+      const iconId = `record-table-${row.id}-locked-by-icon`
+      return (
+        <span>
+          <span className={iconClass} id={iconId}></span>
+          <UncontrolledTooltip placement="top" target={iconId}>
+            {L.l('dataManagement.recordLockedBy', value)}
+          </UncontrolledTooltip>
+        </span>
+      )
+    }
+
     const createAttributeFilter = (attrDef, defaultValue) => ({ type: 'TextFilter', defaultValue })
+
+    const onPageChange = (page) => {
+      this.props.changeRecordSummariesPage(page, recordsPerPage)
+    }
 
     var columns = []
     columns.push(
@@ -238,6 +288,15 @@ class RecordDataTable extends Component {
         {keyAttr.labelOrName}
       </TableHeaderColumn>
     ))
+    const keyAttributeColumnsNew = keyAttributes.map((keyAttr, i) => ({
+      field: `key${i + 1}`,
+      valueFormatter: rootEntityKeyFormatterNew,
+      flex: 1,
+      sortable: true,
+      filter: createAttributeFilter(keyAttr, keyValues[i]),
+      headerName: keyAttr.labelOrName,
+    }))
+
     columns = columns.concat(keyAttributeColumns)
 
     const summaryAttributeColumns = attributeDefsShownInSummaryList.map((attr, i) => {
@@ -253,9 +312,21 @@ class RecordDataTable extends Component {
           filter={canFilterOrSort ? createAttributeFilter(attr, summaryValues[i]) : null}
           editable={false}
         >
-          {attr.label}
+          {attr.labelOrName}
         </TableHeaderColumn>
       )
+    })
+
+    const summaryAttributeColumnsNew = attributeDefsShownInSummaryList.map((attr, i) => {
+      const prefix = 'summary_'
+      const canFilterOrSort = loggedUser.canFilterRecordsBySummaryAttribute(attr, roleInSurvey)
+      return {
+        field: prefix + i,
+        valueFormatter: shownInSummaryListFormatterNew,
+        flex: 1,
+        filter: canFilterOrSort ? createAttributeFilter(attr, summaryValues[i]) : null,
+        headerName: attr.labelOrName,
+      }
     })
     columns = columns.concat(summaryAttributeColumns)
 
@@ -351,7 +422,60 @@ class RecordDataTable extends Component {
     )
 
     return (
-      <div>
+      <>
+        <DataGrid
+          className="records-data-grid"
+          columns={[
+            ...keyAttributeColumnsNew,
+            ...summaryAttributeColumnsNew,
+            { field: 'totalErrors', align: 'right', width: 120, sortable: true, headerName: 'dataManagement.errors' },
+            { field: 'warnings', align: 'right', width: 120, sortable: true, headerName: 'dataManagement.warnings' },
+            {
+              field: 'creationDate',
+              valueFormatter: DataGridValueFormatters.dateTime,
+              width: 140,
+              align: 'center',
+              sortable: true,
+              headerName: 'dataManagement.created',
+            },
+            {
+              field: 'modifiedDate',
+              valueFormatter: DataGridValueFormatters.dateTime,
+              width: 140,
+              align: 'center',
+              sortable: true,
+              headerName: 'dataManagement.modified',
+            },
+            {
+              field: 'step',
+              align: 'center',
+              width: 120,
+              sortable: true,
+              headerName: 'dataManagement.workflow.step.label',
+            },
+            {
+              field: 'owner',
+              renderCell: renderCellOwner,
+              width: 150,
+              sortable: true,
+              headerName: 'dataManagement.owner',
+            },
+            {
+              field: 'lockedBy',
+              renderCell: renderCellLockedBy,
+              align: 'center',
+              width: 60,
+              sortable: true,
+              renderHeader: () => (
+                <i className="fa fa-lock" aria-hidden="true" title={L.l('dataManagement.recordLocked')} />
+              ),
+            },
+          ]}
+          onPageChange={onPageChange}
+          paginationMode="server"
+          rowCount={totalSize}
+          rows={records}
+        />
         <BootstrapTable
           data={records}
           options={{
@@ -373,7 +497,7 @@ class RecordDataTable extends Component {
           striped
           hover
           condensed
-          height="100%"
+          height="200px"
           selectRow={{
             mode: 'checkbox',
             clickToSelect: true,
@@ -387,7 +511,7 @@ class RecordDataTable extends Component {
         >
           {columns}
         </BootstrapTable>
-      </div>
+      </>
     )
   }
 }
