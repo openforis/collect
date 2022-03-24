@@ -19,12 +19,15 @@ export const DataGrid = (props) => {
     onPageSizeChange,
     onRowDoubleClick: onRowDoubleClickProp,
     onSelectedIdsChange,
+    onSortModelChange,
     pageSize,
     paginationMode,
     rowCount,
     rows,
     selectionModel,
     showToolbar,
+    sortingMode,
+    sortModel,
   } = props
 
   const onCellDoubleClick = useCallback(
@@ -91,11 +94,14 @@ export const DataGrid = (props) => {
       onCellDoubleClick={onCellDoubleClick}
       onPageChange={onPageChange}
       onPageSizeChange={onPageSizeChange}
+      onSortModelChange={onSortModelChange}
       pageSize={pageSize}
       paginationMode={paginationMode}
       rowCount={rowCount}
       rowsPerPageOptions={[25, 50, 100]}
       selectionModel={selectionModel}
+      sortingMode={sortingMode}
+      sortMode={sortModel}
     />
   )
 }
@@ -109,4 +115,5 @@ DataGrid.defaultProps = {
   paginationMode: 'client',
   selectionModel: undefined,
   showToolbar: false,
+  sortingMode: 'client',
 }

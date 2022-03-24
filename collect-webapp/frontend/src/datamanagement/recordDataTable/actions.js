@@ -19,8 +19,8 @@ export const REQUEST_RECORD_SUMMARIES = 'REQUEST_RECORD_SUMMARIES'
 export const RECEIVE_RECORD_SUMMARIES = 'RECEIVE_RECORD_SUMMARIES'
 export const INVALIDATE_RECORD_SUMMARIES = 'INVALIDATE_RECORD_SUMMARIES'
 
-const dispatchRecordDataTableStateUpdate = (dispatch, filter) =>
-  dispatch({ type: RECORD_DATA_TABLE_STATE_UPDATE, ...filter })
+const dispatchRecordDataTableStateUpdate = (dispatch, newState) =>
+  dispatch({ type: RECORD_DATA_TABLE_STATE_UPDATE, ...newState })
 
 export const sortRecordSummaries = (sortFields) => (dispatch) => {
   dispatchRecordDataTableStateUpdate(dispatch, { sortFields, records: [] })

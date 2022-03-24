@@ -6,10 +6,12 @@ import { connect } from 'react-redux'
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table'
 import { UncontrolledTooltip } from 'reactstrap'
 
+import { DataGrid, DataGridValueFormatters } from 'common/components/DataGrid'
 import * as Formatters from 'common/components/datatable/formatters'
 import OwnerColumnEditor from './OwnerColumnEditor'
 import RecordOwnerFilter from 'datamanagement/components/RecordOwnerFilter'
 import Tables from 'common/components/Tables'
+import Arrays from 'utils/Arrays'
 import L from 'utils/Labels'
 import { getDataManagementState } from 'datamanagement/state'
 import {
@@ -21,7 +23,40 @@ import {
   updateRecordOwner,
 } from 'datamanagement/recordDataTable/actions'
 import { getRecordDataTableState } from 'datamanagement/recordDataTable/state'
-import { DataGrid, DataGridValueFormatters } from 'common/components/DataGrid'
+
+const internalSortFieldByFieldKey = {
+  key1: 'KEY1',
+  key2: 'KEY2',
+  key3: 'KEY3',
+  summary_0: 'SUMMARY1',
+  summary_1: 'SUMMARY2',
+  summary_2: 'SUMMARY3',
+  totalErrors: 'ERRORS',
+  warnings: 'WARNINGS',
+  owner: 'OWNER_NAME',
+  step: 'STEP',
+  entryComplete: 'STEP',
+  cleansingComplete: 'STEP',
+  creationDate: 'DATE_CREATED',
+  modifiedDate: 'DATE_MODIFIED',
+}
+
+const fieldKeyByInternalSortField = {
+  KEY1: 'key1',
+  KEY2: 'key2',
+  KEY3: 'key3',
+  SUMMARY1: 'summary_0',
+  SUMMARY2: 'summary_1',
+  SUMMARY3: 'summary_2',
+  ERRORS: 'totalErrors',
+  WARNINGS: 'warnings',
+  OWNER_NAME: 'owner',
+  STEP: 'step',
+  DATE_CREATED: 'creationDate',
+  DATE_MODIFIED: 'modifiedDate',
+}
+
+const defaultSortModel = [{ field: 'modifiedDate', sort: 'desc' }]
 
 class RecordDataTable extends Component {
   constructor(props) {
@@ -29,7 +64,6 @@ class RecordDataTable extends Component {
     this.handlePageChange = this.handlePageChange.bind(this)
     this.handleCellEdit = this.handleCellEdit.bind(this)
     this.handleSizePerPageChange = this.handleSizePerPageChange.bind(this)
-    this.handleSortChange = this.handleSortChange.bind(this)
     this.handleFilterChange = this.handleFilterChange.bind(this)
     this.handleOnlyMyOwnRecordsChange = this.handleOnlyMyOwnRecordsChange.bind(this)
   }
@@ -68,58 +102,6 @@ class RecordDataTable extends Component {
       const newOwner = value.owner
       updateRecordOwner(row, newOwner)
     }
-  }
-
-  handleSortChange(sortName, sortOrder) {
-    const { sortRecordSummaries } = this.props
-
-    let sortField
-    switch (sortName) {
-      case 'key1':
-        sortField = 'KEY1'
-        break
-      case 'key2':
-        sortField = 'KEY2'
-        break
-      case 'key3':
-        sortField = 'KEY3'
-        break
-      case 'summary_0':
-        sortField = 'SUMMARY1'
-        break
-      case 'summary_1':
-        sortField = 'SUMMARY2'
-        break
-      case 'summary_2':
-        sortField = 'SUMMARY3'
-        break
-      case 'totalErrors':
-        sortField = 'ERRORS'
-        break
-      case 'warnings':
-        sortField = 'WARNINGS'
-        break
-      case 'owner':
-        sortField = 'OWNER_NAME'
-        break
-      case 'step':
-      case 'entryComplete':
-      case 'cleansingComplete':
-        sortField = 'STEP'
-        break
-      case 'creationDate':
-        sortField = 'DATE_CREATED'
-        break
-      case 'modifiedDate':
-        sortField = 'DATE_MODIFIED'
-        break
-      default:
-        console.log('unsupported sort field: ' + sortName)
-        return
-    }
-    let sortFields = [{ field: sortField, descending: sortOrder === 'desc' }]
-
-    sortRecordSummaries(sortFields)
   }
 
   handleFilterChange(filterObj) {
@@ -164,13 +146,13 @@ class RecordDataTable extends Component {
       summaryValues,
       userCanChangeRecordOwner,
       roleInSurvey,
+      selectedItemIds,
+      sortFields,
     } = this.props
 
     if (surveyId === null) {
       return <div>Please select a survey first</div>
     }
-
-    const createOwnerEditor = (onUpdate, props) => <OwnerColumnEditor onUpdate={onUpdate} {...props} />
 
     function rootEntityKeyFormatter(cell, row) {
       var idx = this.name.substring(3) - 1
@@ -279,6 +261,30 @@ class RecordDataTable extends Component {
       this.props.handleItemsSelection(selectedItems)
     }
 
+    const sortModel = sortFields.map((sortField) => {
+      const fieldKey = fieldKeyByInternalSortField[sortField.field]
+      if (!fieldKey) return null
+      return {
+        field: fieldKey,
+        sort: sortField.descending ? 'desc' : 'asc',
+      }
+    })
+
+    const onSortModelChange = (newSortModel) => {
+      if (JSON.stringify(newSortModel) === JSON.stringify(sortModel)) {
+        // sort unchanged
+        return
+      }
+      const { sortRecordSummaries } = this.props
+      const [{ field, sort }] = Arrays.isEmpty(newSortModel) ? defaultSortModel : newSortModel
+      const sortField = internalSortFieldByFieldKey[field]
+      if (!sortField) {
+        console.log('unsupported sort field: ' + field)
+        return
+      }
+      sortRecordSummaries([{ field: sortField, descending: sort === 'desc' }])
+    }
+
     var columns = []
     columns.push(
       <TableHeaderColumn key="id" dataField="id" isKey hidden dataAlign="center">
@@ -339,6 +345,7 @@ class RecordDataTable extends Component {
         headerName: attr.labelOrName,
       }
     })
+
     columns = columns.concat(summaryAttributeColumns)
 
     /*
@@ -414,7 +421,6 @@ class RecordDataTable extends Component {
         dataFormat={ownerFormatter}
         editable={userCanChangeRecordOwner}
         filter={{ type: 'CustomFilter', getElement: createOwnerFilter }}
-        customEditor={{ getElement: createOwnerEditor, customEditorParameters: { users: this.props.users } }}
         dataAlign="left"
         width="150"
         dataSort
@@ -467,10 +473,22 @@ class RecordDataTable extends Component {
             },
             {
               field: 'owner',
-              renderCell: renderCellOwner,
               width: 150,
               sortable: true,
               headerName: 'dataManagement.owner',
+              renderCell: renderCellOwner,
+              editable: userCanChangeRecordOwner,
+              renderEditCell: ({ api, field, id, row }) => (
+                <OwnerColumnEditor
+                  owner={row.owner}
+                  users={this.props.users}
+                  onUpdate={({ owner }) => {
+                    this.props.updateRecordOwner(row, owner)
+                    // close cell editor
+                    api.setCellMode(id, field, 'view')
+                  }}
+                />
+              ),
             },
             {
               field: 'lockedBy',
@@ -486,18 +504,20 @@ class RecordDataTable extends Component {
           onPageChange={onPageChange}
           onPageSizeChange={onPageSizeChange}
           onSelectedIdsChange={onSelectedIdsChange}
+          onSortModelChange={onSortModelChange}
           pageSize={recordsPerPage}
           paginationMode="server"
           rowCount={totalSize}
           rows={records}
-          selectionModel={this.props.selectedItemIds}
+          selectionModel={selectedItemIds}
+          sortingMode="server"
+          sortModel={sortModel}
         />
         <BootstrapTable
           data={records}
           options={{
             onRowDoubleClick: this.props.handleRowDoubleClick,
             onCellEdit: this.handleCellEdit,
-            onSortChange: this.handleSortChange,
             onFilterChange: this.handleFilterChange,
             page: currentPage,
             sizePerPage: recordsPerPage,
@@ -546,7 +566,7 @@ const mapStateToProps = (state) => {
   const keyAttributes = rootEntityDef.keyAttributeDefinitions
   const attributeDefsShownInSummaryList = rootEntityDef.attributeDefinitionsShownInRecordSummaryList
 
-  const { currentPage, records, totalSize, recordsPerPage, keyValues, summaryValues, availableOwners } =
+  const { currentPage, records, totalSize, recordsPerPage, keyValues, summaryValues, availableOwners, sortFields } =
     recordDataTableState
 
   return {
@@ -564,6 +584,7 @@ const mapStateToProps = (state) => {
     availableOwners,
     userCanChangeRecordOwner,
     roleInSurvey,
+    sortFields,
   }
 }
 
