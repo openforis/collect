@@ -3,14 +3,10 @@ import './RecordDataTable.scss'
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table'
 import { UncontrolledTooltip } from 'reactstrap'
 
 import { DataGrid, DataGridValueFormatters } from 'common/components/DataGrid'
-import * as Formatters from 'common/components/datatable/formatters'
 import OwnerColumnEditor from './OwnerColumnEditor'
-import RecordOwnerFilter from 'datamanagement/components/RecordOwnerFilter'
-import Tables from 'common/components/Tables'
 import Arrays from 'utils/Arrays'
 import L from 'utils/Labels'
 import { getDataManagementState } from 'datamanagement/state'
@@ -24,13 +20,15 @@ import {
 } from 'datamanagement/recordDataTable/actions'
 import { getRecordDataTableState } from 'datamanagement/recordDataTable/state'
 
+const SUMMARY_FIELD_PREFIX = 'summary_'
+
 const internalSortFieldByFieldKey = {
   key1: 'KEY1',
   key2: 'KEY2',
   key3: 'KEY3',
-  summary_0: 'SUMMARY1',
-  summary_1: 'SUMMARY2',
-  summary_2: 'SUMMARY3',
+  [`${SUMMARY_FIELD_PREFIX}0`]: 'SUMMARY1',
+  [`${SUMMARY_FIELD_PREFIX}1`]: 'SUMMARY2',
+  [`${SUMMARY_FIELD_PREFIX}2`]: 'SUMMARY3',
   totalErrors: 'ERRORS',
   warnings: 'WARNINGS',
   owner: 'OWNER_NAME',
@@ -45,9 +43,9 @@ const fieldKeyByInternalSortField = {
   KEY1: 'key1',
   KEY2: 'key2',
   KEY3: 'key3',
-  SUMMARY1: 'summary_0',
-  SUMMARY2: 'summary_1',
-  SUMMARY3: 'summary_2',
+  SUMMARY1: `${SUMMARY_FIELD_PREFIX}0`,
+  SUMMARY2: `${SUMMARY_FIELD_PREFIX}1`,
+  SUMMARY3: `${SUMMARY_FIELD_PREFIX}2`,
   ERRORS: 'totalErrors',
   WARNINGS: 'warnings',
   OWNER_NAME: 'owner',
@@ -61,9 +59,6 @@ const defaultSortModel = [{ field: 'modifiedDate', sort: 'desc' }]
 class RecordDataTable extends Component {
   constructor(props) {
     super(props)
-    this.handlePageChange = this.handlePageChange.bind(this)
-    this.handleCellEdit = this.handleCellEdit.bind(this)
-    this.handleSizePerPageChange = this.handleSizePerPageChange.bind(this)
     this.handleFilterChange = this.handleFilterChange.bind(this)
 
     this.state = {
@@ -87,26 +82,6 @@ class RecordDataTable extends Component {
     }
   }
 
-  handlePageChange(page, recordsPerPage) {
-    // if (page === 0) {
-    //   page = 1
-    // }
-    // this.props.changeRecordSummariesPage({ currentPage: page, recordsPerPage })
-  }
-
-  handleSizePerPageChange(recordsPerPage) {
-    //fetch data handled by page change handler
-  }
-
-  handleCellEdit(row, fieldName, value) {
-    const { updateRecordOwner } = this.props
-
-    if (fieldName === 'owner') {
-      const newOwner = value.owner
-      updateRecordOwner(row, newOwner)
-    }
-  }
-
   handleFilterChange(filterObj) {
     const { filterRecordSummaries } = this.props
 
@@ -118,7 +93,7 @@ class RecordDataTable extends Component {
       if (columnField.startsWith('key')) {
         const keyValueIdx = parseInt(columnField.substring(3), 10) - 1
         keyValues[keyValueIdx] = value
-      } else if (columnField.startsWith('summary_')) {
+      } else if (columnField.startsWith(SUMMARY_FIELD_PREFIX)) {
         const summaryValueIdx = parseInt(columnField.substring(columnField.indexOf('_') + 1), 10)
         summaryValues[summaryValueIdx] = value
       } else if (columnField === 'owner') {
@@ -134,15 +109,11 @@ class RecordDataTable extends Component {
     const {
       surveyId,
       loggedUser,
-      availableOwners,
-      currentPage,
       records,
       totalSize,
       recordsPerPage,
       keyAttributes,
-      keyValues,
       attributeDefsShownInSummaryList,
-      summaryValues,
       userCanChangeRecordOwner,
       roleInSurvey,
       selectedItemIds,
@@ -153,44 +124,14 @@ class RecordDataTable extends Component {
       return <div>Please select a survey first</div>
     }
 
-    function rootEntityKeyFormatter(cell, row) {
-      var idx = this.name.substring(3) - 1
-      return row.rootEntityKeys[idx]
-    }
-
-    const rootEntityKeyFormatterNew = ({ row, field }) => {
+    const rootEntityKeyFormatter = ({ row, field }) => {
       const idx = field.substring(3) - 1
       return row.rootEntityKeys[idx]
     }
 
-    function shownInSummaryListFormatter(cell, row) {
-      var idx = this.name.substring(this.name.indexOf('_') + 1)
-      return row.summaryValues[idx]
-    }
-
-    const shownInSummaryListFormatterNew = ({ row, field }) => {
+    const shownInSummaryListFormatter = ({ row, field }) => {
       const idx = field.substring(field.indexOf('_') + 1)
       return row.summaryValues[idx]
-    }
-
-    function ownerFormatter(cell, row) {
-      const owner = cell
-
-      if (owner) {
-        if (userCanChangeRecordOwner) {
-          return (
-            <span>
-              <i className="fa fa-edit" aria-hidden="true"></i>
-              &nbsp;
-              {owner.username}
-            </span>
-          )
-        } else {
-          return owner.username
-        }
-      } else {
-        return ''
-      }
     }
 
     const renderCellOwner = ({ value: owner }) => {
@@ -205,23 +146,6 @@ class RecordDataTable extends Component {
           <i className="fa fa-edit" aria-hidden="true"></i>
           &nbsp;
           {owner.username}
-        </span>
-      )
-    }
-
-    const lockedByFormatter = (cell, row) => {
-      if (!cell) {
-        return ''
-      }
-      const iconClass = cell === loggedUser.username || loggedUser.canUnlockRecords() ? 'circle-orange' : 'circle-red'
-
-      const iconId = `record-table-${row.id}-locked-by-icon`
-      return (
-        <span>
-          <span className={iconClass} id={iconId}></span>
-          <UncontrolledTooltip placement="top" target={iconId}>
-            {L.l('dataManagement.recordLockedBy', cell)}
-          </UncontrolledTooltip>
         </span>
       )
     }
@@ -242,8 +166,6 @@ class RecordDataTable extends Component {
         </span>
       )
     }
-
-    const createAttributeFilter = (attrDef, defaultValue) => ({ type: 'TextFilter', defaultValue })
 
     const onPageChange = (page) => {
       this.props.changeRecordSummariesPage({ currentPage: page, recordsPerPage })
@@ -284,38 +206,17 @@ class RecordDataTable extends Component {
       sortRecordSummaries([{ field: sortField, descending: sort === 'desc' }])
     }
 
-    var columns = []
-    columns.push(
-      <TableHeaderColumn key="id" dataField="id" isKey hidden dataAlign="center">
-        Id
-      </TableHeaderColumn>
-    )
-
-    const keyAttributeColumns = keyAttributes.map((keyAttr, i) => (
-      <TableHeaderColumn
-        key={'key' + (i + 1)}
-        dataField={'key' + (i + 1)}
-        dataFormat={rootEntityKeyFormatter}
-        width="80"
-        editable={false}
-        dataSort
-        filter={createAttributeFilter(keyAttr, keyValues[i])}
-      >
-        {keyAttr.labelOrName}
-      </TableHeaderColumn>
-    ))
-
     const attributeFieldQuickSearch = (fieldKey) => ({
       onChange: (value) => {
         this.handleFilterChange({ ...this.state.filterModel, [fieldKey]: { value } })
       },
     })
 
-    const keyAttributeColumnsNew = keyAttributes.map((keyAttr, i) => {
+    const keyAttributeColumns = keyAttributes.map((keyAttr, i) => {
       const fieldKey = `key${i + 1}`
       return {
         field: fieldKey,
-        valueFormatter: rootEntityKeyFormatterNew,
+        valueFormatter: rootEntityKeyFormatter,
         flex: 1,
         sortable: true,
         headerName: keyAttr.labelOrName,
@@ -323,240 +224,94 @@ class RecordDataTable extends Component {
       }
     })
 
-    columns = columns.concat(keyAttributeColumns)
-
     const summaryAttributeColumns = attributeDefsShownInSummaryList.map((attr, i) => {
-      const prefix = 'summary_'
-      const canFilterOrSort = loggedUser.canFilterRecordsBySummaryAttribute(attr, roleInSurvey)
-      return (
-        <TableHeaderColumn
-          key={prefix + i}
-          dataSort={canFilterOrSort}
-          dataField={prefix + i}
-          dataFormat={shownInSummaryListFormatter}
-          width="80"
-          filter={canFilterOrSort ? createAttributeFilter(attr, summaryValues[i]) : null}
-          editable={false}
-        >
-          {attr.labelOrName}
-        </TableHeaderColumn>
-      )
-    })
-
-    const summaryAttributeColumnsNew = attributeDefsShownInSummaryList.map((attr, i) => {
-      const prefix = 'summary_'
+      const fieldKey = SUMMARY_FIELD_PREFIX + i
       const canFilterOrSort = loggedUser.canFilterRecordsBySummaryAttribute(attr, roleInSurvey)
       return {
-        field: prefix + i,
-        valueFormatter: shownInSummaryListFormatterNew,
+        field: fieldKey,
+        valueFormatter: shownInSummaryListFormatter,
         flex: 1,
         headerName: attr.labelOrName,
         quickSearch: canFilterOrSort ? attributeFieldQuickSearch(fieldKey) : null,
       }
     })
 
-    columns = columns.concat(summaryAttributeColumns)
-
-    /*
-		function createStepFilter(filterHandler, customFilterParameters) {
-			const filterItems = []
-			for(let stepName in Workflow.STEPS) {
-				let s = Workflow.STEPS[stepName]
-				filterItems.push({
-					value: s.code,
-					label: s.label
-				})
-			}
-			return <SelectFilter multiple filterHandler={filterHandler} dataSource={filterItems} /> 
-		}
-		*/
-
-    function createOwnerFilter(filterHandler, customFilterParameters) {
-      if (availableOwners.length === 0) {
-        return <div />
-      } else {
-        const filterItems = availableOwners.map((u) => {
-          return {
-            value: u.id,
-            label: u.username,
-          }
-        })
-        return <RecordOwnerFilter multiple filterHandler={filterHandler} dataSource={filterItems} />
-      }
-    }
-
-    columns.push(
-      <TableHeaderColumn
-        key="totalErrors"
-        dataField="totalErrors"
-        dataAlign="right"
-        width="80"
-        editable={false}
-        dataSort
-      >
-        {L.l('dataManagement.errors')}
-      </TableHeaderColumn>,
-      <TableHeaderColumn key="warnings" dataField="warnings" dataAlign="right" width="80" editable={false} dataSort>
-        {L.l('dataManagement.warnings')}
-      </TableHeaderColumn>,
-      <TableHeaderColumn
-        key="creationDate"
-        dataField="creationDate"
-        dataFormat={Formatters.dateTimeFormatter}
-        dataAlign="center"
-        width="110"
-        editable={false}
-        dataSort
-      >
-        {L.l('dataManagement.created')}
-      </TableHeaderColumn>,
-      <TableHeaderColumn
-        key="modifiedDate"
-        dataField="modifiedDate"
-        dataFormat={Formatters.dateTimeFormatter}
-        dataAlign="center"
-        width="110"
-        editable={false}
-        dataSort
-      >
-        {L.l('dataManagement.modified')}
-      </TableHeaderColumn>,
-      <TableHeaderColumn key="step" dataField="step" dataAlign="center" width="80" editable={false} dataSort>
-        {L.l('dataManagement.workflow.step.label')}
-      </TableHeaderColumn>,
-      <TableHeaderColumn
-        key="owner"
-        dataField="owner"
-        dataFormat={ownerFormatter}
-        editable={userCanChangeRecordOwner}
-        filter={{ type: 'CustomFilter', getElement: createOwnerFilter }}
-        dataAlign="left"
-        width="150"
-        dataSort
-      >
-        {L.l('dataManagement.owner')}
-      </TableHeaderColumn>,
-      <TableHeaderColumn
-        key="lockedBy"
-        dataField="lockedBy"
-        dataFormat={lockedByFormatter}
-        dataAlign="center"
-        width="30"
-      >
-        <i className="fa fa-lock" aria-hidden="true" title={L.l('dataManagement.recordLocked')} />
-      </TableHeaderColumn>
-    )
-
     return (
-      <>
-        <DataGrid
-          checkboxSelection
-          className="records-data-grid"
-          columns={[
-            ...keyAttributeColumnsNew,
-            ...summaryAttributeColumnsNew,
-            { field: 'totalErrors', align: 'right', width: 120, sortable: true, headerName: 'dataManagement.errors' },
-            { field: 'warnings', align: 'right', width: 120, sortable: true, headerName: 'dataManagement.warnings' },
-            {
-              field: 'creationDate',
-              valueFormatter: DataGridValueFormatters.dateTime,
-              width: 140,
-              align: 'center',
-              sortable: true,
-              headerName: 'dataManagement.created',
-            },
-            {
-              field: 'modifiedDate',
-              valueFormatter: DataGridValueFormatters.dateTime,
-              width: 140,
-              align: 'center',
-              sortable: true,
-              headerName: 'dataManagement.modified',
-            },
-            {
-              field: 'step',
-              align: 'center',
-              width: 120,
-              sortable: true,
-              headerName: 'dataManagement.workflow.step.label',
-            },
-            {
-              field: 'owner',
-              width: 150,
-              sortable: true,
-              headerName: 'dataManagement.owner',
-              renderCell: renderCellOwner,
-              editable: userCanChangeRecordOwner,
-              renderEditCell: ({ api, field, id, row }) => (
-                <OwnerColumnEditor
-                  owner={row.owner}
-                  users={this.props.users}
-                  onUpdate={({ owner }) => {
-                    this.props.updateRecordOwner(row, owner)
-                    // close cell editor
-                    api.setCellMode(id, field, 'view')
-                  }}
-                />
-              ),
-            },
-            {
-              field: 'lockedBy',
-              renderCell: renderCellLockedBy,
-              align: 'center',
-              width: 60,
-              sortable: true,
-              renderHeader: () => (
-                <i className="fa fa-lock" aria-hidden="true" title={L.l('dataManagement.recordLocked')} />
-              ),
-            },
-          ]}
-          dataMode="server"
-          onPageChange={onPageChange}
-          onPageSizeChange={onPageSizeChange}
-          onRowDoubleClick={this.props.handleRowDoubleClick}
-          onSelectedIdsChange={onSelectedIdsChange}
-          onSortModelChange={onSortModelChange}
-          pageSize={recordsPerPage}
-          paginationMode="server"
-          rowCount={totalSize}
-          rows={records}
-          selectionModel={selectedItemIds}
-          sortingMode="server"
-          sortModel={sortModel}
-        />
-        <BootstrapTable
-          data={records}
-          options={{
-            onRowDoubleClick: this.props.handleRowDoubleClick,
-            onCellEdit: this.handleCellEdit,
-            onFilterChange: this.handleFilterChange,
-            page: currentPage,
-            sizePerPage: recordsPerPage,
-            sizePerPageList: [10, 25, 50, 100],
-            paginationShowsTotal: true,
-            sizePerPageDropDown: Tables.renderSizePerPageDropUp,
-          }}
-          fetchInfo={{ dataTotalSize: totalSize }}
-          remote
-          pagination
-          striped
-          hover
-          condensed
-          height="200px"
-          selectRow={{
-            mode: 'checkbox',
-            clickToSelect: true,
-            hideSelectionColumn: true,
-            bgColor: 'lightBlue',
-            onSelect: this.props.handleRowSelect,
-            onSelectAll: this.props.handleAllRowsSelect,
-            selected: this.props.selectedItemIds,
-          }}
-          cellEdit={{ mode: 'click', blurToSave: true }}
-        >
-          {columns}
-        </BootstrapTable>
-      </>
+      <DataGrid
+        checkboxSelection
+        className="records-data-grid"
+        columns={[
+          ...keyAttributeColumns,
+          ...summaryAttributeColumns,
+          { field: 'totalErrors', align: 'right', width: 120, sortable: true, headerName: 'dataManagement.errors' },
+          { field: 'warnings', align: 'right', width: 120, sortable: true, headerName: 'dataManagement.warnings' },
+          {
+            field: 'creationDate',
+            valueFormatter: DataGridValueFormatters.dateTime,
+            width: 140,
+            align: 'center',
+            sortable: true,
+            headerName: 'dataManagement.created',
+          },
+          {
+            field: 'modifiedDate',
+            valueFormatter: DataGridValueFormatters.dateTime,
+            width: 140,
+            align: 'center',
+            sortable: true,
+            headerName: 'dataManagement.modified',
+          },
+          {
+            field: 'step',
+            align: 'center',
+            width: 120,
+            sortable: true,
+            headerName: 'dataManagement.workflow.step.label',
+          },
+          {
+            field: 'owner',
+            width: 150,
+            sortable: true,
+            headerName: 'dataManagement.owner',
+            renderCell: renderCellOwner,
+            editable: userCanChangeRecordOwner,
+            renderEditCell: ({ api, field, id, row }) => (
+              <OwnerColumnEditor
+                owner={row.owner}
+                users={this.props.users}
+                onUpdate={({ owner }) => {
+                  this.props.updateRecordOwner(row, owner)
+                  // close cell editor
+                  api.setCellMode(id, field, 'view')
+                }}
+              />
+            ),
+          },
+          {
+            field: 'lockedBy',
+            renderCell: renderCellLockedBy,
+            align: 'center',
+            width: 60,
+            sortable: true,
+            renderHeader: () => (
+              <i className="fa fa-lock" aria-hidden="true" title={L.l('dataManagement.recordLocked')} />
+            ),
+          },
+        ]}
+        dataMode="server"
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+        onRowDoubleClick={this.props.handleRowDoubleClick}
+        onSelectedIdsChange={onSelectedIdsChange}
+        onSortModelChange={onSortModelChange}
+        pageSize={recordsPerPage}
+        paginationMode="server"
+        rowCount={totalSize}
+        rows={records}
+        selectionModel={selectedItemIds}
+        sortingMode="server"
+        sortModel={sortModel}
+      />
     )
   }
 }

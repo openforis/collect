@@ -1,3 +1,5 @@
+import './DataManagementPage.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 
@@ -16,7 +18,6 @@ import FormHelperText from '@material-ui/core/FormHelperText'
 
 import { withNavigate } from 'common/hooks'
 import MaxAvailableSpaceContainer from 'common/components/MaxAvailableSpaceContainer'
-import TableResizeOnWindowResizeComponent from 'common/components/TableResizeOnWindowResizeComponent'
 import Workflow from 'model/Workflow'
 import Dialogs from 'common/components/Dialogs'
 import SurveyLanguagesSelect from 'common/components/SurveyLanguagesSelect'
@@ -283,7 +284,6 @@ class DataManagementPage extends React.Component {
 
     return (
       <MaxAvailableSpaceContainer ref={this.wrapperRef}>
-        <TableResizeOnWindowResizeComponent wrapperRef={this.wrapperRef} margin={124} />
         <Row className="justify-content-between">
           <Col md={2}>
             {loggedUser.canCreateRecords(userRoleInSurveyGroup) && (
@@ -388,7 +388,7 @@ class DataManagementPage extends React.Component {
             </FormControl>
           </Col>
         </Row>
-        <Row>
+        <Row className="records-data-grid-row">
           <Col>
             <RecordDataTable
               selectedItemIds={this.state.selectedItemIds}
