@@ -109,6 +109,7 @@ class RecordDataTable extends Component {
     const {
       surveyId,
       loggedUser,
+      loading,
       records,
       totalSize,
       recordsPerPage,
@@ -299,6 +300,7 @@ class RecordDataTable extends Component {
           },
         ]}
         dataMode="server"
+        loading={loading}
         onPageChange={onPageChange}
         onPageSizeChange={onPageSizeChange}
         onRowDoubleClick={this.props.handleRowDoubleClick}
@@ -332,13 +334,23 @@ const mapStateToProps = (state) => {
   const keyAttributes = rootEntityDef.keyAttributeDefinitions
   const attributeDefsShownInSummaryList = rootEntityDef.attributeDefinitionsShownInRecordSummaryList
 
-  const { currentPage, records, totalSize, recordsPerPage, keyValues, summaryValues, availableOwners, sortFields } =
-    recordDataTableState
+  const {
+    loading,
+    currentPage,
+    records,
+    totalSize,
+    recordsPerPage,
+    keyValues,
+    summaryValues,
+    availableOwners,
+    sortFields,
+  } = recordDataTableState
 
   return {
     surveyId: survey ? survey.id : null,
     users,
     loggedUser,
+    loading,
     currentPage,
     records,
     totalSize,

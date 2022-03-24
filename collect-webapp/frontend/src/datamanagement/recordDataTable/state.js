@@ -1,4 +1,5 @@
 export const recordDataTableDefaultState = {
+  loading: true,
   currentPage: 0,
   recordsPerPage: 25,
   keyValues: [],
@@ -12,6 +13,8 @@ export const recordDataTableDefaultState = {
 }
 
 export const getRecordDataTableState = (dataManagementState) => dataManagementState.recordDataTable
+
+export const getRecordDataTableLoading = (state) => state.loading
 
 export const getRecordDataTableCurrentPage = (state) => state.currentPage || 0
 

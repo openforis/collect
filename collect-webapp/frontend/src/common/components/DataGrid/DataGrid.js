@@ -20,6 +20,7 @@ export const DataGrid = (props) => {
     headerHeight,
     hideFooterPagination,
     isCellEditable,
+    loading,
     onPageChange,
     onPageSizeChange,
     onRowDoubleClick: onRowDoubleClickProp,
@@ -95,8 +96,8 @@ export const DataGrid = (props) => {
       filterMode={filterMode}
       headerHeight={headerHeight}
       hideFooterPagination={hideFooterPagination}
-      rows={rows}
       isCellEditable={isCellEditable}
+      loading={loading}
       onSelectionModelChange={onSelectedIdsChange}
       onCellClick={({ api, colDef, id, isEditable }) => {
         if (isEditable) {
@@ -111,6 +112,7 @@ export const DataGrid = (props) => {
       pageSize={pageSize}
       paginationMode={paginationMode}
       rowCount={rowCount}
+      rows={rows}
       rowsPerPageOptions={[25, 50, 100]}
       selectionModel={selectionModel}
       sortingMode={sortingMode}

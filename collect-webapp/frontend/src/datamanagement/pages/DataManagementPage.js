@@ -50,8 +50,6 @@ class DataManagementPage extends React.Component {
 
     this.wrapperRef = React.createRef()
 
-    this.handleRowSelect = this.handleRowSelect.bind(this)
-    this.handleAllRowsSelect = this.handleAllRowsSelect.bind(this)
     this.handleItemsSelection = this.handleItemsSelection.bind(this)
     this.handleRowDoubleClick = this.handleRowDoubleClick.bind(this)
     this.handleNewButtonClick = this.handleNewButtonClick.bind(this)
@@ -157,16 +155,6 @@ class DataManagementPage extends React.Component {
         this.navigateToItemEditView(record.id)
       }
     }
-  }
-
-  handleRowSelect(row, isSelected, e) {
-    const newSelectedItems = Arrays.addOrRemoveItem(this.state.selectedItems, row, !isSelected)
-    this.handleItemsSelection(newSelectedItems)
-  }
-
-  handleAllRowsSelect(isSelected, rows) {
-    const newSelectedItems = Arrays.addOrRemoveItems(this.state.selectedItems, rows, !isSelected)
-    this.handleItemsSelection(newSelectedItems)
   }
 
   handleItemsSelection(selectedItems) {
@@ -392,8 +380,6 @@ class DataManagementPage extends React.Component {
           <Col>
             <RecordDataTable
               selectedItemIds={this.state.selectedItemIds}
-              handleRowSelect={this.handleRowSelect}
-              handleAllRowsSelect={this.handleAllRowsSelect}
               handleRowDoubleClick={this.handleRowDoubleClick}
               handleItemsSelection={this.handleItemsSelection}
             />
