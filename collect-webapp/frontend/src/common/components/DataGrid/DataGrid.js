@@ -16,8 +16,10 @@ export const DataGrid = (props) => {
     hideFooterPagination,
     isCellEditable,
     onPageChange,
+    onPageSizeChange,
     onRowDoubleClick: onRowDoubleClickProp,
     onSelectedIdsChange,
+    pageSize,
     paginationMode,
     rowCount,
     rows,
@@ -88,7 +90,8 @@ export const DataGrid = (props) => {
       }}
       onCellDoubleClick={onCellDoubleClick}
       onPageChange={onPageChange}
-      pageSize={25}
+      onPageSizeChange={onPageSizeChange}
+      pageSize={pageSize}
       paginationMode={paginationMode}
       rowCount={rowCount}
       rowsPerPageOptions={[25, 50, 100]}
@@ -102,6 +105,7 @@ DataGrid.defaultProps = {
   disableMultipleSelection: false,
   exportFileName: null,
   hideFooterPagination: false,
+  pageSize: 25,
   paginationMode: 'client',
   selectionModel: undefined,
   showToolbar: false,

@@ -27,15 +27,19 @@ export const sortRecordSummaries = (sortFields) => (dispatch) => {
   dispatch(fetchRecordSummaries())
 }
 
-export const changeRecordSummariesPage = (currentPage, recordsPerPage) => (dispatch) => {
-  dispatchRecordDataTableStateUpdate(dispatch, { currentPage, recordsPerPage })
-  dispatch(fetchRecordSummaries())
-}
+export const changeRecordSummariesPage =
+  ({ currentPage, recordsPerPage }) =>
+  (dispatch) => {
+    dispatchRecordDataTableStateUpdate(dispatch, { currentPage, recordsPerPage })
+    dispatch(fetchRecordSummaries())
+  }
 
-export const filterRecordSummaries = ({ keyValues, summaryValues, ownerIds }) => (dispatch) => {
-  dispatchRecordDataTableStateUpdate(dispatch, { keyValues, summaryValues, ownerIds })
-  dispatch(fetchRecordSummaries())
-}
+export const filterRecordSummaries =
+  ({ keyValues, summaryValues, ownerIds }) =>
+  (dispatch) => {
+    dispatchRecordDataTableStateUpdate(dispatch, { keyValues, summaryValues, ownerIds })
+    dispatch(fetchRecordSummaries())
+  }
 
 export const filterOnlyOwnedRecords = (onlyOwnedRecords) => (dispatch, getState) => {
   const dataManagementState = getDataManagementState(getState())

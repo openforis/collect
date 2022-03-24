@@ -51,10 +51,10 @@ class RecordDataTable extends Component {
   }
 
   handlePageChange(page, recordsPerPage) {
-    if (page === 0) {
-      page = 1
-    }
-    this.props.changeRecordSummariesPage(page, recordsPerPage)
+    // if (page === 0) {
+    //   page = 1
+    // }
+    // this.props.changeRecordSummariesPage({ currentPage: page, recordsPerPage })
   }
 
   handleSizePerPageChange(recordsPerPage) {
@@ -265,7 +265,18 @@ class RecordDataTable extends Component {
     const createAttributeFilter = (attrDef, defaultValue) => ({ type: 'TextFilter', defaultValue })
 
     const onPageChange = (page) => {
-      this.props.changeRecordSummariesPage(page, recordsPerPage)
+      this.props.changeRecordSummariesPage({ currentPage: page, recordsPerPage })
+    }
+
+    const onPageSizeChange = (pageSize) => {
+      this.props.changeRecordSummariesPage({ currentPage: 0, recordsPerPage: pageSize })
+    }
+
+    const onSelectedIdsChange = (selectedIds) => {
+      const selectedItems = selectedIds.map((selectedId) =>
+        this.props.records.find((record) => record.id === selectedId)
+      )
+      this.props.handleItemsSelection(selectedItems)
     }
 
     var columns = []
@@ -424,6 +435,7 @@ class RecordDataTable extends Component {
     return (
       <>
         <DataGrid
+          checkboxSelection
           className="records-data-grid"
           columns={[
             ...keyAttributeColumnsNew,
@@ -472,15 +484,17 @@ class RecordDataTable extends Component {
             },
           ]}
           onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+          onSelectedIdsChange={onSelectedIdsChange}
+          pageSize={recordsPerPage}
           paginationMode="server"
           rowCount={totalSize}
           rows={records}
+          selectionModel={this.props.selectedItemIds}
         />
         <BootstrapTable
           data={records}
           options={{
-            onPageChange: this.handlePageChange,
-            onSizePerPageList: this.handleSizePerPageChange,
             onRowDoubleClick: this.props.handleRowDoubleClick,
             onCellEdit: this.handleCellEdit,
             onSortChange: this.handleSortChange,

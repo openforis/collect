@@ -51,6 +51,7 @@ class DataManagementPage extends React.Component {
 
     this.handleRowSelect = this.handleRowSelect.bind(this)
     this.handleAllRowsSelect = this.handleAllRowsSelect.bind(this)
+    this.handleItemsSelection = this.handleItemsSelection.bind(this)
     this.handleRowDoubleClick = this.handleRowDoubleClick.bind(this)
     this.handleNewButtonClick = this.handleNewButtonClick.bind(this)
     this.handleNewRecordParametersSelected = this.handleNewRecordParametersSelected.bind(this)
@@ -394,6 +395,7 @@ class DataManagementPage extends React.Component {
               handleRowSelect={this.handleRowSelect}
               handleAllRowsSelect={this.handleAllRowsSelect}
               handleRowDoubleClick={this.handleRowDoubleClick}
+              handleItemsSelection={this.handleItemsSelection}
             />
           </Col>
         </Row>
