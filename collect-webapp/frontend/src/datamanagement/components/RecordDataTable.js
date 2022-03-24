@@ -65,7 +65,10 @@ class RecordDataTable extends Component {
     this.handleCellEdit = this.handleCellEdit.bind(this)
     this.handleSizePerPageChange = this.handleSizePerPageChange.bind(this)
     this.handleFilterChange = this.handleFilterChange.bind(this)
-    this.handleOnlyMyOwnRecordsChange = this.handleOnlyMyOwnRecordsChange.bind(this)
+
+    this.state = {
+      filterModel: {},
+    }
   }
 
   static propTypes = {
@@ -110,25 +113,21 @@ class RecordDataTable extends Component {
     const keyValues = []
     const summaryValues = []
     let ownerIds = []
-    for (const [fieldName, filterObjField] of Object.entries(filterObj)) {
-      const filterValue = filterObjField.value
-      const val = filterObjField.type === 'NumberFilter' ? filterValue.number : filterValue
-
-      if (fieldName.startsWith('key')) {
-        const keyValueIdx = parseInt(fieldName.substr(3), 10) - 1
-        keyValues[keyValueIdx] = val
-      } else if (fieldName.startsWith('summary_')) {
-        const summaryValueIdx = parseInt(fieldName.substring(fieldName.indexOf('_') + 1), 10)
-        summaryValues[summaryValueIdx] = val
-      } else if (fieldName === 'owner') {
-        ownerIds = val
+    for (const [columnField, fieldFilterObj] of Object.entries(filterObj)) {
+      const { value } = fieldFilterObj
+      if (columnField.startsWith('key')) {
+        const keyValueIdx = parseInt(columnField.substring(3), 10) - 1
+        keyValues[keyValueIdx] = value
+      } else if (columnField.startsWith('summary_')) {
+        const summaryValueIdx = parseInt(columnField.substring(columnField.indexOf('_') + 1), 10)
+        summaryValues[summaryValueIdx] = value
+      } else if (columnField === 'owner') {
+        ownerIds = value
       }
     }
     filterRecordSummaries({ keyValues, summaryValues, ownerIds })
-  }
 
-  handleOnlyMyOwnRecordsChange(event, checked) {
-    this.props.filterOnlyOwnedRecords(checked)
+    this.setState({ filterModel: filterObj })
   }
 
   render() {
@@ -305,14 +304,24 @@ class RecordDataTable extends Component {
         {keyAttr.labelOrName}
       </TableHeaderColumn>
     ))
-    const keyAttributeColumnsNew = keyAttributes.map((keyAttr, i) => ({
-      field: `key${i + 1}`,
-      valueFormatter: rootEntityKeyFormatterNew,
-      flex: 1,
-      sortable: true,
-      filter: createAttributeFilter(keyAttr, keyValues[i]),
-      headerName: keyAttr.labelOrName,
-    }))
+
+    const attributeFieldQuickSearch = (fieldKey) => ({
+      onChange: (value) => {
+        this.handleFilterChange({ ...this.state.filterModel, [fieldKey]: { value } })
+      },
+    })
+
+    const keyAttributeColumnsNew = keyAttributes.map((keyAttr, i) => {
+      const fieldKey = `key${i + 1}`
+      return {
+        field: fieldKey,
+        valueFormatter: rootEntityKeyFormatterNew,
+        flex: 1,
+        sortable: true,
+        headerName: keyAttr.labelOrName,
+        quickSearch: attributeFieldQuickSearch(fieldKey),
+      }
+    })
 
     columns = columns.concat(keyAttributeColumns)
 
@@ -341,8 +350,8 @@ class RecordDataTable extends Component {
         field: prefix + i,
         valueFormatter: shownInSummaryListFormatterNew,
         flex: 1,
-        filter: canFilterOrSort ? createAttributeFilter(attr, summaryValues[i]) : null,
         headerName: attr.labelOrName,
+        quickSearch: canFilterOrSort ? attributeFieldQuickSearch(fieldKey) : null,
       }
     })
 
@@ -501,8 +510,10 @@ class RecordDataTable extends Component {
               ),
             },
           ]}
+          dataMode="server"
           onPageChange={onPageChange}
           onPageSizeChange={onPageSizeChange}
+          onRowDoubleClick={this.props.handleRowDoubleClick}
           onSelectedIdsChange={onSelectedIdsChange}
           onSortModelChange={onSortModelChange}
           pageSize={recordsPerPage}

@@ -1,18 +1,23 @@
+import './DataGrid.scss'
+
 import React, { useCallback } from 'react'
 import classNames from 'classnames'
 import { DataGrid as MuiDataGrid, GridToolbar } from '@material-ui/data-grid'
 
 import L from 'utils/Labels'
+import { QuickSearchHeader } from './QuickSearchHeader'
 
 export const DataGrid = (props) => {
   const {
     checkboxSelection,
     className,
     columns,
+    dataMode,
     disableMultipleSelection,
     disableSelectionOnClick,
     exportFileName,
     getRowId,
+    headerHeight,
     hideFooterPagination,
     isCellEditable,
     onPageChange,
@@ -21,12 +26,10 @@ export const DataGrid = (props) => {
     onSelectedIdsChange,
     onSortModelChange,
     pageSize,
-    paginationMode,
     rowCount,
     rows,
     selectionModel,
     showToolbar,
-    sortingMode,
     sortModel,
   } = props
 
@@ -37,6 +40,10 @@ export const DataGrid = (props) => {
     },
     [onRowDoubleClickProp]
   )
+
+  const filterMode = dataMode
+  const sortingMode = dataMode
+  const paginationMode = dataMode
 
   return (
     <MuiDataGrid
@@ -51,15 +58,19 @@ export const DataGrid = (props) => {
           field,
           filterable = false,
           headerName: headerNameProp,
+          quickSearch = null,
           renderCell,
           renderEditCell,
-          renderHeader,
+          renderHeader: renderHeaderProp,
           sortable = false,
           valueFormatter,
           width,
           ...otherColProps
         } = col
         const headerName = headerNameProp ? L.l(headerNameProp) : null
+        const renderHeader = quickSearch
+          ? () => <QuickSearchHeader headerName={headerName} onChange={quickSearch.onChange} />
+          : renderHeaderProp
 
         return {
           ...otherColProps,
@@ -81,6 +92,8 @@ export const DataGrid = (props) => {
       componentsProps={{ ...(showToolbar ? { toolbar: { csvOptions: { fileName: exportFileName } } } : {}) }}
       disableMultipleSelection={disableMultipleSelection}
       disableSelectionOnClick={disableSelectionOnClick}
+      filterMode={filterMode}
+      headerHeight={headerHeight}
       hideFooterPagination={hideFooterPagination}
       rows={rows}
       isCellEditable={isCellEditable}
@@ -112,8 +125,6 @@ DataGrid.defaultProps = {
   exportFileName: null,
   hideFooterPagination: false,
   pageSize: 25,
-  paginationMode: 'client',
   selectionModel: undefined,
   showToolbar: false,
-  sortingMode: 'client',
 }

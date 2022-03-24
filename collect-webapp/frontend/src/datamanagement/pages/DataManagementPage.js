@@ -137,7 +137,7 @@ class DataManagementPage extends React.Component {
     RouterUtils.navigateToRecordEditPage(this.props.navigate, itemId)
   }
 
-  handleRowDoubleClick(record) {
+  handleRowDoubleClick({ row: record }) {
     const { loggedUser, survey } = this.props
     const { userInGroupRole, userGroup } = survey
 
