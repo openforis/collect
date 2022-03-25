@@ -18,7 +18,7 @@ public class Collect {
 	private static final String NEXUS_URL_PROPERTY_KEY = Collect.class.getPackage().getName() + ".nexus.url";
 	private static final String VOID_VERSION = "PROJECT_VERSION"; // token was not being replaced into
 																	// version.properties in previous releases
-	private static final Version DEV_VERSION = new Version("4.0.43-SNAPSHOT");
+	private static final Version DEV_VERSION = new Version("4.0.45-SNAPSHOT");
 
 	public static final Version VERSION;
 	public static final String NEXUS_URL;

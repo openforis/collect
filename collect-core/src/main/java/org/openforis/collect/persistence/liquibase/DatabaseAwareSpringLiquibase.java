@@ -64,13 +64,16 @@ public class DatabaseAwareSpringLiquibase extends SpringLiquibase {
 			String dbProductName = liquibase.getDatabase().getDatabaseProductName();
 			String schemaName = liquibase.getDatabase().getDefaultSchemaName();
 
+			Connection connection = ((JdbcConnection) liquibase.getDatabase().getConnection()).getWrappedConnection();
+
 			// before running Liquibase
-			new BeforeMigrations().execute(getDataSource().getConnection(), dbProductName, schemaName);
+			
+			new BeforeMigrations().execute(connection, dbProductName, schemaName);
 
 			super.performUpdate(liquibase);
 
 			// after running Liquibase
-			new AfterMigrations().execute(getDataSource().getConnection(), dbProductName, schemaName);
+			new AfterMigrations().execute(connection, dbProductName, schemaName);
 		} catch (Exception e) {
 			throw new LiquibaseException(e);
 		}

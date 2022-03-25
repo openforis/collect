@@ -1,5 +1,4 @@
 PRAGMA foreign_keys=off;
-BEGIN TRANSACTION;
 
 CREATE TABLE _ofc_survey_new (
 	"id" INTEGER NOT NULL,
@@ -36,5 +35,4 @@ DROP TABLE ofc_survey;
 
 ALTER TABLE _ofc_survey_new RENAME TO ofc_survey;
 
-COMMIT;
 PRAGMA foreign_keys=on;

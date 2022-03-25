@@ -17,6 +17,7 @@ public abstract class Migrations {
 		Migration migration = migrationByDBProductName.get(databaseProductName.toLowerCase(Locale.ENGLISH));
 		if (migration != null) {
 			migration.execute(c, schemaName);
+			c.commit();
 		}
 	}
 }
