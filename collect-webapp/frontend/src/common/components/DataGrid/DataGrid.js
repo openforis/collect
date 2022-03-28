@@ -116,7 +116,7 @@ export const DataGrid = (props) => {
       rowsPerPageOptions={[25, 50, 100]}
       selectionModel={selectionModel}
       sortingMode={sortingMode}
-      sortMode={sortModel}
+      sortModel={sortModel}
     />
   )
 }

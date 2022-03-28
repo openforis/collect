@@ -119,6 +119,7 @@ class RecordDataTable extends Component {
       roleInSurvey,
       selectedItemIds,
       sortFields,
+      handleRowDoubleClick,
     } = this.props
 
     if (surveyId === null) {
@@ -244,7 +245,7 @@ class RecordDataTable extends Component {
         columns={[
           ...keyAttributeColumns,
           ...summaryAttributeColumns,
-          { field: 'totalErrors', align: 'right', width: 120, sortable: true, headerName: 'dataManagement.errors' },
+          { field: 'totalErrors', align: 'right', width: 100, sortable: true, headerName: 'dataManagement.errors' },
           { field: 'warnings', align: 'right', width: 120, sortable: true, headerName: 'dataManagement.warnings' },
           {
             field: 'creationDate',
@@ -303,7 +304,7 @@ class RecordDataTable extends Component {
         loading={loading}
         onPageChange={onPageChange}
         onPageSizeChange={onPageSizeChange}
-        onRowDoubleClick={this.props.handleRowDoubleClick}
+        onRowDoubleClick={handleRowDoubleClick}
         onSelectedIdsChange={onSelectedIdsChange}
         onSortModelChange={onSortModelChange}
         pageSize={recordsPerPage}
