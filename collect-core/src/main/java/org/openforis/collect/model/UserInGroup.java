@@ -36,7 +36,7 @@ public class UserInGroup {
 		ADMINISTRATOR('A'), 
 		SUPERVISOR('S'),
 		DATA_ANALYZER('D'), 
-		DATA_ANALYZER_LIMITED('E'),
+		DATA_CLEANER_LIMITED('E'),
 		OPERATOR('U'), 
 		VIEWER('V');
 		

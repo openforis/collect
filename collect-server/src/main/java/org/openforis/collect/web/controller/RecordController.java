@@ -262,7 +262,7 @@ public class RecordController extends BasicController implements Serializable {
 					String.format("User %s is not allowed to load record with id %d", user.getUsername(), recordId));
 		}
 		CollectRecordSummary recordSummary = recordManager.loadUniqueRecordSummary(survey, recordId);
-		if ((user.hasRole(UserRole.ENTRY_LIMITED) || userInGroup.getRole() == UserGroupRole.DATA_ANALYZER_LIMITED)
+		if ((user.hasRole(UserRole.ENTRY_LIMITED) || userInGroup.getRole() == UserGroupRole.DATA_CLEANER_LIMITED)
 				&& (recordSummary.getOwner() == null || recordSummary.getOwner().getId() != user.getId())) {
 			throw new IllegalStateException(
 					String.format("User '%s' (entry_limited) cannot access record with ID %d: he doesn't own it.",

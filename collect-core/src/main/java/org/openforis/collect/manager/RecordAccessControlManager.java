@@ -40,7 +40,7 @@ public class RecordAccessControlManager {
 			case VIEWER:
 				return false;
 			case OPERATOR:
-			case DATA_ANALYZER_LIMITED:
+			case DATA_CLEANER_LIMITED:
 				return containsOnlyEntryOwnedRecords(recordSummaries, user);
 			default:
 				return true;
