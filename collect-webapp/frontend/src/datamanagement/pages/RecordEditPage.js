@@ -37,7 +37,9 @@ class RecordEditPage extends Component {
 
     const survey = await ServiceFactory.surveyService.fetchById(surveyId, language)
     const record = await ServiceFactory.recordService.fetchById(survey, recordId)
-    record.readOnly = !loggedUser.canEditRecord(record)
+    const { userInGroupRole } = survey
+    
+    record.readOnly = !loggedUser.canEditRecord({ record, userInGroupRole })
     this.recordUpdater = new RecordUpdater(record)
     this.setState({ record, inPopUp })
   }
