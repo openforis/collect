@@ -20,6 +20,9 @@ const Link = ({ to, iconClassName, label }) => (
 const Sidebar = () => {
   const { loggedUser } = useSelector((state) => state.session)
   const { openNavItems } = useSelector((state) => state.sidebar)
+  const { survey } = useSelector((state) => state.activeSurvey)
+  const roleInSurveyGroup = survey?.roleInSurveyGroup
+
   const isFetchingLoggedUser = loggedUser === null
 
   const dispatch = useDispatch()
@@ -76,7 +79,7 @@ const Sidebar = () => {
               </ul>
             </li>
           )}
-          {loggedUser.canAccessDataCleansing && (
+          {loggedUser.canAccessDataCleansing({ roleInSurveyGroup }) && (
             <li className="nav-item">
               <Link to="/datacleansing" iconClassName="fa-gem" label="Data Cleansing" />
             </li>
@@ -86,7 +89,7 @@ const Sidebar = () => {
               <Link to="/map" iconClassName="fa-map" label="Map" />
             </li>
           )}
-          {loggedUser.canAccessSaiku && (
+          {survey && loggedUser.canAccessSaiku({ roleInSurveyGroup }) && (
             <li className="nav-item">
               <Link to="/saiku" iconClassName="fa-chart-bar" label="Saiku" />
             </li>
@@ -161,9 +164,9 @@ const Sidebar = () => {
         <div style={{ position: 'fixed', bottom: '0px' }}>
           <VersionInfo />
           <span>
-            <a href="http://www.openforis.org" target="_blank" rel="noopener noreferrer">
+            <a href="https://www.openforis.org" target="_blank" rel="noopener noreferrer">
               Open Foris
-            </a>{' '}
+            </a>
             &copy; 2010-2022
           </span>
         </div>

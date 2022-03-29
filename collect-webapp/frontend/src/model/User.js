@@ -30,9 +30,10 @@ export default class User extends Serializable {
     OWNER: 'OWNER',
     ADMINISTRATOR: 'ADMINISTRATOR',
     SUPERVISOR: 'SUPERVISOR',
+    DATA_ANALYZER: 'DATA_ANALYZER',
+    DATA_CLEANER_LIMITED: 'DATA_CLEANER_LIMITED',
     OPERATOR: 'OPERATOR',
     VIEWER: 'VIEWER',
-    DATA_ANALYZER: 'DATA_ANALYZER',
   }
 
   static USER_GROUP_JOIN_STATUS = {
@@ -94,6 +95,7 @@ export default class User extends Serializable {
           case User.ROLE_IN_GROUP.OWNER:
           case User.ROLE_IN_GROUP.ADMINISTRATOR:
           case User.ROLE_IN_GROUP.SUPERVISOR:
+          case User.ROLE_IN_GROUP.DATA_CLEANER_LIMITED:
           case User.ROLE_IN_GROUP.DATA_ANALYZER:
           case User.ROLE_IN_GROUP.OPERATOR:
             return true
@@ -103,16 +105,17 @@ export default class User extends Serializable {
     }
   }
 
-  canEditRecord(record) {
+  canEditRecord({ record, userInGroupRole }) {
     const { step } = record
-
+    const userOwnsRecord = record.ownerId === this.id
     switch (step) {
       case Workflow.STEPS.entry:
-        return (
-          this._hasAtLeastRole(User.ROLE.ENTRY) || (this.role === User.ROLE.ENTRY_LIMITED && record.ownerId === this.id)
-        )
+        return this._hasAtLeastRole(User.ROLE.ENTRY) || (this.role === User.ROLE.ENTRY_LIMITED && userOwnsRecord)
       case Workflow.STEPS.cleansing:
-        return this._hasAtLeastRole(User.ROLE.CLEANSING)
+        return (
+          this._hasAtLeastRole(User.ROLE.CLEANSING) &&
+          (userInGroupRole !== User.ROLE_IN_GROUP.DATA_CLEANER_LIMITED || userOwnsRecord)
+        )
       case Workflow.STEPS.analysis:
       default:
         return false
@@ -165,7 +168,11 @@ export default class User extends Serializable {
     const { survey } = record
     const { userInGroupRole } = survey
     const { calculated, qualifier } = attributeDefinition
-    return this.canEditRecord(record) && !calculated && (!qualifier || this.canEditQualifier(userInGroupRole))
+    return (
+      this.canEditRecord({ record, userInGroupRole }) &&
+      !calculated &&
+      (!qualifier || this.canEditQualifier(userInGroupRole))
+    )
   }
 
   canUnlockRecords() {
@@ -225,13 +232,14 @@ export default class User extends Serializable {
     return this.canAccessDashboard
   }
 
-  get canAccessSaiku() {
-    return this.canAccessDataCleansing
+  canAccessSaiku({ roleInSurveyGroup }) {
+    return this.canAccessDataCleansing({ roleInSurveyGroup })
   }
 
-  get canAccessDataCleansing() {
+  canAccessDataCleansing({ roleInSurveyGroup }) {
     switch (this.role) {
       case User.ROLE.CLEANSING:
+        return roleInSurveyGroup !== User.ROLE_IN_GROUP.DATA_CLEANER_LIMITED
       case User.ROLE.ANALYSIS:
       case User.ROLE.DESIGN:
       case User.ROLE.ADMIN:

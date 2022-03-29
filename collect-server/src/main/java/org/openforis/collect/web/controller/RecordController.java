@@ -79,7 +79,9 @@ import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserInGroup;
+import org.openforis.collect.model.UserInGroup.UserGroupRole;
 import org.openforis.collect.model.UserRole;
 import org.openforis.collect.model.proxy.BasicUserProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
@@ -253,17 +255,23 @@ public class RecordController extends BasicController implements Serializable {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		Step step = stepNumber == null ? null : Step.valueOf(stepNumber);
 		User user = sessionManager.getLoggedUser();
+		UserGroup surveyUserGrup = survey.getUserGroup();
+		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyUserGrup.getId(), user.getId());
+		if (userInGroup == null) {
+			throw new IllegalArgumentException(
+					String.format("User %s is not allowed to load record with id %d", user.getUsername(), recordId));
+		}
+		CollectRecordSummary recordSummary = recordManager.loadUniqueRecordSummary(survey, recordId);
+		if ((user.hasRole(UserRole.ENTRY_LIMITED) || userInGroup.getRole() == UserGroupRole.DATA_CLEANER_LIMITED)
+				&& (recordSummary.getOwner() == null || !user.getId().equals(recordSummary.getOwner().getId()))) {
+			throw new IllegalStateException(
+					String.format("User '%s' (entry_limited) cannot access record with ID %d: he doesn't own it.",
+							user.getUsername(), recordId));
+		}
 		CollectRecord record = lock
 				? recordManager.checkout(survey, user, recordId, step,
 						sessionManager.getSessionState().getSessionId(), true)
 				: recordManager.load(survey, recordId, step);
-		if (user.hasRole(UserRole.ENTRY_LIMITED)
-				&& (record.getOwner() == null || record.getOwner().getId() != user.getId())) {
-			throw new IllegalStateException(
-					String.format("User '%s' (entry_limited) cannot access record with ID %d: he doesn't own it.",
-							user.getUsername(), recordId));
-
-		}
 		return toProxy(record);
 	}
 
