@@ -113,8 +113,8 @@ export default class User extends Serializable {
         return this._hasAtLeastRole(User.ROLE.ENTRY) || (this.role === User.ROLE.ENTRY_LIMITED && userOwnsRecord)
       case Workflow.STEPS.cleansing:
         return (
-          (this._hasAtLeastRole(User.ROLE.CLEANSING) && userInGroupRole !== User.ROLE_IN_GROUP.DATA_CLEANER_LIMITED) ||
-          userOwnsRecord
+          this._hasAtLeastRole(User.ROLE.CLEANSING) &&
+          (userInGroupRole !== User.ROLE_IN_GROUP.DATA_CLEANER_LIMITED || userOwnsRecord)
         )
       case Workflow.STEPS.analysis:
       default:
