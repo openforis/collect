@@ -20,6 +20,7 @@ import {
   updateRecordOwner,
 } from 'datamanagement/recordDataTable/actions'
 import { getRecordDataTableState } from 'datamanagement/recordDataTable/state'
+import RecordOwnerFilter from './RecordOwnerFilter'
 
 const SUMMARY_FIELD_PREFIX = 'summary_'
 
@@ -61,6 +62,10 @@ class RecordDataTable extends Component {
   constructor(props) {
     super(props)
     this.onFilterModelChange = this.onFilterModelChange.bind(this)
+
+    this.state = {
+      filterModel: { items: [] },
+    }
   }
 
   static propTypes = {
@@ -98,6 +103,8 @@ class RecordDataTable extends Component {
       }
     })
     filterRecordSummaries({ keyValues, summaryValues, ownerIds })
+
+    this.setState({ filterModel })
   }
 
   render() {
@@ -115,7 +122,11 @@ class RecordDataTable extends Component {
       selectedItemIds,
       sortFields,
       handleRowDoubleClick,
+      availableOwners,
+      users,
     } = this.props
+
+    const { filterModel } = this.state
 
     if (surveyId === null) {
       return <div>Please select a survey first</div>
@@ -262,11 +273,30 @@ class RecordDataTable extends Component {
             sortable: true,
             headerName: 'dataManagement.owner',
             renderCell: renderCellOwner,
+            renderHeader: () => (
+              <div className="owner-header">
+                <span>{L.l('dataManagement.owner')}</span>
+                <RecordOwnerFilter
+                  users={availableOwners}
+                  filterHandler={(ownerIds) => {
+                    const filterItems = filterModel.items
+                    const filterItem = { id: 'owner', columnField: 'owner', value: ownerIds }
+                    const filterItemIdx = Arrays.indexOf(filterItems, filterItem, 'columnField')
+                    const filterItemsUpdated = Arrays.isEmpty(ownerIds)
+                      ? Arrays.removeItem(filterItems, filterItem, 'columnField')
+                      : filterItemIdx >= 0
+                      ? Arrays.replaceItemAt(filterItems, filterItemIdx, filterItem)
+                      : [...filterItems, filterItem]
+                    this.onFilterModelChange({ items: filterItemsUpdated })
+                  }}
+                />
+              </div>
+            ),
             editable: userCanChangeRecordOwner,
             renderEditCell: ({ api, field, id, row }) => (
               <OwnerColumnEditor
                 owner={row.owner}
-                users={this.props.users}
+                users={users}
                 onUpdate={({ owner }) => {
                   this.props.updateRecordOwner(row, owner)
                   // close cell editor
@@ -280,7 +310,6 @@ class RecordDataTable extends Component {
             renderCell: renderCellLockedBy,
             align: 'center',
             width: 60,
-            sortable: true,
             renderHeader: () => (
               <i className="fa fa-lock" aria-hidden="true" title={L.l('dataManagement.recordLocked')} />
             ),

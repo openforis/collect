@@ -138,7 +138,7 @@ class DataManagementPage extends React.Component {
 
   handleRowDoubleClick({ row: record }) {
     const { loggedUser, survey } = this.props
-    const { userInGroupRole, userGroup } = survey
+    const { userInGroupRole } = survey
 
     if (loggedUser.canEditRecords(userInGroupRole)) {
       if (record.lockedBy && !loggedUser.canUnlockRecords()) {
@@ -159,7 +159,6 @@ class DataManagementPage extends React.Component {
 
   handleItemsSelection(selectedItems) {
     this.setState({
-      ...this.state,
       selectedItems: selectedItems,
       selectedItemIds: selectedItems.map((item) => item.id),
       selectedItem: Arrays.uniqueItemOrNull(selectedItems),

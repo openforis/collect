@@ -22,22 +22,32 @@ export const INVALIDATE_RECORD_SUMMARIES = 'INVALIDATE_RECORD_SUMMARIES'
 const dispatchRecordDataTableStateUpdate = (dispatch, newState) =>
   dispatch({ type: RECORD_DATA_TABLE_STATE_UPDATE, ...newState })
 
+const dispatchRecordDataTableLoadingStateUpdate = (dispatch, newState) =>
+  dispatch({ type: RECORD_DATA_TABLE_STATE_UPDATE, loading: true, records: [], ...newState })
+
 export const sortRecordSummaries = (sortFields) => (dispatch) => {
-  dispatchRecordDataTableStateUpdate(dispatch, { loading: true, records: [], sortFields })
+  dispatchRecordDataTableLoadingStateUpdate(dispatch, { sortFields })
   dispatch(fetchRecordSummaries())
 }
 
 export const changeRecordSummariesPage =
   ({ currentPage, recordsPerPage }) =>
   (dispatch) => {
-    dispatchRecordDataTableStateUpdate(dispatch, { loading: true, records: [], currentPage, recordsPerPage })
+    dispatchRecordDataTableLoadingStateUpdate(dispatch, { currentPage, recordsPerPage })
     dispatch(fetchRecordSummaries())
   }
 
 export const filterRecordSummaries =
   ({ keyValues, summaryValues, ownerIds }) =>
   (dispatch) => {
-    dispatchRecordDataTableStateUpdate(dispatch, { loading: true, records: [], keyValues, summaryValues, ownerIds })
+    dispatchRecordDataTableLoadingStateUpdate(dispatch, { keyValues, summaryValues, ownerIds })
+    dispatch(fetchRecordSummaries())
+  }
+
+export const filterRecordSummariesByOwners =
+  ({ ownerIds }) =>
+  (dispatch) => {
+    dispatchRecordDataTableLoadingStateUpdate(dispatch, { ownerIds })
     dispatch(fetchRecordSummaries())
   }
 
@@ -45,7 +55,7 @@ export const filterOnlyOwnedRecords = (onlyOwnedRecords) => (dispatch, getState)
   const dataManagementState = getDataManagementState(getState())
   const recordDataTableState = getRecordDataTableState(dataManagementState)
   const ownerIds = onlyOwnedRecords ? [] : getRecordDataTableOwnerIds(recordDataTableState)
-  dispatchRecordDataTableStateUpdate(dispatch, { loading: true, records: [], ownerIds })
+  dispatchRecordDataTableLoadingStateUpdate(dispatch, { ownerIds })
   dispatch(fetchRecordSummaries())
 }
 

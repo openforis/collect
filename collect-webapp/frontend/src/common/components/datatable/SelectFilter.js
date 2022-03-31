@@ -5,6 +5,7 @@ import Chip from '@material-ui/core/Chip'
 import Arrays from 'utils/Arrays'
 import L from 'utils/Labels'
 import Strings from 'utils/Strings'
+import { OutlinedInput } from '@material-ui/core'
 
 /*
 const styles = theme => ({
@@ -27,81 +28,94 @@ const styles = theme => ({
 })
 */
 class SelectFilter extends React.Component {
-  constructor(props, context) {
+  constructor(props) {
     super(props)
     this.handleChange = this.handleChange.bind(this)
     this.isFiltered = this.isFiltered.bind(this)
     this.buildMenuItems = this.buildMenuItems.bind(this)
     this.buildFixedMenuItems = this.buildFixedMenuItems.bind(this)
-    
+
     this.state = {
       selectedValues: [''],
-      allValuesSelected: true
+      allValuesSelected: true,
+      dataSource: this.extractDataSource(),
     }
   }
 
+  extractDataSource() {
+    return this.props.dataSource
+  }
+
   handleChange(e) {
-    const val = e.target.value
+    const { filterHandler } = this.props
+    const { dataSource } = this.state
+
+    const val = Arrays.toArray(e.target.value)
     const allValuesPreviouslySelected = this.state.allValuesSelected
-    const allValuesSelected = val.length === 0 
-      || (Arrays.contains(val, '') && !allValuesPreviouslySelected) 
-      || (!Arrays.contains(val, '') && val.length === this.props.dataSource.length)
+    const allValuesSelected =
+      val.length === 0 ||
+      (Arrays.contains(val, '') && !allValuesPreviouslySelected) ||
+      (!Arrays.contains(val, '') && val.length === dataSource.length)
     const selectedValues = allValuesSelected ? [''] : Arrays.removeItem(val, '')
-    
-    this.setState({ 
-      allValuesSelected: allValuesSelected,
-      selectedValues: selectedValues 
+
+    this.setState({
+      allValuesSelected,
+      selectedValues,
     })
 
     if (allValuesSelected) {
       //remove the filter
-      this.props.filterHandler()
+      filterHandler()
     } else {
-      this.props.filterHandler(selectedValues)
+      filterHandler(selectedValues)
     }
   }
 
-  isFiltered(targetValue) {
+  isFiltered(_targetValue) {
     return true
   }
 
   buildFixedMenuItems() {
-    const allValuesItem = <MenuItem key="---all---" value=""><em>{L.l('global.all.menuitem')}</em></MenuItem>
+    const allValuesItem = (
+      <MenuItem key="---all---" value="">
+        <em>{L.l('global.all.menuitem')}</em>
+      </MenuItem>
+    )
     return [allValuesItem]
   }
 
   buildMenuItems() {
-    const { dataSource } = this.props
-    
+    const { dataSource } = this.state
+
     const fixedMenuItems = this.buildFixedMenuItems()
-    const menuItems = [fixedMenuItems].concat(dataSource
-      .sort((item1, item2) => Strings.compare(item1.label, item2.label))
-      .map(item =>
-        <MenuItem 
-            key={item.value} 
-            value={item.value}>
+    const menuItems = [fixedMenuItems].concat(
+      dataSource
+        .sort((item1, item2) => Strings.compare(item1.label, item2.label))
+        .map((item) => (
+          <MenuItem key={item.value} value={item.value}>
             {item.label}
-        </MenuItem>
-      ))
+          </MenuItem>
+        ))
+    )
     return menuItems
   }
 
-  isDataSourceItemSelected(selectedValues) {
+  isDataSourceItemSelected(_selectedValues) {
     return !this.state.allValuesSelected
   }
 
   getFixedItemLabel(value) {
-    switch(value) {
+    switch (value) {
       case '':
-          return L.l('global.all.menuitem')
+        return L.l('global.all.menuitem')
       default:
-          return null
+        return null
     }
   }
 
   render() {
-    const { multiple, dataSource } = this.props
-    const { selectedValues } = this.state
+    const { multiple } = this.props
+    const { dataSource, selectedValues } = this.state
 
     const menuItems = this.buildMenuItems()
     return (
@@ -110,19 +124,25 @@ class SelectFilter extends React.Component {
         value={selectedValues}
         onChange={this.handleChange}
         displayEmpty
-        renderValue={selectedValues => {
-            if (!this.isDataSourceItemSelected(selectedValues)) {
-              return <div><em>{this.getFixedItemLabel(selectedValues[0])}</em></div>
-            } else {
-              return <div>
-                  {selectedValues.map(value => {
-                    const item = dataSource.find(item => item.value === value)
-                    return <Chip key={value} label={item.label} />
-                  })}
-                </div>
-            }
+        renderValue={(selectedValues) => {
+          if (!this.isDataSourceItemSelected(selectedValues)) {
+            return (
+              <div>
+                <em>{this.getFixedItemLabel(selectedValues[0])}</em>
+              </div>
+            )
+          } else {
+            return (
+              <div>
+                {selectedValues.map((value) => {
+                  const item = dataSource.find((item) => item.value === value)
+                  return <Chip key={value} label={item.label} size="small" />
+                })}
+              </div>
+            )
+          }
         }}
-        >
+      >
         {menuItems}
       </Select>
     )

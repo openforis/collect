@@ -8,6 +8,8 @@ import L from 'utils/Labels'
 
 const ONLY_ME = '___ONLY_ME___'
 
+const usersToDataSource = (users) => (users || []).map((user) => ({ value: user.id, label: user.username }))
+
 class RecordOwnerFilter extends SelectFilter {
   constructor(props, context) {
     super(props, context)
@@ -17,6 +19,18 @@ class RecordOwnerFilter extends SelectFilter {
     this.state = Object.assign(this.state, {
       onlyMeSelected: false,
     })
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.users?.length !== prevProps.users?.length) {
+      this.setState({
+        dataSource: this.extractDataSource(),
+      })
+    }
+  }
+
+  extractDataSource() {
+    return usersToDataSource(this.props.users)
   }
 
   buildFixedMenuItems() {
@@ -43,8 +57,11 @@ class RecordOwnerFilter extends SelectFilter {
   }
 
   handleChange(e) {
-    const loggedUserId = this.props.loggedUser.id
-    const val = e.target.value
+    e.stopPropagation()
+    const { loggedUser, filterHandler } = this.props
+    const { dataSource } = this.state
+
+    const val = Arrays.toArray(e.target.value)
     const notFixedValues = Arrays.removeItems(val, ['', ONLY_ME])
 
     const onlyMeSelected = Arrays.contains(val, ONLY_ME) && !this.state.onlyMeSelected
@@ -52,11 +69,11 @@ class RecordOwnerFilter extends SelectFilter {
     const allValuesSelected =
       val.length === 0 ||
       (Arrays.contains(val, '') && !this.state.allValuesSelected) ||
-      (!Arrays.contains(val, '') && notFixedValues.length === this.props.dataSource.length)
+      (!Arrays.contains(val, '') && notFixedValues.length === dataSource.length)
 
     const selectedValues = allValuesSelected ? [''] : onlyMeSelected ? [ONLY_ME] : notFixedValues
 
-    const filterValues = allValuesSelected ? null : onlyMeSelected ? [loggedUserId] : notFixedValues
+    const filterValues = allValuesSelected ? null : onlyMeSelected ? [loggedUser.id] : notFixedValues
 
     this.setState({
       allValuesSelected: allValuesSelected,
@@ -65,14 +82,10 @@ class RecordOwnerFilter extends SelectFilter {
     })
 
     if (filterValues === null) {
-      this.props.filterHandler()
+      filterHandler()
     } else {
-      this.props.filterHandler(filterValues)
+      filterHandler(filterValues)
     }
-  }
-
-  render() {
-    return super.render()
   }
 }
 
