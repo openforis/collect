@@ -2,7 +2,7 @@ import React from 'react'
 import MenuItem from '@material-ui/core/MenuItem'
 import { connect } from 'react-redux'
 
-import SelectFilter from 'common/components/datatable/SelectFilter'
+import SelectFilter from 'common/components/DataGrid/SelectFilter'
 import Arrays from 'utils/Arrays'
 import L from 'utils/Labels'
 

@@ -269,7 +269,7 @@ class RecordDataTable extends Component {
           },
           {
             field: 'owner',
-            width: 150,
+            width: 170,
             sortable: true,
             headerName: 'dataManagement.owner',
             renderCell: renderCellOwner,
