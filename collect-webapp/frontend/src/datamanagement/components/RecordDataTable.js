@@ -9,6 +9,7 @@ import { DataGrid, DataGridValueFormatters } from 'common/components/DataGrid'
 import OwnerColumnEditor from './OwnerColumnEditor'
 import Arrays from 'utils/Arrays'
 import L from 'utils/Labels'
+import Strings from 'utils/Strings'
 import { getDataManagementState } from 'datamanagement/state'
 import {
   reloadRecordSummaries,
@@ -59,11 +60,7 @@ const defaultSortModel = [{ field: 'modifiedDate', sort: 'desc' }]
 class RecordDataTable extends Component {
   constructor(props) {
     super(props)
-    this.handleFilterChange = this.handleFilterChange.bind(this)
-
-    this.state = {
-      filterModel: {},
-    }
+    this.onFilterModelChange = this.onFilterModelChange.bind(this)
   }
 
   static propTypes = {
@@ -82,27 +79,25 @@ class RecordDataTable extends Component {
     }
   }
 
-  handleFilterChange(filterObj) {
+  onFilterModelChange(filterModel) {
     const { filterRecordSummaries } = this.props
 
     const keyValues = []
     const summaryValues = []
     let ownerIds = []
-    for (const [columnField, fieldFilterObj] of Object.entries(filterObj)) {
-      const { value } = fieldFilterObj
+    filterModel?.items?.forEach((filterItem) => {
+      const { columnField, value } = filterItem
       if (columnField.startsWith('key')) {
         const keyValueIdx = parseInt(columnField.substring(3), 10) - 1
-        keyValues[keyValueIdx] = value
+        keyValues[keyValueIdx] = Strings.appendIfMissing(value, '*') // starts with value
       } else if (columnField.startsWith(SUMMARY_FIELD_PREFIX)) {
         const summaryValueIdx = parseInt(columnField.substring(columnField.indexOf('_') + 1), 10)
-        summaryValues[summaryValueIdx] = value
+        summaryValues[summaryValueIdx] = Strings.appendIfMissing(value, '*') // starts with value
       } else if (columnField === 'owner') {
         ownerIds = value
       }
-    }
+    })
     filterRecordSummaries({ keyValues, summaryValues, ownerIds })
-
-    this.setState({ filterModel: filterObj })
   }
 
   render() {
@@ -208,23 +203,14 @@ class RecordDataTable extends Component {
       sortRecordSummaries([{ field: sortField, descending: sort === 'desc' }])
     }
 
-    const attributeFieldQuickSearch = (fieldKey) => ({
-      onChange: (value) => {
-        this.handleFilterChange({ ...this.state.filterModel, [fieldKey]: { value } })
-      },
-    })
-
-    const keyAttributeColumns = keyAttributes.map((keyAttr, i) => {
-      const fieldKey = `key${i + 1}`
-      return {
-        field: fieldKey,
-        valueFormatter: rootEntityKeyFormatter,
-        flex: 1,
-        sortable: true,
-        headerName: keyAttr.labelOrName,
-        quickSearch: attributeFieldQuickSearch(fieldKey),
-      }
-    })
+    const keyAttributeColumns = keyAttributes.map((keyAttr, i) => ({
+      field: `key${i + 1}`,
+      valueFormatter: rootEntityKeyFormatter,
+      flex: 1,
+      sortable: true,
+      headerName: keyAttr.labelOrName,
+      quickSearch: true,
+    }))
 
     const summaryAttributeColumns = attributeDefsShownInSummaryList.map((attr, i) => {
       const fieldKey = SUMMARY_FIELD_PREFIX + i
@@ -234,7 +220,7 @@ class RecordDataTable extends Component {
         valueFormatter: shownInSummaryListFormatter,
         flex: 1,
         headerName: attr.labelOrName,
-        quickSearch: canFilterOrSort ? attributeFieldQuickSearch(fieldKey) : null,
+        quickSearch: canFilterOrSort,
       }
     })
 
@@ -302,17 +288,16 @@ class RecordDataTable extends Component {
         ]}
         dataMode="server"
         loading={loading}
+        onFilterModelChange={this.onFilterModelChange}
         onPageChange={onPageChange}
         onPageSizeChange={onPageSizeChange}
         onRowDoubleClick={handleRowDoubleClick}
         onSelectedIdsChange={onSelectedIdsChange}
         onSortModelChange={onSortModelChange}
         pageSize={recordsPerPage}
-        paginationMode="server"
         rowCount={totalSize}
         rows={records}
         selectionModel={selectedItemIds}
-        sortingMode="server"
         sortModel={sortModel}
       />
     )

@@ -1,11 +1,12 @@
 import './DataGrid.scss'
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import classNames from 'classnames'
 import { DataGrid as MuiDataGrid, GridToolbar } from '@material-ui/data-grid'
 
 import L from 'utils/Labels'
 import { QuickSearchHeader } from './QuickSearchHeader'
+import Arrays from 'utils/Arrays'
 
 export const DataGrid = (props) => {
   const {
@@ -21,6 +22,7 @@ export const DataGrid = (props) => {
     hideFooterPagination,
     isCellEditable,
     loading,
+    onFilterModelChange: onFilterModelChangeProp,
     onPageChange,
     onPageSizeChange,
     onRowDoubleClick: onRowDoubleClickProp,
@@ -34,6 +36,10 @@ export const DataGrid = (props) => {
     sortModel,
   } = props
 
+  const filterModelRef = useRef(null)
+
+  const [filterModel, setFilterModel] = useState(undefined)
+
   const onCellDoubleClick = useCallback(
     (params) => {
       const { id, row, colDef } = params
@@ -42,9 +48,32 @@ export const DataGrid = (props) => {
     [onRowDoubleClickProp]
   )
 
-  const filterMode = dataMode
-  const sortingMode = dataMode
-  const paginationMode = dataMode
+  const onQuickSearchChange = useCallback(
+    ({ field }) =>
+      (value) => {
+        const itemsOld = filterModel?.items || []
+        const item = { id: field, columnField: field, operatorValue: 'contains', value }
+        const itemIndex = Arrays.indexOf(itemsOld, item, 'columnField')
+        const itemsUpdated = itemIndex >= 0 ? Arrays.replaceItemAt(itemsOld, itemIndex, item) : [...itemsOld, item]
+        const filterModelUpdated = { items: itemsUpdated }
+        filterModelRef.current = filterModelUpdated
+        setFilterModel(filterModelUpdated)
+
+        onFilterModelChangeProp?.(filterModelUpdated)
+      },
+    [filterModel, setFilterModel]
+  )
+
+  // TODO handle DataGrid onFilterModelChange
+  // const onFilterModelChange = useCallback(
+  //   (filterModelUpdated) => {
+  //     if (JSON.stringify(filterModelRef.current) !== JSON.stringify(filterModelUpdated)) {
+  //       filterModelRef.current = filterModelUpdated
+  //       onFilterModelChangeProp?.(filterModelUpdated)
+  //     }
+  //   },
+  //   [filterModelRef, onFilterModelChangeProp]
+  // )
 
   return (
     <MuiDataGrid
@@ -70,7 +99,7 @@ export const DataGrid = (props) => {
         } = col
         const headerName = headerNameProp ? L.l(headerNameProp) : null
         const renderHeader = quickSearch
-          ? () => <QuickSearchHeader headerName={headerName} onChange={quickSearch.onChange} />
+          ? () => <QuickSearchHeader headerName={headerName} onChange={onQuickSearchChange({ field })} />
           : renderHeaderProp
 
         return {
@@ -93,12 +122,12 @@ export const DataGrid = (props) => {
       componentsProps={{ ...(showToolbar ? { toolbar: { csvOptions: { fileName: exportFileName } } } : {}) }}
       disableMultipleSelection={disableMultipleSelection}
       disableSelectionOnClick={disableSelectionOnClick}
-      filterMode={filterMode}
+      filterMode={dataMode}
+      filterModel={filterModel}
       headerHeight={headerHeight}
       hideFooterPagination={hideFooterPagination}
       isCellEditable={isCellEditable}
       loading={loading}
-      onSelectionModelChange={onSelectedIdsChange}
       onCellClick={({ api, colDef, id, isEditable }) => {
         if (isEditable) {
           // open cell editor on single click
@@ -108,14 +137,15 @@ export const DataGrid = (props) => {
       onCellDoubleClick={onCellDoubleClick}
       onPageChange={onPageChange}
       onPageSizeChange={onPageSizeChange}
+      onSelectionModelChange={onSelectedIdsChange}
       onSortModelChange={onSortModelChange}
       pageSize={pageSize}
-      paginationMode={paginationMode}
+      paginationMode={dataMode}
       rowCount={rowCount}
       rows={rows}
       rowsPerPageOptions={[25, 50, 100]}
       selectionModel={selectionModel}
-      sortingMode={sortingMode}
+      sortingMode={dataMode}
       sortModel={sortModel}
     />
   )
@@ -126,6 +156,7 @@ DataGrid.defaultProps = {
   disableMultipleSelection: false,
   exportFileName: null,
   hideFooterPagination: false,
+  onFilterModelChange: null,
   pageSize: 25,
   selectionModel: undefined,
   showToolbar: false,

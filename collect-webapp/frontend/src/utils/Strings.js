@@ -39,4 +39,15 @@ export default class Strings {
     }
     return result
   }
+
+  /**
+   * Appends the specified value to a string only if the string doesn't end with that value already.
+   *
+   * @param {!string} string - String to update.
+   * @param {!string} value - Value to append.
+   * @returns {string} - The updated string.
+   */
+  static appendIfMissing(string, value) {
+    return string.endsWith(value) ? string : `${string}${value}`
+  }
 }

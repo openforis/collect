@@ -160,7 +160,6 @@ class SurveysListPage extends React.Component {
 
   handleSurveysSelection(newSelectedSurveys) {
     this.setState({
-      ...this.state,
       selectedSurvey: Arrays.uniqueItemOrNull(newSelectedSurveys),
       selectedSurveyIds: newSelectedSurveys.map((item) => item.id),
       selectedSurveys: newSelectedSurveys,
@@ -169,6 +168,7 @@ class SurveysListPage extends React.Component {
 
   render() {
     const { surveys, userGroups, loggedUser, validationResultShown } = this.props
+    const { selectedSurvey } = this.state
 
     if (surveys === null) {
       return <div>Loading...</div>
@@ -190,8 +190,6 @@ class SurveysListPage extends React.Component {
         return merged
       }
     })
-
-    const selectedSurvey = this.state.selectedSurvey
 
     const userGroupCellRenderer = ({ value: userGroupId, row: survey }) => {
       if (!userGroupId) {
@@ -299,24 +297,18 @@ class SurveysListPage extends React.Component {
           className="surveys-list"
           columns={[
             {
-              field: 'id',
-              hide: true,
-            },
-            {
               field: 'name',
               headerName: 'survey.name',
               sortable: true,
               flex: 1,
-              disableColumnMenu: false,
-              filterable: true,
+              quickSearch: true,
             },
             {
               field: 'projectName',
               headerName: 'survey.projectName',
               sortable: true,
               flex: 1.5,
-              disableColumnMenu: false,
-              filterable: true,
+              quickSearch: true,
             },
             {
               field: 'modifiedDate',
@@ -341,7 +333,6 @@ class SurveysListPage extends React.Component {
               renderCell: DataGridCellRenderers.bool,
               width: 150,
               type: 'boolean',
-              filterable: true,
             },
             {
               field: 'published',
@@ -350,7 +341,6 @@ class SurveysListPage extends React.Component {
               renderCell: DataGridCellRenderers.bool,
               width: 120,
               type: 'boolean',
-              filterable: true,
             },
             {
               field: 'userGroupId',
