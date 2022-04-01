@@ -2,13 +2,28 @@ import React from 'react'
 import MuiDialog from '@material-ui/core/Dialog'
 
 export const Dialog = (props) => {
-  const { children, disableBackdropClick, disableEscapeKeyDown, onClose: onCloseProp, ...otherProps } = props
+  const {
+    children,
+    disableBackdropClick,
+    disableEscapeKeyDown,
+    onClose: onCloseProp,
+    onBackdropClick,
+    onEntering,
+    onEscapeKeyDown,
+    ...otherProps
+  } = props
 
   const onClose = (event, reason) => {
-    if ((disableBackdropClick && reason === 'backdropClick') || (disableEscapeKeyDown && reason === 'escapeKeyDown')) {
-      return false
+    switch (reason) {
+      case 'backdropClick':
+        if (disableBackdropClick) return false
+        onBackdropClick?.()
+        break
+      case 'escapeKeyDown':
+        if (disableEscapeKeyDown) return false
+        onEscapeKeyDown?.()
+        break
     }
-
     if (onCloseProp) {
       onCloseProp(event, reason)
     }
