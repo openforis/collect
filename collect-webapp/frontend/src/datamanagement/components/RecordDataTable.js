@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { UncontrolledTooltip } from 'reactstrap'
 
-import { DataGrid, DataGridValueFormatters } from 'common/components/DataGrid'
+import { DataGrid, DataGridValueFormatters } from 'common/components'
 import OwnerColumnEditor from './OwnerColumnEditor'
 import Arrays from 'utils/Arrays'
 import L from 'utils/Labels'

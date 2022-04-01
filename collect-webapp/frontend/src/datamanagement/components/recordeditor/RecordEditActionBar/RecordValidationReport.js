@@ -6,7 +6,7 @@ import { Button, Dialog, DialogContent, DialogTitle, DialogActions } from '@mate
 import L from 'utils/Labels'
 import { Attribute } from 'model/Record/Attribute'
 import * as Validations from 'model/Validations'
-import { DataGrid } from 'common/components/DataGrid'
+import { DataGrid } from 'common/components'
 
 const RecordValidationReport = (props) => {
   const { record, onClose } = props

@@ -5,7 +5,6 @@ import PropTypes from 'prop-types'
 
 import {
   Button,
-  Dialog,
   DialogTitle,
   DialogContent,
   DialogContentText,
@@ -19,6 +18,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 
 import L from 'utils/Labels'
 import RouterUtils from 'utils/RouterUtils'
+import { Dialog } from 'common/components'
 
 const SystemErrorDialog = (props) => {
   const { details, message, showProgressBar, showRefreshButton, title, width } = props

@@ -1,7 +1,7 @@
 import React from 'react'
 
 import L from 'utils/Labels'
-import { DataGrid, DataGridValueFormatters } from 'common/components/DataGrid'
+import { DataGrid, DataGridValueFormatters } from 'common/components'
 
 export const ConflictingRecordsDataGrid = (props) => {
   const { keyAttributeColumns, conflictingRecords, selectedConflictingRecordsIds, stepColumns, onSelectedIdsChange } =

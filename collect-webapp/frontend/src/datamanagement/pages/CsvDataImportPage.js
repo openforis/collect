@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import { Container, Form, FormFeedback, FormGroup, Label, Input, Col } from 'reactstrap'
 
 import Button from '@material-ui/core/Button'
-import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogTitle from '@material-ui/core/DialogTitle'
@@ -23,7 +22,7 @@ import Workflow from 'model/Workflow'
 import Arrays from 'utils/Arrays'
 import * as JobActions from 'actions/job'
 import L from 'utils/Labels'
-import { DataGrid } from 'common/components/DataGrid'
+import { DataGrid, Dialog } from 'common/components'
 
 const importTypes = {
   newRecords: 'newRecords',

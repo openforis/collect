@@ -27,7 +27,7 @@ const styles = theme => ({
   }
 })
 */
-class SelectFilter extends React.Component {
+class DataGridSelectFilter extends React.Component {
   constructor(props) {
     super(props)
     this.handleChange = this.handleChange.bind(this)
@@ -150,4 +150,4 @@ class SelectFilter extends React.Component {
 }
 
 //export default withStyles(styles, { withTheme: true })(SelectFilter)
-export default SelectFilter
+export default DataGridSelectFilter

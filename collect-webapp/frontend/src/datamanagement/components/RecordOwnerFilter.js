@@ -2,7 +2,7 @@ import React from 'react'
 import MenuItem from '@material-ui/core/MenuItem'
 import { connect } from 'react-redux'
 
-import SelectFilter from 'common/components/DataGrid/SelectFilter'
+import { DataGridSelectFilter } from 'common/components'
 import Arrays from 'utils/Arrays'
 import L from 'utils/Labels'
 
@@ -10,7 +10,7 @@ const ONLY_ME = '___ONLY_ME___'
 
 const usersToDataSource = (users) => (users || []).map((user) => ({ value: user.id, label: user.username }))
 
-class RecordOwnerFilter extends SelectFilter {
+class RecordOwnerFilter extends DataGridSelectFilter {
   constructor(props, context) {
     super(props, context)
 

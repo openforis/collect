@@ -28,7 +28,7 @@ import UserGroupService from 'services/UserGroupService'
 
 import { withNavigate, withParams } from 'common/hooks'
 import AbstractItemDetailsPage from 'common/components/AbstractItemDetailsPage'
-import { DataGrid } from 'common/components/DataGrid'
+import { DataGrid } from 'common/components'
 
 import UserRoleDropdownEditor from '../components/UserRoleDropdownEditor'
 

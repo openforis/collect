@@ -12,7 +12,7 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import { hideSurveyValidation, publishSurvey } from '../../actions/surveys'
 
 import L from 'utils/Labels'
-import { DataGrid } from 'common/components/DataGrid'
+import { DataGrid } from 'common/components'
 
 class SurveyValidationResultDialog extends Component {
   constructor(props) {

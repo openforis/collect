@@ -11,7 +11,7 @@ import * as UserActions from 'actions/users'
 
 import AbstractItemsListPage from 'common/components/AbstractItemsListPage'
 import Dialogs from 'common/components/Dialogs'
-import { DataGrid } from 'common/components/DataGrid'
+import { DataGrid } from 'common/components'
 
 import UserDetailsPage from './UserDetailsPage'
 

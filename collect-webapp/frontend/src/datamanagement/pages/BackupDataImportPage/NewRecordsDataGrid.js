@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { DataGrid, DataGridValueFormatters } from 'common/components/DataGrid'
+import { DataGrid, DataGridValueFormatters } from 'common/components'
 
 export const NewRecordsDataGrid = (props) => {
   const { keyAttributeColumns, recordsToImport, selectedRecordsToImportIds, stepColumns, onSelectedIdsChange } = props

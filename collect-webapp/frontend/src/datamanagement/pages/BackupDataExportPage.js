@@ -17,7 +17,7 @@ import ServiceFactory from 'services/ServiceFactory'
 import * as JobActions from 'actions/job'
 import L from 'utils/Labels'
 import Arrays from 'utils/Arrays'
-import { DataGrid } from 'common/components/DataGrid'
+import { DataGrid } from 'common/components'
 
 class BackupDataExportPage extends Component {
   constructor(props) {

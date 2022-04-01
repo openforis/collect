@@ -3,7 +3,7 @@ import './BackupDataImportSummaryForm.scss'
 import React from 'react'
 import { FormGroup } from 'reactstrap'
 
-import { DataGrid } from 'common/components/DataGrid'
+import { DataGrid } from 'common/components'
 import L from 'utils/Labels'
 import Strings from 'utils/Strings'
 import Workflow from 'model/Workflow'
