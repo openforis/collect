@@ -8,7 +8,6 @@ export const Dialog = (props) => {
     disableEscapeKeyDown,
     onClose: onCloseProp,
     onBackdropClick,
-    onEntering,
     onEscapeKeyDown,
     ...otherProps
   } = props
