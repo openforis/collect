@@ -1,20 +1,18 @@
-import React, { useState } from 'react'
+import React from 'react'
 import classNames from 'classnames'
 
 import { FieldDefinition } from 'model/ui/FieldDefinition'
 import { CodeAttributeDefinition } from 'model/Survey'
 import FormItemTypes from 'model/ui/FormItemTypes'
-import * as Validations from 'model/Validations'
-import { NodeCountUpdatedEvent, NodeCountValidationUpdatedEvent } from 'model/event/RecordEvent'
 
 import ValidationTooltip from 'common/components/ValidationTooltip'
-import { useRecordEvent } from 'common/hooks'
 import Fieldset from './Fieldset'
 import MultipleFieldset from './MultipleFieldset'
 import Table from './Table'
 import FormItemFieldComponent from './FormItemFieldComponent'
 import FormItemMultipleFieldComponent from './FormItemMultipleFieldComponent'
 import NodeDefLabel from './NodeDefLabel'
+import { useCardinalityValidation } from './useCardinalityValidation'
 
 const internalComponentByFieldType = {
   [FormItemTypes.FIELD]: FormItemFieldComponent,
@@ -31,21 +29,7 @@ const FormItem = (props) => {
   const { nodeDefinition, type } = itemDef
   const { id: nodeDefinitionId } = nodeDefinition
 
-  const [cardinalityValidation, setCardinalityValidation] = useState(
-    Validations.getCardinalityValidation({ nodeDefinition, parentEntity })
-  )
-
-  useRecordEvent({
-    parentEntity,
-    onEvent: (event) => {
-      if (
-        (event instanceof NodeCountValidationUpdatedEvent || event instanceof NodeCountUpdatedEvent) &&
-        event.isRelativeToNodes({ parentEntity, nodeDefId: nodeDefinitionId })
-      ) {
-        setCardinalityValidation(Validations.getCardinalityValidation({ nodeDefinition, parentEntity }))
-      }
-    },
-  })
+  const { cardinalityValidation } = useCardinalityValidation({ nodeDefinition, parentEntity })
 
   const wrapperId = `form-item-${parentEntity.id}-node-def-${nodeDefinitionId}`
 
