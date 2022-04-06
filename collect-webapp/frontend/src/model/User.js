@@ -183,8 +183,20 @@ export default class User extends Serializable {
     return this.role === User.ROLE.ADMIN
   }
 
-  canEditOnlyOwnedRecords() {
-    return this.role === User.ROLE.ENTRY_LIMITED
+  canPromoteRecord({ record, roleInGroup }) {
+    const { step: recordStep } = record
+    const nextStep = Workflow.getNextStep(recordStep)
+    if (!nextStep) return false
+
+    return this.canEditRecord({ record, userInGroupRole: roleInGroup })
+  }
+
+  canDemoteRecord({ record, roleInGroup }) {
+    const { step: recordStep } = record
+    const prevStep = Workflow.getPrevStep(recordStep)
+    if (!prevStep) return false
+
+    return this.canEditRecord({ record, userInGroupRole: roleInGroup })
   }
 
   canPromoteRecordWithErrors(roleInSurveyGroup) {
@@ -200,8 +212,7 @@ export default class User extends Serializable {
   }
 
   canChangeRecordOwner(roleInSurveyGroup) {
-    const mainRole = this.role
-    switch (mainRole) {
+    switch (this.role) {
       case User.ROLE.ADMIN:
         return true
       case User.ROLE.VIEW:

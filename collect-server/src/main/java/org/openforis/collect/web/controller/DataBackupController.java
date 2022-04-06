@@ -6,6 +6,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openforis.collect.io.data.backup.BackupStorageManager;
+import org.openforis.collect.model.UserRoles;
 import org.openforis.collect.utils.Controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -25,7 +26,7 @@ public class DataBackupController extends BasicController {
 	@Autowired
 	private BackupStorageManager backupStorageManager;
 	
-	@Secured("ROLE_ADMIN")
+	@Secured(UserRoles.ADMIN)
 	@RequestMapping(value = "/surveys/{surveyName}/data/backup/last", method = RequestMethod.GET)
 	public void downloadLastBackup(HttpServletResponse response, @PathVariable String surveyName) throws IOException {
 		File file = backupStorageManager.getLastBackupFile(surveyName);

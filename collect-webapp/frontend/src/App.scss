@@ -112,8 +112,7 @@
     .MuiFormControl-root.MuiTextField-root,
     .MuiInputBase-root.MuiOutlinedInput-root {
       fieldset {
-        border-width: 2px;
-        border-style: solid;
+        border: 2px solid;
         border-radius: 4px;
       }
     }
@@ -123,14 +122,14 @@
       .MuiFormControl-root.MuiTextField-root,
       .MuiInputBase-root.MuiOutlinedInput-root {
         fieldset {
-          border-color: red;
+          border: 2px solid red !important;
         }
       }
     }
 
     &.warning {
       .MuiFormControl-root.MuiTextField-root fieldset {
-        border-color: orange;
+        border: 2px solid orange !important;
       }
     }
   }

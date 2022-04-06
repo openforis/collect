@@ -6,7 +6,12 @@ import { AttributeDefinition } from 'model/Survey'
 import { useRecordEvent } from 'common/hooks'
 import ValidationTooltip from 'common/components/ValidationTooltip'
 
-import { AttributeValueUpdatedEvent, NodeRelevanceUpdatedEvent } from 'model/event/RecordEvent'
+import {
+  AttributeValueUpdatedEvent,
+  NodeCountUpdatedEvent,
+  NodeCountValidationUpdatedEvent,
+  NodeRelevanceUpdatedEvent,
+} from 'model/event/RecordEvent'
 
 import BooleanField from './fields/BooleanField'
 import CodeField from './fields/CodeField'
@@ -41,19 +46,27 @@ const FormItemFieldComponent = (props) => {
   const wrapperIdRef = useRef(`form-item-field-${new Date().getTime()}`)
   const wrapperId = wrapperIdRef.current
 
-  const calculateIsRelevant = useCallback(() => parentEntity.childrenRelevanceByDefinitionId[attributeDefinitionId], [
-    parentEntity,
-  ])
-
-  const calculateValidation = useCallback(
-    () =>
-      Validations.getAttributeValidation({
-        parentEntity,
-        attributeDefinition,
-        attribute,
-      }),
-    [parentEntity, attributeDefinition, attribute]
+  const calculateIsRelevant = useCallback(
+    () => parentEntity.childrenRelevanceByDefinitionId[attributeDefinitionId],
+    [parentEntity]
   )
+
+  const calculateValidation = useCallback(() => {
+    if (inTable) {
+      const cardinalityValidation = Validations.getCardinalityValidation({
+        nodeDefinition: attributeDefinition,
+        parentEntity,
+      })
+      if (cardinalityValidation.hasErrors()) {
+        return cardinalityValidation
+      }
+    }
+    return Validations.getAttributeValidation({
+      parentEntity,
+      attributeDefinition,
+      attribute,
+    })
+  }, [parentEntity, attributeDefinition, attribute])
 
   const [validation, setValidation] = useState(calculateValidation())
   const [relevant, setRelevant] = useState(calculateIsRelevant())
@@ -62,7 +75,9 @@ const FormItemFieldComponent = (props) => {
     parentEntity,
     onEvent: (event) => {
       if (
-        event instanceof AttributeValueUpdatedEvent &&
+        (event instanceof AttributeValueUpdatedEvent ||
+          (inTable && event instanceof NodeCountValidationUpdatedEvent) ||
+          event instanceof NodeCountUpdatedEvent) &&
         event.isRelativeToNodes({ parentEntity, nodeDefId: attributeDefinitionId })
       ) {
         setValidation(calculateValidation())
