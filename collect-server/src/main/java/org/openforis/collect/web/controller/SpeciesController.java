@@ -13,6 +13,7 @@ import org.openforis.collect.manager.TaxonSearchParameters;
 import org.openforis.collect.manager.dataexport.species.SpeciesExportProcess;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
+import org.openforis.collect.model.UserRoles;
 import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.utils.MediaTypes;
@@ -52,7 +53,7 @@ public class SpeciesController {
 		return "ok";
 	}
 
-	@Secured("ROLE_ENTRY")
+	@Secured(UserRoles.ENTRY)
 	@RequestMapping(value = "api/survey/{surveyId}/taxonomy/{taxonomyName}/query", method = RequestMethod.POST)
 	public @ResponseBody List<TaxonOccurrenceProxy> findTaxon(@PathVariable("surveyId") int surveyId,
 			@PathVariable("taxonomyName") String taxonomyName, @RequestBody TaxonQuery query) {

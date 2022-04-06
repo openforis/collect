@@ -73,7 +73,7 @@ public class DataRestoreController extends BasicController {
 	@Autowired
 	private AppWS appWS;
 	
-	@Secured({UserRoles.ENTRY})
+	@Secured(UserRoles.ENTRY)
 	@RequestMapping(value = "/surveys/restore/data", method=POST, consumes=MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody JobStatusResponse restoreData(@RequestParam("file") MultipartFile multipartFile, 
 			@RequestParam(required=false) String surveyName,
@@ -117,7 +117,7 @@ public class DataRestoreController extends BasicController {
 		return response;
 	}
 	
-	@Secured({UserRoles.ENTRY})
+	@Secured(UserRoles.ENTRY)
 	@RequestMapping(value = "/surveys/data/restorejobs/{jobId}/status.json", method=GET)
 	public @ResponseBody RemoteDataRestoreResponse getRestoreDataRemotelyStatus(@PathVariable String jobId) throws IOException {
 		RemoteDataRestoreResponse response;
