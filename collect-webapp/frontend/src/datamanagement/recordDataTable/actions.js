@@ -19,29 +19,43 @@ export const REQUEST_RECORD_SUMMARIES = 'REQUEST_RECORD_SUMMARIES'
 export const RECEIVE_RECORD_SUMMARIES = 'RECEIVE_RECORD_SUMMARIES'
 export const INVALIDATE_RECORD_SUMMARIES = 'INVALIDATE_RECORD_SUMMARIES'
 
-const dispatchRecordDataTableStateUpdate = (dispatch, filter) =>
-  dispatch({ type: RECORD_DATA_TABLE_STATE_UPDATE, ...filter })
+const dispatchRecordDataTableStateUpdate = (dispatch, newState) =>
+  dispatch({ type: RECORD_DATA_TABLE_STATE_UPDATE, ...newState })
+
+const dispatchRecordDataTableLoadingStateUpdate = (dispatch, newState) =>
+  dispatch({ type: RECORD_DATA_TABLE_STATE_UPDATE, loading: true, records: [], ...newState })
 
 export const sortRecordSummaries = (sortFields) => (dispatch) => {
-  dispatchRecordDataTableStateUpdate(dispatch, { sortFields, records: [] })
+  dispatchRecordDataTableLoadingStateUpdate(dispatch, { sortFields })
   dispatch(fetchRecordSummaries())
 }
 
-export const changeRecordSummariesPage = (currentPage, recordsPerPage) => (dispatch) => {
-  dispatchRecordDataTableStateUpdate(dispatch, { currentPage, recordsPerPage })
-  dispatch(fetchRecordSummaries())
-}
+export const changeRecordSummariesPage =
+  ({ currentPage, recordsPerPage }) =>
+  (dispatch) => {
+    dispatchRecordDataTableLoadingStateUpdate(dispatch, { currentPage, recordsPerPage })
+    dispatch(fetchRecordSummaries())
+  }
 
-export const filterRecordSummaries = ({ keyValues, summaryValues, ownerIds }) => (dispatch) => {
-  dispatchRecordDataTableStateUpdate(dispatch, { keyValues, summaryValues, ownerIds })
-  dispatch(fetchRecordSummaries())
-}
+export const filterRecordSummaries =
+  ({ keyValues, summaryValues, ownerIds }) =>
+  (dispatch) => {
+    dispatchRecordDataTableLoadingStateUpdate(dispatch, { keyValues, summaryValues, ownerIds })
+    dispatch(fetchRecordSummaries())
+  }
+
+export const filterRecordSummariesByOwners =
+  ({ ownerIds }) =>
+  (dispatch) => {
+    dispatchRecordDataTableLoadingStateUpdate(dispatch, { ownerIds })
+    dispatch(fetchRecordSummaries())
+  }
 
 export const filterOnlyOwnedRecords = (onlyOwnedRecords) => (dispatch, getState) => {
   const dataManagementState = getDataManagementState(getState())
   const recordDataTableState = getRecordDataTableState(dataManagementState)
   const ownerIds = onlyOwnedRecords ? [] : getRecordDataTableOwnerIds(recordDataTableState)
-  dispatchRecordDataTableStateUpdate(dispatch, { ownerIds })
+  dispatchRecordDataTableLoadingStateUpdate(dispatch, { ownerIds })
   dispatch(fetchRecordSummaries())
 }
 
@@ -86,6 +100,7 @@ export const fetchRecordSummaries = () => (dispatch, getState) => {
     })
     .then((res) => {
       dispatchRecordDataTableStateUpdate(dispatch, {
+        loading: false,
         records: res.records,
         totalSize: res.count,
         availableOwners: res.owners,

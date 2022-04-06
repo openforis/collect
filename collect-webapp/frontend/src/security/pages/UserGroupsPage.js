@@ -1,15 +1,20 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table'
 import { Button, Container, Row, Col } from 'reactstrap'
 
-import { withNavigate } from 'common/hooks'
-import AbstractItemsListPage from 'common/components/AbstractItemsListPage'
-import * as UserGroupActions from 'actions/usergroups'
-import Dialogs from 'common/components/Dialogs'
 import L from 'utils/Labels'
 import RouterUtils from 'utils/RouterUtils'
+
+import * as UserGroupActions from 'actions/usergroups'
+
+import { withNavigate } from 'common/hooks'
+
+import AbstractItemsListPage from 'common/components/AbstractItemsListPage'
+import { DataGrid } from 'common/components/DataGrid'
+import Dialogs from 'common/components/Dialogs'
+
+const findById = (items) => (id) => items.find((u) => u.id === id)
 
 class UserGroupsPage extends AbstractItemsListPage {
   constructor(props) {
@@ -87,30 +92,21 @@ class UserGroupsPage extends AbstractItemsListPage {
         </Row>
         <Row>
           <Col>
-            <BootstrapTable
-              data={editableUserGroups}
-              className="user-groups-data-table"
-              striped
-              hover
-              condensed
-              selectRow={{
-                mode: 'checkbox',
-                clickToSelect: true,
-                hideSelectionColumn: true,
-                bgColor: 'lightBlue',
-                onSelect: this.handleRowSelect,
-                onSelectAll: this.handleAllRowsSelect,
-                selected: this.state.selectedItemIds,
-              }}
-              options={{ onRowDoubleClick: this.handleRowDoubleClick }}
-            >
-              <TableHeaderColumn dataField="id" isKey hidden>
-                Id
-              </TableHeaderColumn>
-              <TableHeaderColumn dataField="name">Name</TableHeaderColumn>
-              <TableHeaderColumn dataField="label">Label</TableHeaderColumn>
-              <TableHeaderColumn dataField="description">Description</TableHeaderColumn>
-            </BootstrapTable>
+            <DataGrid
+              checkboxSelection
+              className="user-groups-data-grid"
+              columns={[
+                { field: 'id', hide: true },
+                { field: 'name', headerName: 'Name', flex: 1 },
+                { field: 'label', headerName: 'Label', flex: 2 },
+                { field: 'description', headerName: 'Description', flex: 2 },
+              ]}
+              rows={editableUserGroups}
+              onSelectedIdsChange={(selectedIds) =>
+                this.handleItemsSelection(selectedIds.map(findById(editableUserGroups)))
+              }
+              onRowDoubleClick={({ row }) => this.handleRowDoubleClick(row)}
+            />
           </Col>
         </Row>
       </Container>

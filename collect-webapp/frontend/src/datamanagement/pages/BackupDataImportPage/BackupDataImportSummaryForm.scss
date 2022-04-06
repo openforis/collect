@@ -1,0 +1,23 @@
+.data-grid.data-import-errors-data-grid {
+  height: 300px;
+
+  ul.errors-list {
+    list-style: none;
+
+    li::before {
+      content: '\2022';
+      color: red;
+      font-weight: bold;
+      font-size: 2rem;
+      display: inline-block;
+      width: 1.5rem;
+      margin-left: -2rem;
+      vertical-align: middle;
+    }
+  }
+}
+
+.data-grid.data-import-new-records,
+.data-grid.data-import-conflicting-records {
+  height: 400px;
+}

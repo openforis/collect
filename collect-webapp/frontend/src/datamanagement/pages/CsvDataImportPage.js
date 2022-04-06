@@ -1,9 +1,10 @@
+import './CsvDataImportPage.scss'
+
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Container, Form, FormFeedback, FormGroup, Label, Input, Col } from 'reactstrap'
 
 import Button from '@material-ui/core/Button'
-import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogTitle from '@material-ui/core/DialogTitle'
@@ -13,8 +14,6 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import Typography from '@material-ui/core/Typography'
 
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table'
-
 import Dropzone from '../../common/components/Dropzone'
 
 import ServiceFactory from 'services/ServiceFactory'
@@ -23,6 +22,7 @@ import Workflow from 'model/Workflow'
 import Arrays from 'utils/Arrays'
 import * as JobActions from 'actions/job'
 import L from 'utils/Labels'
+import { DataGrid, Dialog } from 'common/components'
 
 const importTypes = {
   newRecords: 'newRecords',
@@ -206,14 +206,6 @@ class CsvDataImportPage extends Component {
     const acceptedFileTypesDescription =
       importType === importTypes.multipleFiles ? 'ZIP (.zip)' : supportedSingleFilesDescription
 
-    const formatErrorMessage = function (cell, row) {
-      return L.l(row.message, row.messageArgs)
-    }
-
-    const formatErrorType = function (cell, row) {
-      return L.l('dataManagement.csvDataImport.error.type.' + cell)
-    }
-
     return (
       <Container>
         <Form>
@@ -307,38 +299,37 @@ class CsvDataImportPage extends Component {
           <Dialog open={this.state.errorModalOpen} maxWidth="md" fullWidth disableBackdropClick disableEscapeKeyDown>
             <DialogTitle>{L.l('dataManagement.csvDataImport.errorsInUploadedFile')}</DialogTitle>
             <DialogContent>
-              <BootstrapTable
-                data={this.state.errors}
-                striped
-                hover
-                condensed
-                exportCSV
-                csvFileName={'ofc_csv_data_import_errors.csv'}
-              >
-                <TableHeaderColumn dataField="id" isKey hidden>
-                  Id
-                </TableHeaderColumn>
-                <TableHeaderColumn dataField="fileName" width="200" hidden={importType !== importTypes.multipleFiles}>
-                  {L.l('dataManagement.csvDataImport.filename')}
-                </TableHeaderColumn>
-                <TableHeaderColumn dataField="row" width="80">
-                  {L.l('dataManagement.csvDataImport.row')}
-                </TableHeaderColumn>
-                <TableHeaderColumn dataField="columns" width="150">
-                  {L.l('dataManagement.csvDataImport.columns')}
-                </TableHeaderColumn>
-                <TableHeaderColumn dataField="errorType" width="160" dataFormat={formatErrorType}>
-                  {L.l('dataManagement.csvDataImport.error-type')}
-                </TableHeaderColumn>
-                <TableHeaderColumn
-                  dataField="message"
-                  width="400"
-                  dataFormat={formatErrorMessage}
-                  csvFormat={formatErrorMessage}
-                >
-                  {L.l('dataManagement.csvDataImport.error-message')}
-                </TableHeaderColumn>
-              </BootstrapTable>
+              <DataGrid
+                className="errors-data-grid"
+                columns={[
+                  {
+                    field: 'fileName',
+                    headerName: 'dataManagement.csvDataImport.filename',
+                    hide: importType !== importTypes.multipleFiles,
+                    flex: 1,
+                  },
+                  { field: 'row', headerName: 'dataManagement.csvDataImport.row', width: 80 },
+                  { field: 'columns', headerName: 'dataManagement.csvDataImport.columns', width: 150 },
+                  {
+                    field: 'errorType',
+                    headerName: 'dataManagement.csvDataImport.error-type',
+                    width: 150,
+                    valueFormatter: ({ value }) => L.l(`dataManagement.csvDataImport.error.type.${value}`),
+                  },
+                  {
+                    field: 'message',
+                    headerName: 'dataManagement.csvDataImport.error-message',
+                    flex: 2,
+                    valueFormatter: ({ row }) => L.l(row.message, row.messageArgs),
+                  },
+                ]}
+                exportFileName="ofc_csv_data_import_errors.csv"
+                showToolbar
+                disable
+                getRowId={(row) => `${String(row.row)}_${row.errorType}_${String(row.columns)}`}
+                hideFooterPagination
+                rows={this.state.errors}
+              />
             </DialogContent>
             <DialogActions>
               <Button color="primary" variant="contained" onClick={this.handleErrorsModalCloseButtonClick}>

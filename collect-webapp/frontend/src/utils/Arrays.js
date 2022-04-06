@@ -73,12 +73,14 @@ class Arrays {
     return Arrays.addOrRemoveItems(array, items, true, keyProp)
   }
 
-  static deleteItem = (item, keyProp = null) => (array) => {
-    const idx = Arrays.indexOf(array, item, keyProp)
-    if (idx >= 0) {
-      delete array[idx]
+  static deleteItem =
+    (item, keyProp = null) =>
+    (array) => {
+      const idx = Arrays.indexOf(array, item, keyProp)
+      if (idx >= 0) {
+        delete array[idx]
+      }
     }
-  }
 
   /**
    * Adds or removes an element without side effect on the specified array
@@ -145,6 +147,10 @@ class Arrays {
 
   static singleton(item) {
     return item ? [item] : []
+  }
+
+  static toArray(value) {
+    return Array.isArray(value) ? value : [value]
   }
 }
 

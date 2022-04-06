@@ -1,3 +1,5 @@
+import './DataManagementPage.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 
@@ -16,7 +18,6 @@ import FormHelperText from '@material-ui/core/FormHelperText'
 
 import { withNavigate } from 'common/hooks'
 import MaxAvailableSpaceContainer from 'common/components/MaxAvailableSpaceContainer'
-import TableResizeOnWindowResizeComponent from 'common/components/TableResizeOnWindowResizeComponent'
 import Workflow from 'model/Workflow'
 import Dialogs from 'common/components/Dialogs'
 import SurveyLanguagesSelect from 'common/components/SurveyLanguagesSelect'
@@ -49,8 +50,7 @@ class DataManagementPage extends React.Component {
 
     this.wrapperRef = React.createRef()
 
-    this.handleRowSelect = this.handleRowSelect.bind(this)
-    this.handleAllRowsSelect = this.handleAllRowsSelect.bind(this)
+    this.handleItemsSelection = this.handleItemsSelection.bind(this)
     this.handleRowDoubleClick = this.handleRowDoubleClick.bind(this)
     this.handleNewButtonClick = this.handleNewButtonClick.bind(this)
     this.handleNewRecordParametersSelected = this.handleNewRecordParametersSelected.bind(this)
@@ -136,9 +136,9 @@ class DataManagementPage extends React.Component {
     RouterUtils.navigateToRecordEditPage(this.props.navigate, itemId)
   }
 
-  handleRowDoubleClick(record) {
+  handleRowDoubleClick({ row: record }) {
     const { loggedUser, survey } = this.props
-    const { userInGroupRole, userGroup } = survey
+    const { userInGroupRole } = survey
 
     if (loggedUser.canEditRecords(userInGroupRole)) {
       if (record.lockedBy && !loggedUser.canUnlockRecords()) {
@@ -157,19 +157,8 @@ class DataManagementPage extends React.Component {
     }
   }
 
-  handleRowSelect(row, isSelected, e) {
-    const newSelectedItems = Arrays.addOrRemoveItem(this.state.selectedItems, row, !isSelected)
-    this.handleItemsSelection(newSelectedItems)
-  }
-
-  handleAllRowsSelect(isSelected, rows) {
-    const newSelectedItems = Arrays.addOrRemoveItems(this.state.selectedItems, rows, !isSelected)
-    this.handleItemsSelection(newSelectedItems)
-  }
-
   handleItemsSelection(selectedItems) {
     this.setState({
-      ...this.state,
       selectedItems: selectedItems,
       selectedItemIds: selectedItems.map((item) => item.id),
       selectedItem: Arrays.uniqueItemOrNull(selectedItems),
@@ -282,7 +271,6 @@ class DataManagementPage extends React.Component {
 
     return (
       <MaxAvailableSpaceContainer ref={this.wrapperRef}>
-        <TableResizeOnWindowResizeComponent wrapperRef={this.wrapperRef} margin={124} />
         <Row className="justify-content-between">
           <Col md={2}>
             {loggedUser.canCreateRecords(userRoleInSurveyGroup) && (
@@ -387,13 +375,12 @@ class DataManagementPage extends React.Component {
             </FormControl>
           </Col>
         </Row>
-        <Row>
+        <Row className="records-data-grid-row">
           <Col>
             <RecordDataTable
               selectedItemIds={this.state.selectedItemIds}
-              handleRowSelect={this.handleRowSelect}
-              handleAllRowsSelect={this.handleAllRowsSelect}
               handleRowDoubleClick={this.handleRowDoubleClick}
+              handleItemsSelection={this.handleItemsSelection}
             />
           </Col>
         </Row>

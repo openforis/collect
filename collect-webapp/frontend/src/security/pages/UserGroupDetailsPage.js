@@ -1,3 +1,5 @@
+import './UserGroupDetailsPage.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -14,28 +16,32 @@ import {
   FormFeedback,
   UncontrolledTooltip,
 } from 'reactstrap'
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table'
 
 import User from '../../model/User'
 import * as UserGroupActions from 'actions/usergroups'
-import { withNavigate, withParams } from 'common/hooks'
-import AbstractItemDetailsPage from 'common/components/AbstractItemDetailsPage'
-import UserGroupService from 'services/UserGroupService'
-import UserRoleDropdownEditor from '../components/UserRoleDropdownEditor'
+
 import Arrays from 'utils/Arrays'
 import L from 'utils/Labels'
 import RouterUtils from 'utils/RouterUtils'
+
+import UserGroupService from 'services/UserGroupService'
+
+import { withNavigate, withParams } from 'common/hooks'
+import AbstractItemDetailsPage from 'common/components/AbstractItemDetailsPage'
+import { DataGrid } from 'common/components'
+
+import UserRoleDropdownEditor from '../components/UserRoleDropdownEditor'
 
 class UserGroupDetailsPage extends AbstractItemDetailsPage {
   constructor(props) {
     super(props)
 
     this.handleSaveBtnClick = this.handleSaveBtnClick.bind(this)
-    this.handleAvailableUsersRowSelect = this.handleAvailableUsersRowSelect.bind(this)
-    this.handleUsersInGroupRowSelect = this.handleUsersInGroupRowSelect.bind(this)
+    this.handleAvailableUsersSelection = this.handleAvailableUsersSelection.bind(this)
+    this.handleUsersInGroupSelection = this.handleUsersInGroupSelection.bind(this)
+    this.handleUserInGroupRoleUpdate = this.handleUserInGroupRoleUpdate.bind(this)
     this.handleAddSelectedUsersToGroup = this.handleAddSelectedUsersToGroup.bind(this)
     this.handleRemoveSelectedUsersToGroup = this.handleRemoveSelectedUsersToGroup.bind(this)
-    this.handleSelectedUsersCellEdit = this.handleSelectedUsersCellEdit.bind(this)
 
     this.state = {
       ready: false,
@@ -146,21 +152,35 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
     this.userGroupService.save(formObject).then(this.updateStateFromResponse)
   }
 
-  handleAvailableUsersRowSelect(user, isSelected, e) {
-    const newSelectedUsers = Arrays.addOrRemoveItem(this.state.selectedAvailableUsers, user, !isSelected)
+  handleAvailableUsersSelection(selectedIds) {
+    const { availableUsers } = this.state
+    const newSelectedUsers = selectedIds.map((selectedId) => availableUsers.find((user) => user.id === selectedId))
     this.setState({
-      ...this.state,
       selectedAvailableUsers: newSelectedUsers,
-      selectedAvailableUsersIds: newSelectedUsers.map((u) => u.id),
+      selectedAvailableUsersIds: selectedIds,
     })
   }
 
-  handleUsersInGroupRowSelect(user, isSelected, e) {
-    const newSelectedUsersInGroup = Arrays.addOrRemoveItem(this.state.selectedUsersInGroup, user, !isSelected)
+  handleUsersInGroupSelection(selectedIds) {
+    const { usersInGroup } = this.state
+    const newSelectedUsersInGroup = selectedIds.map((selectedId) =>
+      usersInGroup.find((userInGroup) => userInGroup.userId === selectedId)
+    )
     this.setState({
-      ...this.state,
       selectedUsersInGroup: newSelectedUsersInGroup,
-      selectedUsersInGroupIds: newSelectedUsersInGroup.map((u) => u.userId),
+      selectedUsersInGroupIds: selectedIds,
+    })
+  }
+
+  handleUserInGroupRoleUpdate({ userInGroup, role }) {
+    const { usersInGroup } = this.state
+    const itemIndex = Arrays.indexOf(usersInGroup, userInGroup, 'userId')
+
+    const newUserInGroup = { ...userInGroup, role }
+    const newUsersInGroup = Arrays.replaceItemAt(usersInGroup, itemIndex, newUserInGroup)
+
+    this.setState({
+      usersInGroup: newUsersInGroup,
     })
   }
 
@@ -228,11 +248,6 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
     }
   }
 
-  handleSelectedUsersCellEdit(row, cellName, cellValue) {
-    console.log(cellValue)
-    console.log(this.state.usersInGroup)
-  }
-
   render() {
     if (!this.state.ready) {
       return <div>Loading...</div>
@@ -254,9 +269,6 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
           return false
       }
     })
-    const joinStata = Object.keys(User.USER_GROUP_JOIN_STATUS)
-
-    const createRoleEditor = (onUpdate, props) => <UserRoleDropdownEditor onUpdate={onUpdate} {...props} />
 
     const isNotDescendantOf = function (group1, group2) {
       return true
@@ -466,32 +478,21 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                 <legend>Add/Remove Users</legend>
                 <Row>
                   <Col sm="8">
-                    <BootstrapTable
-                      data={this.state.availableUsers}
-                      striped
-                      hover
-                      condensed
-                      height="200"
-                      selectRow={{
-                        mode: 'checkbox',
-                        clickToSelect: true,
-                        hideSelectionColumn: true,
-                        bgColor: 'lightBlue',
-                        onSelect: this.handleAvailableUsersRowSelect,
-                        selected: this.state.selectedAvailableUsersIds,
-                      }}
-                    >
-                      <TableHeaderColumn dataField="id" isKey hidden>
-                        Id
-                      </TableHeaderColumn>
-                      <TableHeaderColumn dataField="username">Username</TableHeaderColumn>
-                      <TableHeaderColumn dataField="role" width="100">
-                        Role
-                      </TableHeaderColumn>
-                    </BootstrapTable>
+                    <DataGrid
+                      checkboxSelection
+                      className="available-users-data-grid"
+                      columns={[
+                        { field: 'id', hide: true },
+                        { field: 'username', headerName: 'Username', flex: 1 },
+                        { field: 'role', headerName: 'Role', width: 100 },
+                      ]}
+                      hideFooterPagination
+                      onSelectedIdsChange={this.handleAvailableUsersSelection}
+                      rows={this.state.availableUsers}
+                    />
                   </Col>
                   <Col sm="4">
-                    {this.state.selectedAvailableUsers.length > 0 ? (
+                    {this.state.selectedAvailableUsers.length > 0 && (
                       <Row>
                         <Col sm="10">
                           <Input
@@ -512,17 +513,13 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                           <Button onClick={this.handleAddSelectedUsersToGroup}>&gt;</Button>
                         </Col>
                       </Row>
-                    ) : (
-                      ''
                     )}
-                    {this.state.selectedUsersInGroup.length > 0 ? (
+                    {this.state.selectedUsersInGroup.length > 0 && (
                       <Row>
                         <Col sm={{ size: 2, offset: 6 }}>
                           <Button onClick={this.handleRemoveSelectedUsersToGroup}>&lt;</Button>
                         </Col>
                       </Row>
-                    ) : (
-                      ''
                     )}
                   </Col>
                 </Row>
@@ -531,43 +528,36 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
             <Col sm="5">
               <fieldset className="secondary">
                 <legend>Users in Group</legend>
-                <BootstrapTable
-                  data={this.state.usersInGroup}
-                  striped
-                  hover
-                  height="200"
-                  cellEdit={{ mode: 'click', afterSaveCell: this.handleSelectedUsersCellEdit }}
-                  selectRow={{
-                    mode: 'checkbox',
-                    clickToSelect: true,
-                    hideSelectionColumn: true,
-                    bgColor: 'lightBlue',
-                    onSelect: this.handleUsersInGroupRowSelect,
-                    selected: this.state.selectedUsersInGroupIds,
-                    unselectable: [ownerId],
-                  }}
-                >
-                  <TableHeaderColumn dataField="userId" isKey hidden>
-                    Id
-                  </TableHeaderColumn>
-                  <TableHeaderColumn dataField="username" editable={false}>
-                    Username
-                  </TableHeaderColumn>
-                  <TableHeaderColumn
-                    dataField="role"
-                    width="140"
-                    customEditor={{ getElement: createRoleEditor, customEditorParameters: { roles: roles } }}
-                  >
-                    Role
-                  </TableHeaderColumn>
-                  <TableHeaderColumn
-                    dataField="joinStatus"
-                    editable={{ type: 'select', options: { values: joinStata } }}
-                    width="120"
-                  >
-                    Status
-                  </TableHeaderColumn>
-                </BootstrapTable>
+                <DataGrid
+                  checkboxSelection
+                  className="users-in-group-data-grid"
+                  columns={[
+                    { field: 'userId', hide: true },
+                    { field: 'username', headerName: 'Username', flex: 1 },
+                    {
+                      field: 'role',
+                      headerName: 'Role',
+                      width: 140,
+                      editable: true,
+                      renderEditCell: ({ api, field, id, row: userInGroup }) => (
+                        <UserRoleDropdownEditor
+                          onUpdate={(role) => {
+                            this.handleUserInGroupRoleUpdate({ userInGroup, role })
+                            // close cell editor
+                            api.setCellMode(id, field, 'view')
+                          }}
+                          defaultValue={userInGroup.role}
+                          roles={roles}
+                        />
+                      ),
+                    },
+                    { field: 'joinStatus', headerName: 'Status', width: 120 },
+                  ]}
+                  getRowId={(row) => row.userId}
+                  hideFooterPagination
+                  onSelectedIdsChange={this.handleUsersInGroupSelection}
+                  rows={this.state.usersInGroup}
+                />
                 {this.state.errorFeedback['users'] && <FormFeedback>{this.state.errorFeedback['users']}</FormFeedback>}
               </fieldset>
             </Col>

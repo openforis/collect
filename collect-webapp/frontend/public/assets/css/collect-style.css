@@ -450,7 +450,7 @@ input.is-invalid.warning:focus {
 /**
 *====  USERS
 **/
-.users-data-table,
-.user-groups-data-table {
-  height: calc(100vh - 175px);
+.data-grid.users-data-grid,
+.data-grid.user-groups-data-grid {
+  height: calc(100vh - 115px);
 }
