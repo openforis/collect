@@ -1,13 +1,7 @@
 package org.openforis.collect.io.data;
 
-import static org.openforis.collect.model.UserInGroup.UserGroupRole.ADMINISTRATOR;
-import static org.openforis.collect.model.UserInGroup.UserGroupRole.OPERATOR;
-import static org.openforis.collect.model.UserInGroup.UserGroupRole.OWNER;
-import static org.openforis.collect.model.UserInGroup.UserGroupRole.SUPERVISOR;
-
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -51,9 +45,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DataRestoreTask extends Task {
-
-	private static final List<UserGroupRole> DATA_RESTORE_ALLOWED_USER_GROUP_ROLES = Arrays.asList(OWNER, ADMINISTRATOR,
-			SUPERVISOR, OPERATOR);
 
 	public enum OverwriteStrategy {
 		ONLY_SPECIFIED, DO_NOT_OVERWRITE, OVERWRITE_OLDER, OVERWRITE_ALL
@@ -100,7 +91,7 @@ public class DataRestoreTask extends Task {
 			throw new IllegalStateException(String.format("No user group for survey %s found", surveyName));
 		}
 		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(userGroupId, user.getId());
-		if (userInGroup == null || !DATA_RESTORE_ALLOWED_USER_GROUP_ROLES.contains(userInGroup.getRole())) {
+		if (userInGroup == null || userInGroup.getRole() != UserGroupRole.VIEWER) {
 			throw new IllegalStateException(String.format("User %s is not allowed to restore data for survey %s",
 					user.getUsername(), surveyName));
 		}
