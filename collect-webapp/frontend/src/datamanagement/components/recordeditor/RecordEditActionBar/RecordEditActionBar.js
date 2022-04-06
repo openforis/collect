@@ -113,7 +113,7 @@ const RecordEditActionBar = (props) => {
             </IconButton>
             {!inPopUp && (
               <>
-                {prevStep && (
+                {user.canDemoteRecord({ record, roleInGroup }) && (
                   <Button
                     variant="contained"
                     color="default"
@@ -125,7 +125,7 @@ const RecordEditActionBar = (props) => {
                     {L.l('dataManagement.dataEntry.demote')}
                   </Button>
                 )}
-                {nextStep && (
+                {user.canPromoteRecord({ record, roleInGroup }) && (
                   <Button
                     variant="contained"
                     color="secondary"
