@@ -4,10 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.48] - 2022-04-08
+### Fixed
+- Websockets not working properly when Collect runs in a server under https with load balancing;
+- Blank screen starting Saiku when Collect runs in a server under https with load balancing;
+
 ## [4.0.47] - 2022-04-07
 ### Fixed
 - Error uploading data from Collect Mobile;
-- Blank screen starting Saiku when Collect runs in a server under https;
 
 ## [4.0.46] - 2022-04-06
 ### Fixed

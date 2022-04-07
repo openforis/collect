@@ -14,8 +14,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.openforis.collect.Collect;
 import org.openforis.collect.CollectCompleteInfo;
 import org.openforis.collect.CollectInfo;
@@ -31,8 +29,6 @@ import org.w3c.dom.NodeList;
 
 @Component
 public class CollectInfoService {
-
-	protected static final Logger LOG = LogManager.getLogger(CollectInfoService.class);
 
 	private static final String LATEST_RELEASE_METADATA_URL = Collect.NEXUS_URL
 			+ "/org/openforis/collect/collect/maven-metadata.xml";
@@ -75,7 +71,8 @@ public class CollectInfoService {
 				HttpEntity entity = response.getEntity();
 				InputStream is = entity.getContent();
 				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-				// completely disable DOCTYPE declaration to avoid access to external entities in XML parsing
+				// completely disable DOCTYPE declaration to avoid access to external entities
+				// in XML parsing
 				dbFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 				DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 				Document doc = dBuilder.parse(is);
@@ -112,16 +109,10 @@ public class CollectInfoService {
 			return null;
 		}
 	}
-	
+
 	private String determineProtocol(HttpServletRequest request) {
-		try {
-			String requestUrl = request.getRequestURL().toString();
-			LOG.info("Getting info from url " + requestUrl);
-			URL url = new URL(requestUrl);
-			return url.getProtocol();
-		} catch (MalformedURLException e1) {
-			// it should never be thrown, url is the request url and is always correct
-			return null;
-		}
+		return request.isSecure() || "https".equalsIgnoreCase(request.getScheme())
+				|| "https".equalsIgnoreCase(request.getHeader("X-Forwarded-Proto") // set by a load balancer, if any
+				) ? "https" : "http";
 	}
 }
