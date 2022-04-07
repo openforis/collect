@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [4.0.47] - 2022-04-07
 ### Fixed
 - Error uploading data from Collect Mobile;
+- Blank screen starting Saiku when Collect runs in a server under https;
 
 ## [4.0.46] - 2022-04-06
 ### Fixed

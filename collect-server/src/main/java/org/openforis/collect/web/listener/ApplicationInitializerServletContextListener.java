@@ -33,12 +33,13 @@ public class ApplicationInitializerServletContextListener implements ServletCont
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		LOG.info("========Open Foris Collect - Starting initialization ==========");
+		String logMessagePrefix = String.format("======== Open Foris Collect v%s - ", Collect.VERSION.toString());
+		LOG.info(logMessagePrefix + "Starting initialization ==========");
 		initSentry();
 		initDB();
 		CollectConfiguration.setDevelopmentMode(determineIsDevelopmentMode(sce));
 		configureOfUsersModule(sce);
-		LOG.info("========Open Foris Collect - Initialized ======================");
+		LOG.info(logMessagePrefix + "Initialized ======================");
 	}
 
 	private void initSentry() {
@@ -61,10 +62,10 @@ public class ApplicationInitializerServletContextListener implements ServletCont
 	}
 
 	private void initDB() {
-		LOG.info("========Open Foris Collect - Starting DB initialization ========");
+		LOG.info("======== Starting DB initialization ========");
 		DataSourceConnectionProvider connectionProvider = new DataSourceConnectionProvider(DbUtils.getDataSource());
 		new DbInitializer(connectionProvider).start();
-		LOG.info("========Open Foris Collect - DB Initialized ====================");
+		LOG.info("======== DB Initialized ====================");
 	}
 
 	private String determineHostName() {

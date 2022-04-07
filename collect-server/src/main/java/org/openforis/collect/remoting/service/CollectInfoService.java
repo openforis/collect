@@ -1,7 +1,8 @@
 package org.openforis.collect.remoting.service;
 
 import java.io.InputStream;
-import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
@@ -20,7 +21,6 @@ import org.openforis.collect.CollectInternalInfo;
 import org.openforis.collect.reporting.SaikuConfiguration;
 import org.openforis.commons.versioning.Version;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -34,9 +34,6 @@ public class CollectInfoService {
 			+ "/org/openforis/collect/collect/maven-metadata.xml";
 
 	private static final int RELEASE_FETCH_TIMEOUT = 10000;
-
-	private static final String DEV_LOCAL_ADDRESS = "127.0.0.1";
-	private static final String DEV_REQUEST_LOCAL_ADDRESS = "0:0:0:0:0:0:0:1";
 
 	@Autowired
 	private SaikuConfiguration saikuConfiguration;
@@ -95,29 +92,30 @@ public class CollectInfoService {
 	}
 
 	private String determineSaikuUrl(HttpServletRequest request) {
-		String protocol = request.isSecure() ? "https" : "http";
+		String protocol = determineProtocol(request);
 		String host = determineHost(request);
 		return String.format("%s://%s/%s", protocol, host, saikuConfiguration.getContextPath());
 	}
 
 	private String determineHost(HttpServletRequest request) {
-		String host = request.getHeader(HttpHeaders.HOST);
-		if (host == null) {
-			int port = request.getLocalPort();
-			String localHostName = request.getLocalAddr();
-			if (localHostName == null) {
-				try {
-					InetAddress localHost = InetAddress.getLocalHost();
-					localHostName = localHost.getHostName();
-				} catch (Exception e) {
-				}
-			}
-			if (DEV_REQUEST_LOCAL_ADDRESS.equals(localHostName)) {
-				localHostName = DEV_LOCAL_ADDRESS;
-			}
-			return String.format("%s:%d", localHostName, port);
-		} else {
-			return host;
+		try {
+			URL url = new URL(request.getRequestURL().toString());
+			String host = url.getHost();
+			int port = url.getPort();
+			return String.format("%s:%d", host, port);
+		} catch (MalformedURLException e1) {
+			// it should never be thrown, url is the request url and is always correct
+			return null;
+		}
+	}
+	
+	private String determineProtocol(HttpServletRequest request) {
+		try {
+			URL url = new URL(request.getRequestURL().toString());
+			return url.getProtocol();
+		} catch (MalformedURLException e1) {
+			// it should never be thrown, url is the request url and is always correct
+			return null;
 		}
 	}
 }
