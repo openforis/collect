@@ -13,7 +13,7 @@
 	default-lazy-init="true"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/openforis/collect/application-context-server-base.xml"/>
+	<import resource="classpath:org/openforis/collect/application-context-server.xml"/>
 
 	<bean id="devPropertyConfigurer"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
