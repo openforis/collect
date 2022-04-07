@@ -14,6 +14,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.Collect;
 import org.openforis.collect.CollectCompleteInfo;
 import org.openforis.collect.CollectInfo;
@@ -29,6 +31,8 @@ import org.w3c.dom.NodeList;
 
 @Component
 public class CollectInfoService {
+
+	protected static final Logger LOG = LogManager.getLogger(CollectInfoService.class);
 
 	private static final String LATEST_RELEASE_METADATA_URL = Collect.NEXUS_URL
 			+ "/org/openforis/collect/collect/maven-metadata.xml";
@@ -102,7 +106,7 @@ public class CollectInfoService {
 			URL url = new URL(request.getRequestURL().toString());
 			String host = url.getHost();
 			int port = url.getPort();
-			return String.format("%s:%d", host, port);
+			return port > 0 ? String.format("%s:%d", host, port) : host;
 		} catch (MalformedURLException e1) {
 			// it should never be thrown, url is the request url and is always correct
 			return null;
@@ -111,7 +115,9 @@ public class CollectInfoService {
 	
 	private String determineProtocol(HttpServletRequest request) {
 		try {
-			URL url = new URL(request.getRequestURL().toString());
+			String requestUrl = request.getRequestURL().toString();
+			LOG.info("Getting info from url " + requestUrl);
+			URL url = new URL(requestUrl);
 			return url.getProtocol();
 		} catch (MalformedURLException e1) {
 			// it should never be thrown, url is the request url and is always correct
