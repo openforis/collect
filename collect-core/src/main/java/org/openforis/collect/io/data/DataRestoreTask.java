@@ -91,7 +91,7 @@ public class DataRestoreTask extends Task {
 			throw new IllegalStateException(String.format("No user group for survey %s found", surveyName));
 		}
 		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(userGroupId, user.getId());
-		if (userInGroup == null || userInGroup.getRole() != UserGroupRole.VIEWER) {
+		if (userInGroup == null || userInGroup.getRole() == UserGroupRole.VIEWER) {
 			throw new IllegalStateException(String.format("User %s is not allowed to restore data for survey %s",
 					user.getUsername(), surveyName));
 		}
