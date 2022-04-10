@@ -133,22 +133,35 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
   }
 
   extractFormObject() {
+    const {
+      id,
+      name,
+      label,
+      description,
+      visibilityCode,
+      parentId,
+      enabled,
+      qualifierName,
+      qualifierValue,
+      usersInGroup: users,
+    } = this.state
+
     return {
-      id: this.state.id,
-      name: this.state.name,
-      label: this.state.label,
-      description: this.state.description,
-      visibilityCode: this.state.visibilityCode,
-      parentId: this.state.parentId,
-      enabled: this.state.enabled,
-      qualifierName: this.state.qualifierName,
-      qualifierValue: this.state.qualifierValue,
-      users: this.state.usersInGroup,
+      id,
+      name,
+      label,
+      description,
+      visibilityCode,
+      parentId,
+      enabled,
+      qualifierName,
+      qualifierValue,
+      users,
     }
   }
 
   handleSaveBtnClick() {
-    let formObject = this.extractFormObject()
+    const formObject = this.extractFormObject()
     this.userGroupService.save(formObject).then(this.updateStateFromResponse)
   }
 
