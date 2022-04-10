@@ -218,9 +218,12 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		for (UserInGroup oldUserInGroup : oldUsersInGroup) {
 			UserInGroup updatedUserInGroup = parameterUsersInGroupByUserId.get(oldUserInGroup.getUserId());
 			if (updatedUserInGroup != null) {
-				oldUserInGroup.setJoinStatus(updatedUserInGroup.getJoinStatus());
-				oldUserInGroup.setRole(updatedUserInGroup.getRole());
-				updatedUsersInGroupByUserId.put(oldUserInGroup.getUserId(), oldUserInGroup);
+				if (oldUserInGroup.getJoinStatus() != updatedUserInGroup.getJoinStatus() || 
+						oldUserInGroup.getRole() != updatedUserInGroup.getRole()) {
+					oldUserInGroup.setJoinStatus(updatedUserInGroup.getJoinStatus());
+					oldUserInGroup.setRole(updatedUserInGroup.getRole());
+					updatedUsersInGroupByUserId.put(oldUserInGroup.getUserId(), oldUserInGroup);
+				}
 			} else {
 				removedUsersInGroupByUserId.put(oldUserInGroup.getUserId(), oldUserInGroup);
 			}
