@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,8 +14,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import jakarta.activation.FileTypeMap;
 
 /**
  * 
@@ -173,7 +172,6 @@ public class Files {
 	}
 	
 	public static String getContentType(String fileName) {
-		FileTypeMap defaultFileTypeMap = FileTypeMap.getDefaultFileTypeMap();
-		return defaultFileTypeMap.getContentType(fileName);
+		return URLConnection.guessContentTypeFromName(fileName);
 	}
 }
