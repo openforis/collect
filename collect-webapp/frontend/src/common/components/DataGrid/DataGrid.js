@@ -158,7 +158,7 @@ export const DataGrid = (props) => {
 
 DataGrid.defaultProps = {
   checkboxSelection: false,
-  disableMultipleSelection: false,
+  disableMultipleSelection: undefined,
   exportFileName: null,
   hideFooterPagination: false,
   onFilterModelChange: null,
