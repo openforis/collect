@@ -486,7 +486,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                         { field: 'username', headerName: 'Username', flex: 1 },
                         { field: 'role', headerName: 'Role', width: 100 },
                       ]}
-                      hideFooterPagination
+                      hideFooter
                       onSelectedIdsChange={this.handleAvailableUsersSelection}
                       rows={this.state.availableUsers}
                     />
@@ -554,7 +554,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                     { field: 'joinStatus', headerName: 'Status', width: 120 },
                   ]}
                   getRowId={(row) => row.userId}
-                  hideFooterPagination
+                  hideFooter
                   onSelectedIdsChange={this.handleUsersInGroupSelection}
                   rows={this.state.usersInGroup}
                 />

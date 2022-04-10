@@ -19,6 +19,7 @@ export const DataGrid = (props) => {
     exportFileName,
     getRowId,
     headerHeight,
+    hideFooter,
     hideFooterPagination,
     isCellEditable,
     loading,
@@ -28,7 +29,7 @@ export const DataGrid = (props) => {
     onRowDoubleClick: onRowDoubleClickProp,
     onSelectedIdsChange,
     onSortModelChange,
-    pageSize,
+    pageSize: pageSizeProp,
     rowCount,
     rows,
     selectionModel,
@@ -63,6 +64,9 @@ export const DataGrid = (props) => {
       },
     [filterModel, setFilterModel]
   )
+
+  // when footer or pagination is hidden, show all rows
+  const pageSize = hideFooter || hideFooterPagination ? rows?.length : pageSizeProp
 
   // TODO handle DataGrid onFilterModelChange
   // const onFilterModelChange = useCallback(
@@ -125,6 +129,7 @@ export const DataGrid = (props) => {
       filterMode={dataMode}
       filterModel={filterModel}
       headerHeight={headerHeight}
+      hideFooter={hideFooter}
       hideFooterPagination={hideFooterPagination}
       isCellEditable={isCellEditable}
       loading={loading}
