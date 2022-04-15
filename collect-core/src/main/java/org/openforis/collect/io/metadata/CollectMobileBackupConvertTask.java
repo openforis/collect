@@ -29,7 +29,7 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
  */
 public class CollectMobileBackupConvertTask extends Task {
 
-	private static final String SERVER_APPLICATION_CONTEXT_FILE_NAME = "org/openforis/collect/application-context-server.xml";
+	private static final String SERVER_APPLICATION_CONTEXT_FILE_NAME = "org/openforis/collect/application-context-server-base.xml";
 	private static final String DATASOURCE_TEMPLATE_FILE_NAME = "org/openforis/collect/application-context-datasource-template.xml";
 	private static final String COLLECT_DB_FILE_NAME = "collect.db";
 	// input
