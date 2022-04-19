@@ -4,7 +4,7 @@ import { HashRouter, Route, Routes } from 'react-router-dom'
 import thunkMiddleware from 'redux-thunk'
 import { createStore, applyMiddleware, compose } from 'redux'
 import { Provider } from 'react-redux'
-import { createTheme, ThemeProvider, StyledEngineProvider } from '@mui/material';
+import { createTheme, ThemeProvider, StyledEngineProvider } from '@mui/material'
 
 import 'bootstrap/dist/css/bootstrap.css'
 
