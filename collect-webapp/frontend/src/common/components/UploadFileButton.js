@@ -1,8 +1,8 @@
 import React from 'react';
 
-import Button from '@material-ui/core/Button'
+import Button from '@mui/material/Button'
 
-import { LinearProgress } from '@material-ui/core';
+import { LinearProgress } from '@mui/material';
 
 import L from 'utils/Labels';
 

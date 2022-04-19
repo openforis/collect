@@ -1,7 +1,7 @@
 import './RecordValidationReport.css'
 
 import React from 'react'
-import { Button, Dialog, DialogContent, DialogTitle, DialogActions } from '@material-ui/core'
+import { Button, Dialog, DialogContent, DialogTitle, DialogActions } from '@mui/material'
 
 import L from 'utils/Labels'
 import { Attribute } from 'model/Record/Attribute'

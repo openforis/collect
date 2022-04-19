@@ -13,8 +13,8 @@ import {
   Col,
   UncontrolledDropdown,
 } from 'reactstrap'
-import FormControl from '@material-ui/core/FormControl'
-import FormHelperText from '@material-ui/core/FormHelperText'
+import FormControl from '@mui/material/FormControl'
+import FormHelperText from '@mui/material/FormHelperText'
 
 import { withNavigate } from 'common/hooks'
 import MaxAvailableSpaceContainer from 'common/components/MaxAvailableSpaceContainer'
@@ -347,18 +347,18 @@ class DataManagementPage extends React.Component {
                 <DropdownMenu>
                   <DropdownItem header>Promote records</DropdownItem>
                   <DropdownItem onClick={this.handlePromoteEntryToCleansingButtonClick}>
-                    <i className="fa fa-arrow-right" aria-hidden="true"></i> Entry -> Cleansing
+                    <i className="fa fa-arrow-right" aria-hidden="true"></i> Entry -&gt; Cleansing
                   </DropdownItem>
                   <DropdownItem onClick={this.handlePromoteCleansingToAnalysisButtonClick}>
-                    <i className="fa fa-arrow-right" aria-hidden="true"></i> Cleansing -> Analysis
+                    <i className="fa fa-arrow-right" aria-hidden="true"></i> Cleansing -&gt; Analysis
                   </DropdownItem>
                   <DropdownItem divider />
                   <DropdownItem header>Demote records</DropdownItem>
                   <DropdownItem onClick={this.handleDemoteCleansingToEntryButtonClick}>
-                    <i className="fa fa-arrow-left" aria-hidden="true"></i> Cleansing -> Entry
+                    <i className="fa fa-arrow-left" aria-hidden="true"></i> Cleansing -&gt; Entry
                   </DropdownItem>
                   <DropdownItem onClick={this.handleDemoteAnalysisToCleansingButtonClick}>
-                    <i className="fa fa-arrow-left" aria-hidden="true"></i> Analysis -> Cleansing
+                    <i className="fa fa-arrow-left" aria-hidden="true"></i> Analysis -&gt; Cleansing
                   </DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>

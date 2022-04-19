@@ -1,5 +1,5 @@
 import React from 'react'
-import MuiDialog from '@material-ui/core/Dialog'
+import MuiDialog from '@mui/material/Dialog'
 
 export const Dialog = (props) => {
   const {

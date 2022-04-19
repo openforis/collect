@@ -1,5 +1,5 @@
 import React from 'react'
-import { Checkbox, FormControlLabel, Radio } from '@material-ui/core'
+import { Checkbox, FormControlLabel, Radio } from '@mui/material'
 
 import CodeFieldItemLabel from './CodeFieldItemLabel'
 import CodeFieldQualifier from './CodeFieldQualifier'

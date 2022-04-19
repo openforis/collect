@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import MuiAutocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete'
-import { Popper, TextField } from '@material-ui/core'
+import MuiAutocomplete, { createFilterOptions } from '@mui/material/Autocomplete'
+import { Popper, TextField } from '@mui/material'
 
 import Arrays from 'utils/Arrays'
 import LoadingSpinnerSmall from './LoadingSpinnerSmall'

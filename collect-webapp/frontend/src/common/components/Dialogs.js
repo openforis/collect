@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { render, unmountComponentAtNode, findDOMNode } from 'react-dom'
 
-import Button from '@material-ui/core/Button'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import DialogActions from '@material-ui/core/DialogActions'
-import LinearProgress from '@material-ui/core/LinearProgress'
+import Button from '@mui/material/Button'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogActions from '@mui/material/DialogActions'
+import LinearProgress from '@mui/material/LinearProgress'
 
 import L from 'utils/Labels'
 import { Dialog } from 'common/components'

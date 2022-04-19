@@ -11,7 +11,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
-} from '@material-ui/core'
+} from '@mui/material'
 import L from 'utils/Labels'
 import Dates from 'utils/Dates'
 

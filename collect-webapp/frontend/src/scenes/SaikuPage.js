@@ -2,11 +2,11 @@ import React, { Component } from 'react'
 import { Button, Form, FormGroup, Label, Input, Col, Container } from 'reactstrap'
 import { connect } from 'react-redux'
 
-import ExpansionPanel from '@material-ui/core/ExpansionPanel'
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary'
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
-import Grid from '@material-ui/core/Grid'
+import Accordion from '@mui/material/Accordion'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import Grid from '@mui/material/Grid'
 
 import * as JobActions from 'actions/job'
 import ServiceFactory from 'services/ServiceFactory'
@@ -95,9 +95,9 @@ class SaikuPage extends Component {
     return (
       <Grid container direction="column" alignItems="center" spacing={5}>
         <Grid item>
-          <ExpansionPanel defaultExpanded style={{ width: '550px' }}>
-            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>Prepare Saiku database</ExpansionPanelSummary>
-            <ExpansionPanelDetails>
+          <Accordion defaultExpanded style={{ width: '550px' }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>Prepare Saiku database</AccordionSummary>
+            <AccordionDetails>
               <Container>
                 <Form sm={4}>
                   <FormGroup row inline>
@@ -147,8 +147,8 @@ class SaikuPage extends Component {
                   </FormGroup>
                 </Form>
               </Container>
-            </ExpansionPanelDetails>
-          </ExpansionPanel>
+            </AccordionDetails>
+          </Accordion>
         </Grid>
         <Grid item>
           <Button onClick={this.handleStartSaikuClick} className="btn btn-info">

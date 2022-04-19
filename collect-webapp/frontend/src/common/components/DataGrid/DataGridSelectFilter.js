@@ -1,11 +1,10 @@
 import React from 'react'
-import MenuItem from '@material-ui/core/MenuItem'
-import Select from '@material-ui/core/Select'
-import Chip from '@material-ui/core/Chip'
+import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
+import Chip from '@mui/material/Chip'
 import Arrays from 'utils/Arrays'
 import L from 'utils/Labels'
 import Strings from 'utils/Strings'
-import { OutlinedInput } from '@material-ui/core'
 
 /*
 const styles = theme => ({

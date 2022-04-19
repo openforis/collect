@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import MuiTextField from '@material-ui/core/TextField'
+import MuiTextField from '@mui/material/TextField'
 
 import { TextAttributeDefinition } from 'model/Survey'
 

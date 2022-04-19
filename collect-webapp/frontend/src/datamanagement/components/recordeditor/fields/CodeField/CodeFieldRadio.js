@@ -1,5 +1,5 @@
 import React from 'react'
-import { RadioGroup } from '@material-ui/core'
+import { RadioGroup } from '@mui/material'
 
 import { CodeAttributeDefinition } from 'model/Survey'
 import CodeFieldRadioItem from './CodeFieldRadioItem'

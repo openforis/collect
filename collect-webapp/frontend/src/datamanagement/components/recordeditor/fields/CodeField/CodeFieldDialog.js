@@ -1,7 +1,7 @@
 import './CodeFieldDialog.css'
 
 import React, { useState } from 'react'
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'
 
 import L from 'utils/Labels'
 import CodeFieldRadio from './CodeFieldRadio'

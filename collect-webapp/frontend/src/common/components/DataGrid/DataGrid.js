@@ -2,7 +2,7 @@ import './DataGrid.scss'
 
 import React, { useCallback, useRef, useState } from 'react'
 import classNames from 'classnames'
-import { DataGrid as MuiDataGrid, GridToolbar } from '@material-ui/data-grid'
+import { DataGrid as MuiDataGrid, GridToolbar } from '@mui/x-data-grid'
 
 import L from 'utils/Labels'
 import { QuickSearchHeader } from './QuickSearchHeader'
