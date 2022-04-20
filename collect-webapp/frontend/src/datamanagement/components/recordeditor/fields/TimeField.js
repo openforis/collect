@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { TimePicker as MuiTimePicker } from '@mui/x-date-pickers/TimePicker'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import DateFnsUtils from '@date-io/date-fns'
 
 import Dates from 'utils/Dates'
 import AbstractField from './AbstractField'
@@ -11,13 +10,10 @@ import * as FieldSizes from './FieldsSizes'
 import DirtyFieldSpinner from './DirtyFieldSpinner'
 
 const fromValueToDate = (value) => (value ? new Date(1970, 1, 1, value.hour, value.minute) : null)
-const fromDateToValue = (date) => {
-  const dateUtils = new DateFnsUtils()
-  return {
-    hour: dateUtils.getHours(date),
-    minute: dateUtils.getMinutes(date),
-  }
-}
+const fromDateToValue = (date) => ({
+  hour: Dates.getHours(date),
+  minute: Dates.getMinutes(date),
+})
 
 class TimeField extends AbstractField {
   constructor() {

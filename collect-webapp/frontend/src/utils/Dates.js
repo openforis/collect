@@ -49,4 +49,24 @@ export default class Dates {
 
     return d1.getTime() < d2.getTime() ? -1 : d1.getTime() > d2.getTime() ? 1 : 0
   }
+
+  static getYear(date) {
+    return dateFnsUtils.getYear(date)
+  }
+
+  static getMonth(date) {
+    return dateFnsUtils.getMonth(date)
+  }
+
+  static getDay(date) {
+    return Number(dateFnsUtils.getDayText(date))
+  }
+
+  static getHours(date) {
+    return dateFnsUtils.getHours(date)
+  }
+
+  static getMinutes(date) {
+    return dateFnsUtils.getMinutes(date)
+  }
 }
