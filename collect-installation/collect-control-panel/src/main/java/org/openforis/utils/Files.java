@@ -27,7 +27,7 @@ public abstract class Files {
 	}
 
 	public static String tail(File file, long maxSize) {
-		StringBuilder sb = new StringBuilder(new Long(maxSize).intValue());
+		StringBuilder sb = new StringBuilder(Long.valueOf(maxSize).intValue());
 		RandomAccessFile raf = null;
 		try {
 			raf = new RandomAccessFile(file, "r");

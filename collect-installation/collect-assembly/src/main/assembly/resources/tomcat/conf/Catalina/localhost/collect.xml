@@ -9,17 +9,18 @@
 	   name="jdbc/collectDs" 
 	   auth="Container"
 	   type="javax.sql.DataSource"
-	   factory="org.apache.commons.dbcp.BasicDataSourceFactory"
+	   factory="org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory"
 	   driverClassName="org.sqlite.JDBC"
        url="jdbc:sqlite:${user.home}/OpenForis/Collect/data/collect.db">
 	 </Resource>
 	 
-	<!-- PostgreSQL database configuration
+	<!-- PostgreSQL database configuration -->
+	<!--
 	<Resource 
 	   name="jdbc/collectDs" 
 	   auth="Container"
 	   type="javax.sql.DataSource"
-	   factory="org.apache.commons.dbcp.BasicDataSourceFactory"
+	   factory="org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory"
 	   driverClassName="org.postgresql.Driver"
 	   url="jdbc:postgresql://localhost:5432/collect"
 	   username="collect"
