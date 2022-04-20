@@ -66,9 +66,9 @@
 			<outputDirectory>${output.directory}/tomcat/lib</outputDirectory>
 			<includes>
 				<include>org.xerial:sqlite-jdbc:jar</include>
-				<include>postgresql:postgresql:jar</include>
-				<include>commons-pool:commons-pool:jar</include>
-				<include>commons-dbcp:commons-dbcp:jar</include>
+				<include>org.postgresql:postgresql:jar</include>
+				<include>org.apache.commons:commons-pool2:jar</include>
+				<include>org.apache.commons:commons-dbcp2:jar</include>
 			</includes>
 		</dependencySet>
 		<!-- Add the actual Collect webapp (unpacked) -->
