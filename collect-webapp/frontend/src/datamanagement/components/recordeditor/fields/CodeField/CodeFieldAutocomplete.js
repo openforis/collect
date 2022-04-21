@@ -36,18 +36,19 @@ const CodeFieldAutocomplete = (props) => {
   const { codeListId } = attributeDefinition
 
   const fetchCodeItems = useCallback(
-    ({ surveyId, codeListId, versionId, language, ancestorCodes }) => ({ searchString, onComplete }) =>
-      debounce(Strings.isBlank(searchString) ? 0 : 1000, false, async () => {
-        const availableItems = await ServiceFactory.codeListService.findAvailableItems({
-          surveyId,
-          codeListId,
-          versionId,
-          language,
-          ancestorCodes,
-          searchString,
-        })
-        onComplete(availableItems)
-      }),
+    ({ surveyId, codeListId, versionId, language, ancestorCodes }) =>
+      ({ searchString, onComplete }) =>
+        debounce(Strings.isBlank(searchString) ? 0 : 1000, false, async () => {
+          const availableItems = await ServiceFactory.codeListService.findAvailableItems({
+            surveyId,
+            codeListId,
+            versionId,
+            language,
+            ancestorCodes,
+            searchString,
+          })
+          onComplete(availableItems)
+        }),
     [surveyId, codeListId, versionId, language, ancestorCodes]
   )
 
@@ -65,7 +66,9 @@ const CodeFieldAutocomplete = (props) => {
         fetchFunction={fetchCodeItems({ surveyId, codeListId, versionId, language, ancestorCodes })}
         itemLabelFunction={itemLabelFunction}
         itemSelectedFunction={(item, value) => item.code === value.code}
-        itemRenderFunction={(item) => <CodeFieldItemLabel item={item} attributeDefinition={attributeDefinition} />}
+        itemRenderFunction={(renderProps, item) => (
+          <CodeFieldItemLabel {...renderProps} item={item} attributeDefinition={attributeDefinition} />
+        )}
         onSelect={onSelect}
       />
       {!inTable && qualifiableItemSelected && (

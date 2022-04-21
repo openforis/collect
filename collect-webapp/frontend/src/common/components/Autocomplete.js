@@ -6,12 +6,14 @@ import { Popper, TextField } from '@mui/material'
 import Arrays from 'utils/Arrays'
 import LoadingSpinnerSmall from './LoadingSpinnerSmall'
 
-const PopperCustom = ({ popUpWidth, popUpWidthContentBased }) => (props) => {
-  const { style: styleProps = {} } = props
-  const width = popUpWidthContentBased ? null : popUpWidth || styleProps?.width
-  const style = { ...styleProps, minWidth: '100px', width: width ? `${width}px` : 'auto' }
-  return <Popper {...props} style={style} placement="bottom-start" />
-}
+const PopperCustom =
+  ({ popUpWidth, popUpWidthContentBased }) =>
+  (props) => {
+    const { style: styleProps = {} } = props
+    const width = popUpWidthContentBased ? null : popUpWidth || styleProps?.width
+    const style = { ...styleProps, minWidth: '100px', width: width ? `${width}px` : 'auto' }
+    return <Popper {...props} style={style} placement="bottom-start" />
+  }
 
 const Autocomplete = (props) => {
   const {
@@ -138,7 +140,6 @@ const Autocomplete = (props) => {
       onChange={(_, selection) => onSelect(selection, inputValue)}
       onInputChange={onInputChange}
       getOptionLabel={itemLabelFunction}
-      getOptionSelected={itemSelectedFunction}
       options={items}
       filterOptions={filterOptions}
       loading={loading}

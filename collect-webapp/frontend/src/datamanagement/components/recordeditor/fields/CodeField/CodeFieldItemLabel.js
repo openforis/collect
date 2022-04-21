@@ -21,7 +21,7 @@ export const itemLabelFunction = (attributeDefinition) => (item) => {
 }
 
 const CodeFieldItemLabel = (props) => {
-  const { item, attributeDefinition, singleLine } = props
+  const { item, attributeDefinition, singleLine, ...renderProps } = props
 
   const [labelTruncated, setLabelTruncated] = useState(false)
 
@@ -32,6 +32,8 @@ const CodeFieldItemLabel = (props) => {
 
   return (
     <span
+      key={item.id}
+      {...renderProps}
       className={classNames('code-field-item-label', {
         'single-line': singleLine,
         'with-info-icon': hasDescription,
