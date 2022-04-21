@@ -346,14 +346,13 @@ class SurveysListPage extends React.Component {
               field: 'userGroupId',
               headerName: 'survey.userGroup',
               sortable: true,
-              renderCell: userGroupCellRenderer,
               editable: true,
-              renderEditCell: ({ api, field, id, row }) => (
+              renderCell: userGroupCellRenderer,
+              renderEditCell: ({ id, field, row, onValueUpdate }) => (
                 <UserGroupColumnEditor
                   onUpdate={({ userGroupId }) => {
                     this.handleUserGroupIdUpdate({ row, userGroupId })
-                    // close cell editor
-                    api.setCellMode(id, field, 'view')
+                    onValueUpdate({ id, field, value: userGroupId })
                   }}
                   row={row}
                   userGroups={userGroups}

@@ -293,14 +293,13 @@ class RecordDataTable extends Component {
               </div>
             ),
             editable: userCanChangeRecordOwner,
-            renderEditCell: ({ api, field, id, row }) => (
+            renderEditCell: ({ api, field, id, row, onValueUpdate }) => (
               <OwnerColumnEditor
                 owner={row.owner}
                 users={users}
                 onUpdate={({ owner }) => {
                   this.props.updateRecordOwner(row, owner)
-                  // close cell editor
-                  api.setCellMode(id, field, 'view')
+                  onValueUpdate({ id, field, value })
                 }}
               />
             ),

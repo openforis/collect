@@ -2,11 +2,23 @@ import './DataGrid.scss'
 
 import React, { useCallback, useRef, useState } from 'react'
 import classNames from 'classnames'
-import { DataGrid as MuiDataGrid, GridToolbar } from '@mui/x-data-grid'
+import { DataGrid as MuiDataGrid, GridToolbar, useGridApiContext } from '@mui/x-data-grid'
 
 import L from 'utils/Labels'
 import { QuickSearchHeader } from './QuickSearchHeader'
 import Arrays from 'utils/Arrays'
+
+const EditCell = (props) => {
+  const { id, field, row, renderEditCell } = props
+
+  const apiRef = useGridApiContext()
+
+  const onValueUpdate = ({ id, field, value }) => {
+    apiRef.current.setEditCellValue({ id, field, value })
+  }
+
+  return renderEditCell({ id, field, row, api: apiRef.current, onValueUpdate })
+}
 
 export const DataGrid = (props) => {
   const {
@@ -94,10 +106,10 @@ export const DataGrid = (props) => {
           headerName: headerNameProp,
           quickSearch = null,
           renderCell,
-          renderEditCell,
+          renderEditCell: renderEditCellProp,
           renderHeader: renderHeaderProp,
           sortable = false,
-          valueFormatter,
+          valueFormatter: valueFormatterProp,
           width,
           ...otherColProps
         } = col
@@ -115,10 +127,17 @@ export const DataGrid = (props) => {
           filterable,
           headerName,
           renderCell,
-          renderEditCell,
+          renderEditCell: renderEditCellProp
+            ? ({ id, field, row }) => <EditCell id={id} field={field} row={row} renderEditCell={renderEditCellProp} />
+            : undefined,
           renderHeader,
           sortable,
-          valueFormatter,
+          valueFormatter: valueFormatterProp
+            ? ({ id, field, value, api }) => {
+                const row = api.getRow(id)
+                return valueFormatterProp({ id, field, value, api, row })
+              }
+            : undefined,
           width,
         }
       })}
@@ -126,6 +145,7 @@ export const DataGrid = (props) => {
       componentsProps={{ ...(showToolbar ? { toolbar: { csvOptions: { fileName: exportFileName } } } : {}) }}
       disableMultipleSelection={disableMultipleSelection}
       disableSelectionOnClick={disableSelectionOnClick}
+      experimentalFeatures={{ newEditingApi: true }}
       filterMode={dataMode}
       filterModel={filterModel}
       headerHeight={headerHeight}
@@ -133,12 +153,6 @@ export const DataGrid = (props) => {
       hideFooterPagination={hideFooterPagination}
       isCellEditable={isCellEditable}
       loading={loading}
-      onCellClick={({ api, colDef, id, isEditable }) => {
-        if (isEditable) {
-          // open cell editor on single click
-          api.setCellMode(id, colDef.field, 'edit')
-        }
-      }}
       onCellDoubleClick={onCellDoubleClick}
       onPageChange={onPageChange}
       onPageSizeChange={onPageSizeChange}

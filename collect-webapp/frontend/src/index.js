@@ -4,7 +4,7 @@ import { HashRouter, Route, Routes } from 'react-router-dom'
 import thunkMiddleware from 'redux-thunk'
 import { createStore, applyMiddleware, compose } from 'redux'
 import { Provider } from 'react-redux'
-import { createTheme, ThemeProvider, StyledEngineProvider } from '@mui/material'
+import { createTheme, ThemeProvider } from '@mui/material'
 
 import 'bootstrap/dist/css/bootstrap.css'
 
@@ -40,19 +40,17 @@ Labels.initialize(() => {
     <Provider store={store}>
       <SessionTimeoutVerifier>
         <Startup>
-          <StyledEngineProvider injectFirst>
-            <ThemeProvider theme={theme}>
-              <HashRouter>
-                <Routes>
-                  <Route path="/signin" name="Signin Page" element={<Signin />} />
-                  <Route path="/register" name="Register Page" element={<Register />} />
-                  <Route path="/404" name="Page 404" element={<Page404 />} />
-                  <Route path="/500" name="Page 500" element={<Page500 />} />
-                  <Route path="*" name="Home" element={<App />} />
-                </Routes>
-              </HashRouter>
-            </ThemeProvider>
-          </StyledEngineProvider>
+          <ThemeProvider theme={theme}>
+            <HashRouter>
+              <Routes>
+                <Route path="/signin" name="Signin Page" element={<Signin />} />
+                <Route path="/register" name="Register Page" element={<Register />} />
+                <Route path="/404" name="Page 404" element={<Page404 />} />
+                <Route path="/500" name="Page 500" element={<Page500 />} />
+                <Route path="*" name="Home" element={<App />} />
+              </Routes>
+            </HashRouter>
+          </ThemeProvider>
         </Startup>
       </SessionTimeoutVerifier>
     </Provider>,
