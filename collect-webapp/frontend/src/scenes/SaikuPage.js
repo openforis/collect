@@ -122,7 +122,7 @@ class SaikuPage extends Component {
                     </Col>
                   </FormGroup>
                   {reportingRepositoryInfo && (
-                    <Form>
+                    <>
                       <FormGroup row inline>
                         <Label sm={8}>Last Saiku DB generation:</Label>
                         <Col sm={4} className="form-control">
@@ -135,7 +135,7 @@ class SaikuPage extends Component {
                           {reportingRepositoryInfo.updatedRecordsSinceLastUpdate}
                         </Col>
                       </FormGroup>
-                    </Form>
+                    </>
                   )}
                   <FormGroup row>{dbGenerationNeeded && <div>Saiku DB Generation needed</div>}</FormGroup>
                   <FormGroup row>

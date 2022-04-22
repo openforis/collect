@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { TextField } from '@mui/material'
 import { DatePicker as MuiDatePicker } from '@mui/x-date-pickers/DatePicker'
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 
 import Dates from 'utils/Dates'
@@ -11,17 +11,19 @@ export const DatePicker = (props) => {
   const { disabled, maxDate, minDate, onChange, style, value } = props
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+    <LocalizationProvider dateAdapter={AdapterMoment}>
       <MuiDatePicker
+        allowSameDateSelection
         disabled={disabled}
-        format={Dates.DATE_FORMAT}
-        margin="none"
+        inputFormat={Dates.DATE_FORMAT}
         minDate={minDate}
         maxDate={maxDate}
-        value={value}
-        onChange={onChange}
-        style={style}
+        onChange={(moment) => {
+          onChange(moment?.toDate())
+        }}
         renderInput={(params) => <TextField {...params} />}
+        style={style}
+        value={value}
       />
     </LocalizationProvider>
   )

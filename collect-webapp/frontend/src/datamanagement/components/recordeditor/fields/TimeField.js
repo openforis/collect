@@ -1,7 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
+
+import { TextField } from '@mui/material'
 import { TimePicker as MuiTimePicker } from '@mui/x-date-pickers/TimePicker'
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 
 import Dates from 'utils/Dates'
@@ -41,16 +43,15 @@ class TimeField extends AbstractField {
 
     return (
       <div>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <LocalizationProvider dateAdapter={AdapterMoment}>
           <MuiTimePicker
-            format={Dates.TIME_FORMAT}
+            inputFormat={Dates.TIME_FORMAT}
             ampm={false}
-            margin="none"
             disabled={readOnly}
             value={selectedTime}
             onChange={this.onChange}
-            keyboardIcon={<span className="far fa-clock" />}
             style={{ width: `${width}px` }}
+            renderInput={(params) => <TextField {...params} />}
           />
         </LocalizationProvider>
         {dirty && <DirtyFieldSpinner />}
