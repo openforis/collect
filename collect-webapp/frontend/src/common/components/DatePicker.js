@@ -13,10 +13,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import Dates from 'utils/Dates'
 
 export const DatePicker = (props) => {
-  const { disabled, maxDate: maxDateProp, minDate: minDateProp, onChange, style, value } = props
-
-  const minDate = Dates.parseDateISO('2021-01-01')
-  const maxDate = Dates.parseDateISO('2023-01-01')
+  const { disabled, maxDate, minDate, onChange, style, value } = props
 
   return (
     <LocalizationProvider dateAdapter={AdapterMoment}>
