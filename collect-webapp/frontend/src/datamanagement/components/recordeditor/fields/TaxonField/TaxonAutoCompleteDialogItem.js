@@ -11,19 +11,14 @@ const widthByField = {
 }
 
 const TaxonAutoCompleteDialogItem = (props) => {
-  const { taxonOccurrence, attributeDefinition, ...renderProps } = props
+  const { taxonOccurrence, attributeDefinition } = props
   const { availableFieldNames } = attributeDefinition
 
   const visibleFields = Object.keys(widthByField).filter((field) => availableFieldNames.includes(field))
   const gridTemplateColumns = visibleFields.map((field) => widthByField[field]).join(' ')
 
   return (
-    <div
-      key={`${taxonOccurrence.code}_${taxonOccurrence.scientificName}`}
-      {...renderProps}
-      className="taxon-autocomplete-dialog-item"
-      style={{ gridTemplateColumns }}
-    >
+    <div className="taxon-autocomplete-dialog-item" style={{ gridTemplateColumns }}>
       {visibleFields.map((field) => {
         const valueFieldName = TaxonAttributeDefinition.ValueFieldByField[field]
         const fieldValue = taxonOccurrence[valueFieldName]

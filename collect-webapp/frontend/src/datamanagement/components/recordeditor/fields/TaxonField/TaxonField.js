@@ -102,9 +102,9 @@ class TaxonField extends AbstractField {
             items={langOptions}
             inputFieldWidth={FieldsSizes.TaxonFieldWidths[field]}
             selectedItems={Arrays.singleton(selectedOption)}
-            itemLabelFunction={(option) => `${option.code} - ${option.label}`}
-            itemSelectedFunction={(item) => item.code === langCode}
-            onSelect={(option) => this.onChangeField(field)(option.code)}
+            itemLabelFunction={(item) => `${item.code} - ${item.label}`}
+            isItemEqualToValue={({ item, value }) => item.code === value.code}
+            onSelect={(item) => this.onChangeField(field)(item.code)}
           />
         )
       }

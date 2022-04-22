@@ -64,11 +64,9 @@ const CodeFieldAutocomplete = (props) => {
         inputFieldWidth={width || FieldsSizes.getWidth({ fieldDef, inTable })}
         selectedItems={selectedItems}
         fetchFunction={fetchCodeItems({ surveyId, codeListId, versionId, language, ancestorCodes })}
+        isItemEqualToValue={({ item, value }) => item.code === value.code}
         itemLabelFunction={itemLabelFunction}
-        itemSelectedFunction={(item, value) => item.code === value.code}
-        itemRenderFunction={(renderProps, item) => (
-          <CodeFieldItemLabel {...renderProps} item={item} attributeDefinition={attributeDefinition} />
-        )}
+        itemRenderFunction={({ item }) => <CodeFieldItemLabel item={item} attributeDefinition={attributeDefinition} />}
         onSelect={onSelect}
       />
       {!inTable && qualifiableItemSelected && (

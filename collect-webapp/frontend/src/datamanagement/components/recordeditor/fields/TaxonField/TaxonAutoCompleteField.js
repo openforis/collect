@@ -78,14 +78,10 @@ const TaxonAutoCompleteField = (props) => {
       inputFieldWidth={FieldsSizes.TaxonFieldWidths[field]}
       selectedItems={Arrays.singleton(selectedTaxonOccurrence)}
       fetchFunction={fetchTaxa({ surveyId, fieldDef, queryField })}
+      isItemEqualToValue={({ item, value }) => item.code === value.code}
       itemLabelFunction={Objects.getProp(valueField, '')}
-      itemSelectedFunction={(item, value) => item.code === value.code}
-      itemRenderFunction={(renderProps, taxonOccurrence) => (
-        <TaxonAutoCompleteDialogItem
-          {...renderProps}
-          attributeDefinition={attributeDefinition}
-          taxonOccurrence={taxonOccurrence}
-        />
+      itemRenderFunction={({ item: taxonOccurrence }) => (
+        <TaxonAutoCompleteDialogItem attributeDefinition={attributeDefinition} taxonOccurrence={taxonOccurrence} />
       )}
       onInputChange={onInputChange}
       onSelect={onTaxonSelected}

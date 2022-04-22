@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import MuiAutocomplete, { createFilterOptions } from '@mui/material/Autocomplete'
-import { Popper, TextField } from '@mui/material'
+import { Box, Popper, TextField } from '@mui/material'
 
 import Arrays from 'utils/Arrays'
 import LoadingSpinnerSmall from './LoadingSpinnerSmall'
@@ -28,9 +28,9 @@ const Autocomplete = (props) => {
     popUpWidthContentBased,
     selectedItems,
     fetchFunction,
+    isItemEqualToValue,
     itemRenderFunction,
     itemLabelFunction,
-    itemSelectedFunction,
     onInputChange: onInputChangeProps,
     readOnly,
     tagsRenderFunction,
@@ -126,7 +126,33 @@ const Autocomplete = (props) => {
 
   const filterOptions = asynchronous ? () => items : createFilterOptions()
 
+  const renderOption = itemRenderFunction
+    ? (renderProps, item) => <Box {...renderProps}>{itemRenderFunction({ renderProps, item })}</Box>
+    : undefined
+
   const inputFieldWidthPx = inputFieldWidth instanceof Number ? `${String(inputFieldWidth)}px` : inputFieldWidth
+
+  const renderInput = (params) => (
+    <TextField
+      {...params}
+      fullWidth={inputFieldWidth === '100%'}
+      style={{ width: inputFieldWidthPx }}
+      variant="outlined"
+      InputProps={{
+        ...params.InputProps,
+        endAdornment: (
+          <>
+            {loading && <LoadingSpinnerSmall />}
+            {params.InputProps.endAdornment}
+          </>
+        ),
+      }}
+    />
+  )
+
+  const isOptionEqualToValue = isItemEqualToValue
+    ? (option, value) => isItemEqualToValue({ item: option, value })
+    : null
 
   return (
     <MuiAutocomplete
@@ -143,29 +169,14 @@ const Autocomplete = (props) => {
       options={items}
       filterOptions={filterOptions}
       loading={loading}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          fullWidth={inputFieldWidth === '100%'}
-          style={{ width: inputFieldWidthPx }}
-          variant="outlined"
-          InputProps={{
-            ...params.InputProps,
-            endAdornment: (
-              <>
-                {loading && <LoadingSpinnerSmall />}
-                {params.InputProps.endAdornment}
-              </>
-            ),
-          }}
-        />
-      )}
+      renderInput={renderInput}
       renderTags={tagsRenderFunction}
-      renderOption={itemRenderFunction}
+      renderOption={renderOption}
       className={className}
       disabled={disabled || readOnly}
       multiple={multiple}
       PopperComponent={PopperCustom({ popUpWidth, popUpWidthContentBased })}
+      isOptionEqualToValue={isOptionEqualToValue}
     />
   )
 }
@@ -178,10 +189,10 @@ Autocomplete.propTypes = {
   className: PropTypes.string,
   inputValue: PropTypes.string, // text shown in input field
   inputFieldWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  isItemEqualToValue: PropTypes.func,
   items: PropTypes.array,
   itemRenderFunction: PropTypes.func,
   itemLabelFunction: PropTypes.func,
-  itemSelectedFunction: PropTypes.func,
   readOnly: PropTypes.bool,
   selectedItems: PropTypes.array,
   tagsRenderFunction: PropTypes.func,
@@ -203,10 +214,10 @@ Autocomplete.defaultProps = {
   className: null,
   inputValue: null,
   inputFieldWidth: 300,
+  isItemEqualToValue: null,
   items: [],
   itemRenderFunction: null,
   itemLabelFunction: null,
-  itemSelectedFunction: null,
   onInputChange: () => {},
   onDismiss: () => {},
   popUpWidth: null, // default to inputFieldWidth
