@@ -105,16 +105,14 @@ const RecordEditActionBar = (props) => {
         <ValidationReportIcon record={record} />
         {!preview && (
           <>
-            <IconButton
-              title={L.l('common.exportToExcel')}
-              onClick={onExportToExcel}
-              size="large">
+            <IconButton title={L.l('common.exportToExcel')} onClick={onExportToExcel} size="large">
               <Icon className="fa fa-file-excel" color="primary" />
             </IconButton>
             <IconButton
               title={L.l('dataManagement.export.exportToCollectFormat')}
               onClick={onExportToCollectFormat}
-              size="large">
+              size="large"
+            >
               <Icon className="fa fa-file-archive" color="primary" />
             </IconButton>
             {!inPopUp && (
@@ -122,10 +120,12 @@ const RecordEditActionBar = (props) => {
                 {user.canDemoteRecord({ record, roleInGroup }) && (
                   <Button
                     variant="contained"
+                    color="warning"
                     size="small"
                     startIcon={<ThumbDown />}
                     title={L.l('dataManagement.dataEntry.demoteTo', [prevStepLabel])}
-                    onClick={onDemote}>
+                    onClick={onDemote}
+                  >
                     {L.l('dataManagement.dataEntry.demote')}
                   </Button>
                 )}
@@ -147,7 +147,7 @@ const RecordEditActionBar = (props) => {
         )}
       </div>
     </div>
-  );
+  )
 }
 
 export default RecordEditActionBar

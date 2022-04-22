@@ -277,12 +277,12 @@ class DataManagementPage extends React.Component {
               <Button color={'info'} onClick={this.handleNewButtonClick}>
                 New
               </Button>
-            )}{' '}
+            )}
             {loggedUser.canEditRecords(userRoleInSurveyGroup) && this.state.selectedItem && (
               <Button color={'success'} onClick={this.handleEditButtonClick}>
                 Edit
               </Button>
-            )}{' '}
+            )}
             {loggedUser.canDeleteRecords(userRoleInSurveyGroup, this.state.selectedItems) &&
               this.state.selectedItemIds.length > 0 && (
                 <Button color="danger" onClick={this.handleDeleteButtonClick}>
@@ -309,7 +309,7 @@ class DataManagementPage extends React.Component {
                   <i className="fa fa-file-excel-o" aria-hidden="true"></i> {L.l('dataManagement.export.toCsv')}
                 </DropdownItem>
                 <DropdownItem onClick={this.handleBackupButtonClick}>
-                  <i className="fa fa-file-code-o" aria-hidden="true"></i>{' '}
+                  <i className="fa fa-file-code-o" aria-hidden="true"></i>
                   {L.l('dataManagement.export.toCollectFormat')}
                 </DropdownItem>
               </DropdownMenu>
@@ -330,7 +330,7 @@ class DataManagementPage extends React.Component {
                     <i className="fa fa-file-excel-o" aria-hidden="true"></i> {L.l('dataManagement.import.fromCsv')}
                   </DropdownItem>
                   <DropdownItem onClick={this.handleBackupImportButtonClick}>
-                    <i className="fa fa-file-code-o" aria-hidden="true"></i>{' '}
+                    <i className="fa fa-file-code-o" aria-hidden="true"></i>
                     {L.l('dataManagement.import.fromCollectFormat')}
                   </DropdownItem>
                 </DropdownMenu>
