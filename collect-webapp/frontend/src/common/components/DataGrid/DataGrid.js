@@ -6,7 +6,7 @@ import { DataGrid as MuiDataGrid, GridToolbar, useGridApiContext } from '@mui/x-
 
 import L from 'utils/Labels'
 import { QuickSearchHeader } from './QuickSearchHeader'
-import Arrays from 'utils/Arrays'
+import Strings from 'utils/Strings'
 
 const EditCell = (props) => {
   const { id, field, row, renderEditCell } = props
@@ -64,10 +64,9 @@ export const DataGrid = (props) => {
   const onQuickSearchChange = useCallback(
     ({ field }) =>
       (value) => {
-        const itemsOld = filterModel?.items || []
-        const item = { id: field, columnField: field, operatorValue: 'contains', value }
-        const itemIndex = Arrays.indexOf(itemsOld, item, 'columnField')
-        const itemsUpdated = itemIndex >= 0 ? Arrays.replaceItemAt(itemsOld, itemIndex, item) : [...itemsOld, item]
+        const itemsUpdated = Strings.isBlank(value)
+          ? []
+          : [{ id: field, columnField: field, operatorValue: 'contains', value }]
         const filterModelUpdated = { items: itemsUpdated }
         filterModelRef.current = filterModelUpdated
         setFilterModel(filterModelUpdated)
@@ -115,7 +114,14 @@ export const DataGrid = (props) => {
         } = col
         const headerName = headerNameProp ? L.l(headerNameProp) : null
         const renderHeader = quickSearch
-          ? () => <QuickSearchHeader headerName={headerName} onChange={onQuickSearchChange({ field })} />
+          ? () => (
+              <QuickSearchHeader
+                field={field}
+                filterModel={filterModel}
+                headerName={headerName}
+                onChange={onQuickSearchChange({ field })}
+              />
+            )
           : renderHeaderProp
 
         return {
@@ -143,6 +149,7 @@ export const DataGrid = (props) => {
       })}
       components={{ Toolbar: showToolbar ? GridToolbar : null }}
       componentsProps={{ ...(showToolbar ? { toolbar: { csvOptions: { fileName: exportFileName } } } : {}) }}
+      disableMultipleColumnsFiltering={false}
       disableMultipleSelection={disableMultipleSelection}
       disableSelectionOnClick={disableSelectionOnClick}
       experimentalFeatures={{ newEditingApi: true }}
@@ -172,8 +179,10 @@ export const DataGrid = (props) => {
 
 DataGrid.defaultProps = {
   checkboxSelection: false,
+  dataMode: 'client',
   disableMultipleSelection: undefined,
   exportFileName: null,
+  headerHeight: 56,
   hideFooterPagination: false,
   onFilterModelChange: null,
   pageSize: 25,
