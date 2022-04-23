@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import NumberFormat from 'react-number-format'
-import { TextField } from '@material-ui/core'
+import { TextField } from '@mui/material'
 
 const CustomInput = (inputProps) => {
   const { maxLength, onBlur, onChange, onFocus, onKeyDown, onMouseUp, readOnly, size, value, width } = inputProps

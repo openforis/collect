@@ -1,5 +1,5 @@
 import React, { Suspense, useState } from 'react'
-import WarningIcon from '@material-ui/icons/Warning'
+import WarningIcon from '@mui/icons-material/Warning'
 
 import LoadingSpinnerSmall from './LoadingSpinnerSmall'
 import L from 'utils/Labels'

@@ -1,11 +1,18 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { debounce } from 'throttle-debounce'
 
 import { QuickSearchField } from '../QuickSearchField'
 
 export const QuickSearchHeader = (props) => {
-  const { onChange: onChangeProp, headerName } = props
+  const { field, filterModel, headerName, onChange: onChangeProp } = props
+
   const [value, setValue] = useState('')
+
+  useEffect(() => {
+    if (filterModel?.items?.[0]?.columnField !== field) {
+      setValue('') // only one search field at a time is supported
+    }
+  }, [filterModel])
 
   const onValueChange = (val) => {
     setValue(val)

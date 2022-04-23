@@ -1,10 +1,8 @@
-import DateFnsUtils from '@date-io/date-fns'
-
-const dateFnsUtils = new DateFnsUtils()
+import moment from 'moment'
 
 export default class Dates {
-  static DATE_FORMAT = 'dd/MM/yyyy'
-  static DATE_FORMAT_ISO = 'yyyy-MM-dd'
+  static DATE_FORMAT = 'DD/MM/YYYY'
+  static DATE_FORMAT_ISO = 'YYYY-MM-DD'
   static TIME_FORMAT = 'HH:mm'
   static DATETIME_FORMAT = `${Dates.DATE_FORMAT} ${Dates.TIME_FORMAT}`
   static MILLIS = 'millis'
@@ -13,7 +11,7 @@ export default class Dates {
   static YEARS = 'years'
 
   static format(date, pattern = Dates.DATE_FORMAT) {
-    return date == null ? '' : dateFnsUtils.format(date, pattern)
+    return date == null ? '' : moment(date).format(pattern)
   }
 
   static formatDatetime(dateTime) {
@@ -21,10 +19,10 @@ export default class Dates {
   }
 
   static parseDateISO(dateStr) {
-    return dateStr ? dateFnsUtils.parse(dateStr, Dates.DATE_FORMAT_ISO) : null
+    return dateStr ? moment(dateStr, Dates.DATE_FORMAT_ISO).toDate() : null
   }
 
-  static formatDateIso(dateStr) {
+  static convertFromISOToStandard(dateStr) {
     const date = Dates.parseDateISO(dateStr)
     return date ? Dates.format(date) : null
   }
@@ -48,5 +46,25 @@ export default class Dates {
     d2.setHours(0, 0, 0, 0)
 
     return d1.getTime() < d2.getTime() ? -1 : d1.getTime() > d2.getTime() ? 1 : 0
+  }
+
+  static getYear(date) {
+    return moment(date).year()
+  }
+
+  static getMonth(date) {
+    return moment(date).month()
+  }
+
+  static getDay(date) {
+    return moment(date).date()
+  }
+
+  static getHours(date) {
+    return moment(date).hours()
+  }
+
+  static getMinutes(date) {
+    return moment(date).minutes()
   }
 }

@@ -3,8 +3,8 @@ import './RecordEditActionBar.scss'
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { Button, Icon, IconButton } from '@material-ui/core'
-import { ThumbDown, ThumbUp } from '@material-ui/icons'
+import { Button, Icon, IconButton } from '@mui/material'
+import { ThumbDown, ThumbUp } from '@mui/icons-material'
 
 import L from 'utils/Labels'
 import RouterUtils from 'utils/RouterUtils'
@@ -105,10 +105,14 @@ const RecordEditActionBar = (props) => {
         <ValidationReportIcon record={record} />
         {!preview && (
           <>
-            <IconButton title={L.l('common.exportToExcel')} onClick={onExportToExcel}>
+            <IconButton title={L.l('common.exportToExcel')} onClick={onExportToExcel} size="large">
               <Icon className="fa fa-file-excel" color="primary" />
             </IconButton>
-            <IconButton title={L.l('dataManagement.export.exportToCollectFormat')} onClick={onExportToCollectFormat}>
+            <IconButton
+              title={L.l('dataManagement.export.exportToCollectFormat')}
+              onClick={onExportToCollectFormat}
+              size="large"
+            >
               <Icon className="fa fa-file-archive" color="primary" />
             </IconButton>
             {!inPopUp && (
@@ -116,7 +120,7 @@ const RecordEditActionBar = (props) => {
                 {user.canDemoteRecord({ record, roleInGroup }) && (
                   <Button
                     variant="contained"
-                    color="default"
+                    color="warning"
                     size="small"
                     startIcon={<ThumbDown />}
                     title={L.l('dataManagement.dataEntry.demoteTo', [prevStepLabel])}

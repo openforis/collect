@@ -32,6 +32,7 @@ const CodeFieldItemLabel = (props) => {
 
   return (
     <span
+      key={item.id}
       className={classNames('code-field-item-label', {
         'single-line': singleLine,
         'with-info-icon': hasDescription,

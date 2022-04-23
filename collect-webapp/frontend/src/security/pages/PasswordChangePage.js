@@ -1,7 +1,7 @@
 import React from 'react'
 import { withFormik } from 'formik'
 
-import Button from '@material-ui/core/Button'
+import Button from '@mui/material/Button'
 
 import ServiceFactory from 'services/ServiceFactory'
 import { TextFormItem, asyncValidate, handleValidationResponse } from 'common/components/Forms'

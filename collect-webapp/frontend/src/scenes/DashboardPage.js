@@ -351,10 +351,12 @@ class DashboardPage extends Component {
   }
 
   handlePeriodFromChange(date) {
+    if (isNaN(date)) return
     this.setState({ periodFrom: date }, this.updateChartsData)
   }
 
   handlePeriodToChange(date) {
+    if (isNaN(date)) return
     this.setState({ periodTo: date }, this.updateChartsData)
   }
 

@@ -13,8 +13,8 @@ import {
   Col,
   UncontrolledDropdown,
 } from 'reactstrap'
-import FormControl from '@material-ui/core/FormControl'
-import FormHelperText from '@material-ui/core/FormHelperText'
+import FormControl from '@mui/material/FormControl'
+import FormHelperText from '@mui/material/FormHelperText'
 
 import { withNavigate } from 'common/hooks'
 import MaxAvailableSpaceContainer from 'common/components/MaxAvailableSpaceContainer'
@@ -277,12 +277,12 @@ class DataManagementPage extends React.Component {
               <Button color={'info'} onClick={this.handleNewButtonClick}>
                 New
               </Button>
-            )}{' '}
+            )}
             {loggedUser.canEditRecords(userRoleInSurveyGroup) && this.state.selectedItem && (
               <Button color={'success'} onClick={this.handleEditButtonClick}>
                 Edit
               </Button>
-            )}{' '}
+            )}
             {loggedUser.canDeleteRecords(userRoleInSurveyGroup, this.state.selectedItems) &&
               this.state.selectedItemIds.length > 0 && (
                 <Button color="danger" onClick={this.handleDeleteButtonClick}>
@@ -309,7 +309,7 @@ class DataManagementPage extends React.Component {
                   <i className="fa fa-file-excel-o" aria-hidden="true"></i> {L.l('dataManagement.export.toCsv')}
                 </DropdownItem>
                 <DropdownItem onClick={this.handleBackupButtonClick}>
-                  <i className="fa fa-file-code-o" aria-hidden="true"></i>{' '}
+                  <i className="fa fa-file-code-o" aria-hidden="true"></i>
                   {L.l('dataManagement.export.toCollectFormat')}
                 </DropdownItem>
               </DropdownMenu>
@@ -330,7 +330,7 @@ class DataManagementPage extends React.Component {
                     <i className="fa fa-file-excel-o" aria-hidden="true"></i> {L.l('dataManagement.import.fromCsv')}
                   </DropdownItem>
                   <DropdownItem onClick={this.handleBackupImportButtonClick}>
-                    <i className="fa fa-file-code-o" aria-hidden="true"></i>{' '}
+                    <i className="fa fa-file-code-o" aria-hidden="true"></i>
                     {L.l('dataManagement.import.fromCollectFormat')}
                   </DropdownItem>
                 </DropdownMenu>
@@ -347,18 +347,18 @@ class DataManagementPage extends React.Component {
                 <DropdownMenu>
                   <DropdownItem header>Promote records</DropdownItem>
                   <DropdownItem onClick={this.handlePromoteEntryToCleansingButtonClick}>
-                    <i className="fa fa-arrow-right" aria-hidden="true"></i> Entry -> Cleansing
+                    <i className="fa fa-arrow-right" aria-hidden="true"></i> Entry -&gt; Cleansing
                   </DropdownItem>
                   <DropdownItem onClick={this.handlePromoteCleansingToAnalysisButtonClick}>
-                    <i className="fa fa-arrow-right" aria-hidden="true"></i> Cleansing -> Analysis
+                    <i className="fa fa-arrow-right" aria-hidden="true"></i> Cleansing -&gt; Analysis
                   </DropdownItem>
                   <DropdownItem divider />
                   <DropdownItem header>Demote records</DropdownItem>
                   <DropdownItem onClick={this.handleDemoteCleansingToEntryButtonClick}>
-                    <i className="fa fa-arrow-left" aria-hidden="true"></i> Cleansing -> Entry
+                    <i className="fa fa-arrow-left" aria-hidden="true"></i> Cleansing -&gt; Entry
                   </DropdownItem>
                   <DropdownItem onClick={this.handleDemoteAnalysisToCleansingButtonClick}>
-                    <i className="fa fa-arrow-left" aria-hidden="true"></i> Analysis -> Cleansing
+                    <i className="fa fa-arrow-left" aria-hidden="true"></i> Analysis -&gt; Cleansing
                   </DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>

@@ -22,7 +22,7 @@ const TaxonAutoCompleteDialogItem = (props) => {
       {visibleFields.map((field) => {
         const valueFieldName = TaxonAttributeDefinition.ValueFieldByField[field]
         const fieldValue = taxonOccurrence[valueFieldName]
-        return <div>{fieldValue}</div>
+        return <div key={field}>{fieldValue}</div>
       })}
     </div>
   )

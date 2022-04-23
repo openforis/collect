@@ -2,7 +2,7 @@ import './CodeField.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { InputLabel } from '@material-ui/core'
+import { InputLabel } from '@mui/material'
 
 import ServiceFactory from 'services/ServiceFactory'
 import { CodeAttributeUpdatedEvent } from 'model/event/RecordEvent'

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import Grid from '@material-ui/core/Grid'
+import Grid from '@mui/material/Grid'
 
 import { withNavigate } from 'common/hooks'
 import NewSurveyParametersForm from '../components/NewSurveyParametersForm'
@@ -18,12 +18,12 @@ class NewSurveyPage extends Component {
 
   render() {
     return (
-      <Grid container justify="center">
+      <Grid container justifyContent="center">
         <Grid item>
           <NewSurveyParametersForm style={{ width: '500px' }} />
         </Grid>
       </Grid>
-    )
+    );
   }
 }
 

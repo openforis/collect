@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { MenuItem, Select, TextField as MuiTextField } from '@material-ui/core'
+import { MenuItem, Select, TextField as MuiTextField } from '@mui/material'
 import { CoordinateAttributeDefinition } from 'model/Survey'
 
 import InputNumber from 'common/components/InputNumber'

@@ -552,12 +552,17 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                       headerName: 'Role',
                       width: 140,
                       editable: true,
-                      renderEditCell: ({ api, field, id, row: userInGroup }) => (
+                      renderCell: ({ value }) => (
+                        <span>
+                          <i className="fa fa-edit" aria-hidden="true"></i>
+                          {value}
+                        </span>
+                      ),
+                      renderEditCell: ({ field, id, row: userInGroup, onValueUpdate }) => (
                         <UserRoleDropdownEditor
                           onUpdate={(role) => {
                             this.handleUserInGroupRoleUpdate({ userInGroup, role })
-                            // close cell editor
-                            api.setCellMode(id, field, 'view')
+                            onValueUpdate({ id, field, value: role })
                           }}
                           defaultValue={userInGroup.role}
                           roles={roles}

@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import classNames from 'classnames'
-import { Checkbox, TextField } from '@material-ui/core'
+import { Checkbox, TextField } from '@mui/material'
 
 import { BooleanAttributeDefinition } from 'model/Survey'
 

@@ -1,7 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { MuiPickersUtilsProvider, KeyboardTimePicker } from '@material-ui/pickers'
-import DateFnsUtils from '@date-io/date-fns'
+
+import { TextField } from '@mui/material'
+import { TimePicker as MuiTimePicker } from '@mui/x-date-pickers/TimePicker'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 
 import Dates from 'utils/Dates'
 import AbstractField from './AbstractField'
@@ -9,13 +12,10 @@ import * as FieldSizes from './FieldsSizes'
 import DirtyFieldSpinner from './DirtyFieldSpinner'
 
 const fromValueToDate = (value) => (value ? new Date(1970, 1, 1, value.hour, value.minute) : null)
-const fromDateToValue = (date) => {
-  const dateUtils = new DateFnsUtils()
-  return {
-    hour: dateUtils.getHours(date),
-    minute: dateUtils.getMinutes(date),
-  }
-}
+const fromDateToValue = (date) => ({
+  hour: Dates.getHours(date),
+  minute: Dates.getMinutes(date),
+})
 
 class TimeField extends AbstractField {
   constructor() {
@@ -43,20 +43,17 @@ class TimeField extends AbstractField {
 
     return (
       <div>
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-          <KeyboardTimePicker
-            variant="dialog"
-            inputVariant="outlined"
-            format={Dates.TIME_FORMAT}
+        <LocalizationProvider dateAdapter={AdapterMoment}>
+          <MuiTimePicker
+            inputFormat={Dates.TIME_FORMAT}
             ampm={false}
-            margin="none"
             disabled={readOnly}
             value={selectedTime}
             onChange={this.onChange}
-            keyboardIcon={<span className="far fa-clock" />}
             style={{ width: `${width}px` }}
+            renderInput={(params) => <TextField {...params} />}
           />
-        </MuiPickersUtilsProvider>
+        </LocalizationProvider>
         {dirty && <DirtyFieldSpinner />}
       </div>
     )

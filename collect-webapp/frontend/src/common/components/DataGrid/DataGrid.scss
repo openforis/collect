@@ -4,3 +4,11 @@
   flex-direction: column;
   width: 100%;
 }
+
+.MuiDataGrid-footerContainer {
+  .MuiTablePagination-root {
+    p {
+      margin-bottom: 0;
+    }
+  }
+}

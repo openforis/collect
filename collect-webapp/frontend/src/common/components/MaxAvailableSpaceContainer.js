@@ -24,21 +24,19 @@ class MaxAvailableSpaceContainer extends Component {
   }
 
   handleWindowResize() {
-    this.setState({ ...this.state, maxAvailableHeight: this.calculateMaxAvailableHeight() })
+    this.setState({ maxAvailableHeight: this.calculateMaxAvailableHeight() })
   }
 
   calculateMaxAvailableHeight() {
-    return window.document.body.clientHeight - (HEADER_HEIGHT + PADDING) + 'px'
+    return (window.document.body.clientHeight - (HEADER_HEIGHT + PADDING) || 0) + 'px'
   }
 
   render() {
-    const { className } = this.props
+    const { className, children } = this.props
+    const { maxAvailableHeight } = this.state
     return (
-      <div
-        className={`max-available-space ${className ? className : ''}`}
-        style={{ height: this.state.maxAvailableHeight }}
-      >
-        {this.props.children}
+      <div className={`max-available-space ${className ? className : ''}`} style={{ height: maxAvailableHeight }}>
+        {children}
       </div>
     )
   }

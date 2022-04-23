@@ -11,7 +11,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
-} from '@material-ui/core'
+} from '@mui/material'
 import L from 'utils/Labels'
 import Dates from 'utils/Dates'
 
@@ -37,7 +37,7 @@ const NewRecordParametersDialog = (props) => {
               <TableRow key={v.id} hover onClick={() => onOk(v.id)}>
                 <TableCell>{v.name}</TableCell>
                 <TableCell>{v.label}</TableCell>
-                <TableCell>{Dates.formatDateIso(v.date)}</TableCell>
+                <TableCell>{Dates.convertFromISOToStandard(v.date)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

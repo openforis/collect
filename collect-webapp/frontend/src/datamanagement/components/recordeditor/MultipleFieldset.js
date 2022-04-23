@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button } from 'reactstrap'
-import { MenuItem, Select } from '@material-ui/core'
+import { MenuItem, Select } from '@mui/material'
 
 import DeleteIconButton from 'common/components/DeleteIconButton'
 import L from 'utils/Labels'

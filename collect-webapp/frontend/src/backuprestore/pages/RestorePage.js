@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Col, Container, Form, FormGroup, Label, Input, Row } from 'reactstrap';
-import Button from '@material-ui/core/Button';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import Typography from '@material-ui/core/Typography';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Button from '@mui/material/Button';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { connect } from 'react-redux';
 
 import * as JobActions from 'actions/job';
@@ -129,11 +129,11 @@ class RestorePage extends Component {
                         }
                     </FormGroup>
                     <FormGroup row>
-                        <ExpansionPanel>
-                            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                        <Accordion>
+                            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                                 <Typography>{L.l('general.additionalOptions')}</Typography>
-                            </ExpansionPanelSummary>
-                            <ExpansionPanelDetails>
+                            </AccordionSummary>
+                            <AccordionDetails>
                                 <div>
                                     <FormGroup row check>
                                         <Label check>
@@ -148,8 +148,8 @@ class RestorePage extends Component {
                                         </Label>
                                     </FormGroup>
                                 </div>
-                            </ExpansionPanelDetails>
-                        </ExpansionPanel>
+                            </AccordionDetails>
+                        </Accordion>
                     </FormGroup>
                     <br/>
                     <br/> 

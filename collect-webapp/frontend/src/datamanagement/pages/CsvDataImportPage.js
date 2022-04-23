@@ -4,15 +4,15 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Container, Form, FormFeedback, FormGroup, Label, Input, Col } from 'reactstrap'
 
-import Button from '@material-ui/core/Button'
-import DialogActions from '@material-ui/core/DialogActions'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import ExpansionPanel from '@material-ui/core/ExpansionPanel'
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary'
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
-import Typography from '@material-ui/core/Typography'
+import Button from '@mui/material/Button'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+import Accordion from '@mui/material/Accordion'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import Typography from '@mui/material/Typography'
 
 import Dropzone from '../../common/components/Dropzone'
 
@@ -257,11 +257,11 @@ class CsvDataImportPage extends Component {
               </Col>
             </FormGroup>
             <FormGroup row>
-              <ExpansionPanel>
-                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography>{L.l('general.additionalOptions')}</Typography>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
+                </AccordionSummary>
+                <AccordionDetails>
                   <div>
                     <FormGroup row check>
                       <Label check>
@@ -284,8 +284,8 @@ class CsvDataImportPage extends Component {
                       </Label>
                     </FormGroup>
                   </div>
-                </ExpansionPanelDetails>
-              </ExpansionPanel>
+                </AccordionDetails>
+              </Accordion>
             </FormGroup>
           </FormGroup>
           <FormGroup row>

@@ -1,8 +1,8 @@
 import './CodeFieldText.css'
 
 import React, { useState } from 'react'
-import { IconButton, TextField as MuiTextField } from '@material-ui/core'
-import ListIcon from '@material-ui/icons/List'
+import { IconButton, TextField as MuiTextField } from '@mui/material'
+import ListIcon from '@mui/icons-material/List'
 
 import CodeFieldDialog from './CodeFieldDialog'
 
@@ -37,39 +37,37 @@ const CodeFieldText = (props) => {
 
   const [dialogOpen, setDialogOpen] = useState(false)
 
-  return (
-    <>
-      <div className="code-field-text-wrapper">
-        <MuiTextField
-          variant="outlined"
-          disabled
-          value={valuesString}
-          title={selectedItems.map(itemLabelFunction).join('; ')}
-          onClick={() => setDialogOpen(true)}
-        />
-        <IconButton onClick={() => setDialogOpen(true)}>
-          <ListIcon />
-        </IconButton>
-      </div>
-      {dialogOpen && (
-        <CodeFieldDialog
-          asynchronous={asynchronous}
-          parentEntity={parentEntity}
-          ancestorCodes={ancestorCodes}
-          attributeDefinition={attributeDefinition}
-          fieldDef={fieldDef}
-          itemLabelFunction={itemLabelFunction}
-          items={items}
-          onChange={onChange}
-          onChangeQualifier={onChangeQualifier}
-          onClose={() => setDialogOpen(false)}
-          readOnly={readOnly}
-          selectedItems={selectedItems}
-          values={values}
-        />
-      )}
-    </>
-  )
+  return <>
+    <div className="code-field-text-wrapper">
+      <MuiTextField
+        variant="outlined"
+        disabled
+        value={valuesString}
+        title={selectedItems.map(itemLabelFunction).join('; ')}
+        onClick={() => setDialogOpen(true)}
+      />
+      <IconButton onClick={() => setDialogOpen(true)} size="large">
+        <ListIcon />
+      </IconButton>
+    </div>
+    {dialogOpen && (
+      <CodeFieldDialog
+        asynchronous={asynchronous}
+        parentEntity={parentEntity}
+        ancestorCodes={ancestorCodes}
+        attributeDefinition={attributeDefinition}
+        fieldDef={fieldDef}
+        itemLabelFunction={itemLabelFunction}
+        items={items}
+        onChange={onChange}
+        onChangeQualifier={onChangeQualifier}
+        onClose={() => setDialogOpen(false)}
+        readOnly={readOnly}
+        selectedItems={selectedItems}
+        values={values}
+      />
+    )}
+  </>;
 }
 
 export default CodeFieldText

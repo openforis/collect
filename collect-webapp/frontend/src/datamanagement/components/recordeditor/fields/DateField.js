@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import classNames from 'classnames'
-import DateFnsUtils from '@date-io/date-fns'
 
+import Dates from 'utils/Dates'
 import L from 'utils/Labels'
 import { DatePicker } from 'common/components/DatePicker'
 
@@ -11,14 +11,11 @@ import * as FieldSizes from './FieldsSizes'
 import DirtyFieldSpinner from './DirtyFieldSpinner'
 
 const fromValueToDate = (value) => (value ? new Date(value.year, value.month - 1, value.day) : null)
-const fromDateToValue = (date) => {
-  const dateUtils = new DateFnsUtils()
-  return {
-    year: dateUtils.getYear(date),
-    month: dateUtils.getMonth(date) + 1,
-    day: Number(dateUtils.getDayText(date)),
-  }
-}
+const fromDateToValue = (date) => ({
+  year: Dates.getYear(date),
+  month: Dates.getMonth(date) + 1,
+  day: Dates.getDay(date),
+})
 
 class DateField extends AbstractField {
   constructor() {

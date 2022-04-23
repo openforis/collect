@@ -1,7 +1,14 @@
 import React from 'react'
+
 import PropTypes from 'prop-types'
-import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
-import DateFnsUtils from '@date-io/date-fns'
+
+import moment from 'moment'
+
+import { TextField } from '@mui/material'
+
+import { DatePicker as MuiDatePicker } from '@mui/x-date-pickers/DatePicker'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 
 import Dates from 'utils/Dates'
 
@@ -9,20 +16,19 @@ export const DatePicker = (props) => {
   const { disabled, maxDate, minDate, onChange, style, value } = props
 
   return (
-    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-      <KeyboardDatePicker
+    <LocalizationProvider dateAdapter={AdapterMoment}>
+      <MuiDatePicker
+        allowSameDateSelection
         disabled={disabled}
-        variant="dialog"
-        inputVariant="outlined"
-        format={Dates.DATE_FORMAT}
-        margin="none"
-        minDate={minDate}
-        maxDate={maxDate}
-        value={value}
-        onChange={onChange}
+        inputFormat={Dates.DATE_FORMAT}
+        minDate={minDate ? moment(minDate) : undefined}
+        maxDate={maxDate ? moment(maxDate) : undefined}
+        onChange={(momentObj) => onChange(momentObj?.toDate())}
+        renderInput={(params) => <TextField {...params} />}
         style={style}
+        value={value}
       />
-    </MuiPickersUtilsProvider>
+    </LocalizationProvider>
   )
 }
 

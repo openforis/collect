@@ -10,32 +10,34 @@ import Objects from 'utils/Objects'
 import TaxonAutoCompleteDialogItem from './TaxonAutoCompleteDialogItem'
 import * as FieldsSizes from '../FieldsSizes'
 
-const fetchTaxa = ({ surveyId, fieldDef, queryField }) => ({ searchString, onComplete }) => {
-  return debounce(1000, false, async () => {
-    const { attributeDefinition } = fieldDef
-    const { allowUnlisted, highestRank, includeUniqueVernacularName, showFamily, taxonomyName } = attributeDefinition
+const fetchTaxa =
+  ({ surveyId, fieldDef, queryField }) =>
+  ({ searchString, onComplete }) => {
+    return debounce(1000, false, async () => {
+      const { attributeDefinition } = fieldDef
+      const { allowUnlisted, highestRank, includeUniqueVernacularName, showFamily, taxonomyName } = attributeDefinition
 
-    const query = {
-      field: queryField,
-      searchString,
-      parameters: { highestRank, includeUniqueVernacularName, includeAncestorTaxons: showFamily },
-    }
-    const taxa = await ServiceFactory.speciesService.findTaxa({ surveyId, taxonomyName, query })
-    if (taxa.length === 0 && allowUnlisted) {
-      taxa.push(
-        {
-          [TaxonAttributeDefinition.ValueFields.CODE]: 'UNK',
-          [TaxonAttributeDefinition.ValueFields.SCIENTIFIC_NAME]: 'Unknown',
-        },
-        {
-          [TaxonAttributeDefinition.ValueFields.CODE]: 'UNL',
-          [TaxonAttributeDefinition.ValueFields.SCIENTIFIC_NAME]: 'Unlisted',
-        }
-      )
-    }
-    onComplete(taxa)
-  })
-}
+      const query = {
+        field: queryField,
+        searchString,
+        parameters: { highestRank, includeUniqueVernacularName, includeAncestorTaxons: showFamily },
+      }
+      const taxa = await ServiceFactory.speciesService.findTaxa({ surveyId, taxonomyName, query })
+      if (taxa.length === 0 && allowUnlisted) {
+        taxa.push(
+          {
+            [TaxonAttributeDefinition.ValueFields.CODE]: 'UNK',
+            [TaxonAttributeDefinition.ValueFields.SCIENTIFIC_NAME]: 'Unknown',
+          },
+          {
+            [TaxonAttributeDefinition.ValueFields.CODE]: 'UNL',
+            [TaxonAttributeDefinition.ValueFields.SCIENTIFIC_NAME]: 'Unlisted',
+          }
+        )
+      }
+      onComplete(taxa)
+    })
+  }
 
 const TaxonAutoCompleteField = (props) => {
   const { parentEntity, fieldDef, field, valueByFields, onInputChange, onSelect, onDismiss, readOnly } = props
@@ -76,9 +78,9 @@ const TaxonAutoCompleteField = (props) => {
       inputFieldWidth={FieldsSizes.TaxonFieldWidths[field]}
       selectedItems={Arrays.singleton(selectedTaxonOccurrence)}
       fetchFunction={fetchTaxa({ surveyId, fieldDef, queryField })}
+      isItemEqualToValue={({ item, value }) => item.code === value.code}
       itemLabelFunction={Objects.getProp(valueField, '')}
-      itemSelectedFunction={(item, value) => item.code === value.code}
-      itemRenderFunction={(taxonOccurrence) => (
+      itemRenderFunction={({ item: taxonOccurrence }) => (
         <TaxonAutoCompleteDialogItem attributeDefinition={attributeDefinition} taxonOccurrence={taxonOccurrence} />
       )}
       onInputChange={onInputChange}
