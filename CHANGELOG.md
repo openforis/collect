@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [4.0.51] - NOT RELEASED YET
 ### Fixed
 - Updated dependencies;
+- Fix in collect-core for Collect Mobile;
 
 ## [4.0.50] - 2022-04-15
 ### Fixed

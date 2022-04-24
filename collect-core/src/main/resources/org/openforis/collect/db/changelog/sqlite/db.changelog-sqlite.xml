@@ -44,6 +44,10 @@
   <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20181212.xml" />
   <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20190117.xml" />
   <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20201011.xml" />
-  <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20210720.xml" />
+  <!--
+  	exclude this changelog: it has been fixed by the following one
+  	<include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20210720.xml" />
+  -->
+  <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20210720-fix.xml" />
   
 </databaseChangeLog>
