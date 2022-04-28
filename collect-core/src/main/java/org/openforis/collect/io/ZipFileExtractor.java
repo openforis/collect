@@ -27,15 +27,15 @@ public class ZipFileExtractor {
 		this.zipFile = zipFile;
 	}
 
-	public File extract(String entryName) {
+	public File extract(String entryName) throws IOException {
 		return extract(entryName, true);
 	}
 
-	public File extract(String entryName, boolean required) {
+	public File extract(String entryName, boolean required) throws IOException {
 		ZipEntry entry = findEntry(entryName);
 		if ( entry == null ) {
 			if ( required ) {
-				throw new RuntimeException("Entry not found in packaged file: " + entryName);
+				throw new IOException("Entry not found in packaged file: " + entryName);
 			} else {
 				return null;
 			}
@@ -44,16 +44,19 @@ public class ZipFileExtractor {
 		}
 	}
 
-	private File extract(ZipEntry entry) {
+	private File extract(ZipEntry entry) throws IOException {
 		String entryName = entry.getName();
 		try {
 			InputStream is = zipFile.getInputStream(entry);
 			String fileName = FilenameUtils.getName(entryName);
 			File tempFile = File.createTempFile("collect", fileName);
+			if (!tempFile.getCanonicalPath().startsWith(FileUtils.getTempDirectoryPath())) {
+				throw new IOException("Trying to extract ZIP entry outside of temp target directory");
+			}
 			FileUtils.copyInputStreamToFile(is, tempFile);
 			return tempFile;
 		} catch (IOException e) {
-			throw new RuntimeException(String.format("Error extracting file %s from backup archive: %s", entryName, e.getMessage()), e);
+			throw new IOException(String.format("Error extracting file %s from backup archive: %s", entryName, e.getMessage()), e);
 		}
 	}
 

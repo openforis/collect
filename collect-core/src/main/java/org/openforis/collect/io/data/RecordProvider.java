@@ -24,7 +24,7 @@ public interface RecordProvider extends Closeable {
 	
 	ParseRecordResult provideRecordParsingResult(int entryId, Step step) throws IOException;
 	
-	List<Integer> findEntryIds();
+	List<Integer> findEntryIds() throws IOException;
 
 	void setConfiguration(RecordProviderConfiguration config);
 }

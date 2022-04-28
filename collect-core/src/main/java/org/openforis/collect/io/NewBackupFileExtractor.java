@@ -50,11 +50,11 @@ public class NewBackupFileExtractor implements Closeable {
 		ZipFiles.extract(zipFile, tempUncompressedFolder, progressListener);
 	}
 	
-	public File extractInfoFile() {
+	public File extractInfoFile() throws IOException {
 		return extract(SurveyBackupJob.INFO_FILE_NAME);
 	}
 	
-	public SurveyBackupInfo getInfo() {
+	public SurveyBackupInfo getInfo() throws IOException {
 		if (info == null) {
 			if (isOldFormat()) {
 				info = new SurveyBackupInfo();
@@ -66,32 +66,35 @@ public class NewBackupFileExtractor implements Closeable {
 		return info;
 	}
 	
-	public SurveyBackupInfo extractInfo() {
+	public SurveyBackupInfo extractInfo() throws IOException {
 		try {
 			File infoFile = extractInfoFile();
 			SurveyBackupInfo info = SurveyBackupInfo.parse(new FileInputStream(infoFile));
 			return info;
 		} catch (Exception e) {
-			throw new RuntimeException("Error extracting info file from archive", e);
+			throw new IOException("Error extracting info file from archive", e);
 		}
 	}
 	
-	public File extractIdmlFile() {
+	public File extractIdmlFile() throws IOException {
 		return extract(SurveyBackupJob.SURVEY_XML_ENTRY_NAME);
 	}
 	
-	public File extract(String entryName) {
+	public File extract(String entryName) throws IOException {
 		return extract(entryName, true);
 	}
 	
-	public File extract(String entryName, boolean required) {
+	public File extract(String entryName, boolean required) throws IOException {
 		File folder = ZipFiles.getOrCreateEntryFolder(tempUncompressedFolder, entryName);
 		String fileName = Files.extractFileName(entryName);
 		File result = new File(folder, fileName);
+		if (!result.getCanonicalPath().startsWith(tempUncompressedFolder.getCanonicalPath())) {
+			throw new IOException("Entry is outside of target directory");
+		}
 		return result.exists() ? result: null;
 	}
 
-	public List<String> listSpeciesEntryNames() {
+	public List<String> listSpeciesEntryNames() throws IOException {
 		List<String> entries = Files.listFileNamesInFolder(tempUncompressedFolder, SurveyBackupJob.SPECIES_FOLDER);
 		return entries;
 	}
@@ -116,16 +119,20 @@ public class NewBackupFileExtractor implements Closeable {
 	}
 
 	public boolean containsEntry(String name) {
-		File file = extract(name, false);
-		return file != null;
+		try {
+			File file = extract(name, false);
+			return file != null;
+		} catch (IOException e) {
+			return false;
+		}
 	}
 	
-	public boolean containsEntriesInPath(String path) {
+	public boolean containsEntriesInPath(String path) throws IOException {
 		List<String> fileNames = listFilesInFolder(path);
 		return ! fileNames.isEmpty();
 	}
 	
-	public List<String> listFilesInFolder(String path) {
+	public List<String> listFilesInFolder(String path) throws IOException {
 		return Files.listFileNamesInFolder(tempUncompressedFolder, path);
 	}
 	
@@ -147,7 +154,7 @@ public class NewBackupFileExtractor implements Closeable {
 
 	public boolean isOldFormat() {
 		if (oldFormat == null) {
-			oldFormat = ! containsEntry(SurveyBackupJob.INFO_FILE_NAME);
+			oldFormat = !containsEntry(SurveyBackupJob.INFO_FILE_NAME);
 		}
 		return oldFormat;
 	}

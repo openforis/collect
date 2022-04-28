@@ -99,11 +99,15 @@ public class DataRestoreTask extends Task {
 
 	@Override
 	protected long countTotalItems() {
-		List<Integer> idsToImport = calculateEntryIdsToImport();
-		return idsToImport.size();
+		try {
+			List<Integer> idsToImport = calculateEntryIdsToImport();
+			return idsToImport.size();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	private List<Integer> calculateEntryIdsToImport() {
+	private List<Integer> calculateEntryIdsToImport() throws IOException {
 		if (entryIdsToImport != null) {
 			return entryIdsToImport;
 		}
@@ -140,7 +144,7 @@ public class DataRestoreTask extends Task {
 		}
 	}
 
-	private void reportMissingStepsErrors(int entryId, MissingStepsException e) {
+	private void reportMissingStepsErrors(int entryId, MissingStepsException e) throws IOException {
 		Step originalStep = e.getOperations().getOriginalStep();
 		String entryName = recordProvider.getEntryName(entryId, originalStep);
 		errors.add(new RecordImportError(entryId, entryName, originalStep, "Missing data for step", Level.ERROR));

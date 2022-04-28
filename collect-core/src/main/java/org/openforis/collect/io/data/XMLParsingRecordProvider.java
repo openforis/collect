@@ -79,7 +79,7 @@ public class XMLParsingRecordProvider implements RecordProvider {
 		initializeRecordUserLoader();
 	}
 
-	private void initDataUnmarshaller() {
+	private void initDataUnmarshaller() throws IOException {
 		this.dataUnmarshaller.setRecordValidationEnabled(initializeRecords && validateRecords);
 		this.dataUnmarshaller.setIgnoreDuplicateRecordKeyValidationErrors(ignoreDuplicateRecordKeyValidationErrors);
 		this.dataUnmarshaller.setRecordApplicationVersion(backupFileExtractor.getInfo().getCollectVersion());
@@ -138,7 +138,7 @@ public class XMLParsingRecordProvider implements RecordProvider {
 	}
 
 	@Override
-	public List<Integer> findEntryIds() {
+	public List<Integer> findEntryIds() throws IOException {
 		Set<Integer> result = new TreeSet<Integer>();
 		for (Step step : Step.values()) {
 			int stepNumber = step.getStepNumber();
@@ -192,13 +192,13 @@ public class XMLParsingRecordProvider implements RecordProvider {
 		return validateRecords;
 	}
 	
-	public void setValidateRecords(boolean validateRecords) {
+	public void setValidateRecords(boolean validateRecords) throws IOException {
 		this.validateRecords = validateRecords;
 		initDataUnmarshaller();
 		initRecordUpdater();
 	}
 	
-	public void setInitializeRecords(boolean initializeRecords) {
+	public void setInitializeRecords(boolean initializeRecords) throws IOException {
 		this.initializeRecords = initializeRecords;
 		initDataUnmarshaller();
 		initRecordUpdater();

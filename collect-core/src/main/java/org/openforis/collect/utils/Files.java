@@ -64,12 +64,15 @@ public class Files {
 		return (temp);
 	}
 
-	public static File getOrCreateFolder(File parentDestinationFolder, String path) {
+	public static File getOrCreateFolder(File parentDestinationFolder, String path) throws IOException {
 		String[] entryParts = path.split(PATH_SEPARATOR_PATTERN);
 		File folder = parentDestinationFolder;
 		for (int i = 0; i < entryParts.length; i++) {
 			String part = entryParts[i];
 			folder = new File(folder, part);
+		}
+		if (!folder.getCanonicalPath().startsWith(parentDestinationFolder.getCanonicalPath())) {
+			throw new IOException("The folder to be created is outside of the target folder");
 		}
 		if (! folder.exists()) {
 			folder.mkdirs();
@@ -82,11 +85,11 @@ public class Files {
 		return name;
 	}
 
-	public static List<String> listFileNamesInFolder(File parentFolder) {
+	public static List<String> listFileNamesInFolder(File parentFolder) throws IOException {
 		return listFileNamesInFolder(parentFolder, null);
 	}
 	
-	public static List<String> listFileNamesInFolder(File parentFolder, String folderPath) {
+	public static List<String> listFileNamesInFolder(File parentFolder, String folderPath) throws IOException {
 		List<File> files = listFilesInFolder(parentFolder, folderPath);
 		List<String> result = extractNames(files);
 		return result;
@@ -101,11 +104,11 @@ public class Files {
 		return result;
 	}
 
-	public static List<File> listFilesInFolder(File parentFolder) {
+	public static List<File> listFilesInFolder(File parentFolder) throws IOException {
 		return listFilesInFolder(parentFolder, null);
 	}
 	
-	public static List<File> listFilesInFolder(File parentFolder, String folderPath) {
+	public static List<File> listFilesInFolder(File parentFolder, String folderPath) throws IOException {
 		List<File> result = new ArrayList<File>();
 		File folder = folderPath == null ? parentFolder : 
 			Files.getOrCreateFolder(parentFolder, folderPath);

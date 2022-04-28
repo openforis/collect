@@ -79,7 +79,7 @@ public class RecordFileRestoreTask extends Task {
 		}
 	}
 	
-	private List<Integer> calculateEntryIdsToImport() {
+	private List<Integer> calculateEntryIdsToImport() throws IOException {
 		if ( entryIdsToImport != null ) {
 			return entryIdsToImport;
 		} 

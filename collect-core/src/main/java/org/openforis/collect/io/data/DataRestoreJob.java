@@ -246,7 +246,12 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		
 		@Override
 		protected long countTotalItems() {
-			List<Integer> entryIds = calculateEntryIdsToImport();
+			List<Integer> entryIds;
+			try {
+				entryIds = calculateEntryIdsToImport();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 			return entryIds.size() * Step.values().length;
 		}
 		
@@ -273,7 +278,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			((XMLParsingRecordProvider) recordProvider).setValidateRecords(originalRecordValidationSetting);
 		}
 		
-		private List<Integer> calculateEntryIdsToImport() {
+		private List<Integer> calculateEntryIdsToImport() throws IOException {
 			if ( entryIdsToImport != null ) {
 				return entryIdsToImport;
 			} else {
