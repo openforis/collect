@@ -87,7 +87,9 @@ public class ZipFiles {
 		File folder = getOrCreateEntryFolder(parentDestinationFolder, entryName);
 		String fileName = Files.extractFileName(entryName);
 		File result = new File(folder, fileName);
-		return result.exists() ? result: null;
+		if (result.exists()) return result;
+		if (required) throw new IOException("Entry not found");
+		return null;
 	}
 
 	public static File getOrCreateEntryFolder(File parentDestinationFolder, String entryName) throws IOException {

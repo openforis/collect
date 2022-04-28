@@ -54,7 +54,7 @@ public class NewBackupFileExtractor implements Closeable {
 		return extract(SurveyBackupJob.INFO_FILE_NAME);
 	}
 	
-	public SurveyBackupInfo getInfo() {
+	public SurveyBackupInfo getInfo() throws IOException {
 		if (info == null) {
 			if (isOldFormat()) {
 				info = new SurveyBackupInfo();
@@ -66,13 +66,13 @@ public class NewBackupFileExtractor implements Closeable {
 		return info;
 	}
 	
-	public SurveyBackupInfo extractInfo() {
+	public SurveyBackupInfo extractInfo() throws IOException {
 		try {
 			File infoFile = extractInfoFile();
 			SurveyBackupInfo info = SurveyBackupInfo.parse(new FileInputStream(infoFile));
 			return info;
 		} catch (Exception e) {
-			throw new RuntimeException("Error extracting info file from archive", e);
+			throw new IOException("Error extracting info file from archive", e);
 		}
 	}
 	
@@ -127,17 +127,13 @@ public class NewBackupFileExtractor implements Closeable {
 		}
 	}
 	
-	public boolean containsEntriesInPath(String path) {
+	public boolean containsEntriesInPath(String path) throws IOException {
 		List<String> fileNames = listFilesInFolder(path);
 		return ! fileNames.isEmpty();
 	}
 	
-	public List<String> listFilesInFolder(String path) {
-		try {
-			return Files.listFileNamesInFolder(tempUncompressedFolder, path);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public List<String> listFilesInFolder(String path) throws IOException {
+		return Files.listFileNamesInFolder(tempUncompressedFolder, path);
 	}
 	
 	public List<String> getEntryNames() {

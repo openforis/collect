@@ -99,19 +99,19 @@ public class DataRestoreTask extends Task {
 
 	@Override
 	protected long countTotalItems() {
-		List<Integer> idsToImport = calculateEntryIdsToImport();
-		return idsToImport.size();
-	}
-
-	private List<Integer> calculateEntryIdsToImport() {
-		if (entryIdsToImport != null) {
-			return entryIdsToImport;
-		}
 		try {
-			return recordProvider.findEntryIds();
+			List<Integer> idsToImport = calculateEntryIdsToImport();
+			return idsToImport.size();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private List<Integer> calculateEntryIdsToImport() throws IOException {
+		if (entryIdsToImport != null) {
+			return entryIdsToImport;
+		}
+		return recordProvider.findEntryIds();
 	}
 
 	@Override
