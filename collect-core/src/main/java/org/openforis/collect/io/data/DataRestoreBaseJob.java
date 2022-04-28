@@ -4,6 +4,7 @@
 package org.openforis.collect.io.data;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.io.BackupFileExtractor;
@@ -73,7 +74,7 @@ public abstract class DataRestoreBaseJob extends Job {
 		surveyName = newSurvey ? extractSurveyName() : publishedSurvey.getName();
 	}
 
-	private File extractDataSummaryFile() {
+	private File extractDataSummaryFile() throws IOException {
 		if (oldBackupFormat) {
 			return null;
 		} else {
@@ -131,22 +132,26 @@ public abstract class DataRestoreBaseJob extends Job {
 
 	@Override
 	protected void initializeTask(Worker task) {
-		if (task instanceof SurveyRestoreJob) {
-			SurveyRestoreJob t = (SurveyRestoreJob) task;
-			t.setFile(file);
-			t.setRestoreIntoPublishedSurvey(true);
-			t.setSurveyName(surveyName);
-			t.setValidateSurvey(true);
-			t.setUserGroup(newSurveyUserGroup);
-		} else if ( task instanceof IdmlUnmarshallTask ) {
-			IdmlUnmarshallTask t = (IdmlUnmarshallTask) task;
-			File idmlFile = backupFileExtractor.extractIdmlFile();
-			t.setSurveyManager(surveyManager);
-			t.setFile(idmlFile);
-			t.setValidate(false);
-		} else if (task instanceof RecordProviderInitializerTask) {
-			RecordProviderInitializerTask t = (RecordProviderInitializerTask) task;
-			t.setInput(createRecordProviderInitializerTaskInput());
+		try {
+			if (task instanceof SurveyRestoreJob) {
+				SurveyRestoreJob t = (SurveyRestoreJob) task;
+				t.setFile(file);
+				t.setRestoreIntoPublishedSurvey(true);
+				t.setSurveyName(surveyName);
+				t.setValidateSurvey(true);
+				t.setUserGroup(newSurveyUserGroup);
+			} else if ( task instanceof IdmlUnmarshallTask ) {
+				IdmlUnmarshallTask t = (IdmlUnmarshallTask) task;
+				File idmlFile = backupFileExtractor.extractIdmlFile();
+				t.setSurveyManager(surveyManager);
+				t.setFile(idmlFile);
+				t.setValidate(false);
+			} else if (task instanceof RecordProviderInitializerTask) {
+				RecordProviderInitializerTask t = (RecordProviderInitializerTask) task;
+				t.setInput(createRecordProviderInitializerTaskInput());
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 		super.initializeTask(task);
 	}

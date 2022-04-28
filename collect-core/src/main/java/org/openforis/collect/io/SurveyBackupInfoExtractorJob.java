@@ -4,6 +4,7 @@
 package org.openforis.collect.io;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FilenameUtils;
@@ -67,19 +68,23 @@ public class SurveyBackupInfoExtractorJob extends Job {
 	
 	@Override
 	protected void initializeTask(Worker task) {
-		if ( task instanceof SurveyBackupVerifierTask ) {
-			SurveyBackupVerifierTask t = (SurveyBackupVerifierTask) task;
-			t.setZipFile(zipFile);
-		} else if ( task instanceof SurveyBackupInfoExtractorTask ) {
-			File infoFile = backupFileExtractor.extractInfoFile();
-			SurveyBackupInfoExtractorTask t = (SurveyBackupInfoExtractorTask) task;
-			t.setFile(infoFile);
-		} else if ( task instanceof IdmlUnmarshallTask ) {
-			File idmlFile = zipFile == null ? file: backupFileExtractor.extractIdmlFile();
-			IdmlUnmarshallTask t = (IdmlUnmarshallTask) task;
-			t.setSurveyManager(surveyManager);
-			t.setValidate(validate);
-			t.setFile(idmlFile);
+		try {
+			if ( task instanceof SurveyBackupVerifierTask ) {
+				SurveyBackupVerifierTask t = (SurveyBackupVerifierTask) task;
+				t.setZipFile(zipFile);
+			} else if ( task instanceof SurveyBackupInfoExtractorTask ) {
+				File infoFile = backupFileExtractor.extractInfoFile();
+				SurveyBackupInfoExtractorTask t = (SurveyBackupInfoExtractorTask) task;
+				t.setFile(infoFile);
+			} else if ( task instanceof IdmlUnmarshallTask ) {
+				File idmlFile = zipFile == null ? file: backupFileExtractor.extractIdmlFile();
+				IdmlUnmarshallTask t = (IdmlUnmarshallTask) task;
+				t.setSurveyManager(surveyManager);
+				t.setValidate(validate);
+				t.setFile(idmlFile);
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 	

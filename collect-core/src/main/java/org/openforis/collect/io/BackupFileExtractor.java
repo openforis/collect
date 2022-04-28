@@ -27,7 +27,7 @@ public class BackupFileExtractor extends ZipFileExtractor implements Closeable {
 		super(zipFile);
 	}
 	
-	public File extractInfoFile() {
+	public File extractInfoFile() throws IOException {
 		return extract(SurveyBackupJob.INFO_FILE_NAME);
 	}
 	
@@ -41,11 +41,11 @@ public class BackupFileExtractor extends ZipFileExtractor implements Closeable {
 		}
 	}
 	
-	public File extractIdmlFile() {
+	public File extractIdmlFile() throws IOException {
 		return extract(SurveyBackupJob.SURVEY_XML_ENTRY_NAME);
 	}
 	
-	public File extractDataSummaryFile() {
+	public File extractDataSummaryFile() throws IOException {
 		return extract(SurveyBackupJob.DATA_SUMMARY_ENTRY_NAME, false);
 	}
 	

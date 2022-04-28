@@ -61,36 +61,40 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 
 	@Override
 	protected void initializeTask(Worker task) {
-		if ( task instanceof IdmlUnmarshallTask ) {
-			IdmlUnmarshallTask t = (IdmlUnmarshallTask) task;
-			t.setFile(idmlFile);
-			t.setSurveyManager(surveyManager);
-			t.setValidate(false);
-		} else if ( task instanceof IdmlImportTask ) {
-			IdmlImportTask t = (IdmlImportTask) task;
-			t.setSurveyManager(surveyManager);
-			t.setFile(idmlFile);
-			t.setSurveyUri(surveyUri);
-			t.setSurveyName(surveyName);
-			t.setImportInPublishedSurvey(restoreIntoPublishedSurvey);
-			t.setActiveUser(activeUser);
-			t.setUserGroup(userGroup);
-			t.setValidate(false);
-		} else if ( task instanceof CEPropertiesImportTask ) {
-			CEPropertiesImportTask t = (CEPropertiesImportTask) task;
-			t.setSurveyManager(surveyManager);
-			t.setSurvey(survey);
-			t.setFile(zipFileExtractor.extract("project_definition.properties"));
-		} else if ( task instanceof CollectEarthUniqueSurveyFileImportTask) {
-			CollectEarthUniqueSurveyFileImportTask t = (CollectEarthUniqueSurveyFileImportTask) task;
-			t.setSurveyManager(surveyManager);
-			t.setSurvey(survey);
-			t.setZipFileExtractor(zipFileExtractor);
-		} else if ( task instanceof GridFilesImportTask ) {
-			GridFilesImportTask t = (GridFilesImportTask) task;
-			t.setSurveyManager(surveyManager);
-			t.setSurvey(survey);
-			t.setZipFileExtractor(zipFileExtractor);
+		try {
+			if ( task instanceof IdmlUnmarshallTask ) {
+				IdmlUnmarshallTask t = (IdmlUnmarshallTask) task;
+				t.setFile(idmlFile);
+				t.setSurveyManager(surveyManager);
+				t.setValidate(false);
+			} else if ( task instanceof IdmlImportTask ) {
+				IdmlImportTask t = (IdmlImportTask) task;
+				t.setSurveyManager(surveyManager);
+				t.setFile(idmlFile);
+				t.setSurveyUri(surveyUri);
+				t.setSurveyName(surveyName);
+				t.setImportInPublishedSurvey(restoreIntoPublishedSurvey);
+				t.setActiveUser(activeUser);
+				t.setUserGroup(userGroup);
+				t.setValidate(false);
+			} else if ( task instanceof CEPropertiesImportTask ) {
+				CEPropertiesImportTask t = (CEPropertiesImportTask) task;
+				t.setSurveyManager(surveyManager);
+				t.setSurvey(survey);
+				t.setFile(zipFileExtractor.extract("project_definition.properties"));
+			} else if ( task instanceof CollectEarthUniqueSurveyFileImportTask) {
+				CollectEarthUniqueSurveyFileImportTask t = (CollectEarthUniqueSurveyFileImportTask) task;
+				t.setSurveyManager(surveyManager);
+				t.setSurvey(survey);
+				t.setZipFileExtractor(zipFileExtractor);
+			} else if ( task instanceof GridFilesImportTask ) {
+				GridFilesImportTask t = (GridFilesImportTask) task;
+				t.setSurveyManager(surveyManager);
+				t.setSurvey(survey);
+				t.setZipFileExtractor(zipFileExtractor);
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 		super.initializeTask(task);
 	}

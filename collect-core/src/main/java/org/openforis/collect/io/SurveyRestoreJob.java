@@ -4,6 +4,7 @@
 package org.openforis.collect.io;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -117,55 +118,59 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 
 	@Override
 	protected void initializeTask(Worker task) {
-		if ( task instanceof SurveyBackupInfoExtractorTask ) {
-			SurveyBackupInfoExtractorTask t = (SurveyBackupInfoExtractorTask) task;
-			File infoFile = backupFileExtractor.extract(SurveyBackupJob.INFO_FILE_NAME);
-			t.setFile(infoFile);
-		} else if ( task instanceof IdmlUnmarshallTask ) {
-			IdmlUnmarshallTask t = (IdmlUnmarshallTask) task;
-			File idmlFile = backupFileExtractor.extractIdmlFile();
-			t.setFile(idmlFile);
-			t.setSurveyManager(surveyManager);
-			t.setValidate(false);
-		} else if ( task instanceof IdmlImportTask ) {
-			IdmlImportTask t = (IdmlImportTask) task;
-			t.setSurveyManager(surveyManager);
-			File idmlFile = backupFileExtractor.extractIdmlFile();
-			t.setFile(idmlFile);
-			t.setSurveyUri(surveyUri);
-			t.setSurveyName(surveyName);
-			t.setImportInPublishedSurvey(restoreIntoPublishedSurvey);
-			t.setValidate(false);
-			t.setUserGroup(userGroup);
-			t.setActiveUser(activeUser);
-		} else if (task instanceof CodeListImagesImportTask) {
-			CodeListImagesImportTask t = (CodeListImagesImportTask) task;
-			t.setCodeListManager(codeListManager);
-			t.setZipFile(zipFile);
-			t.setSurvey(survey);
-		} else if ( task instanceof SamplingDesignCleanTask) {
-			SamplingDesignCleanTask t = (SamplingDesignCleanTask) task;
-			t.setSurveyId(survey.getId());
-		} else if ( task instanceof SamplingDesignImportTask ) {
-			SamplingDesignImportTask t = (SamplingDesignImportTask) task;
-			File samplingDesignFile = backupFileExtractor.extract(SurveyBackupJob.SAMPLING_DESIGN_ENTRY_NAME);
-			t.setSamplingDesignManager(samplingDesignManager);
-			t.setFile(samplingDesignFile);
-			t.setSkipValidation(true);
-			t.setOverwriteAll(true);
-			t.setSurvey(survey);
-		} else if ( task instanceof SpeciesBackupImportTask ) {
-			SpeciesBackupImportTask t = (SpeciesBackupImportTask) task;
-			t.setSpeciesManager(speciesManager);
-			t.setSurvey(survey);
-		} else if ( task instanceof SurveyFilesImportTask ) {
-			SurveyFilesImportTask t = (SurveyFilesImportTask) task;
-			t.setSurvey(survey);
-			t.setBackupFileExtractor(backupFileExtractor);
-		} else if (task instanceof DataCleansingImportTask) {
-			DataCleansingImportTask t = (DataCleansingImportTask) task;
-			t.setSurvey(survey);
-			t.setInputFile(backupFileExtractor.extract(SurveyBackupJob.DATA_CLEANSING_METADATA_ENTRY_NAME));
+		try {
+			if ( task instanceof SurveyBackupInfoExtractorTask ) {
+				SurveyBackupInfoExtractorTask t = (SurveyBackupInfoExtractorTask) task;
+				File infoFile = backupFileExtractor.extract(SurveyBackupJob.INFO_FILE_NAME);
+				t.setFile(infoFile);
+			} else if ( task instanceof IdmlUnmarshallTask ) {
+				IdmlUnmarshallTask t = (IdmlUnmarshallTask) task;
+				File idmlFile = backupFileExtractor.extractIdmlFile();
+				t.setFile(idmlFile);
+				t.setSurveyManager(surveyManager);
+				t.setValidate(false);
+			} else if ( task instanceof IdmlImportTask ) {
+				IdmlImportTask t = (IdmlImportTask) task;
+				t.setSurveyManager(surveyManager);
+				File idmlFile = backupFileExtractor.extractIdmlFile();
+				t.setFile(idmlFile);
+				t.setSurveyUri(surveyUri);
+				t.setSurveyName(surveyName);
+				t.setImportInPublishedSurvey(restoreIntoPublishedSurvey);
+				t.setValidate(false);
+				t.setUserGroup(userGroup);
+				t.setActiveUser(activeUser);
+			} else if (task instanceof CodeListImagesImportTask) {
+				CodeListImagesImportTask t = (CodeListImagesImportTask) task;
+				t.setCodeListManager(codeListManager);
+				t.setZipFile(zipFile);
+				t.setSurvey(survey);
+			} else if ( task instanceof SamplingDesignCleanTask) {
+				SamplingDesignCleanTask t = (SamplingDesignCleanTask) task;
+				t.setSurveyId(survey.getId());
+			} else if ( task instanceof SamplingDesignImportTask ) {
+				SamplingDesignImportTask t = (SamplingDesignImportTask) task;
+				File samplingDesignFile = backupFileExtractor.extract(SurveyBackupJob.SAMPLING_DESIGN_ENTRY_NAME);
+				t.setSamplingDesignManager(samplingDesignManager);
+				t.setFile(samplingDesignFile);
+				t.setSkipValidation(true);
+				t.setOverwriteAll(true);
+				t.setSurvey(survey);
+			} else if ( task instanceof SpeciesBackupImportTask ) {
+				SpeciesBackupImportTask t = (SpeciesBackupImportTask) task;
+				t.setSpeciesManager(speciesManager);
+				t.setSurvey(survey);
+			} else if ( task instanceof SurveyFilesImportTask ) {
+				SurveyFilesImportTask t = (SurveyFilesImportTask) task;
+				t.setSurvey(survey);
+				t.setBackupFileExtractor(backupFileExtractor);
+			} else if (task instanceof DataCleansingImportTask) {
+				DataCleansingImportTask t = (DataCleansingImportTask) task;
+				t.setSurvey(survey);
+				t.setInputFile(backupFileExtractor.extract(SurveyBackupJob.DATA_CLEANSING_METADATA_ENTRY_NAME));
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 		super.initializeTask(task);
 	}
@@ -202,7 +207,7 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 		}
 	}
 	
-	private void addSpeciesImportTasks() {
+	private void addSpeciesImportTasks() throws IOException {
 		List<String> speciesFilesNames = backupFileExtractor.listSpeciesEntryNames();
 		for (String speciesFileName : speciesFilesNames) {
 			String taxonomyName = FilenameUtils.getBaseName(speciesFileName);
