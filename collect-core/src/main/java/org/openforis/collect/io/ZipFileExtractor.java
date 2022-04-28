@@ -49,7 +49,8 @@ public class ZipFileExtractor {
 		try {
 			InputStream is = zipFile.getInputStream(entry);
 			String fileName = FilenameUtils.getName(entryName);
-			File tempFile = File.createTempFile("collect", fileName);
+			String fileNameNormalized = FilenameUtils.normalize(fileName);
+			File tempFile = File.createTempFile("collect", fileNameNormalized);
 			if (!tempFile.getCanonicalPath().startsWith(FileUtils.getTempDirectoryPath())) {
 				throw new IOException("Trying to extract ZIP entry outside of temp target directory");
 			}
