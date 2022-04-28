@@ -51,8 +51,6 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class CSVDataExportJob extends SurveyLockingJob {
 	
-//	private static Logger LOG = Logger.getLogger(CSVDataExportJob.class);
-
 	@Autowired
 	private RecordManager recordManager;
 	
@@ -65,7 +63,6 @@ public class CSVDataExportJob extends SurveyLockingJob {
 	
 	@Override
 	protected void buildTasks() throws Throwable {
-		logError("building tasks", null);
 		addTask(new CSVDataExportTask());
 	}
 

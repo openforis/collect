@@ -510,6 +510,10 @@ public class RecordController extends BasicController implements Serializable {
 			if (job.isCompleted()) {
 				String fileName = String.format("record_data_%d_%s.zip", recordId, Dates.formatDate(new Date()));
 				Controllers.writeFileToResponse(response, outputFile, fileName, MediaTypes.ZIP_CONTENT_TYPE);
+			} else if (job.getLastException() != null) {
+				throw new RuntimeException(job.getLastException());
+			} else {
+				throw new RuntimeException("Error exporting record");
 			}
 		}
 	}
