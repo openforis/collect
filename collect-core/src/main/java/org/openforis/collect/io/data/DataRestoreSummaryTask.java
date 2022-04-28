@@ -82,7 +82,12 @@ public class DataRestoreSummaryTask extends Task {
 	
 	@Override
 	protected long countTotalItems() {
-		List<Integer> entryIds = extractEntryIdsToImport();
+		List<Integer> entryIds;
+		try {
+			entryIds = extractEntryIdsToImport();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		return Step.values().length * entryIds.size();
 	}
 
@@ -325,7 +330,7 @@ public class DataRestoreSummaryTask extends Task {
 		return entryName;
 	}
 
-	private List<Integer> extractEntryIdsToImport() {
+	private List<Integer> extractEntryIdsToImport() throws IOException {
 		if (dataSummaryFile == null) { 
 			return recordProvider.findEntryIds();
 		} else {

@@ -50,7 +50,7 @@ public class NewBackupFileExtractor implements Closeable {
 		ZipFiles.extract(zipFile, tempUncompressedFolder, progressListener);
 	}
 	
-	public File extractInfoFile() {
+	public File extractInfoFile() throws IOException {
 		return extract(SurveyBackupJob.INFO_FILE_NAME);
 	}
 	
@@ -76,22 +76,25 @@ public class NewBackupFileExtractor implements Closeable {
 		}
 	}
 	
-	public File extractIdmlFile() {
+	public File extractIdmlFile() throws IOException {
 		return extract(SurveyBackupJob.SURVEY_XML_ENTRY_NAME);
 	}
 	
-	public File extract(String entryName) {
+	public File extract(String entryName) throws IOException {
 		return extract(entryName, true);
 	}
 	
-	public File extract(String entryName, boolean required) {
+	public File extract(String entryName, boolean required) throws IOException {
 		File folder = ZipFiles.getOrCreateEntryFolder(tempUncompressedFolder, entryName);
 		String fileName = Files.extractFileName(entryName);
 		File result = new File(folder, fileName);
+		if (!result.getCanonicalPath().startsWith(tempUncompressedFolder.getCanonicalPath())) {
+			throw new IOException("Entry is outside of target directory");
+		}
 		return result.exists() ? result: null;
 	}
 
-	public List<String> listSpeciesEntryNames() {
+	public List<String> listSpeciesEntryNames() throws IOException {
 		List<String> entries = Files.listFileNamesInFolder(tempUncompressedFolder, SurveyBackupJob.SPECIES_FOLDER);
 		return entries;
 	}
@@ -116,8 +119,12 @@ public class NewBackupFileExtractor implements Closeable {
 	}
 
 	public boolean containsEntry(String name) {
-		File file = extract(name, false);
-		return file != null;
+		try {
+			File file = extract(name, false);
+			return file != null;
+		} catch (IOException e) {
+			return false;
+		}
 	}
 	
 	public boolean containsEntriesInPath(String path) {
@@ -126,7 +133,11 @@ public class NewBackupFileExtractor implements Closeable {
 	}
 	
 	public List<String> listFilesInFolder(String path) {
-		return Files.listFileNamesInFolder(tempUncompressedFolder, path);
+		try {
+			return Files.listFileNamesInFolder(tempUncompressedFolder, path);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public List<String> getEntryNames() {
@@ -147,7 +158,7 @@ public class NewBackupFileExtractor implements Closeable {
 
 	public boolean isOldFormat() {
 		if (oldFormat == null) {
-			oldFormat = ! containsEntry(SurveyBackupJob.INFO_FILE_NAME);
+			oldFormat = !containsEntry(SurveyBackupJob.INFO_FILE_NAME);
 		}
 		return oldFormat;
 	}

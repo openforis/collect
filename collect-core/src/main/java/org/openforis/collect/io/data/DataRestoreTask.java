@@ -107,7 +107,11 @@ public class DataRestoreTask extends Task {
 		if (entryIdsToImport != null) {
 			return entryIdsToImport;
 		}
-		return recordProvider.findEntryIds();
+		try {
+			return recordProvider.findEntryIds();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -140,7 +144,7 @@ public class DataRestoreTask extends Task {
 		}
 	}
 
-	private void reportMissingStepsErrors(int entryId, MissingStepsException e) {
+	private void reportMissingStepsErrors(int entryId, MissingStepsException e) throws IOException {
 		Step originalStep = e.getOperations().getOriginalStep();
 		String entryName = recordProvider.getEntryName(entryId, originalStep);
 		errors.add(new RecordImportError(entryId, entryName, originalStep, "Missing data for step", Level.ERROR));

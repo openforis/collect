@@ -76,18 +76,18 @@ public class ZipFiles {
 		}
 	}
 	
-	public File extractEntry(File parentDestinationFolder, String entryName) {
+	public File extractEntry(File parentDestinationFolder, String entryName) throws IOException {
 		return extractEntry(parentDestinationFolder, entryName, true);
 	}
 	
-	public static File extractEntry(File parentDestinationFolder, String entryName, boolean required) {
+	public static File extractEntry(File parentDestinationFolder, String entryName, boolean required) throws IOException {
 		File folder = getOrCreateEntryFolder(parentDestinationFolder, entryName);
 		String fileName = Files.extractFileName(entryName);
 		File result = new File(folder, fileName);
 		return result.exists() ? result: null;
 	}
 
-	public static File getOrCreateEntryFolder(File parentDestinationFolder, String entryName) {
+	public static File getOrCreateEntryFolder(File parentDestinationFolder, String entryName) throws IOException {
 		String path = FilenameUtils.getPathNoEndSeparator(entryName);
 		return Files.getOrCreateFolder(parentDestinationFolder, path);
 	}

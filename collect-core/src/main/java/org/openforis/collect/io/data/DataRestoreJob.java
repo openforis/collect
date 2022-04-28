@@ -277,7 +277,11 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			if ( entryIdsToImport != null ) {
 				return entryIdsToImport;
 			} else {
-				return recordProvider.findEntryIds();
+				try {
+					return recordProvider.findEntryIds();
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
 			}
 		}
 		
