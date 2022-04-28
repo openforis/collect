@@ -65,6 +65,9 @@ public class ZipFiles {
 				File folder = getOrCreateEntryFolder(destinationFolder, entryName);
 				String fileName = Files.extractFileName(entryName);
 				File newFile = new File(folder, fileName);
+				if (!newFile.getCanonicalPath().startsWith(destinationFolder.getCanonicalPath())) {
+					throw new IOException("Trying to extract entry outside of destination folder");
+				}
 				newFile.createNewFile();
 				InputStream is = zipFile.getInputStream(zipEntry);
 				FileUtils.copyInputStreamToFile(is, newFile);
