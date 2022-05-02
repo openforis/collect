@@ -38,7 +38,7 @@ const CodeFieldAutocomplete = (props) => {
   const fetchCodeItems = useCallback(
     ({ surveyId, codeListId, versionId, language, ancestorCodes }) =>
       ({ searchString, onComplete }) =>
-        debounce(Strings.isBlank(searchString) ? 0 : 1000, false, async () => {
+        debounce(Strings.isBlank(searchString) ? 0 : 1000, async () => {
           const availableItems = await ServiceFactory.codeListService.findAvailableItems({
             surveyId,
             codeListId,
