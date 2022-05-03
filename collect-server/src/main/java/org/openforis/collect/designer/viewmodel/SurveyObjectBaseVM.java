@@ -51,6 +51,7 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	
 	public SurveyObjectBaseVM() {
 		commitChangesOnApply = true;
+		formObject = createFormObject();
 	}
 	
 	protected void doAfterCompose(@ContextParam(ContextType.VIEW) Component view){

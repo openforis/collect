@@ -4,8 +4,8 @@
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.VersioningVM')"
 		validationMessages="@id('vmsgs')"
-		width="750px" 
-		height="300px"
+		width="800px" 
+		height="600px"
 		border="normal"
 		position="center" 
 		closable="true" onClose="@command('close')">
@@ -15,7 +15,7 @@
 					<label value="${labels.survey.versioning.introduction}" />
 				</box>
 			</north>
-			<west width="180px">
+			<west width="280px">
 				<borderlayout>
 					<center border="none"
 						title="${labels.global.items.header.inserted}:">
@@ -109,7 +109,7 @@
 											<label value="${labels.survey.versioning.date}:" />
 		                                </fieldErrorHandler>
 		      			                <fieldErrorHandler message="@load(vmsgs['date'])">
-											<datebox width="100px" compact="false" buttonVisible="true" format="@load(vm.dateFormat)" 
+											<datebox width="150px" compact="false" buttonVisible="true" format="@load(vm.dateFormat)" 
 					                    		value="@bind(fx.date)" onChange="@command('applyChanges')" />
 		                                </fieldErrorHandler>
 									</row>
