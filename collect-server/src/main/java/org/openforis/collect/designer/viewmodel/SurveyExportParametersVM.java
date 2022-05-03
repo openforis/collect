@@ -98,7 +98,7 @@ public class SurveyExportParametersVM extends BaseVM {
 	
 	private SurveySummary surveySummary;
 	private SurveyExportParametersFormObject formObject;
-	private Form tempForm;
+	private SimpleForm tempForm;
 	
 	private Window jobStatusPopUp;
 
@@ -333,7 +333,7 @@ public class SurveyExportParametersVM extends BaseVM {
 		return tempForm;
 	}
 	
-	public void setTempForm(Form tempForm) {
+	public void setTempForm(SimpleForm tempForm) {
 		this.tempForm = tempForm;
 	}
 	

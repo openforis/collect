@@ -48,7 +48,6 @@ import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
-import org.zkoss.zkplus.databind.BindingListModelList;
 
 /**
  * 
@@ -337,14 +336,14 @@ public abstract class SurveyBaseVM extends BaseVM {
 
 	public List<ModelVersion> getFormVersions() {
 		List<ModelVersion> versions = getSurveyFormVersions();
-		return new BindingListModelList<ModelVersion>(versions, false);
+		return versions;
 	}
 
 	public List<Object> getFormVersionsWithEmptyOption() {
 		List<ModelVersion> versions = getSurveyFormVersions();
 		List<Object> result = new ArrayList<Object>(versions);
 		result.add(0, FormObject.VERSION_EMPTY_SELECTION);
-		return new BindingListModelList<Object>(result, false);
+		return result;
 	}
 	
 	public List<Integer> getFormVersionIdsWithEmptyOption() {
@@ -354,7 +353,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 		for (ModelVersion modelVersion : versions) {
 			result.add(modelVersion.getId());
 		}
-		return new BindingListModelList<Integer>(result, false);
+		return result;
 	}
 
 	public String getVersionLabel(int id) {
@@ -397,7 +396,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 		boolean includeSamplingDesignList = survey.getTarget() != SurveyTarget.COLLECT_EARTH;
 		List<CodeList> result = new ArrayList<CodeList>(survey.getCodeLists(includeSamplingDesignList));
 		result = sortByName(result);
-		return new BindingListModelList<CodeList>(result, false);
+		return result;
 	}
 	
 	@DependsOn("surveyId")
@@ -412,7 +411,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 	
 	public List<Unit> getUnits() {
 		List<Unit> result = new ArrayList<Unit>(survey.getUnits());
-		return new BindingListModelList<Unit>(result, false);
+		return result;
 	}
 	
 	public String getUnitLabelFromPrecision(Precision precision) {

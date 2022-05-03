@@ -64,7 +64,6 @@ import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
-import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Window;
 
@@ -292,7 +291,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 			return null;
 		} else {
 			List<String> languages = survey.getLanguages();
-			return new BindingListModelList<>(languages, false);
+			return languages;
 		}
 	}
 

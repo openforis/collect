@@ -26,7 +26,6 @@ import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Wire;
-import org.zkoss.zkplus.databind.BindingListModelList;
 
 /**
  * 
@@ -65,9 +64,9 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		resetEditedItem();
 	}
 	
-	public BindingListModelList<T> getItems() {
+	public List<T> getItems() {
 		List<T> items = getItemsInternal();
-		return new BindingListModelList<T>(items, false);
+		return items;
 	}
 	
 	protected abstract List<T> getItemsInternal();

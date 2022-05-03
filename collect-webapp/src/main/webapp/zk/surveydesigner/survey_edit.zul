@@ -26,7 +26,7 @@
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')">
 		<center border="none">
 			<absolutelayout hflex="1" vflex="1">
-				<absolutechildren hflex="1" vflex="1">
+				<absolutechildren hflex="1" height="100%">
 					<!-- main tabs -->
 					<tabbox id="tb" hflex="1" vflex="1">
 						<tabs id="tabs">
@@ -155,7 +155,7 @@
 				</absolutechildren>
 			</absolutelayout>
 		</center>
-		<south height="30px" border="none">
+		<south height="100px" border="none">
 			<borderlayout hflex="1">
 				<west border="none" size="30%" vflex="1">
 					<hlayout hflex="1" vflex="1" valign="middle">

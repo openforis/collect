@@ -24,7 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
-import org.zkoss.bind.Form;
+import org.zkoss.bind.SimpleForm;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
@@ -32,7 +32,6 @@ import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.WebApp;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
-import org.zkoss.zkplus.databind.BindingListModelListModel;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Window;
 
@@ -59,7 +58,7 @@ public abstract class BaseVM {
 	@WireVariable
 	protected UserGroupManager userGroupManager;
 
-	private BindingListModelListModel<LabelledItem> userGroupsModel;
+	private ListModelList<LabelledItem> userGroupsModel;
 
 	void init() {
 		initUserGroupsModel();
@@ -79,7 +78,7 @@ public abstract class BaseVM {
 						: userGroup.getLabel();
 			items.add(new LabelledItem(userGroup.getName(), label));
 		}
-		userGroupsModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(items));
+		userGroupsModel = new ListModelList<LabelledItem>(items);
 		userGroupsModel.setMultiple(false);
 	}
 	
@@ -151,7 +150,7 @@ public abstract class BaseVM {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected <T> T getFormFieldValue(Form form, String field) {
+	protected <T> T getFormFieldValue(SimpleForm form, String field) {
 		return (T) form.getField(field);
 	}
 	
@@ -160,7 +159,7 @@ public abstract class BaseVM {
 		setFormFieldValue(ComponentUtil.getForm(binder), field, value);
 	}
 	
-	protected void setFormFieldValue(Form form, String field, Object value) {
+	protected void setFormFieldValue(SimpleForm form, String field, Object value) {
 		form.setField(field, value);
 		BindUtils.postNotifyChange(null, null, form, field);
 	}
@@ -177,7 +176,7 @@ public abstract class BaseVM {
 		return PRETTY_DATE_FORMAT.format(date);
 	}
 	
-	public BindingListModelListModel<LabelledItem> getUserGroupsModel() {
+	public ListModelList<LabelledItem> getUserGroupsModel() {
 		return userGroupsModel;
 	}
 }
