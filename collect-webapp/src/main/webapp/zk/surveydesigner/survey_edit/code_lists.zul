@@ -7,56 +7,54 @@
 		validationMessages="@id('vmsgs')"
 		hflex="true" vflex="true">
 		<west width="260px" title="${labels.survey.code_list.items.header}:">
-			
-					<vlayout vflex="true">
-						<box pack="center" align="center" hflex="1" vflex="1" visible="@load(empty vm.items)">
-							<label style="white-space: pre-line;" value="${labels.survey.code_list.items.empty_list}" />
-						</box>
-						<listbox id="itemsListBox" visible="@load(not empty vm.items)"
-							selectedItem="@load(vm.selectedItem)" model="@load(vm.items)"
-							onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
-							width="250px" vflex="true">
-							<listhead>
-								<listheader label="" width="175px" />
-								<listheader label="" width="30px" />
-							</listhead>
-							<template name="model">
-								<listitem>
-									<listcell label="@load(each.name)" />
-									<listcell tooltiptext="@load(vm.getWarnings(each))">
-										<image visible="@load(vm.hasWarnings(each))"
-											src="/assets/images/warning-small.png" /> 
-									</listcell>
-								</listitem>
-							</template>
-						</listbox>
-						<menubar>
-							<menuitem 
-								sclass="icon-button with-label" 
-								label="${labels.survey.code_list.add_list}"
-								image="/assets/images/add.png" 
-								onClick="@command('newItem')"
-								width="70px" />
-							<menuitem
-								sclass="icon-button"
-								tooltiptext="${labels.global.delete_item}"
-								image="/assets/images/delete.png"
-								disabled="@load(empty vm.selectedItem)"
-								onClick="@command('deleteCodeList', item=vm.selectedItem)" />
-							<menu
-								sclass="icon-button" 
-								image="/assets/images/settings-small.png" 
-								tooltiptext="${labels.survey.code_list.import_export}">
-								<menupopup>
-									<menuitem label="${labels.survey.code_list.batch_import}"
-										upload="true,maxsize=-1" onUpload="@command('batchImportFileUploaded')"  />
-									<menuitem label="${labels.survey.code_list.batch_export}"
-										onClick="@command('batchExport')" />
-								</menupopup>
-							</menu>
-						</menubar>
-					</vlayout>
-				
+			<vlayout vflex="true">
+				<box pack="center" align="center" hflex="1" vflex="1" visible="@load(empty vm.items)">
+					<label style="white-space: pre-line;" value="${labels.survey.code_list.items.empty_list}" />
+				</box>
+				<listbox id="itemsListBox" visible="@load(not empty vm.items)"
+					selectedItem="@load(vm.selectedItem)" model="@load(vm.items)"
+					onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
+					width="250px" vflex="true">
+					<listhead>
+						<listheader label="" width="175px" />
+						<listheader label="" width="30px" />
+					</listhead>
+					<template name="model">
+						<listitem>
+							<listcell label="@load(each.name)" />
+							<listcell tooltiptext="@load(vm.getWarnings(each))">
+								<image visible="@load(vm.hasWarnings(each))"
+									src="/assets/images/warning-small.png" /> 
+							</listcell>
+						</listitem>
+					</template>
+				</listbox>
+				<menubar>
+					<menuitem 
+						sclass="icon-button with-label" 
+						label="${labels.survey.code_list.add_list}"
+						image="/assets/images/add.png" 
+						onClick="@command('newItem')"
+						width="70px" />
+					<menuitem
+						sclass="icon-button"
+						tooltiptext="${labels.global.delete_item}"
+						image="/assets/images/delete.png"
+						disabled="@load(empty vm.selectedItem)"
+						onClick="@command('deleteCodeList', item=vm.selectedItem)" />
+					<menu
+						sclass="icon-button" 
+						image="/assets/images/settings-small.png" 
+						tooltiptext="${labels.survey.code_list.import_export}">
+						<menupopup>
+							<menuitem label="${labels.survey.code_list.batch_import}"
+								upload="true,maxsize=-1" onUpload="@command('batchImportFileUploaded')"  />
+							<menuitem label="${labels.survey.code_list.batch_export}"
+								onClick="@command('batchExport')" />
+						</menupopup>
+					</menu>
+				</menubar>
+			</vlayout>
 		</west>
 		<center>
 			<absolutelayout hflex="true" vflex="true">

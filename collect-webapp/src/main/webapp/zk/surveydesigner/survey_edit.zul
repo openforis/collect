@@ -155,7 +155,7 @@
 				</absolutechildren>
 			</absolutelayout>
 		</center>
-		<south height="100px" border="none">
+		<south height="80px" border="none">
 			<borderlayout hflex="1">
 				<west border="none" size="30%" vflex="1">
 					<hlayout hflex="1" vflex="1" valign="middle">
