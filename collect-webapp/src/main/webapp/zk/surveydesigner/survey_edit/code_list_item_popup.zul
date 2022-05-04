@@ -4,8 +4,7 @@
 	<custom-attributes parentItem="${arg.parentItem}" />
 
 	<window id="codeListItemManagerPopUp"
-		title="${labels.survey.code_list.item.manager.title}" width="600px"
-		height="460px" border="normal" position="center"
+		title="${labels.survey.code_list.item.manager.title}" width="700px" height="560px" border="normal" position="center"
 		sclass="form" apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CodeListItemVM')"
 		validationMessages="@id('vmsgs')"
@@ -18,7 +17,7 @@
         	<center autoscroll="true">
 				<grid>
 					<columns>
-						<column width="150px" />
+						<column width="220px" />
 						<column />
 					</columns>
 					<rows>

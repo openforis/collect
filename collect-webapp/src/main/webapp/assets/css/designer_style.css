@@ -42,6 +42,12 @@ button.icon {
 
 .z-west-header, .z-center-header, .z-east-header, .z-north-header, .z-south-header {
 	background: #f6f6f6;
+	height: 37px;
+	padding: 8px 12px;
+}
+
+.z-north-body, .z-south-body, .z-west-body, .z-center-body, .z-east-body {
+	padding: 6px;
 }
 
 .z-hlayout.controlBar .z-hlayout-inner {
