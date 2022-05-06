@@ -71,6 +71,12 @@ button.icon {
 	.z-decimalbox-readonly,	.z-decimalbox-text-disd {
 	background: #EEEEEE;
 }
+textarea.z-textbox {
+	padding: 6px;
+}
+.z-select {
+	height: 2rem;
+}
 .nopadding {
 	padding: 0px;
 }
@@ -84,12 +90,6 @@ button.icon {
 .collapsible .z-groupbox-3d-hm {
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;
-}
-
-.collapsible.closed .z-groupbox-3d-hm,
-.collapsible.open .z-groupbox-3d-cnt {
-	border-bottom-left-radius: 10px;
-	border-bottom-right-radius: 10px;
 }
 
 .z-groupbox-3d-hm {
@@ -130,6 +130,10 @@ button.icon {
 .z-treecell-cnt {
 	white-space: nowrap;
 }
+.z-treecell-content {
+	padding: 6px 4px;
+	white-space: nowrap;
+}
 .z-textbox.error, .z-intbox.error, .z-select.error, .z-datebox.error {
 	border: 2px inset #FF0000;
 	color: #000000;
@@ -157,6 +161,9 @@ div.z-listbox-header th.z-listheader-sort-over {
 }
 .z-toolbarbutton-cnt {
 	zoom: 1.2;
+}
+.z-toolbarbutton {
+	padding: 2px;
 }
 
 .z-groupbox-header span.z-caption-cnt, 
@@ -317,12 +324,12 @@ div.z-listbox-header th.z-listheader-sort-over {
 	display: none;
 }
 
-.z-menubar-hor.transparentbackground {
+.z-menubar-horizontal.transparent {
 	background: transparent;
 	border-color: transparent;
 }
 
-.z-menubar-hor.withicons .z-menuitem-btn,
+.z-menubar-horizontal.withicons .z-menuitem-btn,
 .z-menuitem.icon-button .z-menuitem-btn {
 	height: 30px;
 	width: 26px;

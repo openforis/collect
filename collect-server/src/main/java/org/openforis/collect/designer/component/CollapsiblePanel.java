@@ -4,9 +4,7 @@ import org.openforis.collect.designer.util.ComponentUtil;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zul.Caption;
-import org.zkoss.zul.Div;
 import org.zkoss.zul.Groupbox;
-import org.zkoss.zul.Label;
 
 public class CollapsiblePanel extends Groupbox {
 	
@@ -27,14 +25,11 @@ public class CollapsiblePanel extends Groupbox {
 	}
 
 	protected void handleOpenChange() {
-		ComponentUtil.toggleClass(this, "open", isOpen());
-		ComponentUtil.toggleClass(this, "closed", !isOpen());
-		getCaption().setSclass("open-" + isOpen());
+		getCaption().setIconSclass("z-icon-caret-" + (isOpen() ? "up": "down"));
 	}
 
 	public void setCaptionLabel(String captionText) {
-		Label label = (Label) getCaption().getFirstChild().getFirstChild();
-		label.setValue(captionText);
+		getCaption().setLabel(captionText);
 	}
 	
 	@Override
@@ -45,10 +40,6 @@ public class CollapsiblePanel extends Groupbox {
 	
 	private void createAndAddCaption() {
 		Caption caption = new Caption();
-		Div labelWrapper = new Div();
-		labelWrapper.setStyle("text-align: left;");
-		labelWrapper.getChildren().add(new Label());
-		caption.getChildren().add(labelWrapper);
 		getChildren().add(caption);
 	}
 }

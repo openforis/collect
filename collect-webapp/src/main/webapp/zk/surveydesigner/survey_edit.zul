@@ -74,12 +74,12 @@
 						</tabpanels>
 					</tabbox>
 				</absolutechildren>
-				<absolutechildren x="650" width="300px">
+				<absolutechildren x="650">
 					<hlayout hflex="1" spacing="10px"
 						style="text-align: right;" sclass="controlBar">
 
 						<!-- Language selector -->
-						<hlayout id="languageSelector" width="245px"
+						<hlayout id="languageSelector" 
 							sclass="controlBar">
 							<label
 								value="${labels.survey.language.current_language}:"
@@ -94,15 +94,14 @@
 										value="@load(each)" />
 								</template>
 							</listbox>
-							<button sclass="icon" height="24px"
+							<button sclass="icon"
 								tooltiptext="${labels.survey.language_manager}"
 								onClick="@command('openLanguageManagerPopUp')"
 								image="/assets/images/edit-language.png" />
 						</hlayout>
 
 						<!-- Advanced options -->
-						<menubar sclass="transparentbackground"
-							height="18px">
+						<menubar sclass="transparent">
 							<menu
 								tooltiptext="${labels.global.advanced_functions}"
 								image="/assets/images/settings-small.png">

@@ -90,6 +90,9 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	@SuppressWarnings("unchecked")
 	@Override
 	protected FormObject<T> createFormObject() {
+		if (editedItem == null) {
+			return null;
+		}
 		AttributeType attributeTypeEnum = AttributeType.valueOf(editedItem);
 		formObject = (AttributeDefinitionFormObject<T>) NodeDefinitionFormObject.newInstance(parentEntity, attributeTypeEnum);
 		return formObject;

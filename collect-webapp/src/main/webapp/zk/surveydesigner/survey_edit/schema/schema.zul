@@ -10,8 +10,8 @@
           
     <borderlayout vflex="1">
       <west title="${labels.survey.schema.definitions}" 
-        width="250px"
-        minsize="250"
+        width="280px"
+        minsize="280"
         splittable="true">
         <borderlayout visible="@load(not empty vm.treeModel)">
         	<north border="none">
@@ -29,7 +29,7 @@
        		  </hlayout>
         	</north>
           <center border="none">
-            <tree id="nodesTree" zclass="z-dottree" width="100%"
+            <tree id="nodesTree" width="100%"
               vflex="true" model="@load(vm.treeModel)"
               context="nodesTreePopup"
               onSelect="@command('nodeSelected', data=self.selectedItem.value.data)">
@@ -50,7 +50,7 @@
           		<!-- Info tip -->
        		  <label value="${labels.survey.schema.right_click_tip}" sclass="tipMessage" />
           		<!-- Button bar -->
-	            <toolbar width="100%" height="26px">
+	            <toolbar width="100%">
 	              <toolbarbutton image="/assets/images/arrow-up.png"
 	              	tooltiptext="${labels.global.item.move_up}"
 	                disabled="@load(vm.moveNodeUpDisabled)"
@@ -59,7 +59,7 @@
 	              	tooltiptext="${labels.global.item.move_down}"
 	                disabled="@load(vm.moveNodeDownDisabled)"
 	                onClick="@command('moveNodeDown')" />
-	              <space width="100px" />
+	              <space vflex="true" />
 	              <toolbarbutton image="/assets/images/expand-small.png"
 	              	tooltiptext="${labels.survey.schema.tree.expand}"
 	                onClick="@command('expandTree')" />
@@ -71,9 +71,9 @@
           </south>
         </borderlayout>
       </west>
-      <center>
+      <center border="none">
       	<borderlayout hflex="true" visible="@load(vm.editingNode)">
-      		<north border="none" height="30px">
+      		<north border="none">
       			<hlayout hflex="true" sclass="z-center-header node-type-header">
   					<box hflex="1">
 		      			<label value="@load(vm.nodeTypeHeaderLabel)" />

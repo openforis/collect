@@ -23,7 +23,7 @@
 						src="/assets/images/info-small.png" />
 	    		</fieldErrorHandler>
   				<fieldErrorHandler message="@load(vmsgs['name'])">
-  					<textbox width="250px" maxlength="40"
+  					<textbox width="22rem" maxlength="40"
   						id="nodeNameTextbox"
   						value="@bind(fx.name)"
   						readonly="@load(vm.collectEarthSurvey and (vm.rootEntity or vm.predefinedCollectEarthAttribute))"
@@ -40,7 +40,7 @@
       			</fieldErrorHandler>
       			<fieldErrorHandler
       				message="@load(vmsgs['instanceLabel'])">
-      				<textbox width="300px"
+      				<textbox width="30rem"
       					value="@bind(fx.instanceLabel)"
       					placeholder="@load(fx.defaultInstanceLabel)"
       					onChange="@command('singleInstanceLabelChange', label=self.value)" />
@@ -56,7 +56,7 @@
       			</fieldErrorHandler>
       			<fieldErrorHandler
       				message="@load(vmsgs['description'])">
-      				<textbox width="300px" multiline="true" rows="4"
+      				<textbox width="30rem" multiline="true" rows="4"
       					value="@bind(fx.description)"
       					placeholder="@load(fx.defaultDescription)"
       					onChange="@command('applyChanges')" />
@@ -293,7 +293,7 @@
   	
   	<collapsiblepanel open="false" visible="@load(not vm.rootEntity)"
 		captionLabel="${labels.survey.schema.node.dependent_paths}">
-		<listbox id="dependentNodeListbox" vflex="true" rows="4"
+		<listbox id="dependentNodeListbox" rows="4"
 			model="@load(vm.dependentNodes)">
 			<listhead>
 				<listheader
@@ -319,7 +319,7 @@
     <collapsiblepanel open="false" captionLabel="${labels.survey.schema.node.other_labels}">
       	<grid class="inner">
       		<columns>
-      			<column width="150px" />
+      			<column width="220px" />
       			<column />
       		</columns>
       		<rows>
@@ -333,7 +333,7 @@
 	      			</fieldErrorHandler>
 	      			<fieldErrorHandler
 	      				message="@load(vmsgs['headingLabel'])">
-	      				<textbox width="250px"
+	      				<textbox width="30rem"
 	      					value="@bind(fx.headingLabel)"
 	      					placeholder="@load(fx.defaultHeadingLabel)"
 	      					onChange="@command('applyChanges')" />
@@ -349,7 +349,7 @@
 	      			</fieldErrorHandler>
 	      			<fieldErrorHandler
 	      				message="@load(vmsgs['numberLabel'])">
-	      				<textbox width="250px"
+	      				<textbox width="30rem"
 	      					value="@bind(fx.numberLabel)"
 	      					onChange="@command('applyChanges')" />
 	      			</fieldErrorHandler>
@@ -364,7 +364,7 @@
 	      			</fieldErrorHandler>
 	      			<fieldErrorHandler
 	      				message="@load(vmsgs['abbreviatedLabel'])">
-	      				<textbox width="250px"
+	      				<textbox width="30rem"
 	      					value="@bind(fx.abbreviatedLabel)"
 	      					onChange="@command('applyChanges')" />
 	      			</fieldErrorHandler>
@@ -379,7 +379,7 @@
 	      			</fieldErrorHandler>
 	      			<fieldErrorHandler
 	      				message="@load(vmsgs['reportingLabel'])">
-	      				<textbox width="250px"
+	      				<textbox width="30rem"
 	      					value="@bind(fx.reportingLabel)"
 	      					onChange="@command('applyChanges')" />
 	      			</fieldErrorHandler>
@@ -394,7 +394,7 @@
 	      			</fieldErrorHandler>
 	      			<fieldErrorHandler
 	      				message="@load(vmsgs['pcPromptLabel'])">
-	      				<textbox width="250px"
+	      				<textbox width="30rem"
 	      					value="@bind(fx.pcPromptLabel)"
 	      					onChange="@command('applyChanges')" />
 	      			</fieldErrorHandler>
@@ -409,7 +409,7 @@
 	                </fieldErrorHandler>
 	                <fieldErrorHandler
 	                	message="@load(vmsgs['interviewPromptLabel'])">
-	                	<textbox width="250px"
+	                	<textbox width="30rem"
 	                		value="@bind(fx.interviewPromptLabel)"
 	                		onChange="@command('applyChanges')" />
 	                </fieldErrorHandler>
@@ -424,7 +424,7 @@
         		    </fieldErrorHandler>
 	                <fieldErrorHandler
 	                	message="@load(vmsgs['paperPromptLabel'])">
-	                	<textbox width="250px"
+	                	<textbox width="30rem"
 	                		value="@bind(fx.paperPromptLabel)"
 	                		onChange="@command('applyChanges')" />
 	                </fieldErrorHandler>
@@ -439,7 +439,7 @@
       				</fieldErrorHandler>
       				<fieldErrorHandler
       					message="@load(vmsgs['handheldPromptLabel'])">
-      					<textbox width="250px"
+      					<textbox width="30rem"
       						value="@bind(fx.handheldPromptLabel)"
       						onChange="@command('applyChanges')" />
       				</fieldErrorHandler>
