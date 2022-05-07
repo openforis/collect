@@ -54,9 +54,6 @@ button.icon {
 .z-hlayout.controlBar .z-hlayout-inner {
 	vertical-align: middle;
 }
-.z-textbox, .z-decimalbox, .z-intbox, .z-longbox, .z-doublebox {
-	border: 2px inset #E7E7E7;
-}
 .z-textbox-focus, .z-textbox-focus input, 
 	.z-decimalbox-focus, .z-decimalbox-focus input, 
 	.z-intbox-focus, .z-intbox-focus input,
@@ -137,6 +134,9 @@ textarea.z-textbox {
 .z-textbox.error, .z-intbox.error, .z-select.error, .z-datebox.error {
 	border: 2px inset #FF0000;
 	color: #000000;
+}
+.z-combobox.error input, .z-combobox.error a {
+	border-color: red;
 }
 .z-groupbox.error .z-groupbox-hr, 
 .z-groupbox.error .z-groupbox-cnt {

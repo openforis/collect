@@ -27,31 +27,32 @@
 				<row>
 					<label value="${labels.survey.file.type.$}:" />
 					<fieldErrorHandler message="@load(vmsgs['type'])">
-						<listbox id="typeListBox"
-							selectedItem="@bind(fx.type)" mold="select"
-							onSelect="@command('typeChanged')">
-							<listitem selected="true"
-								label="${labels.survey.file.type.generic}" value="GENERIC" />
-							<listitem selected="true"
+						<combobox id="typeListBox"
+							selectedItem="@bind(fx.type)"
+							onChange="@command('typeChanged')">
+							<comboitem
+								label="${labels.survey.file.type.generic}" 
+								value="GENERIC" />
+							<comboitem
 								label="${labels.survey.file.type.survey_guide}"
 								value="SURVEY_GUIDE" />
-							<listitem
+							<comboitem
 								visible="@load(vm.collectEarthSurvey)"
 								label="${labels.survey.file.type.collect_earth_area_per_attribute}"
 								value="COLLECT_EARTH_AREA_PER_ATTRIBUTE" />
-							<listitem
+							<comboitem
 								visible="@load(vm.collectEarthSurvey)"
 								label="${labels.survey.file.type.collect_earth_grid.$}"
 								value="COLLECT_EARTH_GRID" />
-							<listitem
+							<comboitem
 								visible="@load(vm.collectEarthSurvey)"
 								label="${labels.survey.file.type.collect_earth_ee_script}"
 								value="COLLECT_EARTH_EE_SCRIPT" />
-							<listitem
+							<comboitem
 								visible="@load(vm.collectEarthSurvey)"
 								label="${labels.survey.file.type.collect_earth_saiku_query}"
 								value="COLLECT_EARTH_SAIKU_QUERY" />
-						</listbox>
+						</combobox>
 						<button
 							label="${labels.survey.file.type.download_example}"
 							visible="@load(fx.type eq 'COLLECT_EARTH_GRID')"

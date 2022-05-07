@@ -44,6 +44,7 @@ import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.relational.print.RDBPrintJob;
 import org.openforis.collect.relational.print.RDBPrintJob.RdbDialect;
 import org.openforis.collect.utils.Dates;
+import org.openforis.collect.utils.Files;
 import org.openforis.concurrency.Job;
 import org.springframework.http.MediaType;
 import org.zkoss.bind.Form;
@@ -205,8 +206,7 @@ public class SurveyExportParametersVM extends BaseVM {
 			protected void onJobCompleted() {
 				File file = job.getOutputFile();
 				CollectSurvey survey = job.getSurvey();
-				String extension = "sql";
-				downloadFile(file, extension, MediaType.TEXT_PLAIN_VALUE, survey, survey.getDefaultLanguage());
+				downloadFile(file, Files.ZIP_FILE_EXTENSION, MediaType.TEXT_PLAIN_VALUE, survey, survey.getDefaultLanguage());
 				super.onJobCompleted();
 			}
 		});

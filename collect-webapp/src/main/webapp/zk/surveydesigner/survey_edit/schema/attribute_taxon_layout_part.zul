@@ -9,13 +9,13 @@
     <rows>
       <row>
         <label value="${labels.survey.schema.attribute.visible_fields.label}:" />
-        <listbox width="300px" model="@load(vm.visibleFieldsTemplates)"
-			selectedItem="@bind(fx.visibleFields)" mold="select"
+        <combobox width="350px" model="@load(vm.visibleFieldsTemplates)"
+			selectedItem="@bind(fx.visibleFields)"
 			onSelect="@command('applyChanges')">
 			<template name="model">
-				<listitem value="each" label="@load(vm.getVisibleFieldsTemplateLabel(each))" />
+				<comboitem value="each" label="@load(vm.getVisibleFieldsTemplateLabel(each))" />
 			</template>
-		</listbox>
+		</combobox>
       </row>
     </rows>
   </grid>

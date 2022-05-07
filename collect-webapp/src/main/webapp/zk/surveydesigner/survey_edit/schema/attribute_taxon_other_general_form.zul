@@ -10,22 +10,22 @@
         <label
           value="${labels.survey.schema.attribute.taxon.taxonomy}:" />
         <fieldErrorHandler message="@load(vmsgs['taxonomy'])">
-          <listbox width="150px" model="@load(vm.taxonomyNames)"
-            selectedItem="@bind(fx.taxonomy)" mold="select"
-            onSelect="@command('applyChanges')" />
+          <combobox width="250px" model="@load(vm.taxonomyNames)"
+            selectedItem="@bind(fx.taxonomy)"
+            onChange="@command('applyChanges')" />
         </fieldErrorHandler>
       </row>
       <row>
         <label
           value="${labels.survey.schema.attribute.taxon.highest_rank}:" />
         <fieldErrorHandler message="@load(vmsgs['highestRank'])">
-          <listbox width="150px" model="@load(vm.ranks)"
-          	selectedItem="@bind(fx.highestRank)" mold="select"
-            onSelect="@command('applyChanges')">
+          <combobox width="150px" model="@load(vm.ranks)"
+          	selectedItem="@bind(fx.highestRank)"
+            onChange="@command('applyChanges')">
             <template name="model">
-               <listitem label="@load(vm.getRankLabel(each))" />
+               <comboitem label="@load(vm.getRankLabel(each))" />
              </template>
-          </listbox>
+          </combobox>
         </fieldErrorHandler>
       </row>
       <row>

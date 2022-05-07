@@ -462,13 +462,13 @@
 	    				<label value="${labels.global.item.since_version}:" />
 	    			</fieldErrorHandler>
     				<fieldErrorHandler message="@load(vmsgs['sinceVersionId'])">
-                    	<listbox width="200px" model="@load(vm.formVersionIdsWithEmptyOption)"
-    						selectedItem="@bind(fx.sinceVersionId)" mold="select"
-    						onSelect="@command('applyChanges')">
+                    	<combobox width="200px" model="@load(vm.formVersionIdsWithEmptyOption)"
+    						selectedItem="@bind(fx.sinceVersionId)"
+    						onChange="@command('applyChanges')">
     						<template name="model">
-    							<listitem label="@load(vm.getVersionLabel(each))" />
+    							<comboitem label="@load(vm.getVersionLabel(each))" />
     						</template>
-    					</listbox>
+    					</combobox>
     					<button sclass="icon"
     					  tooltiptext="${labels.survey.versioning_manager}" 
     						onClick="@global-command('openVersioningManagerPopUp')"
@@ -480,13 +480,13 @@
 	    				<label value="${labels.global.item.deprecated_version}:" />
 	    			</fieldErrorHandler>
     				<fieldErrorHandler message="@load(vmsgs['deprecatedVersionId'])">
-                    	<listbox width="200px" model="@load(vm.formVersionIdsWithEmptyOption)"
-    						selectedItem="@bind(fx.deprecatedVersionId)" mold="select"
-    						onSelect="@command('applyChanges')">
+                    	<combobox width="200px" model="@load(vm.formVersionIdsWithEmptyOption)"
+    						selectedItem="@bind(fx.deprecatedVersionId)"
+    						onChange="@command('applyChanges')">
     						<template name="model">
-    							<listitem label="@load(vm.getVersionLabel(each))" />
+    							<comboitem label="@load(vm.getVersionLabel(each))" />
     						</template>
-    					</listbox>
+    					</combobox>
     					<button sclass="icon"
     					  tooltiptext="${labels.survey.versioning_manager}" 
     						onClick="@global-command('openVersioningManagerPopUp')"

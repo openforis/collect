@@ -91,30 +91,30 @@
 					value="${labels.survey.collect_earth.plot_layout.plot_area}:" />
 				<fieldErrorHandler
 					message="@load(vmsgs['collectEarthPlotArea'])">
-					<listbox mold="select" rows="1"
+					<combobox rows="1"
 						selectedItem="@load(fx.collectEarthPlotArea) @save(fx.collectEarthPlotArea)"
-						onSelect="@command('applyChanges')">
-						<listitem label="0.25 ha" value="0_25" />
-						<listitem label="0.50 ha" value="0_5" />
-						<listitem label="1 ha" value="1" />
-						<listitem label="5 ha" value="5" />
-						<listitem label="10 ha" value="10" />
-					</listbox>
+						onChange="@command('applyChanges')">
+						<comboitem label="0.25 ha" value="0_25" />
+						<comboitem label="0.50 ha" value="0_5" />
+						<comboitem label="1 ha" value="1" />
+						<comboitem label="5 ha" value="5" />
+						<comboitem label="10 ha" value="10" />
+					</combobox>
 				</fieldErrorHandler>
 				<space width="100px" />
 				<label
 					value="${labels.survey.collect_earth.plot_layout.sample_points}:" />
 				<fieldErrorHandler
 					message="@load(vmsgs['collectEarthSamplePoints'])">
-					<listbox mold="select" rows="1"
+					<combobox rows="1"
 						selectedItem="@load(fx.collectEarthSamplePoints) @save(fx.collectEarthSamplePoints)"
-						onSelect="@command('applyChanges')">
-						<listitem label="Empty square" value="0" />
-						<listitem label="Central point" value="1" />
-						<listitem label="3x3" value="9" />
-						<listitem label="5x5" value="25" />
-						<listitem label="7x7" value="49" />
-					</listbox>
+						onChange="@command('applyChanges')">
+						<comboitem label="Empty square" value="0" />
+						<comboitem label="Central point" value="1" />
+						<comboitem label="3x3" value="9" />
+						<comboitem label="5x5" value="25" />
+						<comboitem label="7x7" value="49" />
+					</combobox>
 				</fieldErrorHandler>
 			</hlayout>
 		</groupbox>
@@ -133,7 +133,7 @@
 				</fieldErrorHandler>
 				<fieldErrorHandler
 					message="@load(vmsgs['bingMapsKey'])">
-					<textbox width="350px" value="@bind(fx.bingMapsKey)"
+					<textbox width="600px" value="@bind(fx.bingMapsKey)"
 						onChange="@command('applyChanges')" />
 				</fieldErrorHandler>
 

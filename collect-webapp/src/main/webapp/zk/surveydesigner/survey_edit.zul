@@ -84,16 +84,16 @@
 							<label
 								value="${labels.survey.language.current_language}:"
 								width="150px" style="white-space: nowrap;" />
-							<listbox
+							<combobox
 								model="@load(vm.availableLanguages)"
 								selectedItem="@load(vm.currentLanguageCode)"
-								onSelect="@command('languageCodeSelected', code=self.selectedItem.value)"
-								mold="select" width="110px">
+								onChange="@command('languageCodeSelected', code=self.selectedItem.value)"
+								width="110px">
 								<template name="model">
-									<listitem label="${c:l(each)}"
+									<comboitem label="${c:l(each)}"
 										value="@load(each)" />
 								</template>
-							</listbox>
+							</combobox>
 							<button sclass="icon"
 								tooltiptext="${labels.survey.language_manager}"
 								onClick="@command('openLanguageManagerPopUp')"

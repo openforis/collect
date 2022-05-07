@@ -18,14 +18,14 @@
 				<!-- View type -->
        		  <hlayout valign="middle">
        		  	<label value="${labels.survey.schema.tree.view_type.$}:" />
-       		  	<listbox width="150px"
+       		  	<combobox width="150px"
        		  		model="@load(vm.treeViewTypes)"
-       		  		selectedItem="@load(vm.selectedTreeViewType)" mold="select"
-       		  		onSelect="@command('treeViewTypeSelected', type=self.selectedItem.value)">
+       		  		selectedItem="@load(vm.selectedTreeViewType)"
+       		  		onChange="@command('treeViewTypeSelected', type=self.selectedItem.value)">
        		  		<template name="model">
-       		  			<listitem label="@load(vm.getTreeViewTypeLabel(each))" />
+       		  			<comboitem label="@load(vm.getTreeViewTypeLabel(each))" />
        		  		</template>
-       		  	</listbox>
+       		  	</combobox>
        		  </hlayout>
         	</north>
           <center border="none">

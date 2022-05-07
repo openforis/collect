@@ -4,14 +4,14 @@
     
     <label value="${labels.survey.schema.root_entity}:" />
     
-    <listbox width="250px" model="@load(vm.rootEntities)"
-      selectedItem="@load(vm.selectedRootEntity)" mold="select"
-      onSelect="@command('rootEntitySelected', rootEntity=self.selectedItem.value)"
+    <combobox width="250px" model="@load(vm.rootEntities)"
+      selectedItem="@load(vm.selectedRootEntity)"
+      onChange="@command('rootEntitySelected', rootEntity=self.selectedItem.value)"
       visible="@load(not vm.singleRootEntityDefined)">
       <template name="model">
-        <listitem label="@load(each.name)" />
+        <comboitem label="@load(each.name)" />
       </template>
-    </listbox>
+    </combobox>
     
     <textbox  
     	value="@load(vm.selectedRootEntity.name)" 
@@ -43,13 +43,13 @@
     
     <label value="${labels.survey.schema.form_version}:" />
     
-    <listbox width="150px" model="@load(vm.formVersionsWithEmptyOption)"
-      selectedItem="@load(vm.selectedVersion)" mold="select"
-      onSelect="@command('versionSelected', version=self.selectedItem.value)">
+    <combobox width="150px" model="@load(vm.formVersionsWithEmptyOption)"
+      selectedItem="@load(vm.selectedVersion)"
+      onChange="@command('versionSelected', version=self.selectedItem.value)">
       <template name="model">
-        <listitem label="@load(each.name)" />
+        <comboitem label="@load(each.name)" />
       </template>
-    </listbox>
+    </combobox>
     
     <button sclass="icon"
       tooltiptext="${labels.survey.versioning_manager}"

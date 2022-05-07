@@ -16,7 +16,7 @@
         String title = Labels.getLabel("survey.schema.node.check.popup.title", new String[]{typeLabel, attrName});
     ]]></zscript>
 	<window id="checkPopUp" title="${title}" 
-		width="750px"
+		width="850px"
 		border="normal"
 		position="center" 
 		closable="true" onClose="@command('close')"

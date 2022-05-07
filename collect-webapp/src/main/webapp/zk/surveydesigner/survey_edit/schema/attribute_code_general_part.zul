@@ -12,14 +12,13 @@
     		<cell>
     			<hlayout>
     				<fieldErrorHandler message="@load(vmsgs['list'])">
-    					<listbox width="300px"
+    					<combobox width="300px"
     						model="@load(vm.codeLists)" selectedItem="@bind(fx.list)"
-    						mold="select"
-    						onSelect="@command('onListChanged', list=self.selectedItem.value)">
+    						onChange="@command('onListChanged', list=self.selectedItem.value)">
     						<template name="model">
-    							<listitem label="@load(each.name)" />
+    							<comboitem label="@load(each.name)" />
     						</template>
-    					</listbox>
+    					</combobox>
     				</fieldErrorHandler>
     				<button sclass="icon"
     					tooltiptext="${labels.survey.code_list.manager.title}"

@@ -56,13 +56,13 @@
 						<hlayout valign="middle">
 							<label
 								value="${labels.survey.language.other_languages}" />
-							<listbox model="@load(vm.unassignedLanguages)"
-								width="150px" mold="select"
+							<combobox model="@load(vm.unassignedLanguages)"
+								width="150px"
 								selectedItem="@bind(vm.selectedLanguageToAssign)">
 								<template name="model">
-									<listitem label="${each.label} (${each.code})" />
+									<comboitem label="${each.label} (${each.code})" />
 								</template>
-							</listbox>
+							</combobox>
 							<button label="${labels.global.add_item}"
 								disabled="@load(empty vm.selectedLanguageToAssign)" onClick="@command('addLanguage')" />
 						</hlayout>
