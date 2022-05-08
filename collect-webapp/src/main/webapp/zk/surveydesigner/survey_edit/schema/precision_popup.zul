@@ -39,7 +39,7 @@
               value="${labels.survey.schema.attribute.numeric.precisions.unit}:" />
             <hlayout>
               <fieldErrorHandler message="@load(vmsgs['unit'])">
-                <combobox width="120px" model="@load(vm.units)"
+                <combobox width="120px" model="@load(vm.unitFormObjects)"
                   selectedItem="@bind(fx.unit)"
                   onChange="@command('applyChanges')">
                   <template name="model">

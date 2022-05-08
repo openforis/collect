@@ -19,6 +19,8 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.FormObject;
+import org.openforis.collect.designer.form.FormObjects;
+import org.openforis.collect.designer.form.UnitFormObject;
 import org.openforis.collect.designer.metamodel.SchemaUpdater;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.ComponentUtil;
@@ -414,21 +416,26 @@ public abstract class SurveyBaseVM extends BaseVM {
 		return result;
 	}
 	
+	public List<UnitFormObject> getUnitFormObjects() {
+		return FormObjects.fromObjects(survey.getUnits(), UnitFormObject.class, currentLanguageCode);
+	}
+	
+	
 	public String getUnitLabelFromPrecision(Precision precision) {
 		Unit unit = precision.getUnit();
 		return getUnitLabel(unit);
 	}
 	
 	public String getUnitLabel(Unit unit) {
-		String result = null;
-		if ( unit != null ) {
-			result = unit.getLabel(currentLanguageCode);
-			if ( result == null ) {
-				result = unit.getName();
-			}
-		}
-		return result;
+		if (unit == null) return null;
+		return StringUtils.defaultIfBlank(unit.getLabel(currentLanguageCode), unit.getName());
 	}
+	
+	public String getUnitLabel(UnitFormObject unitFormObject) {
+		if (unitFormObject == null) return null;
+		return StringUtils.defaultIfBlank(unitFormObject.getLabel(), unitFormObject.getName());
+	}
+
 	
 	public boolean isDefaultLanguage() {
 		CollectSurvey survey = getSurvey();

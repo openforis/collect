@@ -1,10 +1,10 @@
 package org.openforis.collect.designer.form;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.Precision;
-import org.openforis.idm.metamodel.Unit;
 
 /**
  * 
@@ -13,30 +13,31 @@ import org.openforis.idm.metamodel.Unit;
  */
 public class PrecisionFormObject extends FormObject<Precision> {
 
-	private Unit unit;
+	private UnitFormObject unit;
 	private Integer decimalDigits;
 	private boolean defaultPrecision;
+	// optional (empty when created by ZK
+	private CollectSurvey survey;
+	private List<UnitFormObject> units;
 
-	public static List<PrecisionFormObject> fromList(List<Precision> precisionDefinitions, String languageCode) {
-		ArrayList<PrecisionFormObject> result = new ArrayList<PrecisionFormObject>();
-		for (Precision precision : precisionDefinitions) {
-			PrecisionFormObject formObject = new PrecisionFormObject();
-			formObject.loadFrom(precision, languageCode);
-			result.add(formObject);
-		}
-		return result;
+	public PrecisionFormObject() {
+	}
+	
+	public PrecisionFormObject(CollectSurvey survey, List<UnitFormObject> units) {
+		this.survey = survey;
+		this.units = units;
 	}
 
 	@Override
 	public void loadFrom(Precision source, String languageCode) {
-		unit = source.getUnit();
+		unit = source.getUnit() == null ? null : CollectionUtils.findItem(units, source.getUnit().getName(), "name");
 		decimalDigits = source.getDecimalDigits();
 		defaultPrecision = source.isDefaultPrecision();
 	}
 
 	@Override
 	public void saveTo(Precision dest, String languageCode) {
-		dest.setUnit(unit);
+		dest.setUnit(unit == null ? null : survey.getUnit(unit.getName()));
 		dest.setDecimalDigits(decimalDigits);
 		dest.setDefaultPrecision(defaultPrecision);
 	}
@@ -45,12 +46,12 @@ public class PrecisionFormObject extends FormObject<Precision> {
 	protected void reset() {
 		// TODO Auto-generated method stub
 	}
-	
-	public Unit getUnit() {
+
+	public UnitFormObject getUnit() {
 		return unit;
 	}
 
-	public void setUnit(Unit unit) {
+	public void setUnit(UnitFormObject unit) {
 		this.unit = unit;
 	}
 
