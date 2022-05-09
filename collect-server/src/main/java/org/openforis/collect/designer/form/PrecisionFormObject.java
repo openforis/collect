@@ -1,9 +1,6 @@
 package org.openforis.collect.designer.form;
 
-import java.util.List;
-
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.Precision;
 
 /**
@@ -13,31 +10,29 @@ import org.openforis.idm.metamodel.Precision;
  */
 public class PrecisionFormObject extends FormObject<Precision> {
 
-	private UnitFormObject unit;
+	private String unitName;
 	private Integer decimalDigits;
 	private boolean defaultPrecision;
 	// optional (empty when created by ZK
 	private CollectSurvey survey;
-	private List<UnitFormObject> units;
 
 	public PrecisionFormObject() {
 	}
 	
-	public PrecisionFormObject(CollectSurvey survey, List<UnitFormObject> units) {
+	public PrecisionFormObject(CollectSurvey survey) {
 		this.survey = survey;
-		this.units = units;
 	}
 
 	@Override
 	public void loadFrom(Precision source, String languageCode) {
-		unit = source.getUnit() == null ? null : CollectionUtils.findItem(units, source.getUnit().getName(), "name");
+		unitName = source.getUnitName();
 		decimalDigits = source.getDecimalDigits();
 		defaultPrecision = source.isDefaultPrecision();
 	}
 
 	@Override
 	public void saveTo(Precision dest, String languageCode) {
-		dest.setUnit(unit == null ? null : survey.getUnit(unit.getName()));
+		dest.setUnit(unitName == null ? null : survey.getUnit(unitName));
 		dest.setDecimalDigits(decimalDigits);
 		dest.setDefaultPrecision(defaultPrecision);
 	}
@@ -47,12 +42,12 @@ public class PrecisionFormObject extends FormObject<Precision> {
 		// TODO Auto-generated method stub
 	}
 
-	public UnitFormObject getUnit() {
-		return unit;
+	public String getUnitName() {
+		return unitName;
 	}
 
-	public void setUnit(UnitFormObject unit) {
-		this.unit = unit;
+	public void setUnitName(String unitName) {
+		this.unitName = unitName;
 	}
 
 	public Integer getDecimalDigits() {

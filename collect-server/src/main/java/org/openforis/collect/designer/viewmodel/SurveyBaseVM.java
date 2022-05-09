@@ -19,7 +19,6 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.FormObject;
-import org.openforis.collect.designer.form.FormObjects;
 import org.openforis.collect.designer.form.UnitFormObject;
 import org.openforis.collect.designer.metamodel.SchemaUpdater;
 import org.openforis.collect.designer.session.SessionStatus;
@@ -31,6 +30,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.SurveySummary;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.lang.Strings;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -416,13 +416,17 @@ public abstract class SurveyBaseVM extends BaseVM {
 		return result;
 	}
 	
-	public List<UnitFormObject> getUnitFormObjects() {
-		return FormObjects.fromObjects(survey.getUnits(), UnitFormObject.class, currentLanguageCode);
+	public List<String> getUnitNames() {
+		return CollectionUtils.project(survey.getUnits(), "name");
 	}
-	
 	
 	public String getUnitLabelFromPrecision(Precision precision) {
 		Unit unit = precision.getUnit();
+		return getUnitLabel(unit);
+	}
+	
+	public String getUnitLabelFromName(String name) {
+		Unit unit = survey.getUnit(name);
 		return getUnitLabel(unit);
 	}
 	

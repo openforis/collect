@@ -42,7 +42,7 @@ public class PrecisionVM extends SurveyObjectBaseVM<Precision> {
 
 	@Override
 	protected FormObject<Precision> createFormObject() {
-		return survey == null ? new PrecisionFormObject() : new PrecisionFormObject(survey, this.getUnitFormObjects());
+		return survey == null ? new PrecisionFormObject() : new PrecisionFormObject(survey);
 	}
 
 	@Override

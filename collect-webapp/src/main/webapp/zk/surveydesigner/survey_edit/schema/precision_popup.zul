@@ -39,11 +39,11 @@
               value="${labels.survey.schema.attribute.numeric.precisions.unit}:" />
             <hlayout>
               <fieldErrorHandler message="@load(vmsgs['unit'])">
-                <combobox width="120px" model="@load(vm.unitFormObjects)"
-                  selectedItem="@bind(fx.unit)"
+                <combobox width="200px" model="@load(vm.unitNames)"
+                  selectedItem="@bind(fx.unitName)"
                   onChange="@command('applyChanges')">
                   <template name="model">
-                    <comboitem label="${vm.getUnitLabel(each)}" />
+                    <comboitem value="@load(each)" label="${vm.getUnitLabelFromName(each)}" />
                   </template>
                 </combobox>
               </fieldErrorHandler>
