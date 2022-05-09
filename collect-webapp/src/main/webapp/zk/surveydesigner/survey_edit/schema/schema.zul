@@ -60,10 +60,10 @@
 	                disabled="@load(vm.moveNodeDownDisabled)"
 	                onClick="@command('moveNodeDown')" />
 	              <space vflex="true" />
-	              <toolbarbutton image="/assets/images/expand-small.png"
+	              <toolbarbutton image="/assets/images/expand.png"
 	              	tooltiptext="${labels.survey.schema.tree.expand}"
 	                onClick="@command('expandTree')" />
-	              <toolbarbutton image="/assets/images/collapse-small.png"
+	              <toolbarbutton image="/assets/images/collapse.png"
 	              	tooltiptext="${labels.survey.schema.tree.collapse}"
 	                onClick="@command('collapseTree')" />
 	            </toolbar>
