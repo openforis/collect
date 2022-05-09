@@ -3,14 +3,14 @@
 	<window id="nodeEditPopUp" 
 		apply="org.zkoss.bind.BindComposer"
 		title="${arg.title}" 
-		width="500px" 
-		height="320px"
+		width="800px" 
+		height="420px"
 		border="normal"
 		position="center" 
 		closable="false">
 		
 		<borderlayout>
-			<center>
+			<center border="none">
 				<include id="nodeFormInclude"
 					src="${arg.formLocation}"
 					parentEntity="${arg.parentEntity}"
@@ -20,7 +20,7 @@
 					style="overflow-y: auto"
 			 	/>
 			</center>
-			<south>
+			<south border="none">
 			 	<box width="100%" align="center">
 			 		<hbox>
 			 			<button label="${labels.global.apply}"

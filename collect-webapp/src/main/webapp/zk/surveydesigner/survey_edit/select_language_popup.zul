@@ -1,10 +1,10 @@
 <zk>
 	<window id="selectLanguagePopUp"
-		title="${labels.survey.language_manager}" width="400px" height="350px"
+		title="${labels.survey.language_manager}" width="500px" height="550px"
 		border="normal" position="center" 
 		closable="true"
 		onClose="@command('close')">
-		<borderlayout height="100%" 
+		<borderlayout 
 			vflex="true"
 			apply="org.zkoss.bind.BindComposer"
 			viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyLanguageVM')">

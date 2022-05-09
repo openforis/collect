@@ -2,7 +2,7 @@
 <zk>
   <window id="schemaLabelsImportPopUp"
     title="${labels.survey.schema.labels_import_export.popup.title}"
-    width="500px" border="normal" position="center"
+    width="600px" border="normal" position="center"
     apply="org.zkoss.bind.BindComposer"
     viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SchemaLabelsImportVM')"
     validationMessages="@id('vmsgs')"
