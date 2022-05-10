@@ -14,10 +14,10 @@
 				<listbox id="itemsListBox" visible="@load(not empty vm.items)"
 					selectedItem="@load(vm.selectedItem)" model="@load(vm.items)"
 					onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
-					width="250px" vflex="true">
+					hflex="true" vflex="true">
 					<listhead>
-						<listheader label="" width="175px" />
-						<listheader label="" width="30px" />
+						<listheader label="" />
+						<listheader label="" width="44px" />
 					</listhead>
 					<template name="model">
 						<listitem>
@@ -34,8 +34,7 @@
 						sclass="icon-button with-label" 
 						label="${labels.survey.code_list.add_list}"
 						image="/assets/images/add.png" 
-						onClick="@command('newItem')"
-						width="70px" />
+						onClick="@command('newItem')" />
 					<menuitem
 						sclass="icon-button"
 						tooltiptext="${labels.global.delete_item}"

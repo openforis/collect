@@ -5,7 +5,7 @@
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.TaxonomiesVM')"
 		validationMessages="@id('vmsgs')" hflex="true" vflex="true">
-		<west width="250px"
+		<west width="260px"
 			title="${labels.survey.taxonomy.items.header}:">
 			<vlayout vflex="true">
 				<box pack="center" align="center" hflex="1" vflex="1"
@@ -17,10 +17,10 @@
 					visible="@load(not empty vm.items)"
 					selectedItem="@load(vm.selectedItem)" model="@load(vm.items)"
 					onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
-					width="220px" vflex="true">
+					hflex="true" vflex="true">
 					<listhead>
-						<listheader label="" width="175px" />
-						<listheader label="" width="30px" />
+						<listheader label="" />
+						<listheader label="" width="44px" />
 					</listhead>
 					<template name="model">
 						<listitem>
