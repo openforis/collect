@@ -29,7 +29,7 @@
 								tooltiptext="@load(vm.getWarnings(each))">
 								<image
 									visible="@load(vm.hasWarnings(each))"
-									src="/assets/images/warning-small.png" />
+									src="/assets/images/warning.png" />
 							</listcell>
 						</listitem>
 					</template>

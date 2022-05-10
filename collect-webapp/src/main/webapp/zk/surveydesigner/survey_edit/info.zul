@@ -62,17 +62,17 @@
 			<hlayout>
 				<button label="${labels.survey.versioning_manager}"
 					onClick="@global-command('openVersioningManagerPopUp')"
-					image="/assets/images/edit-big.png" height="32" />
+					image="/assets/images/edit.png" height="32" />
 			</hlayout>
 			<hlayout>
 				<button label="${labels.survey.srs.$}"
 					onClick="@global-command('openSRSManagerPopUp')"
-					image="/assets/images/compass-medium.png" height="32" />
+					image="/assets/images/compass.png" height="32" />
 			</hlayout>
 			<hlayout>
 				<button label="${labels.survey.unit.manager.title}"
 					onClick="@global-command('openUnitsManagerPopUp')"
-					image="/assets/images/ruler-medium.png" height="32" />
+					image="/assets/images/ruler.png" height="32" />
 			</hlayout>
 		</hlayout>
 
