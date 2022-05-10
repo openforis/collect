@@ -229,6 +229,9 @@ public class CEComponentHTMLFormatter {
 					.a("class", "form-control numeric" + componentAdditionalClass); //$NON-NLS-1$ //$NON-NLS-2$
 				if (comp.isReadOnly()) {
 					fieldBuilder.a("disabled", "disabled"); //$NON-NLS-1$ //$NON-NLS-2$
+					if (comp.isExtra()) {
+						fieldBuilder.a("value", String.format(EXTRA_VALUE_FORMAT, comp.getName()));
+					}
 				}
 				break;
 			case BOOLEAN:
