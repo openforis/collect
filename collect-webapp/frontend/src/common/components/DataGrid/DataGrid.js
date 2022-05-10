@@ -1,6 +1,6 @@
 import './DataGrid.scss'
 
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import classNames from 'classnames'
 import { DataGrid as MuiDataGrid, GridToolbar, useGridApiContext } from '@mui/x-data-grid'
 
@@ -37,7 +37,7 @@ export const DataGrid = (props) => {
     loading,
     onFilterModelChange: onFilterModelChangeProp,
     onPageChange,
-    onPageSizeChange,
+    onPageSizeChange: onPageSizeChangeProp,
     onRowDoubleClick: onRowDoubleClickProp,
     onSelectedIdsChange,
     onSortModelChange,
@@ -52,6 +52,8 @@ export const DataGrid = (props) => {
   const filterModelRef = useRef(null)
 
   const [filterModel, setFilterModel] = useState(undefined)
+
+  const [pageSize, setPageSize] = useState(pageSizeProp)
 
   const onCellDoubleClick = useCallback(
     (params) => {
@@ -76,8 +78,22 @@ export const DataGrid = (props) => {
     [filterModel, setFilterModel]
   )
 
+  const onPageSizeChange = useCallback(
+    (pageSizeNew) => {
+      if (onPageSizeChangeProp) {
+        onPageSizeChangeProp(pageSizeNew)
+      } else {
+        setPageSize(pageSizeNew)
+      }
+    },
+    [onPageSizeChangeProp, setPageSize]
+  )
+
   // when footer or pagination is hidden, show all rows
-  const pageSize = hideFooter || hideFooterPagination ? rows?.length : pageSizeProp
+  const rowsLength = rows?.length || 0
+  useEffect(() => {
+    setPageSize(hideFooter || hideFooterPagination ? rowsLength : pageSizeProp)
+  }, [hideFooter, hideFooterPagination, rowsLength, pageSizeProp])
 
   // TODO handle DataGrid onFilterModelChange
   // const onFilterModelChange = useCallback(
