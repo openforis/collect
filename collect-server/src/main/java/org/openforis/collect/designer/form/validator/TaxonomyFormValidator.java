@@ -37,8 +37,8 @@ public class TaxonomyFormValidator extends FormValidator {
 		Taxonomy editedItem = viewModel.getEditedItem();
 		CollectSurvey survey = viewModel.getSurvey();
 		String name = (String) getValue(ctx, NAME_FIELD);
-		Taxonomy existingItem = survey.getContext().getSpeciesListService().loadTaxonomyByName(survey, name);
-		if (existingItem != null && existingItem.getId().intValue() != editedItem.getId().intValue()) {
+		Taxonomy itemSameName = survey.getContext().getSpeciesListService().loadTaxonomyByName(survey, name);
+		if (itemSameName != null && !itemSameName.getId().equals(editedItem.getId())) {
 			String message = Labels.getLabel(ITEM_NAME_ALREADY_DEFINED_MESSAGE_KEY);
 			addInvalidMessage(ctx, NAME_FIELD, message);
 			return false;
