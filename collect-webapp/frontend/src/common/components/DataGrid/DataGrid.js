@@ -53,7 +53,7 @@ export const DataGrid = (props) => {
 
   const [filterModel, setFilterModel] = useState(undefined)
 
-  const [pageSize, setPageSize] = useState(pageSizeProp)
+  const [pageSize, setPageSize] = useState(hideFooter || hideFooterPagination ? undefined : pageSizeProp)
 
   const onCellDoubleClick = useCallback(
     (params) => {
@@ -90,10 +90,9 @@ export const DataGrid = (props) => {
   )
 
   // when footer or pagination is hidden, show all rows
-  const rowsLength = rows?.length || 0
   useEffect(() => {
-    setPageSize(hideFooter || hideFooterPagination ? rowsLength : pageSizeProp)
-  }, [hideFooter, hideFooterPagination, rowsLength, pageSizeProp])
+    setPageSize(hideFooter || hideFooterPagination ? undefined : pageSizeProp)
+  }, [hideFooter, hideFooterPagination, pageSizeProp])
 
   // TODO handle DataGrid onFilterModelChange
   // const onFilterModelChange = useCallback(
