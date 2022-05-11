@@ -230,7 +230,7 @@ public class CEComponentHTMLFormatter {
 				if (comp.isReadOnly()) {
 					fieldBuilder.a("disabled", "disabled"); //$NON-NLS-1$ //$NON-NLS-2$
 					if (comp.isExtra()) {
-						value = String.format(EXTRA_VALUE_FORMAT, comp.getName())
+						value = String.format(EXTRA_VALUE_FORMAT, comp.getName());
 					}
 				}
 				fieldBuilder.a("value", value );
