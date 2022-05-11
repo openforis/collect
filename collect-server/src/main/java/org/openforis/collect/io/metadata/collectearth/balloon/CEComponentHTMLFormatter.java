@@ -225,14 +225,15 @@ public class CEComponentHTMLFormatter {
 					.a("id", elId) //$NON-NLS-1$
 					.a("name", elId) //$NON-NLS-1$
 					.a("type", "text") //$NON-NLS-1$ //$NON-NLS-2$
-					.a("value", "0") //$NON-NLS-1$ //$NON-NLS-2$
 					.a("class", "form-control numeric" + componentAdditionalClass); //$NON-NLS-1$ //$NON-NLS-2$
+				String value = "0";
 				if (comp.isReadOnly()) {
 					fieldBuilder.a("disabled", "disabled"); //$NON-NLS-1$ //$NON-NLS-2$
 					if (comp.isExtra()) {
-						fieldBuilder.a("value", String.format(EXTRA_VALUE_FORMAT, comp.getName()));
+						value = String.format(EXTRA_VALUE_FORMAT, comp.getName());
 					}
 				}
+				fieldBuilder.a("value", value );
 				break;
 			case BOOLEAN:
 				if (comp.isReadOnly()) {

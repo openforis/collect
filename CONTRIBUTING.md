@@ -78,13 +78,20 @@ If you want to configure Collect in Tomcat under Eclipse and publish automatical
 
 - import all the projects as `Existing Maven Projects`. Install the plugins required during this process. Once done, if everything went well you shouldn't have any errors in every module.
 - add Tomcat (version 9 or greater) to the Server Runtime Environments (if not done already)
-- add some required libraries to the Tomcat lib folder: commons-pool-1.6.jar, commons-dbcp-1.4.jar, h2-1.4.193.jar, sqlite-jdbc-3.7.2.jar, postgresql-9.1-901.jdbc4.jar
+- add some required libraries to the Tomcat lib folder: sqlite-jdbc-XXX.jar, postgresql-XXX.jdbc4.jar
 - add the DB connection parameters as a Resource among the GlobalNamingResources in the Tomcat server.xml file. E.g. 
 
 ```
-<Resource auth="Container" driverClassName="org.sqlite.JDBC" factory="org.apache.commons.dbcp.BasicDataSourceFactory" name="jdbc/collectDs" type="javax.sql.DataSource" url="jdbc:sqlite:${user.home}/OpenForis/CollectDev/data/collect.db"/>
+<Resource 
+	auth="Container"
+	driverClassName="org.sqlite.JDBC"
+	factory="org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory"
+	name="jdbc/collectDs"
+	type="javax.sql.DataSource"
+	url="jdbc:sqlite:${user.home}/OpenForis/CollectDev/data/collect.db" />
 ```
 (note that if you are using SQLite DB, the path to the .db file must exist).
+
 - add the devMode=true parameter to the context.xml file:
 
 ```
