@@ -155,11 +155,15 @@
 .MuiSelect-outlined,
 .MuiAutocomplete-inputRoot[class*='MuiOutlinedInput-root'] .MuiAutocomplete-input:first-child,
 .MuiInputBase-formControl.MuiInputBase-multiline.MuiOutlinedInput-multiline {
-  padding: 10px;
+  padding: 6px;
 
   textarea {
     padding: 0;
   }
+}
+
+.MuiOutlinedInput-root.MuiInputBase-root {
+  padding: 0px 6px;
 }
 
 .MuiAutocomplete-root {
