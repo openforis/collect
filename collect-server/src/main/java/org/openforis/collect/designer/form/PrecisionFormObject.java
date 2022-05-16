@@ -1,10 +1,7 @@
 package org.openforis.collect.designer.form;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.Precision;
-import org.openforis.idm.metamodel.Unit;
 
 /**
  * 
@@ -13,30 +10,29 @@ import org.openforis.idm.metamodel.Unit;
  */
 public class PrecisionFormObject extends FormObject<Precision> {
 
-	private Unit unit;
+	private String unitName;
 	private Integer decimalDigits;
 	private boolean defaultPrecision;
+	// optional (empty when created by ZK
+	private CollectSurvey survey;
 
-	public static List<PrecisionFormObject> fromList(List<Precision> precisionDefinitions, String languageCode) {
-		ArrayList<PrecisionFormObject> result = new ArrayList<PrecisionFormObject>();
-		for (Precision precision : precisionDefinitions) {
-			PrecisionFormObject formObject = new PrecisionFormObject();
-			formObject.loadFrom(precision, languageCode);
-			result.add(formObject);
-		}
-		return result;
+	public PrecisionFormObject() {
+	}
+	
+	public PrecisionFormObject(CollectSurvey survey) {
+		this.survey = survey;
 	}
 
 	@Override
 	public void loadFrom(Precision source, String languageCode) {
-		unit = source.getUnit();
+		unitName = source.getUnitName();
 		decimalDigits = source.getDecimalDigits();
 		defaultPrecision = source.isDefaultPrecision();
 	}
 
 	@Override
 	public void saveTo(Precision dest, String languageCode) {
-		dest.setUnit(unit);
+		dest.setUnit(unitName == null ? null : survey.getUnit(unitName));
 		dest.setDecimalDigits(decimalDigits);
 		dest.setDefaultPrecision(defaultPrecision);
 	}
@@ -45,13 +41,13 @@ public class PrecisionFormObject extends FormObject<Precision> {
 	protected void reset() {
 		// TODO Auto-generated method stub
 	}
-	
-	public Unit getUnit() {
-		return unit;
+
+	public String getUnitName() {
+		return unitName;
 	}
 
-	public void setUnit(Unit unit) {
-		this.unit = unit;
+	public void setUnitName(String unitName) {
+		this.unitName = unitName;
 	}
 
 	public Integer getDecimalDigits() {

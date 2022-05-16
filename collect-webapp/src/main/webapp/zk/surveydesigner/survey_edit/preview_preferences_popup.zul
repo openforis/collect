@@ -1,7 +1,7 @@
 <?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <zk>
   <window title="${labels.survey.preview.preferences.title}"
-    width="300px"
+    width="400px"
     border="normal" position="center" closable="true"
     onClose="@global-commnad('closePreviewPreferencesPopUp')"
     apply="org.zkoss.bind.BindComposer"
@@ -9,27 +9,27 @@
 
     <grid>
       <columns>
-        <column width="100px" />
+        <column width="150px" />
         <column width="100%" />
       </columns>
       <rows>
         <row visible="${c:length(vm.formVersions) > 0}" >
           <label value="${labels.survey.preview.preferences.form_version}:" />
-          <listbox id="formVersionsList" width="150px" mold="select"
+          <combobox id="formVersionsList" width="150px"
             model="@load(vm.formVersions)">
             <template name="model">
-              <listitem label="@load(each.name)" />
+              <comboitem label="@load(each.name)" />
             </template>
-          </listbox>
+          </combobox>
         </row>
         <row visible="${c:length(vm.rootEntities) > 1}" >
           <label value="${labels.survey.layout.root_entity}:" />
-          <listbox id="rootEntitiesList" width="150px" mold="select"
+          <combobox id="rootEntitiesList" width="150px"
             model="@load(vm.rootEntities)">
             <template name="model">
-              <listitem label="@load(each.name)" />
+              <comboitem label="@load(each.name)" />
             </template>
-          </listbox>
+          </combobox>
         </row>
       </rows>
     </grid>

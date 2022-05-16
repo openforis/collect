@@ -1,8 +1,8 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
 	<window id="unitsManagerPopUp" title="${labels.survey.unit.manager.title}" 
-		width="600px"
-		height="370px"
+		width="700px"
+		height="470px"
 		border="normal"
 		position="center" 
 		apply="org.zkoss.bind.BindComposer"
@@ -100,13 +100,13 @@
 									<row>
 										<label value="${labels.survey.unit.dimension.$}:" />
 		                                <fieldErrorHandler message="@load(vmsgs['dimensionLabel'])">
-											<listbox width="150px" model="@load(vm.availableDimensions)"
-												selectedItem="@bind(fx.dimensionLabel)" mold="select"
-												onSelect="@command('applyChanges')" >
+											<combobox width="150px" model="@load(vm.availableDimensions)"
+												selectedItem="@bind(fx.dimensionLabel)"
+												onChange="@command('applyChanges')" >
 												<template name="model">
-													<listitem label="@load(each)" />
+													<comboitem label="@load(each)" />
 												</template>
-											</listbox>
+											</combobox>
 		                                </fieldErrorHandler>
 									</row>
 									<row>

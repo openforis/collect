@@ -2,8 +2,8 @@
 <zk>
 	<window 
 		title="${labels.survey.srs.$}" 
-		height="400px"
-		width="700px"
+		height="550px"
+		width="850px"
 		border="normal"
 		position="center" 
 		validationMessages="@id('vmsgs')"
@@ -16,7 +16,7 @@
 					<label value="${labels.susvey.srs.introduction}" />
 				</box>
 			</north>
-			<west width="180px">
+			<west width="250px">
 				<borderlayout>
 					<center border="none"
 						title="${labels.global.items.header.inserted}:">
@@ -40,10 +40,9 @@
 						<vbox spacing="0px" hflex="true">
 							<label value="${labels.survey.srs.predefined_srss}:" />
 							<hbox>
-								<listbox id="predefinedSrsList"
+								<combobox id="predefinedSrsList"
 	       							model="@load(vm.availablePredefinedSRSs)"
-	       							selectedItem="@bind(vm.selectedPredefinedSrsCode)"
-	       							mold="select" />
+	       							selectedItem="@bind(vm.selectedPredefinedSrsCode)" />
 								<button label="${labels.global.add_item}" 
 									disabled="@load(empty vm.selectedPredefinedSrsCode)"
 									onClick="@command('addPredefinedSrs')" />
@@ -88,7 +87,7 @@
 							hflex="1">
 							<grid>
 								<columns>
-									<column width="100px" />
+									<column width="150px" />
 									<column />
 								</columns>
 								<rows>
@@ -108,7 +107,7 @@
 			                                  	languageCode="@load(vm.currentLanguageCode)" />
 			                            </fieldErrorHandler>
 		                                <fieldErrorHandler message="@load(vmsgs['label'])">
-											<textbox width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
+											<textbox width="250px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
 										</fieldErrorHandler>
 									</row>
 									<row>
@@ -119,7 +118,7 @@
 		                                  		languageCode="@load(vm.currentLanguageCode)" />
 		                                </fieldErrorHandler>
 		                                <fieldErrorHandler message="@load(vmsgs['description'])">
-											<textbox width="300px" multiline="true" rows="4"
+											<textbox width="250px" multiline="true" rows="2"
 		                                      value="@bind(fx.description)" onChange="@command('applyChanges')" />
 										</fieldErrorHandler>
 									</row>
@@ -128,8 +127,8 @@
 											<label value="${labels.survey.srs.wkt}:" />
 										</fieldErrorHandler>
 		                                <fieldErrorHandler message="@load(vmsgs['wellKnownText'])">
-											<textbox width="300px" value="@bind(fx.wellKnownText)" 
-												multiline="true" rows="10" cols="40"
+											<textbox width="330px" value="@bind(fx.wellKnownText)" 
+												multiline="true" rows="6"
 												onChange="@command('applyChanges')" />
 										</fieldErrorHandler>
 									</row>

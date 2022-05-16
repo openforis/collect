@@ -32,7 +32,9 @@ public abstract class FormObject<T> {
 		// to be extended by subclasses
 	}
 
-	protected abstract void reset();
+	protected void reset() {
+		// to be extended by subclasses
+	}
 
 	public T getSource() {
 		return source;

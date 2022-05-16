@@ -22,16 +22,16 @@
       <rows>
         <row>
           <label value="${labels.survey.schema.node.check.flag.$}:" />
-          <listbox
+          <combobox
               selectedItem="@bind(fx.flag)"
-              mold="select" onSelect="@command('applyChanges')">
-              <listitem
+              onChange="@command('applyChanges')">
+              <comboitem
                 label="${labels.survey.schema.node.check.flag.error}"
                 value="ERROR" />
-              <listitem
+              <comboitem
                 label="${labels.survey.schema.node.check.flag.warning}"
                 value="WARN" />
-          </listbox>
+          </combobox>
         </row>
         <row>
           <fieldErrorHandler message="@load(vmsgs['message'])">

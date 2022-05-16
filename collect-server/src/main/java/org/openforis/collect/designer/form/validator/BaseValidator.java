@@ -216,16 +216,16 @@ public abstract class BaseValidator extends AbstractValidator {
 		if ( fieldName == null ) {
 			value = ctx.getProperty().getValue();
 		} else {
-			Map<String, Property> properties = getProperties(ctx);
-			Property property = properties.get(fieldName);
-			if ( property == null ) {
+			Map<String, Property[]> beanProperties = ctx.getProperties();
+			Property[] fieldProperties = beanProperties.get(fieldName);
+			if ( fieldProperties == null || fieldProperties.length == 0) {
 				if ( required ) {
 					throw new RuntimeException("Required property not found in form object: " + fieldName);
 				} else {
 					value = null;
 				}
 			} else {
-				value = property.getValue();
+				value = fieldProperties[0].getValue();
 			}
 		}
 		return (T) value;

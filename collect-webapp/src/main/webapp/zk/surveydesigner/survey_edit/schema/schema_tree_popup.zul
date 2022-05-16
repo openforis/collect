@@ -3,8 +3,8 @@
 <zk>
 	<window id="schemaTreePopUp" 
 		title="${arg.title}" 
-		width="500px"
-		height="320px" 
+		width="600px"
+		height="420px" 
 		border="normal" 
 		position="center" 
 		apply="org.zkoss.bind.BindComposer"
@@ -13,8 +13,7 @@
 
 		<vlayout hflex="true" vflex="true">
 			<tree id="tree" 
-				zclass="z-dottree" 
-				width="100%"
+				hflex="true"
 				vflex="true" 
 				model="@load(vm.treeModel)">
 				<template name="model">

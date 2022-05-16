@@ -324,11 +324,10 @@ class CsvDataImportPage extends Component {
                   },
                 ]}
                 exportFileName="ofc_csv_data_import_errors.csv"
-                showToolbar
-                disable
+                hideFooter
                 getRowId={(row) => `${String(row.row)}_${row.errorType}_${String(row.columns)}`}
-                hideFooterPagination
                 rows={this.state.errors}
+                showToolbar
               />
             </DialogContent>
             <DialogActions>

@@ -4,8 +4,7 @@
 	<custom-attributes parentItem="${arg.parentItem}" />
 
 	<window id="codeListItemManagerPopUp"
-		title="${labels.survey.code_list.item.manager.title}" width="600px"
-		height="460px" border="normal" position="center"
+		title="${labels.survey.code_list.item.manager.title}" width="700px" height="560px" border="normal" position="center"
 		sclass="form" apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CodeListItemVM')"
 		validationMessages="@id('vmsgs')"
@@ -18,7 +17,7 @@
         	<center autoscroll="true">
 				<grid>
 					<columns>
-						<column width="150px" />
+						<column width="220px" />
 						<column />
 					</columns>
 					<rows>
@@ -123,7 +122,7 @@
 								<collapsiblepanel open="false" captionLabel="${labels.global.item.versioning}">
 									<grid>
 										<columns>
-											<column width="150px" />
+											<column width="220px" />
 											<column />
 										</columns>
 										<rows>
@@ -132,14 +131,14 @@
 													<label value="${labels.global.item.since_version}:" />
 												</fieldErrorHandler>
 												<fieldErrorHandler message="@load(vmsgs['sinceVersionId'])">
-													<listbox width="200px"
+													<combobox width="200px"
 														model="@load(vm.formVersionIdsWithEmptyOption)"
-														selectedItem="@bind(fx.sinceVersionId)" mold="select"
-														onSelect="@command('validate')">
+														selectedItem="@bind(fx.sinceVersionId)"
+														onChange="@command('validate')">
 														<template name="model">
-															<listitem label="@load(vm.getVersionLabel(each))" />
+															<comboitem label="@load(vm.getVersionLabel(each))" />
 														</template>
-													</listbox>
+													</combobox>
 													<button sclass="icon"
 														tooltiptext="${labels.survey.versioning_manager}"
 														onClick="@global-command('openVersioningManagerPopUp')"
@@ -151,14 +150,14 @@
 													<label value="${labels.global.item.deprecated_version}:" />
 												</fieldErrorHandler>
 												<fieldErrorHandler message="@load(vmsgs['deprecatedVersionId'])">
-													<listbox width="200px"
+													<combobox width="200px"
 														model="@load(vm.formVersionIdsWithEmptyOption)"
-														selectedItem="@bind(fx.deprecatedVersionId)" mold="select"
-														onSelect="@command('validate')">
+														selectedItem="@bind(fx.deprecatedVersionId)"
+														onChange="@command('validate')">
 														<template name="model">
-															<listitem label="@load(vm.getVersionLabel(each))" />
+															<comboitem label="@load(vm.getVersionLabel(each))" />
 														</template>
-													</listbox>
+													</combobox>
 													<button sclass="icon"
 														tooltiptext="${labels.survey.versioning_manager}"
 														onClick="@global-command('openVersioningManagerPopUp')"

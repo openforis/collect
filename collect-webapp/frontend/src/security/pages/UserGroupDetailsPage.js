@@ -506,33 +506,57 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                   </Col>
                   <Col sm="4">
                     {this.state.selectedAvailableUsers.length > 0 && (
-                      <Row>
-                        <Col sm="10">
-                          <Input
-                            type="select"
-                            name="newUserRole"
-                            id="newUserRoleSelect"
-                            onChange={(event) => this.setState({ ...this.state, newUserRoleCode: event.target.value })}
-                            value={this.state.newUserRoleCode}
-                          >
-                            {availableRoles.map((role) => (
-                              <option key={role} value={role}>
-                                {role}
-                              </option>
-                            ))}
-                          </Input>
-                        </Col>
-                        <Col sm="2">
-                          <Button onClick={this.handleAddSelectedUsersToGroup}>&gt;</Button>
-                        </Col>
-                      </Row>
+                      <>
+                        <Row>
+                          <Col sm="12">
+                            Selected {this.state.selectedAvailableUsers.length} user(s) to add with role:
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col sm="10">
+                            <Input
+                              type="select"
+                              name="newUserRole"
+                              id="newUserRoleSelect"
+                              onChange={(event) =>
+                                this.setState({ ...this.state, newUserRoleCode: event.target.value })
+                              }
+                              value={this.state.newUserRoleCode}
+                            >
+                              {availableRoles.map((role) => (
+                                <option key={role} value={role}>
+                                  {role}
+                                </option>
+                              ))}
+                            </Input>
+                          </Col>
+                          <Col sm="2">
+                            <Button
+                              title="Add selected users to the group"
+                              onClick={this.handleAddSelectedUsersToGroup}
+                            >
+                              &gt;
+                            </Button>
+                          </Col>
+                        </Row>
+                      </>
                     )}
                     {this.state.selectedUsersInGroup.length > 0 && (
-                      <Row>
-                        <Col sm={{ size: 2, offset: 6 }}>
-                          <Button onClick={this.handleRemoveSelectedUsersToGroup}>&lt;</Button>
-                        </Col>
-                      </Row>
+                      <>
+                        <Row>
+                          <Col sm="10">
+                            Selected {this.state.selectedUsersInGroup.length} user(s) to remove from group:
+                          </Col>
+                          <Col sm="2">
+                            <Button
+                              title="Remove selected users from the group"
+                              onClick={this.handleRemoveSelectedUsersToGroup}
+                            >
+                              &lt;
+                            </Button>
+                          </Col>
+                        </Row>
+                      </>
                     )}
                   </Col>
                 </Row>

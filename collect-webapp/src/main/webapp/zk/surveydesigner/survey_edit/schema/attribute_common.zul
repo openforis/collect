@@ -64,15 +64,15 @@
 						</fieldErrorHandler>
 						<fieldErrorHandler
 							message="@load(vmsgs['phaseToApplyDefaultValue'])">
-							<listbox mold="select"
+							<combobox
 								selectedItem="@bind(fx.phaseToApplyDefaultValue)"
-								onSelect="@command('applyChanges')"
+								onChange="@command('applyChanges')"
 								model="@load(vm.editableRecordStepNames)">
 								<template name="model">
-									<listitem value="@load(each)"
+									<comboitem value="@load(each)"
 										label="${c:l('workflow.data_entry_type.'.concat(each.toLowerCase()))}" />
 								</template>
-							</listbox>
+							</combobox>
 						</fieldErrorHandler>
 					</row>
 				</rows>

@@ -6,69 +6,63 @@
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CodeListsVM')"
 		validationMessages="@id('vmsgs')"
 		hflex="true" vflex="true">
-		<west width="220px">
-			<borderlayout>
-				<center border="none"
-					title="${labels.survey.code_list.items.header}:">
-					<vlayout vflex="true">
-						<box pack="center" align="center" hflex="1" vflex="1" visible="@load(empty vm.items)">
-							<label style="white-space: pre-line;" value="${labels.survey.code_list.items.empty_list}" />
-						</box>
-						<listbox id="itemsListBox" visible="@load(not empty vm.items)"
-							selectedItem="@load(vm.selectedItem)" model="@load(vm.items)"
-							onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
-							width="220px" vflex="true">
-							<listhead>
-								<listheader label="" width="175px" />
-								<listheader label="" width="30px" />
-							</listhead>
-							<template name="model">
-								<listitem>
-									<listcell label="@load(each.name)" />
-									<listcell tooltiptext="@load(vm.getWarnings(each))">
-										<image visible="@load(vm.hasWarnings(each))"
-											src="/assets/images/warning-small.png" /> 
-									</listcell>
-								</listitem>
-							</template>
-						</listbox>
-						<menubar>
-							<menuitem 
-								sclass="icon-button with-label" 
-								label="${labels.survey.code_list.add_list}"
-								image="/assets/images/add.png" 
-								onClick="@command('newItem')"
-								width="70px" />
-							<menuitem
-								sclass="icon-button"
-								tooltiptext="${labels.global.delete_item}"
-								image="/assets/images/delete.png"
-								disabled="@load(empty vm.selectedItem)"
-								onClick="@command('deleteCodeList', item=vm.selectedItem)" />
-							<menu
-								sclass="icon-button" 
-								image="/assets/images/settings-small.png" 
-								tooltiptext="${labels.survey.code_list.import_export}">
-								<menupopup>
-									<menuitem label="${labels.survey.code_list.batch_import}"
-										upload="true,maxsize=-1" onUpload="@command('batchImportFileUploaded')"  />
-									<menuitem label="${labels.survey.code_list.batch_export}"
-										onClick="@command('batchExport')" />
-								</menupopup>
-							</menu>
-						</menubar>
-					</vlayout>
-				</center>
-			</borderlayout>
+		<west width="260px" title="${labels.survey.code_list.items.header}:">
+			<vlayout vflex="true">
+				<box pack="center" align="center" hflex="1" vflex="1" visible="@load(empty vm.items)">
+					<label style="white-space: pre-line;" value="${labels.survey.code_list.items.empty_list}" />
+				</box>
+				<listbox id="itemsListBox" visible="@load(not empty vm.items)"
+					selectedItem="@load(vm.selectedItem)" model="@load(vm.items)"
+					onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
+					hflex="true" vflex="true">
+					<listhead>
+						<listheader label="" />
+						<listheader label="" width="44px" />
+					</listhead>
+					<template name="model">
+						<listitem>
+							<listcell label="@load(each.name)" />
+							<listcell tooltiptext="@load(vm.getWarnings(each))">
+								<image visible="@load(vm.hasWarnings(each))"
+									src="/assets/images/warning.png" /> 
+							</listcell>
+						</listitem>
+					</template>
+				</listbox>
+				<menubar>
+					<menuitem 
+						sclass="icon-button with-label" 
+						label="${labels.survey.code_list.add_list}"
+						image="/assets/images/add.png" 
+						onClick="@command('newItem')" />
+					<menuitem
+						sclass="icon-button"
+						tooltiptext="${labels.global.delete_item}"
+						image="/assets/images/delete.png"
+						disabled="@load(empty vm.selectedItem)"
+						onClick="@command('deleteCodeList', item=vm.selectedItem)" />
+					<menu
+						sclass="icon-button" 
+						image="/assets/images/settings-small.png" 
+						tooltiptext="${labels.survey.code_list.import_export}">
+						<menupopup>
+							<menuitem label="${labels.survey.code_list.batch_import}"
+								upload="true,maxsize=-1" onUpload="@command('batchImportFileUploaded')"  />
+							<menuitem label="${labels.survey.code_list.batch_export}"
+								onClick="@command('batchExport')" />
+						</menupopup>
+					</menu>
+				</menubar>
+			</vlayout>
 		</west>
 		<center>
 			<absolutelayout hflex="true" vflex="true">
-				<absolutechildren hflex="true" vflex="true">
+				<absolutechildren hflex="true" vflex="true" visible="@load(not vm.editingItem)">
 					<box pack="center" align="center" hflex="1" vflex="1">
 	        			<label value="${labels.global.item.select_or_create_new_one}" />
         			</box>
 				</absolutechildren>
-				<absolutechildren hflex="true" vflex="true">
+				<absolutechildren hflex="true" height="100%">
 			        <vlayout visible="@load(vm.editingItem)"
 			        	id="formContainer"
 			        	sclass="form compact" 
@@ -94,7 +88,7 @@
 		        					<fieldErrorHandler
 		        						message="@load(vmsgs['name'])">
 		        						<textbox id="nameTextbox"
-		        							width="150px" maxlength="255"
+		        							width="30rem" maxlength="255"
 		        							value="@bind(fx.name)"
 		        							onChange="@command('applyChanges')" />
 		        					</fieldErrorHandler>
@@ -109,7 +103,7 @@
 			        				</fieldErrorHandler>
 		        					<fieldErrorHandler
 		        						message="@load(vmsgs['itemLabel'])">
-		        						<textbox width="300px"
+		        						<textbox width="30rem"
 		        							value="@bind(fx.itemLabel)"
 		        							maxlength="255"
 		        							placeholder="@load(fx.defaultItemLabel)"
@@ -126,7 +120,7 @@
 		        					</fieldErrorHandler>
 		        					<fieldErrorHandler
 		        						message="@load(vmsgs['description'])">
-		        						<textbox width="300px"
+		        						<textbox width="30rem"
 		        							value="@bind(fx.description)" 
 		        							multiline="true" rows="4" maxlength="1023"
 											placeholder="@load(fx.defaultDescription)"
@@ -212,7 +206,7 @@
 			        							</listbox>
 			        						</panelchildren>
 			        						<!-- action buttons toolbar -->
-		        							<toolbar height="30px">
+		        							<toolbar height="50px">
 		        								<toolbarbutton
 		        									image="/assets/images/add-small.png"
 		        									label="${labels.survey.code_list.add_child_item}"

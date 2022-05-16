@@ -26,7 +26,7 @@
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')">
 		<center border="none">
 			<absolutelayout hflex="1" vflex="1">
-				<absolutechildren hflex="1" vflex="1">
+				<absolutechildren hflex="1" height="100%">
 					<!-- main tabs -->
 					<tabbox id="tb" hflex="1" vflex="1">
 						<tabs id="tabs">
@@ -74,35 +74,34 @@
 						</tabpanels>
 					</tabbox>
 				</absolutechildren>
-				<absolutechildren x="650" width="300px">
+				<absolutechildren x="650">
 					<hlayout hflex="1" spacing="10px"
 						style="text-align: right;" sclass="controlBar">
 
 						<!-- Language selector -->
-						<hlayout id="languageSelector" width="245px"
+						<hlayout id="languageSelector" 
 							sclass="controlBar">
 							<label
 								value="${labels.survey.language.current_language}:"
 								width="150px" style="white-space: nowrap;" />
-							<listbox
+							<combobox
 								model="@load(vm.availableLanguages)"
 								selectedItem="@load(vm.currentLanguageCode)"
-								onSelect="@command('languageCodeSelected', code=self.selectedItem.value)"
-								mold="select" width="110px">
+								onChange="@command('languageCodeSelected', code=self.selectedItem.value)"
+								width="200px">
 								<template name="model">
-									<listitem label="${c:l(each)}"
+									<comboitem label="${c:l(each)}"
 										value="@load(each)" />
 								</template>
-							</listbox>
-							<button sclass="icon" height="24px"
+							</combobox>
+							<button sclass="icon"
 								tooltiptext="${labels.survey.language_manager}"
 								onClick="@command('openLanguageManagerPopUp')"
 								image="/assets/images/edit-language.png" />
 						</hlayout>
 
 						<!-- Advanced options -->
-						<menubar sclass="transparentbackground"
-							height="18px">
+						<menubar sclass="transparent">
 							<menu
 								tooltiptext="${labels.global.advanced_functions}"
 								image="/assets/images/settings-small.png">
@@ -155,7 +154,7 @@
 				</absolutechildren>
 			</absolutelayout>
 		</center>
-		<south height="30px" border="none">
+		<south height="80px" border="none">
 			<borderlayout hflex="1">
 				<west border="none" size="30%" vflex="1">
 					<hlayout hflex="1" vflex="1" valign="middle">

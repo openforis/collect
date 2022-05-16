@@ -1,5 +1,6 @@
 package org.openforis.collect.designer.form.validator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.viewmodel.CodeAttributeVM;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -26,7 +27,7 @@ public class CodeAttributeDefinitionFormValidator extends AttributeDefinitionFor
 
 	private void validateParentAttributeDefinition(ValidationContext ctx) {
 		String parentCodeAttributeDefPath = getValue(ctx, PARENT_CODE_ATTRIBUTE_DEFINITION_PATH_FIELD);
-		if (parentCodeAttributeDefPath != null) {
+		if (StringUtils.isNotBlank(parentCodeAttributeDefPath)) {
 			CodeAttributeVM vm = getVM(ctx);
 			CollectSurvey survey = vm.getSurvey();
 			CodeAttributeDefinition parentDef = (CodeAttributeDefinition) survey.getSchema().getDefinitionByPath(parentCodeAttributeDefPath);

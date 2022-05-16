@@ -44,6 +44,7 @@ import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.relational.print.RDBPrintJob;
 import org.openforis.collect.relational.print.RDBPrintJob.RdbDialect;
 import org.openforis.collect.utils.Dates;
+import org.openforis.collect.utils.Files;
 import org.openforis.concurrency.Job;
 import org.springframework.http.MediaType;
 import org.zkoss.bind.Form;
@@ -98,7 +99,7 @@ public class SurveyExportParametersVM extends BaseVM {
 	
 	private SurveySummary surveySummary;
 	private SurveyExportParametersFormObject formObject;
-	private Form tempForm;
+	private SimpleForm tempForm;
 	
 	private Window jobStatusPopUp;
 
@@ -205,8 +206,7 @@ public class SurveyExportParametersVM extends BaseVM {
 			protected void onJobCompleted() {
 				File file = job.getOutputFile();
 				CollectSurvey survey = job.getSurvey();
-				String extension = "sql";
-				downloadFile(file, extension, MediaType.TEXT_PLAIN_VALUE, survey, survey.getDefaultLanguage());
+				downloadFile(file, Files.ZIP_FILE_EXTENSION, MediaType.TEXT_PLAIN_VALUE, survey, survey.getDefaultLanguage());
 				super.onJobCompleted();
 			}
 		});
@@ -333,7 +333,7 @@ public class SurveyExportParametersVM extends BaseVM {
 		return tempForm;
 	}
 	
-	public void setTempForm(Form tempForm) {
+	public void setTempForm(SimpleForm tempForm) {
 		this.tempForm = tempForm;
 	}
 	

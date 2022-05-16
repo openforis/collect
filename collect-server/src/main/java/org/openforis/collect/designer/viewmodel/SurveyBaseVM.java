@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.FormObject;
+import org.openforis.collect.designer.form.UnitFormObject;
 import org.openforis.collect.designer.metamodel.SchemaUpdater;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.ComponentUtil;
@@ -29,6 +30,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.SurveySummary;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.lang.Strings;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -48,7 +50,6 @@ import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
-import org.zkoss.zkplus.databind.BindingListModelList;
 
 /**
  * 
@@ -337,14 +338,14 @@ public abstract class SurveyBaseVM extends BaseVM {
 
 	public List<ModelVersion> getFormVersions() {
 		List<ModelVersion> versions = getSurveyFormVersions();
-		return new BindingListModelList<ModelVersion>(versions, false);
+		return versions;
 	}
 
 	public List<Object> getFormVersionsWithEmptyOption() {
 		List<ModelVersion> versions = getSurveyFormVersions();
 		List<Object> result = new ArrayList<Object>(versions);
 		result.add(0, FormObject.VERSION_EMPTY_SELECTION);
-		return new BindingListModelList<Object>(result, false);
+		return result;
 	}
 	
 	public List<Integer> getFormVersionIdsWithEmptyOption() {
@@ -354,7 +355,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 		for (ModelVersion modelVersion : versions) {
 			result.add(modelVersion.getId());
 		}
-		return new BindingListModelList<Integer>(result, false);
+		return result;
 	}
 
 	public String getVersionLabel(int id) {
@@ -397,7 +398,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 		boolean includeSamplingDesignList = survey.getTarget() != SurveyTarget.COLLECT_EARTH;
 		List<CodeList> result = new ArrayList<CodeList>(survey.getCodeLists(includeSamplingDesignList));
 		result = sortByName(result);
-		return new BindingListModelList<CodeList>(result, false);
+		return result;
 	}
 	
 	@DependsOn("surveyId")
@@ -412,7 +413,11 @@ public abstract class SurveyBaseVM extends BaseVM {
 	
 	public List<Unit> getUnits() {
 		List<Unit> result = new ArrayList<Unit>(survey.getUnits());
-		return new BindingListModelList<Unit>(result, false);
+		return result;
+	}
+	
+	public List<String> getUnitNames() {
+		return CollectionUtils.project(survey.getUnits(), "name");
 	}
 	
 	public String getUnitLabelFromPrecision(Precision precision) {
@@ -420,16 +425,21 @@ public abstract class SurveyBaseVM extends BaseVM {
 		return getUnitLabel(unit);
 	}
 	
-	public String getUnitLabel(Unit unit) {
-		String result = null;
-		if ( unit != null ) {
-			result = unit.getLabel(currentLanguageCode);
-			if ( result == null ) {
-				result = unit.getName();
-			}
-		}
-		return result;
+	public String getUnitLabelFromName(String name) {
+		Unit unit = survey.getUnit(name);
+		return getUnitLabel(unit);
 	}
+	
+	public String getUnitLabel(Unit unit) {
+		if (unit == null) return null;
+		return StringUtils.defaultIfBlank(unit.getLabel(currentLanguageCode), unit.getName());
+	}
+	
+	public String getUnitLabel(UnitFormObject unitFormObject) {
+		if (unitFormObject == null) return null;
+		return StringUtils.defaultIfBlank(unitFormObject.getLabel(), unitFormObject.getName());
+	}
+
 	
 	public boolean isDefaultLanguage() {
 		CollectSurvey survey = getSurvey();

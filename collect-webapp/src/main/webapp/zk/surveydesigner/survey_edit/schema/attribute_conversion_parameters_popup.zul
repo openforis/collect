@@ -1,7 +1,7 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
 	<window title="${labels.survey.schema.attribute.conversion_popup.title}" 
-		width="300px"
+		width="550px"
 		border="normal" 
 		position="center" 
 		closable="true"
@@ -12,7 +12,7 @@
 
 		<grid>
 			<columns>
-				<column width="100px" />
+				<column width="200px" />
 				<column width="100%" />
 			</columns>
 			<rows>
@@ -26,12 +26,12 @@
 				</row>
 				<row>
 					<label value="${labels.survey.schema.attribute.conversion.to_type}:" />
-					<listbox model="@load(vm.attributeTypes)" mold="select" 
+					<combobox model="@load(vm.attributeTypes)"
 						selectedItem="@bind(fx.type)">
    						<template name="model">
-   							<listitem label="${each}" />
+   							<comboitem label="${each}" />
    						</template>
-   					</listbox>
+   					</combobox>
 				</row>
 			</rows>
 		</grid>

@@ -3,8 +3,8 @@
 		title="${labels.global.process_status_popup.title}"
 		border="normal" 
 		position="center"
-		width="200px"
-		height="150px"
+		width="300px"
+		height="200px"
 		apply="org.openforis.collect.designer.composer.JobStatusPopUpComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.JobStatusPopUpVM')">
 

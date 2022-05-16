@@ -7,6 +7,17 @@ import org.openforis.commons.lang.Objects;
 
 public abstract class FormObjects {
 
+	public static <T, F extends FormObject<T>> F fromObject(T obj, Class<F> formObjectType) {
+		return fromObject(obj, formObjectType, null);
+	}
+	
+	public static <T, F extends FormObject<T>> F fromObject(T obj, Class<F> formObjectType, String language) {
+		if (obj == null) return null;
+		F formObject = Objects.newInstance(formObjectType);
+		formObject.loadFrom(obj, language);
+		return formObject;
+	}
+
 	public static <T, F extends FormObject<T>> List<F> fromObjects(List<T> objects, Class<F> formObjectType) {
 		return fromObjects(objects, formObjectType, null);
 	}
@@ -15,9 +26,7 @@ public abstract class FormObjects {
 			String language) {
 		List<F> formObjects = new ArrayList<>(objects.size());
 		for (T obj : objects) {
-			F formObject = Objects.newInstance(formObjectType);
-			formObject.loadFrom(obj, language);
-			formObjects.add(formObject);
+			formObjects.add(fromObject(obj, formObjectType, language));
 		}
 		return formObjects;
 	}

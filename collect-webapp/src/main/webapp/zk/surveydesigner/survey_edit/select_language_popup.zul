@@ -1,10 +1,10 @@
 <zk>
 	<window id="selectLanguagePopUp"
-		title="${labels.survey.language_manager}" width="400px" height="350px"
+		title="${labels.survey.language_manager}" width="500px" height="550px"
 		border="normal" position="center" 
 		closable="true"
 		onClose="@command('close')">
-		<borderlayout height="100%" 
+		<borderlayout 
 			vflex="true"
 			apply="org.zkoss.bind.BindComposer"
 			viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyLanguageVM')">
@@ -56,13 +56,13 @@
 						<hlayout valign="middle">
 							<label
 								value="${labels.survey.language.other_languages}" />
-							<listbox model="@load(vm.unassignedLanguages)"
-								width="150px" mold="select"
+							<combobox model="@load(vm.unassignedLanguages)"
+								width="150px"
 								selectedItem="@bind(vm.selectedLanguageToAssign)">
 								<template name="model">
-									<listitem label="${each.label} (${each.code})" />
+									<comboitem label="${each.label} (${each.code})" />
 								</template>
-							</listbox>
+							</combobox>
 							<button label="${labels.global.add_item}"
 								disabled="@load(empty vm.selectedLanguageToAssign)" onClick="@command('addLanguage')" />
 						</hlayout>

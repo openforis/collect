@@ -52,7 +52,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	private static final String INSTANCE_LABEL_FIELD_NAME = "instanceLabel";
 	protected static final String MULTIPLE_FIELD_NAME = "multiple";
 	
-	protected Form tempFormObject;
+	protected SimpleForm tempFormObject;
 	protected EntityDefinition parentEntity;
 
 	public NodeDefinitionVM() {

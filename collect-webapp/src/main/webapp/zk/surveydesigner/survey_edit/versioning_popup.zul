@@ -4,8 +4,8 @@
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.VersioningVM')"
 		validationMessages="@id('vmsgs')"
-		width="750px" 
-		height="300px"
+		width="800px" 
+		height="600px"
 		border="normal"
 		position="center" 
 		closable="true" onClose="@command('close')">
@@ -15,7 +15,7 @@
 					<label value="${labels.survey.versioning.introduction}" />
 				</box>
 			</north>
-			<west width="180px">
+			<west width="280px">
 				<borderlayout>
 					<center border="none"
 						title="${labels.global.items.header.inserted}:">
@@ -36,7 +36,7 @@
 				        </listbox>
 					</center>
 					<south border="none">
-				        <toolbar height="30px">
+				        <toolbar>
 				        	<toolbarbutton
 				        	  tooltiptext="${labels.global.add_item}"
 				        	  image="/assets/images/add.png"
@@ -58,10 +58,9 @@
 		        			<label value="${labels.global.item.select_or_create_new_one}" />
 	        			</box>
 	        		</absolutechildren>
-	        		<absolutechildren hflex="1" vflex="1">
+	        		<absolutechildren hflex="1" vflex="1" visible="@load(vm.editingItem)">
 						<vlayout
-							visible="@load(vm.editingItem)"
-		                    sclass="form"
+							sclass="form"
 							form="@id('fx') 
 								@load(vm.formObject)
 		                        @save(vm.formObject, before={'validate','applyChanges'})
@@ -109,7 +108,7 @@
 											<label value="${labels.survey.versioning.date}:" />
 		                                </fieldErrorHandler>
 		      			                <fieldErrorHandler message="@load(vmsgs['date'])">
-											<datebox width="100px" compact="false" buttonVisible="true" format="@load(vm.dateFormat)" 
+											<datebox width="150px" compact="false" buttonVisible="true" format="@load(vm.dateFormat)" 
 					                    		value="@bind(fx.date)" onChange="@command('applyChanges')" />
 		                                </fieldErrorHandler>
 									</row>
