@@ -53,6 +53,10 @@ public class CodeListImportVM extends BaseSurveyFileImportVM {
 	@Command
 	public void close(@ContextParam(ContextType.TRIGGER_EVENT) Event event) {
 		event.stopPropagation();
+		postCloseGlobalCommand();
+	}
+
+	private void postCloseGlobalCommand() {
 		BindUtils.postGlobalCommand(null, null, CodeListsVM.CLOSE_CODE_LIST_IMPORT_POP_UP_COMMAND, null);
 	}
 
@@ -79,6 +83,7 @@ public class CodeListImportVM extends BaseSurveyFileImportVM {
 							MessageUtil.showInfo("survey.code_list.import_data.completed");
 							// Survey has been updated (last id changed for new code list items): save it!
 							SurveyEditVM.dispatchSurveySaveCommand();
+							postCloseGlobalCommand();
 							break;
 						case FAILED:
 							String title = Labels.getLabel("survey.code_list.import_data.error_popup.title",
