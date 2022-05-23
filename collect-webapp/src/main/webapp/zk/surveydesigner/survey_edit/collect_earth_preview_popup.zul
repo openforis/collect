@@ -1,6 +1,6 @@
 <zk>
   <window title="${labels.survey.preview.title}"
-    width="450px" height="650px" sizable="true"
+    width="480px" height="720px" sizable="true"
     border="normal" position="center" 
     closable="true"
     onClose="@global-commnad('closeCollectEarthPreviewPopUp')"
