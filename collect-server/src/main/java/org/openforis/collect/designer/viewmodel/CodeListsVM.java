@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -88,7 +89,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	public static final String CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND = "closeCodeListItemPopUp";
 	public static final String CLOSE_CODE_LIST_IMPORT_POP_UP_COMMAND = "closeCodeListImportPopUp";
 	
-	private List<List<CodeListItem>> itemsPerLevel;
+	private Map<Integer, List<CodeListItem>> itemsPerLevel;
 	private boolean newChildItem;
 	private CodeListItem editedChildItem;
 	private CodeListItem editedChildItemParentItem;
@@ -510,13 +511,17 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	protected void moveChildItem(CodeListItem item, int toIndex) {
 		codeListManager.shiftItem(item, toIndex);
 		int levelIdx = getLevelIndex(item);
-		List<CodeListItem> siblings = itemsPerLevel.get(levelIdx);
+		List<CodeListItem> siblings = getItemsByLevelIndex(levelIdx);
 		CollectionUtils.shiftItem(siblings, item, toIndex);
-		itemsPerLevel.set(levelIdx, siblings);
+		itemsPerLevel.put(levelIdx, siblings);
 		if ( item instanceof PersistedCodeListItem ) {
 			reloadSiblingsSortOrder((PersistedCodeListItem) item);
 		}
 		notifyChange("itemsPerLevel");
+	}
+
+	private List<CodeListItem> getItemsByLevelIndex(int levelIdx) {
+		return itemsPerLevel.get(levelIdx);
 	}
 	
 	/**
@@ -534,7 +539,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 			CodeListItem parentItem = codeListManager.loadParentItem(item);
 			newItems = codeListManager.loadChildItems(parentItem);
 		}
-		List<CodeListItem> items = itemsPerLevel.get(levelIdx);
+		List<CodeListItem> items = getItemsByLevelIndex(levelIdx);
 		for(int i=0; i < items.size(); i++) {
 			CodeListItem oldItem = items.get(i);
 			CodeListItem newItem = newItems.get(i);
@@ -544,7 +549,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
 	protected int getLevelIndex(CodeListItem item) {
 		for ( int index = 0; index < itemsPerLevel.size(); index++) {
-			List<CodeListItem> items = itemsPerLevel.get(index);
+			List<CodeListItem> items = getItemsByLevelIndex(index);
 			if ( items.contains(item) ) {
 				return index;
 			}
@@ -554,7 +559,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	
 	protected List<CodeListItem> getSiblings(CodeListItem item) {
 		int levelIdx = getLevelIndex(item);
-		List<CodeListItem> siblings = itemsPerLevel.get(levelIdx);
+		List<CodeListItem> siblings = getItemsByLevelIndex(levelIdx);
 		return siblings;
 	}
 	
@@ -710,7 +715,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 			//add item as a child of the edited parent item in the code list
 			editedChildItemParentItem.addChildItem(editedChildItem);
 		}
-		List<CodeListItem> itemsForCurrentLevel = itemsPerLevel.get(editedChildItemLevelIndex);
+		List<CodeListItem> itemsForCurrentLevel = getItemsByLevelIndex(editedChildItemLevelIndex);
 		itemsForCurrentLevel.add(editedChildItem);
 		deselectItemsAfterLevel(editedChildItemLevelIndex);
 		selectedItemsPerLevel.add(editedChildItem);
@@ -730,17 +735,20 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	}
 
 	protected void initItemsPerLevel() {
-		itemsPerLevel = new ArrayList<List<CodeListItem>>();
+		itemsPerLevel = new LinkedHashMap<>();
 		if ( /*isSurveyStored() && */ editedItem != null && ! editedItem.isExternal() ) {
 			List<CodeListItem> rootItems = codeListManager.loadRootItems(editedItem);
-			itemsPerLevel.add(new ArrayList<CodeListItem>(rootItems));
+			int levelIndex = 0;
+			itemsPerLevel.put(levelIndex, new ArrayList<CodeListItem>(rootItems));
+			levelIndex ++;
 			for (CodeListItem selectedItem : selectedItemsPerLevel) {
 				List<CodeListItem> childItems = codeListManager.loadChildItems(selectedItem);
-				itemsPerLevel.add(new ArrayList<CodeListItem>(childItems));
+				itemsPerLevel.put(levelIndex, new ArrayList<CodeListItem>(childItems));
+				levelIndex ++;
 			}
 		} else {
 			//add empty root items list
-			itemsPerLevel.add(new ArrayList<CodeListItem>());
+			itemsPerLevel.put(0, new ArrayList<CodeListItem>());
 		}
 		notifyChange("itemsPerLevel");
 	}
@@ -766,7 +774,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		return selectedItemsPerLevel.size() - 1;
 	}
 	
-	public List<List<CodeListItem>> getItemsPerLevel() {
+	public Map<Integer, List<CodeListItem>> getItemsPerLevel() {
 		return itemsPerLevel;
 	}
 	
