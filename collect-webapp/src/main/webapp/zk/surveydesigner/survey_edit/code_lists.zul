@@ -130,6 +130,7 @@
 		        				<row>
 		        					<label
 		        						value="${labels.survey.code_list.type.$}:" />
+		        					<hlayout spacing="50px">
 	 		        					<radiogroup id="typeRG"
 	 		        						selectedItem="@bind(fx.type)"
 	 		        						onCheck="@command('typeChanged', type=self.selectedItem.value)">
@@ -142,6 +143,19 @@
 	 		        							value="HIERARCHICAL"
 	 		        							disabled="@load(vm.multipleLevelsPresent)" />
 	 		        					</radiogroup>
+	 		        					<hlayout id="levelsControlBar"
+				        					visible="@load(fx.type eq 'HIERARCHICAL')">
+				        					<button
+				        						image="/assets/images/add-small.png"
+				        						label="${labels.survey.code_list.add_level}"
+				        						onClick="@command('addLevel')" />
+				        					<button
+				        						image="/assets/images/delete-small.png"
+				        						label="${labels.survey.code_list.remove_level}"
+				        						onClick="@command('removeLevel')"
+				        						visible="@load(vm.multipleLevelsPresent)" />
+				        				</hlayout>
+		        					</hlayout>
 		        				</row>
 		        			</rows>
 		        		</grid>
@@ -227,20 +241,6 @@
 		        					</template>
 		        				</hlayout>
 		        			</center>
-		        			<east width="70px">
-		        				<vlayout id="levelsControlBar"
-		        					visible="@load(fx.type eq 'HIERARCHICAL')">
-		        					<button
-		        						image="/assets/images/add-small.png"
-		        						label="${labels.survey.code_list.add_level}"
-		        						onClick="@command('addLevel')" />
-		        					<button
-		        						image="/assets/images/delete-small.png"
-		        						label="${labels.survey.code_list.remove_level}"
-		        						onClick="@command('removeLevel')"
-		        						visible="@load(vm.multipleLevelsPresent)" />
-		        				</vlayout>
-		        			</east>
 		        		</borderlayout>
       					<box  
       						align="center" 

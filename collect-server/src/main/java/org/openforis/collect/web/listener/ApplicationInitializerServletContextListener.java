@@ -28,7 +28,7 @@ import io.sentry.Sentry;
 public class ApplicationInitializerServletContextListener implements ServletContextListener {
 
 	private static final Logger LOG = LogManager.getLogger(ApplicationInitializerServletContextListener.class);
-	private static final String SENTRY_DSN = "https://d3693c474ffb41f2b5e6265dc3411705@sentry.io/1246866?release=" + Collect.VERSION;
+	private static final String SENTRY_DSN = "https://d3693c474ffb41f2b5e6265dc3411705@o170144.ingest.sentry.io/1246866?release=" + Collect.VERSION;
 	private static final String DEV_MODE_INIT_PARAMETER_NAME = "devMode";
 
 	@Override

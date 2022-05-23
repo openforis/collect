@@ -24,6 +24,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.FormattedMessage;
 import org.openforis.collect.io.AbstractSurveyRestoreJob;
 import org.openforis.collect.io.CESurveyRestoreJob;
 import org.openforis.collect.io.SurveyBackupInfo;
@@ -360,44 +361,49 @@ public class SurveyController extends BasicController {
 	}
 
 	@RequestMapping(value = "prepareimport", method = POST, consumes = MULTIPART_FORM_DATA_VALUE)
-	public @ResponseBody Response prepareSurveyImport(@RequestParam("file") MultipartFile multipartFile)
-			throws IOException {
-		String fileName = multipartFile.getOriginalFilename();
-		File tempFile = Files.writeToTempFile(multipartFile.getInputStream(), multipartFile.getOriginalFilename(),
-				"ofc_csv_data_import");
-		String extension = FilenameUtils.getExtension(fileName);
-
-		this.uploadedSurveyFile = tempFile;
-
-		if (surveyBackupInfoExtractorJob != null && surveyBackupInfoExtractorJob.isRunning()) {
-			surveyBackupInfoExtractorJob.abort();
-		}
-		surveyBackupInfoExtractorJob = jobManager.createJob(SurveyBackupInfoExtractorJob.class);
-
-		if (COLLECT_EARTH_PROJECT_FILE_EXTENSION.equalsIgnoreCase(extension)) {
-			File idmFile = extractIdmFromCEPFile(tempFile);
-			surveyBackupInfoExtractorJob.setFile(idmFile);
-		} else {
-			surveyBackupInfoExtractorJob.setFile(tempFile);
-		}
-		surveyBackupInfoExtractorJob.setValidate(false);
-
-		jobManager.start(surveyBackupInfoExtractorJob, false);
-
+	public @ResponseBody Response prepareSurveyImport(@RequestParam("file") MultipartFile multipartFile) {
 		Response response = new Response();
-		if (surveyBackupInfoExtractorJob.isCompleted()) {
-			uploadedSurveyInfo = surveyBackupInfoExtractorJob.getInfo();
-			response.addObject("surveyBackupInfo", uploadedSurveyInfo);
-			SurveySummary existingSummary = surveyManager.loadSummaryByUri(uploadedSurveyInfo.getSurveyUri());
-			response.addObject("importingIntoExistingSurvey", existingSummary != null);
-			response.addObject("existingSurveyUserGroupId",
-					existingSummary == null ? null : existingSummary.getUserGroupId());
-			return response;
-		} else {
+		try {
+			String fileName = multipartFile.getOriginalFilename();
+			File tempFile = Files.writeToTempFile(multipartFile.getInputStream(), multipartFile.getOriginalFilename(),
+					"ofc_csv_data_import");
+			String extension = FilenameUtils.getExtension(fileName);
+	
+			this.uploadedSurveyFile = tempFile;
+	
+			if (surveyBackupInfoExtractorJob != null && surveyBackupInfoExtractorJob.isRunning()) {
+				surveyBackupInfoExtractorJob.abort();
+			}
+			surveyBackupInfoExtractorJob = jobManager.createJob(SurveyBackupInfoExtractorJob.class);
+	
+			if (COLLECT_EARTH_PROJECT_FILE_EXTENSION.equalsIgnoreCase(extension)) {
+				File idmFile = extractIdmFromCEPFile(tempFile);
+				surveyBackupInfoExtractorJob.setFile(idmFile);
+			} else {
+				surveyBackupInfoExtractorJob.setFile(tempFile);
+			}
+			surveyBackupInfoExtractorJob.setValidate(false);
+	
+			jobManager.start(surveyBackupInfoExtractorJob, false);
+	
+			if (surveyBackupInfoExtractorJob.isCompleted()) {
+				uploadedSurveyInfo = surveyBackupInfoExtractorJob.getInfo();
+				response.addObject("surveyBackupInfo", uploadedSurveyInfo);
+				SurveySummary existingSummary = surveyManager.loadSummaryByUri(uploadedSurveyInfo.getSurveyUri());
+				response.addObject("importingIntoExistingSurvey", existingSummary != null);
+				response.addObject("existingSurveyUserGroupId",
+						existingSummary == null ? null : existingSummary.getUserGroupId());
+			} else {
+				response.setErrorStatus();
+				response.setErrorMessage(surveyBackupInfoExtractorJob.getErrorMessage());
+			}
+		} catch(Exception e) {
+			FormattedMessage formattedMessage = new FormattedMessage("Error preparing survey import: %s", e.getMessage());
+			LOG.error(formattedMessage, e);
 			response.setErrorStatus();
-			response.setErrorMessage(surveyBackupInfoExtractorJob.getErrorMessage());
-			return response;
+			response.setErrorMessage(formattedMessage.toString());
 		}
+		return response;
 	}
 
 	@RequestMapping(value = "validateimport", method = POST)
