@@ -3,7 +3,7 @@
 <zk>
 	<window id="codeListsManagerPopUp" title="${labels.survey.code_list.manager.title}" 
 		width="800px" 
-		height="620px"
+		height="800px"
 		border="normal"
 		position="center" 
 		apply="org.zkoss.bind.BindComposer"

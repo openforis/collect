@@ -291,8 +291,7 @@ div.z-listbox-header th.z-listheader-sort-over {
 	display: inline-block;
 }
 
-.z-panel.without-header .z-panel-tl, 
-.z-panel.without-header .z-panel-hl {
+.z-panel.without-header .z-panel-head {
 	display: none;
 }
 
