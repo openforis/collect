@@ -170,7 +170,7 @@
         								<!-- code list items per level container -->
 		        						<panel closable="false"
 		        							sizable="true"
-		        							border="normal" 
+		        							border="normal"
 		        							vflex="true"
 		        							sclass="@load(fx.type eq 'HIERARCHICAL' ? '': 'without-header')"
 		        							width="300px">
