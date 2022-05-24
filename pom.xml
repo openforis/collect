@@ -415,17 +415,6 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>JBoss</id>
-			<name>JBoss Repository</name>
-			<url>http://repository.jboss.org/nexus/content/groups/public/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-		<repository>
 			<id>jitpack.io</id>
 			<url>https://jitpack.io</url>
 		</repository>
@@ -455,16 +444,6 @@
 			<releases>
 				<updatePolicy>never</updatePolicy>
 			</releases>
-		</pluginRepository>
-		<pluginRepository>
-			<id>flex-mojo-plugins</id>
-			<url>https://repository.sonatype.org/content/groups/flexgroup</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
 
