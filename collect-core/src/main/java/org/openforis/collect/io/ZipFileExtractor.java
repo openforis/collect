@@ -51,13 +51,19 @@ public class ZipFileExtractor {
 			String fileName = FilenameUtils.getName(entryName);
 			String fileNameNormalized = FilenameUtils.normalize(fileName);
 			File tempFile = File.createTempFile("collect", fileNameNormalized);
-			if (!tempFile.getCanonicalPath().startsWith(FileUtils.getTempDirectoryPath())) {
-				throw new IOException("Trying to extract ZIP entry outside of temp target directory");
-			}
+			checkIsExtractingFileInsideFolder(tempFile, FileUtils.getTempDirectory());
 			FileUtils.copyInputStreamToFile(is, tempFile);
 			return tempFile;
 		} catch (IOException e) {
 			throw new IOException(String.format("Error extracting file %s from backup archive: %s", entryName, e.getMessage()), e);
+		}
+	}
+	
+	private static void checkIsExtractingFileInsideFolder(File file, File destinationFolder) throws IOException {
+		String path = file.getCanonicalPath();
+		String destinationPath = destinationFolder.getCanonicalPath();
+		if (!path.startsWith(destinationPath)) {
+			throw new IOException(String.format("Trying to extract entry %s outside of destination folder %s", path, destinationPath));
 		}
 	}
 

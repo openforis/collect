@@ -13,7 +13,7 @@ import * as FieldsSizes from '../FieldsSizes'
 const fetchTaxa =
   ({ surveyId, fieldDef, queryField }) =>
   ({ searchString, onComplete }) => {
-    return debounce(1000, false, async () => {
+    return debounce(1000, async () => {
       const { attributeDefinition } = fieldDef
       const { allowUnlisted, highestRank, includeUniqueVernacularName, showFamily, taxonomyName } = attributeDefinition
 
