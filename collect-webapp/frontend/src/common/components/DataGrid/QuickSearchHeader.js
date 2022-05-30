@@ -16,7 +16,7 @@ export const QuickSearchHeader = (props) => {
 
   const onValueChange = (val) => {
     setValue(val)
-    debounce(500, false, async () => onChangeProp(val))()
+    debounce(500, async () => onChangeProp(val))()
   }
 
   return (
