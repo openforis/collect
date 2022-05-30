@@ -83,7 +83,7 @@ export default class AbstractField extends AbstractFormComponent {
     if (this._updateAttributeValueDebounced) {
       this._updateAttributeValueDebounced.cancel()
     }
-    this._updateAttributeValueDebounced = debounce(debounced ? 1000 : 0, false, updateFn)
+    this._updateAttributeValueDebounced = debounce(debounced ? 1000 : 0, updateFn)
     this._updateAttributeValueDebounced()
   }
 
