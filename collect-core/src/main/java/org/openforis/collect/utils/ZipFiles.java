@@ -65,9 +65,7 @@ public class ZipFiles {
 				File folder = getOrCreateEntryFolder(destinationFolder, entryName);
 				String fileName = Files.extractFileName(entryName);
 				File newFile = new File(folder, fileName);
-				if (!newFile.getCanonicalPath().startsWith(destinationFolder.getCanonicalPath())) {
-					throw new IOException("Trying to extract entry outside of destination folder");
-				}
+				checkIsExtractingFileInsideFolder(newFile, destinationFolder);
 				newFile.createNewFile();
 				InputStream is = zipFile.getInputStream(zipEntry);
 				FileUtils.copyInputStreamToFile(is, newFile);
@@ -76,6 +74,14 @@ public class ZipFiles {
 			if (progressListener != null) {
 				progressListener.progressMade(new Progress(count, zipFile.size()));
 			}
+		}
+	}
+
+	private static void checkIsExtractingFileInsideFolder(File file, File destinationFolder) throws IOException {
+		String path = file.getCanonicalPath();
+		String destinationPath = destinationFolder.getCanonicalPath();
+		if (!path.startsWith(destinationPath)) {
+			throw new IOException(String.format("Trying to extract entry %s outside of destination folder %s", path, destinationPath));
 		}
 	}
 	
