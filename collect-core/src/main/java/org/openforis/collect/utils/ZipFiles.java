@@ -64,7 +64,8 @@ public class ZipFiles {
 				String entryName = zipEntry.getName();
 				File folder = getOrCreateEntryFolder(destinationFolder, entryName);
 				String fileName = Files.extractFileName(entryName);
-				File newFile = new File(folder, fileName);
+				String fileNameNormalized = FilenameUtils.normalize(fileName);
+				File newFile = new File(folder, fileNameNormalized);
 				checkIsExtractingFileInsideFolder(newFile, destinationFolder);
 				newFile.createNewFile();
 				InputStream is = zipFile.getInputStream(zipEntry);
