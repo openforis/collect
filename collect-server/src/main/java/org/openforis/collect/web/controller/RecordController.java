@@ -959,9 +959,14 @@ public class RecordController extends BasicController implements Serializable {
 		if (rootEntityId == null) {
 			rootEntityId = survey.getSchema().getFirstRootEntityDefinition().getId();
 		}
+		
+		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(survey.getUserGroupId(), user.getId());
+		
 		RecordFilter recordFilter = new RecordFilter(survey);
 		recordFilter.setRootEntityId(rootEntityId);
-		if (onlyOwnedRecords || user.getRole() == UserRole.ENTRY_LIMITED) {
+		
+		if (onlyOwnedRecords || user.getRole() == UserRole.ENTRY_LIMITED ||
+				userInGroup != null && userInGroup.getRole() == UserGroupRole.DATA_CLEANER_LIMITED) {
 			recordFilter.setOwnerId(user.getId());
 		}
 		if (user.getRole() != UserRole.ADMIN) {
