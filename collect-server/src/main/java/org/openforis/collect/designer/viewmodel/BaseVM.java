@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.designer.model.LabelledItem;
@@ -146,12 +147,20 @@ public abstract class BaseVM {
 	}
 	
 	protected <T> T getFormFieldValue(Binder binder, String field) {
-		return getFormFieldValue(ComponentUtil.getForm(binder), field);
+		Object form = ComponentUtil.getForm(binder);
+		return getFormFieldValue(form, field);
 	}
 
 	@SuppressWarnings("unchecked")
-	protected <T> T getFormFieldValue(SimpleForm form, String field) {
-		return (T) form.getField(field);
+	protected <T> T getFormFieldValue(Object form, String field) {
+		if (form instanceof SimpleForm) {
+			return (T) ((SimpleForm) form).getField(field);
+		}
+		try {
+			return (T) PropertyUtils.getProperty(form, field);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 	
 	protected void setFormFieldValue(Binder binder, String field,
@@ -159,8 +168,16 @@ public abstract class BaseVM {
 		setFormFieldValue(ComponentUtil.getForm(binder), field, value);
 	}
 	
-	protected void setFormFieldValue(SimpleForm form, String field, Object value) {
-		form.setField(field, value);
+	protected void setFormFieldValue(Object form, String field, Object value) {
+		if (form instanceof SimpleForm) {
+			((SimpleForm) form).setField(field, value);
+		} else {
+			try {
+				PropertyUtils.setProperty(form, field, value);
+			} catch (Exception e) {
+				// ignore it
+			}
+		}
 		BindUtils.postNotifyChange(null, null, form, field);
 	}
 	

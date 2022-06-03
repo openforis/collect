@@ -10,7 +10,6 @@ import org.apache.commons.compress.utils.CharsetNames;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.zkoss.bind.Binder;
-import org.zkoss.bind.SimpleForm;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
@@ -50,14 +49,14 @@ public class ComponentUtil {
 		return binder;
 	}
 	
-	public static SimpleForm getForm(Binder binder) {
+	public static Object getForm(Binder binder) {
 		Component view = binder.getView();
 		return getForm(view);
 	}
 
-	public static SimpleForm getForm(Component view) {
+	public static Object getForm(Component view) {
 		String formId = (String) view.getAttribute(FORM_ID_ATTRIBUTE);
-		return formId == null ? null : (SimpleForm) view.getAttribute(formId);
+		return formId == null ? null : view.getAttribute(formId);
 	}
 	
 	@SuppressWarnings("unchecked")
