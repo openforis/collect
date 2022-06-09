@@ -384,21 +384,29 @@ public class RecordController extends BasicController implements Serializable {
 	@RequestMapping(value = "survey/{surveyId}/data/import/records/summary", method = POST, consumes = MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody JobView startRecordImportSummaryJob(@PathVariable("surveyId") int surveyId,
 			@RequestParam("file") MultipartFile multipartFile, @RequestParam String rootEntityName) throws IOException {
-		File file = File.createTempFile("ofc_data_restore", ".collect-data");
-		FileUtils.copyInputStreamToFile(multipartFile.getInputStream(), file);
-		CollectSurvey survey = surveyManager.getById(surveyId);
+		File tempFile = null;
+		try {
+			tempFile = File.createTempFile("ofc_data_restore", ".collect-data");
+			tempFile.deleteOnExit();
+			FileUtils.copyInputStreamToFile(multipartFile.getInputStream(), tempFile);
 
-		DataRestoreSummaryJob job = jobManager.createJob(DataRestoreSummaryJob.class);
-		job.setUser(sessionManager.getLoggedUser());
-		job.setFullSummary(true);
-		job.setFile(file);
-		job.setPublishedSurvey(survey);
-		job.setCloseRecordProviderOnComplete(false);
-		job.setDeleteInputFileOnDestroy(true);
-
-		jobManager.start(job);
-		this.dataRestoreSummaryJob = job;
-		return new JobView(job);
+			CollectSurvey survey = surveyManager.getById(surveyId);
+			
+			DataRestoreSummaryJob job = jobManager.createJob(DataRestoreSummaryJob.class);
+			job.setUser(sessionManager.getLoggedUser());
+			job.setFullSummary(true);
+			job.setFile(tempFile);
+			job.setPublishedSurvey(survey);
+			job.setCloseRecordProviderOnComplete(false);
+			job.setDeleteInputFileOnDestroy(true);
+			
+			jobManager.start(job);
+			this.dataRestoreSummaryJob = job;
+			return new JobView(job);
+		} catch (Exception e) {
+			FileUtils.deleteQuietly(tempFile);
+			throw e;
+		}
 	}
 
 	@RequestMapping(value = "survey/{surveyId}/data/import/records/summary", method = GET)
