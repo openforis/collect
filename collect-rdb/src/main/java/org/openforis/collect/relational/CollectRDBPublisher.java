@@ -26,6 +26,7 @@ import org.openforis.concurrency.ProcessProgressListener;
 import org.openforis.concurrency.ProcessStepProgressListener;
 import org.openforis.concurrency.Progress;
 import org.openforis.concurrency.ProgressListener;
+import org.openforis.idm.metamodel.Survey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.datasource.DataSourceUtils;
@@ -76,13 +77,19 @@ public class CollectRDBPublisher {
 	
 	public void export(String surveyName, String rootEntityName, Step step,
 			String targetSchemaName, Connection targetConn, RelationalSchemaConfig config, ProgressListener progressListener) throws CollectRdbException {
+		CollectSurvey survey = surveyManager.get(surveyName);
+		export(survey, rootEntityName, step, targetSchemaName, targetConn, config, progressListener);
+	}
+	
+	
+	public void export(CollectSurvey survey, String rootEntityName, Step step,
+				String targetSchemaName, Connection targetConn, RelationalSchemaConfig config, ProgressListener progressListener) throws CollectRdbException {
 		try {
 			targetConn.setAutoCommit(false);
 		} catch (SQLException e) {
 		}
 		try {
-			CollectSurvey survey = surveyManager.get(surveyName);
-			
+
 			// Generate relational model
 			RelationalSchemaGenerator schemaGenerator = new RelationalSchemaGenerator(config);
 			RelationalSchema relationalSchema = schemaGenerator.generateSchema(survey, targetSchemaName);
