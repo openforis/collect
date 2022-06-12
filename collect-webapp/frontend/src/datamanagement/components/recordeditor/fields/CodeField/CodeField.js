@@ -279,13 +279,13 @@ class CodeField extends AbstractField {
 
     if (enumerator) {
       return (
-        <InputLabel style={{ width: FieldsSizes.getWidth({ fieldDef, inTable }) }}>
+        <div className='code-field-enumerated-item' style={{ width: FieldsSizes.getWidth({ fieldDef, inTable }) }}>
           <CodeFieldItemLabel
             item={Arrays.head(selectedItems)}
             attributeDefinition={attributeDefinition}
             singleLine={inTable}
           />
-        </InputLabel>
+        </div>
       )
     }
 
