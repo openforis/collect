@@ -88,6 +88,7 @@
 		        					<fieldErrorHandler
 		        						message="@load(vmsgs['name'])">
 		        						<textbox id="nameTextbox"
+		        							readonly="@load(vm.locked)"
 		        							width="30rem" maxlength="255"
 		        							value="@bind(fx.name)"
 		        							onChange="@command('applyChanges')" />
@@ -132,6 +133,7 @@
 		        						value="${labels.survey.code_list.type.$}:" />
 		        					<hlayout spacing="50px">
 	 		        					<radiogroup id="typeRG"
+	 		        						disabled="@load(vm.locked)"
 	 		        						selectedItem="@bind(fx.type)"
 	 		        						onCheck="@command('typeChanged', type=self.selectedItem.value)">
 	 		        						<radio
@@ -146,10 +148,12 @@
 	 		        					<hlayout id="levelsControlBar"
 				        					visible="@load(fx.type eq 'HIERARCHICAL')">
 				        					<button
+				        						disabled="@load(vm.locked)"
 				        						image="/assets/images/add-small.png"
 				        						label="${labels.survey.code_list.add_level}"
 				        						onClick="@command('addLevel')" />
 				        					<button
+				        						disabled="@load(vm.locked)"
 				        						image="/assets/images/delete-small.png"
 				        						label="${labels.survey.code_list.remove_level}"
 				        						onClick="@command('removeLevel')"
@@ -178,7 +182,9 @@
 		        								visible="@load(fx.type eq 'HIERARCHICAL' ? true: false)">
 		        								<fieldErrorHandler hflex="true"
 		        									message="@load(vmsgs[vm.getHierarchyLevelNameValidationKey(forEachStatus.index)])">
-			        								<textbox inplace="true"
+			        								<textbox
+			        									readonly="@load(vm.locked)" 
+			        									inplace="true"
 			        									hflex="true"
 			        									style="padding-right: 12px;"
 			        									value="@bind(each.name) @validator(vm.getHierarchyLevelNameValidator(forEachStatus.index))" />
@@ -220,7 +226,7 @@
 			        							</listbox>
 			        						</panelchildren>
 			        						<!-- action buttons toolbar -->
-		        							<toolbar height="50px">
+		        							<toolbar height="50px" visible="@load(not(vm.locked))">
 		        								<toolbarbutton
 		        									image="/assets/images/add-small.png"
 		        									label="${labels.survey.code_list.add_child_item}"

@@ -24,7 +24,7 @@
         </listitem>
       </template>
     </listbox>
-    <toolbar>
+    <toolbar visible="@load(not(vm.locked))">
       <toolbarbutton tooltiptext="${labels.global.add_item}"
         image="/assets/images/add-small.png"
         onClick="@command('addAttributeDefault')" />

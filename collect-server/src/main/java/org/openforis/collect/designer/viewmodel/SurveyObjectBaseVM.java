@@ -13,6 +13,7 @@ import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.metamodel.SurveyObject;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
@@ -340,4 +341,10 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		this.commitChangesOnApply = commitChangesOnApply;
 	}
 
+	public boolean isLocked() {
+		return editedItem != null && (
+				editedItem instanceof SurveyObject && survey.getAnnotations().isLocked((SurveyObject) editedItem) 
+		);
+	}
+	
 }

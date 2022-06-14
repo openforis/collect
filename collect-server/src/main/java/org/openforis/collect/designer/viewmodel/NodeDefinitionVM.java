@@ -288,6 +288,11 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		return true;
 	}
 	
+	public boolean isLocked() {
+		return super.isLocked() || editedItem != null
+				&& ((isCollectEarthSurvey() && isRootEntity() || isPredefinedCollectEarthAttribute()));
+	}
+	
 	public List<Map<String, String>> getDependentNodes() {
 		List<Map<String, String>> result = new ArrayList<Map<String,String>>();
 		try {

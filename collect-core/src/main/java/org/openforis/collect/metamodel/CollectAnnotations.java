@@ -17,6 +17,7 @@ import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.SurveyObject;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 
@@ -50,6 +51,7 @@ public class CollectAnnotations {
 		PHASE_TO_APPLY_DEFAULT_VALUE(new QName(COLLECT_NAMESPACE_URI, "phaseToApplyDefaultValue"), Step.ENTRY),
 		EDITABLE(new QName(COLLECT_NAMESPACE_URI, "editable"), true),
 		FILE_TYPE(new QName(COLLECT_NAMESPACE_URI, "fileType"), FileType.IMAGE),
+		LOCKED(new QName(COLLECT_NAMESPACE_URI, "locked"), false), // cannot edit the node definition from Survey Designer (only labels)
 		MEASUREMENT(new QName(COLLECT_NAMESPACE_URI, "measurement"), false),
 		TEXT_INPUT(new QName(COLLECT_NAMESPACE_URI, "textInput"), TextInput.KEYBOARD),
 		TARGET(new QName(COLLECT_NAMESPACE_URI, "target"), SurveyTarget.COLLECT_DESKTOP),
@@ -217,6 +219,14 @@ public class CollectAnnotations {
 		setAnnotationValue(defn, Annotation.EDITABLE, value);
 	}
 
+	public boolean isLocked(SurveyObject defn) {
+		return getAnnotationValueBoolean(defn, Annotation.LOCKED);
+	}
+
+	public void setLocked(SurveyObject defn, boolean value) {
+		setAnnotationValue(defn, Annotation.LOCKED, value);
+	}
+	
 	public boolean isQualifier(AttributeDefinition defn) {
 		return getAnnotationValueBoolean(defn, Annotation.QUALIFIER);
 	}

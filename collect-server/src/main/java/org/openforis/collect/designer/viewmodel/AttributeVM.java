@@ -142,6 +142,8 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	
 	@Command
 	public void editCheck() {
+		if (isLocked()) return;
+		
 		editingNewCheck = false;
 		editedCheck = selectedCheck;
 		openCheckEditPopUp();
@@ -286,6 +288,8 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 
 	@Command
 	public void editAttributeDefault() {
+		if (isLocked()) return;
+		
 		editingNewAttributeDefault = false;
 		editedAttributeDefault = selectedAttributeDefault;
 		openAttributeDefaultEditPopUp();

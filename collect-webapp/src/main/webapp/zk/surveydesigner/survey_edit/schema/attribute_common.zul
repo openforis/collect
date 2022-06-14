@@ -36,7 +36,9 @@
 					</fieldErrorHandler>
 					<fieldErrorHandler
 						message="@load(vmsgs['showInMapBalloon'])">
-						<checkbox checked="@bind(fx.showInMapBalloon)"
+						<checkbox
+							disabled="@load(vm.locked)" 
+							checked="@bind(fx.showInMapBalloon)"
 							onCheck="@command('applyChanges')" />
 					</fieldErrorHandler>
 				</row>
@@ -65,6 +67,7 @@
 						<fieldErrorHandler
 							message="@load(vmsgs['phaseToApplyDefaultValue'])">
 							<combobox
+								disabled="@load(vm.locked)"
 								selectedItem="@bind(fx.phaseToApplyDefaultValue)"
 								onChange="@command('applyChanges')"
 								model="@load(vm.editableRecordStepNames)">

@@ -390,6 +390,8 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	
 	@Command
 	public void editCodeListItem(@BindingParam("item") CodeListItem item) {
+		if (isLocked()) return ;
+		
 		newChildItem = false;
 		editedChildItem = item;
 		editedChildItemParentItem = codeListManager.loadParentItem(item);

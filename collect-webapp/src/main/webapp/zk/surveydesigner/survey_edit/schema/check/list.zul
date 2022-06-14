@@ -26,7 +26,7 @@
         </listitem>
       </template>
     </listbox>
-    <menubar>
+    <menubar visible="@load(not(vm.locked))">
       <menu tooltiptext="${labels.global.add_item}" class="icon-button"
         image="/assets/images/add-small.png">
         <menupopup>
