@@ -2,6 +2,8 @@ package org.openforis.collect.io.metadata.parsing;
 
 import java.util.Arrays;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * 
  * @author S. Ricci
@@ -61,6 +63,10 @@ public class ParsingError {
 	
 	public ParsingError(ErrorType type, long row, String column) {
 		this(type, row, column, (String) null);
+	}
+	
+	public String getColumnsString() {
+		return StringUtils.join(columns, ", ");
 	}
 	
 	public ErrorType getErrorType() {

@@ -2,7 +2,7 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
 	<window id="codeListsManagerPopUp" title="${labels.survey.code_list.manager.title}" 
-		width="800px" 
+		width="1050px" 
 		height="800px"
 		border="normal"
 		position="center" 

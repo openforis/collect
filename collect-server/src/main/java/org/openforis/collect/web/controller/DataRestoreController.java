@@ -15,6 +15,8 @@ import java.util.zip.ZipException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupInfo;
@@ -56,7 +58,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Scope(SCOPE_SESSION)
 public class DataRestoreController extends BasicController {
 
-	//private static Logger LOG = Logger.getLogger(RestoreController.class);
+	private static final Logger LOG = LogManager.getLogger(DataRestoreController.class);
 	
 	@Autowired
 	private SurveyManager surveyManager;
@@ -86,6 +88,7 @@ public class DataRestoreController extends BasicController {
 					validateRecords, deleteAllRecordsBeforeImport, OverwriteStrategy.valueOf(recordOverwriteStrategy));
 			return createResponse(job);
 		} catch (Exception e) {
+			LOG.error(e);
 			JobStatusResponse response = new JobStatusResponse();
 			response.setErrorStatus();
 			response.setErrorMessage(e.getMessage());
@@ -103,10 +106,12 @@ public class DataRestoreController extends BasicController {
 			try {
 				User user = userManager.loadAdminUser();
 				boolean newSurvey = surveyManager.get(surveyName) == null;
+
 				DataRestoreJob job = startRestoreJob(uploadItem.getFileData().getInputStream(), newSurvey, surveyName, user,
 						true, false, OverwriteStrategy.OVERWRITE_OLDER);
 				response.setJobId(job.getId().toString());
 			} catch (Exception e) {
+				LOG.error(e);
 				response.setErrorStatus();
 				response.setErrorMessage(e.getMessage());
 			}
@@ -166,43 +171,48 @@ public class DataRestoreController extends BasicController {
 		response.setErrorMessage(job.getErrorMessage());
 	}
 	
-	private DataRestoreJob startRestoreJob(InputStream fileInputStream, boolean newSurvey, 
+	private DataRestoreJob startRestoreJob(InputStream inputStream, boolean newSurvey, 
 			String expectedSurveyName, User user, boolean validateRecords, boolean deleteAllRecords,
 			OverwriteStrategy recordOverwriteStrategy) throws IOException,	FileNotFoundException, ZipException {
-		File tempFile = File.createTempFile("ofc_data_restore", ".collect-backup");
-		FileUtils.copyInputStreamToFile(fileInputStream, tempFile);
-		
-		SurveyBackupInfo info = extractInfo(tempFile);
-		
-		CollectSurvey publishedSurvey = findPublishedSurvey(info);
-		if (newSurvey) {
-			checkPackagedNewSurveyValidity(info);
-		} else {
-			checkPackagedSurveyValidity(info, expectedSurveyName);
-		}
-		UserGroup newSurveyUserGroup = userGroupManager.getDefaultPublicUserGroup();
-		
-		DataRestoreJob job = jobManager.createJob(DataRestoreJob.JOB_NAME, DataRestoreJob.class);
-		job.setUser(user);
-		job.setStoreRestoredFile(true);
-		job.setPublishedSurvey(publishedSurvey);
-		job.setNewSurveyUserGroup(newSurveyUserGroup);
-		job.setFile(tempFile);
-		job.setRecordOverwriteStrategy(recordOverwriteStrategy);
-		job.setRestoreUploadedFiles(true);
-		job.setValidateRecords(validateRecords);
-		job.setDeleteAllRecordsBeforeRestore(deleteAllRecords);
-		//on complete, dispatch surveys_updated event to WS
-		job.addStatusChangeListener(event -> {
-			if (event.getTo() == Status.COMPLETED) {
-				appWS.sendMessage(MessageType.SURVEYS_UPDATED);
+		File tempFile = null;
+		try {
+			tempFile = createTempFile(inputStream);
+			
+			SurveyBackupInfo info = extractInfo(tempFile);
+			
+			CollectSurvey publishedSurvey = findPublishedSurvey(info);
+			if (newSurvey) {
+				checkPackagedNewSurveyValidity(info);
+			} else {
+				checkPackagedSurveyValidity(info, expectedSurveyName);
 			}
-		});
-		
-		String lockId = extractSurveyUri(tempFile);
-		jobManager.start(job, lockId);
-		
-		return job;
+			UserGroup newSurveyUserGroup = userGroupManager.getDefaultPublicUserGroup();
+			
+			DataRestoreJob job = jobManager.createJob(DataRestoreJob.JOB_NAME, DataRestoreJob.class);
+			job.setUser(user);
+			job.setStoreRestoredFile(true);
+			job.setPublishedSurvey(publishedSurvey);
+			job.setNewSurveyUserGroup(newSurveyUserGroup);
+			job.setFile(tempFile);
+			job.setRecordOverwriteStrategy(recordOverwriteStrategy);
+			job.setRestoreUploadedFiles(true);
+			job.setValidateRecords(validateRecords);
+			job.setDeleteAllRecordsBeforeRestore(deleteAllRecords);
+			//on complete, dispatch surveys_updated event to WS
+			job.addStatusChangeListener(event -> {
+				if (event.getTo() == Status.COMPLETED) {
+					appWS.sendMessage(MessageType.SURVEYS_UPDATED);
+				}
+			});
+			
+			String lockId = extractSurveyUri(tempFile);
+			jobManager.start(job, lockId);
+			
+			return job;
+		} catch (Exception e) {
+			FileUtils.deleteQuietly(tempFile);
+			throw e;
+		}
 	}
 
 	private void checkPackagedSurveyValidity(SurveyBackupInfo info,
@@ -249,6 +259,13 @@ public class DataRestoreController extends BasicController {
 		} finally {
 			IOUtils.closeQuietly(backupFileExtractor);
 		}
+	}
+	
+	private File createTempFile(InputStream inputStream) throws IOException {
+		File file = File.createTempFile("ofc_data_restore", ".collect-data");
+		file.deleteOnExit();
+		FileUtils.copyInputStreamToFile(inputStream, file);
+		return file;
 	}
 	
 	public static class RemoteDataRestoreResponse extends JobStatusResponse {

@@ -4,7 +4,7 @@
 		apply="org.zkoss.bind.BindComposer"
 		title="${arg.title}" 
 		width="800px" 
-		height="420px"
+		height="520px"
 		border="normal"
 		position="center" 
 		closable="false">

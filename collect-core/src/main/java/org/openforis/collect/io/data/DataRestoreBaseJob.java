@@ -64,32 +64,13 @@ public abstract class DataRestoreBaseJob extends Job {
 	protected transient boolean oldBackupFormat;
 	protected transient File dataSummaryFile;
 
-	@Override
-	public void createInternalVariables() throws Throwable {
-		super.createInternalVariables();
-		newSurvey = publishedSurvey == null;
-		backupFileExtractor = new BackupFileExtractor(file);
-		oldBackupFormat = backupFileExtractor.isOldFormat();
-		dataSummaryFile = extractDataSummaryFile();
-		surveyName = newSurvey ? extractSurveyName() : publishedSurvey.getName();
-	}
 
-	private File extractDataSummaryFile() throws IOException {
-		if (oldBackupFormat) {
-			return null;
-		} else {
-			SurveyBackupInfo info = backupFileExtractor.extractInfo();
-			if (info.getCollectVersion().compareTo(DATA_SUMMARY_FILE_COLLECT_VERSION) >= 0) {
-				return backupFileExtractor.extractDataSummaryFile();
-			} else {
-				return null;
-			}
-		}
-	}
-	
 	@Override
 	protected void validateInput() throws Throwable {
 		super.validateInput();
+		if (file == null) {
+			throw new IllegalArgumentException("Input file not specified");
+		}
 		BackupFileExtractor backupFileExtractor = null;
 		try {
 			backupFileExtractor = new BackupFileExtractor(file);
@@ -118,6 +99,29 @@ public abstract class DataRestoreBaseJob extends Job {
 		}
 	}
 
+	@Override
+	public void createInternalVariables() throws Throwable {
+		super.createInternalVariables();
+		newSurvey = publishedSurvey == null;
+		backupFileExtractor = new BackupFileExtractor(file);
+		oldBackupFormat = backupFileExtractor.isOldFormat();
+		dataSummaryFile = extractDataSummaryFile();
+		surveyName = newSurvey ? extractSurveyName() : publishedSurvey.getName();
+	}
+
+	private File extractDataSummaryFile() throws IOException {
+		if (oldBackupFormat) {
+			return null;
+		} else {
+			SurveyBackupInfo info = backupFileExtractor.extractInfo();
+			if (info.getCollectVersion().compareTo(DATA_SUMMARY_FILE_COLLECT_VERSION) >= 0) {
+				return backupFileExtractor.extractDataSummaryFile();
+			} else {
+				return null;
+			}
+		}
+	}
+	
 	@Override
 	protected void buildTasks() throws Throwable {
 		if (newSurvey) {

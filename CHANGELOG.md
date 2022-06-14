@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.58] - 2022-06-13
+### Fixed
+- Error importing species list;
+- Error starting Collect Earth;
+
+## [4.0.57] - 2022-06-12
+### Fixed
+- Layout adjustments (enumerated entities);
+
+## [4.0.56] - 2022-06-09
+### Fixed
+- Fixed errors in survey designer (editing sampling unit);
+
 ## [4.0.55] - 2022-06-03
 ### Fixed
 - Fixed error importing survey file;

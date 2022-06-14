@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>4.0.56-SNAPSHOT</version>
+		<version>4.0.59-SNAPSHOT</version>
 	</parent>
 	<name>Open Foris Collect Server module</name>
 	<artifactId>collect-server</artifactId>
@@ -16,7 +16,7 @@
 		<geotools.version>26.3</geotools.version>
 		<aspectj.version>1.9.9.1</aspectj.version>
 		<jackson.version>2.13.2</jackson.version>
-		<zk.version>9.6.0.1</zk.version>
+		<zk.version>9.6.0.2</zk.version>
 		<zk.spring.version>4.0.1</zk.spring.version>
 	</properties>
 

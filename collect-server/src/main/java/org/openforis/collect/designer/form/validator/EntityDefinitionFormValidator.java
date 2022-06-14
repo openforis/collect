@@ -47,7 +47,7 @@ public class EntityDefinitionFormValidator extends NodeDefinitionFormValidator {
 			return;
 		}
 		String field = LAYOUT_FIELD;
-		String layoutValue = getValue(ctx, field);
+		String layoutValue = getValueWithDefault(ctx, field, Layout.FORM.name());
 		Layout layout = Layout.valueOf(layoutValue);
 		EntityDefinition parentEntity = getParentEntity(ctx);
 		CollectSurvey survey = (CollectSurvey) editedNode.getSurvey();
