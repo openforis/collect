@@ -39,7 +39,7 @@ const CodeFieldAutocomplete = (props) => {
     ({ surveyId, codeListId, versionId, language, ancestorCodes }) =>
       ({ searchString, onComplete }) => {
         const delay = Strings.isBlank(searchString) ? 0 : 1000
-        debounce(delay, async () => {
+        return debounce(delay, async () => {
           const availableItems = await ServiceFactory.codeListService.findAvailableItems({
             surveyId,
             codeListId,
