@@ -6,7 +6,6 @@
 		position="center" 
 		closable="true"
 		apply="org.zkoss.bind.BindComposer"
-		form="@id('fx') @load(vm.form) @save(vm.form, before='convert')" 
 		validationMessages="@id('vmsgs')"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.AttributeConversionVM')">
 
@@ -27,7 +26,7 @@
 				<row>
 					<label value="${labels.survey.schema.attribute.conversion.to_type}:" />
 					<combobox model="@load(vm.attributeTypes)"
-						selectedItem="@bind(fx.type)">
+						selectedItem="@bind(vm.attributeType)">
    						<template name="model">
    							<comboitem label="${each}" />
    						</template>

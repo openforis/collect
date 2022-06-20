@@ -31,13 +31,9 @@ import org.zkoss.zul.Window;
  */
 public class AttributeConversionVM extends SurveyBaseVM {
 
-	private Map<String,String> form;
 	private AttributeDefinition attributeDefinition;
 	private AttributeType originalAttributeType;
-	
-	public AttributeConversionVM() {
-		form = new HashMap<String, String>();
-	}
+	private String attributeType;
 	
 	public static Window openPopup(final AttributeDefinition attrDefn) {
 		@SuppressWarnings("serial")
@@ -59,8 +55,7 @@ public class AttributeConversionVM extends SurveyBaseVM {
 	@Command
 	public void convert(@ContextParam(ContextType.BIND_CONTEXT) BindContext ctx) {
 		if ( validateForm(ctx) ) {
-			String typeLabel = form.get("type");
-			AttributeType type = AttributeTypeUtils.fromLabel(typeLabel);
+			AttributeType type = AttributeTypeUtils.fromLabel(attributeType);
 			AttributeDefinition convertedAttribute = new AttributeConverter().convert(attributeDefinition, type);
 			dispatchNodeConvertedCommand(convertedAttribute);
 			Window popUp = ComponentUtil.getClosest(ctx.getComponent(), Window.class);
@@ -70,8 +65,7 @@ public class AttributeConversionVM extends SurveyBaseVM {
 	
 	protected boolean validateForm(BindContext ctx) {
 		String messageKey = null;
-		String typeLabel = form.get("type");
-		if (typeLabel == null) {
+		if (attributeType == null) {
 			messageKey = "survey.schema.node.conversion.select_type";
 		}
 		if ( messageKey == null ) {
@@ -94,20 +88,20 @@ public class AttributeConversionVM extends SurveyBaseVM {
 		return typeLabels;
 	}
 	
-	public Map<String, String> getForm() {
-		return form;
-	}
-	
-	public void setForm(Map<String, String> form) {
-		this.form = form;
-	}
-	
 	public String getOriginalAttributeTypeLabel() {
 		return AttributeTypeUtils.getLabel(originalAttributeType);
 	}
 	
 	public AttributeDefinition getAttributeDefinition() {
 		return attributeDefinition;
+	}
+	
+	public String getAttributeType() {
+		return attributeType;
+	}
+	
+	public void setAttributeType(String attributeType) {
+		this.attributeType = attributeType;
 	}
 
 	private static class AttributeConverter {
