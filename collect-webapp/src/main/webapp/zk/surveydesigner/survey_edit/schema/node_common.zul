@@ -558,6 +558,14 @@
 		  						onChange="@command('applyChanges')" />
 		  				</fieldErrorHandler>
 		  			</row>
+		  		</rows>
+		  	</grid>
+		  	<grid class="inner" visible="@load(not vm.insideTableEntity)">
+    			<columns>
+    				<column width="150px" />
+    				<column />
+    			</columns>
+    			<rows>
 			  		<row visible="@load(not vm.collectEarthSurvey)">
 		  				<fieldErrorHandler message="@load(vmsgs['labelOrientation'])">
 		  					<label value="${labels.survey.schema.node.layout.label_orientation.$}:" />
