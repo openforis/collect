@@ -2,7 +2,7 @@
 <zk>
   <window id="samplingPointDataImportPopUp"
     title="${labels.survey.sampling_point_data.import_data.title}"
-    width="600px" border="normal" position="center"
+    width="800px" border="normal" position="center"
     apply="org.zkoss.bind.BindComposer"
     viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SamplingPointDataImportPopUpVM')"
     validationMessages="@id('vmsgs')"
