@@ -24,6 +24,7 @@ import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLevel;
 import org.openforis.idm.metamodel.ExternalCodeListItem;
 import org.openforis.idm.metamodel.ExternalCodeListProvider;
+import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
@@ -43,6 +44,7 @@ public class DatabaseExternalCodeListProvider implements
 	private static final String ID_COLUMN_NAME = "id";
 	private static final String DEFAULT_CODE_COLUMN_NAME = "code";
 	private static final String LABEL_COLUMN_PREFIX = "label";
+	private static final String SAMPLING_POINT_INFO_LABEL_PREFIX = "label_";
 	
 	private static final String SURVEY_ID_FIELD = "survey_id";
 
@@ -172,6 +174,18 @@ public class DatabaseExternalCodeListProvider implements
 		int id = Long.valueOf(samplingDesignItem.getId()).intValue();
 		ExternalCodeListItem item = new ExternalCodeListItem(list, id, parentKeyByLevel, level);
 		item.setCode(samplingDesignItem.getLevelCode(level));
+		
+		// set labels
+		Survey survey = list.getSurvey();
+		SamplingPointDefinition samplingPointDefinition = survey.getReferenceDataSchema().getSamplingPointDefinition();
+		List<String> infoAttributeNames = samplingPointDefinition.getAttributeNames();
+		for (String languageCode : survey.getLanguages()) {
+			int infoAttributeIndex = infoAttributeNames.indexOf(SAMPLING_POINT_INFO_LABEL_PREFIX + languageCode);
+			if (infoAttributeIndex >= 0) {
+				String label = samplingDesignItem.getInfoAttribute(infoAttributeIndex);
+				item.setLabel(languageCode, label);
+			}
+		}
 		return item;
 	}
 	
