@@ -167,6 +167,7 @@ public abstract class NodeDefinitionBuilder {
 	
 	public static class AttributeDefinitionBuilder extends NodeDefinitionBuilder {
 
+		private AttributeType type = AttributeType.TEXT;
 		private boolean key;
 		private boolean calculated;
 		private List<AttributeDefault> defaultValues;
@@ -175,6 +176,11 @@ public abstract class NodeDefinitionBuilder {
 		AttributeDefinitionBuilder(String name) {
 			super(name);
 			defaultValues = new ArrayList<AttributeDefault>();
+		}
+		
+		public AttributeDefinitionBuilder type(AttributeType type) {
+			this.type = type;
+			return this;
 		}
 		
 		@Override
@@ -232,7 +238,7 @@ public abstract class NodeDefinitionBuilder {
 		
 		@Override
 		protected NodeDefinition buildInternal(Survey survey) {
-			AttributeDefinition def = survey.getSchema().createTextAttributeDefinition();
+			AttributeDefinition def = createAttributeDefinition(survey);
 			initNodeDefinition(def);
 			if ( def instanceof KeyAttributeDefinition) {
 				((KeyAttributeDefinition) def).setKey(key);
@@ -245,6 +251,34 @@ public abstract class NodeDefinitionBuilder {
 				def.addCheck(new CustomCheck(validationExpression));
 			}
 			return def;
+		}
+
+		private AttributeDefinition createAttributeDefinition(Survey survey) {
+			Schema schema = survey.getSchema();
+			switch(type) {
+			case BOOLEAN:
+				return schema.createBooleanAttributeDefinition();
+			case CODE:
+				return schema.createCodeAttributeDefinition();
+			case COORDINATE:
+				return schema.createCoordinateAttributeDefinition();
+			case DATE:
+				return schema.createDateAttributeDefinition();
+			case FILE:
+				return schema.createFileAttributeDefinition();
+			case NUMBER:
+				return schema.createNumberAttributeDefinition();
+			case RANGE:
+				return schema.createRangeAttributeDefinition();
+			case TAXON:
+				return schema.createTaxonAttributeDefinition();
+			case TEXT:
+				return schema.createTextAttributeDefinition();
+			case TIME:
+				return schema.createTimeAttributeDefinition();
+			default:
+				throw new RuntimeException("Unsupported type: " + type);
+			}
 		}
 
 	}
