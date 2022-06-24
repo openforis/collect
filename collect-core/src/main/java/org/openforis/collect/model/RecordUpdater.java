@@ -425,7 +425,8 @@ public class RecordUpdater {
 	private Set<CodeAttribute> clearDependentCodeAttributes(NodePointer nodePointer) {
 		Record record = nodePointer.getRecord();
 		Set<CodeAttribute> attributes = new HashSet<CodeAttribute>(record.determineDependentCodeAttributes(nodePointer));
-		return clearUserSpecifiedAttributes(attributes);
+		clearUserSpecifiedAttributes(attributes);
+		return attributes;
 	}
 
 	private boolean clearNoMoreRelevantAttribute(Attribute<?, ?> attr) {
