@@ -16,6 +16,7 @@ class CEField extends CEComponent {
 	private boolean key;
 	private boolean readOnly = false;
 	private boolean extra = false;
+	private boolean calculated = false;
 	
 	public CEField(String htmlParameterName, String name, String label, String tooltip, boolean multiple, CEField.CEFieldType type, boolean key) {
 		super(htmlParameterName, name, label, tooltip, multiple);
@@ -45,6 +46,14 @@ class CEField extends CEComponent {
 
 	public void setExtra(boolean extra) {
 		this.extra = extra;
+	}
+	
+	public boolean isCalculated() {
+		return calculated;
+	}
+
+	public void setCalculated(boolean calculated) {
+		this.calculated = calculated;
 	}
 
 }
