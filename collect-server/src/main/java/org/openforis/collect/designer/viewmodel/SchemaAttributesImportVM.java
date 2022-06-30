@@ -10,9 +10,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Predicate;
@@ -302,7 +302,7 @@ public class SchemaAttributesImportVM extends BaseSurveyFileImportVM {
 								AttributeType attributeType;
 								if (isDate(reader, val)) {
 									attributeType = AttributeType.DATE;
-								} else if (NumberUtils.isNumber(val)) {
+								} else if (NumberUtils.isCreatable(val)) {
 									attributeType = AttributeType.NUMBER;
 								} else if (isBoolean(reader, val)) {
 									attributeType = AttributeType.BOOLEAN;

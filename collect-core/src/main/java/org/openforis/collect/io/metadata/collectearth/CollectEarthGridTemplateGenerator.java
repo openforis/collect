@@ -182,7 +182,7 @@ public class CollectEarthGridTemplateGenerator  {
 		int headingColumns = keyAttributeDefinitions.size();
 		
 		// The line contains headers if the second or third columns are NOT number ( the CSV columns should always contain a latitude and a longitude value at those positions)
-		return !( NumberUtils.isNumber( firstLineValues.get( headingColumns ) ) && NumberUtils.isNumber( firstLineValues.get(headingColumns + 1 ) ) );
+		return !( NumberUtils.isCreatable( firstLineValues.get( headingColumns ) ) && NumberUtils.isCreatable( firstLineValues.get(headingColumns + 1 ) ) );
 	}
 
 	

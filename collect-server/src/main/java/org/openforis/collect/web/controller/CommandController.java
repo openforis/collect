@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openforis.collect.command.AddAttributeCommand;
 import org.openforis.collect.command.AddEntityCommand;
 import org.openforis.collect.command.CommandDispatcher;
