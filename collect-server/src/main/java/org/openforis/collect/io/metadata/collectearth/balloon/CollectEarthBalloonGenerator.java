@@ -372,10 +372,14 @@ public class CollectEarthBalloonGenerator {
 				comp = new CEField(htmlParameterName, def.getName(), label, tooltip,  multiple, type, key);
 			}
 			CollectAnnotations annotations = survey.getAnnotations();
-			if (attrDef.isCalculated() || 
-					(annotations.isFromCollectEarthCSV(attrDef) && annotations.isShowReadOnlyFieldInCollectEarth(attrDef))) {
+			if ( annotations.isFromCollectEarthCSV(attrDef) && annotations.isShowReadOnlyFieldInCollectEarth(attrDef) ) {
 				((CEField) comp).setReadOnly(true);
 				((CEField) comp).setExtra(true);
+			}
+			
+			if( attrDef.isCalculated() ){
+				((CEField) comp).setReadOnly(true);
+				((CEField) comp).setCalculated(true);
 			}
 		}
 		comp.hideWhenNotRelevant = hideWhenNotRelevant;

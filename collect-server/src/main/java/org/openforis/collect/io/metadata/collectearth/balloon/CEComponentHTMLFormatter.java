@@ -159,7 +159,7 @@ public class CEComponentHTMLFormatter {
 		XMLBuilder formControlContainer = formGroupBuilder.e("div") //$NON-NLS-1$
 				.a("class", "col-sm-8"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		String componentAdditionalClass =  comp.isExtra() ? " " + CollectEarthBalloonGenerator.EXTRA_HIDDEN_FIELD_CLASS : "";
+		String componentAdditionalClass =  comp.isExtra() || comp.isCalculated() ? " " + CollectEarthBalloonGenerator.EXTRA_HIDDEN_FIELD_CLASS : "";
 
 		if (comp instanceof CECodeField) {
 			if (comp.isReadOnly()) {
