@@ -44,7 +44,6 @@ public class DatabaseExternalCodeListProvider implements
 	private static final String ID_COLUMN_NAME = "id";
 	private static final String DEFAULT_CODE_COLUMN_NAME = "code";
 	private static final String LABEL_COLUMN_PREFIX = "label";
-	private static final String SAMPLING_POINT_INFO_LABEL_PREFIX = "label_";
 	
 	private static final String SURVEY_ID_FIELD = "survey_id";
 
@@ -180,7 +179,7 @@ public class DatabaseExternalCodeListProvider implements
 		SamplingPointDefinition samplingPointDefinition = survey.getReferenceDataSchema().getSamplingPointDefinition();
 		List<String> infoAttributeNames = samplingPointDefinition.getAttributeNames();
 		for (String languageCode : survey.getLanguages()) {
-			int infoAttributeIndex = infoAttributeNames.indexOf(SAMPLING_POINT_INFO_LABEL_PREFIX + languageCode);
+			int infoAttributeIndex = infoAttributeNames.indexOf(SamplingPointDefinition.INFO_LABEL_PREFIX + languageCode);
 			if (infoAttributeIndex >= 0) {
 				String label = samplingDesignItem.getInfoAttribute(infoAttributeIndex);
 				item.setLabel(languageCode, label);

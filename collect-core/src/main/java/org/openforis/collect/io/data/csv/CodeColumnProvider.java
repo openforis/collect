@@ -77,8 +77,13 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 				result.add(ITEM_POSITION_FIELD_NAME);
 			}
 			//label field
-			if ( getConfig().isIncludeCodeItemLabelColumn() && ! list.isExternal() ) {
-				result.add(ITEM_LABEL_FIELD_NAME);
+			if ( getConfig().isIncludeCodeItemLabelColumn() ) {
+				CollectSurvey survey = (CollectSurvey) list.getSurvey();
+				if (!list.isExternal() || survey.isSamplingDesignCodeList(list)
+						&& survey.getReferenceDataSchema().getSamplingPointDefinition()
+								.hasLabelAttributes()) {
+					result.add(ITEM_LABEL_FIELD_NAME);
+				}
 			}
 		}
 		return result.toArray(new String[result.size()]);

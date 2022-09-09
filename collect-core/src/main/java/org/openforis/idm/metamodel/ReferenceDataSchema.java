@@ -217,7 +217,18 @@ public class ReferenceDataSchema {
 	}
 
 	public static class SamplingPointDefinition extends ReferenceDataDefinition {
+		
+		public static final String INFO_LABEL_PREFIX = "label_";
 
+		public boolean hasLabelAttributes() {
+			List<String> attributeNames = getAttributeNames();
+			for (String attributeName : attributeNames) {
+				if (attributeName.matches(INFO_LABEL_PREFIX + "[a-z]{2}")) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 
 	public static class TaxonomyDefinition extends ReferenceDataDefinition {
