@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.viewmodel.SurveyFileVM;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
@@ -89,6 +90,9 @@ public class SurveyFileFormValidator extends FormValidator {
 	
 	private String[] getFilenames(ValidationContext ctx) {
 		String filenamesStr = getValue(ctx, FILENAMES_FIELD_NAME);
+		if (StringUtils.isBlank(filenamesStr)) {
+			return new String[0];
+		}
 		return filenamesStr.split("\n");
 	}
 
