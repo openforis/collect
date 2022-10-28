@@ -1,9 +1,11 @@
-package org.openforis.collect.io.data.csv;
+package org.openforis.collect.io.data.csv.columnProviders;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.openforis.collect.io.data.csv.CSVDataExportParameters;
+import org.openforis.collect.io.data.csv.Column;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;

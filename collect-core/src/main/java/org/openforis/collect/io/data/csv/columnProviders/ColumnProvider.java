@@ -1,7 +1,8 @@
-package org.openforis.collect.io.data.csv;
+package org.openforis.collect.io.data.csv.columnProviders;
 
 import java.util.List;
 
+import org.openforis.collect.io.data.csv.Column;
 import org.openforis.idm.model.Node;
 
 /**

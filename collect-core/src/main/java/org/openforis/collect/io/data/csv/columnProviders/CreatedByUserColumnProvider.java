@@ -1,9 +1,10 @@
-package org.openforis.collect.io.data.csv;
+package org.openforis.collect.io.data.csv.columnProviders;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.openforis.collect.io.data.csv.Column;
 import org.openforis.collect.io.data.csv.Column.DataType;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.User;

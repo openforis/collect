@@ -3,7 +3,7 @@ package org.openforis.collect.io.data.csv;
 public class Column {
 
 	public enum DataType {
-		STRING, INTEGER, DECIMAL, DATE, TIME
+		STRING, INTEGER, DECIMAL, DATE, TIME, IMAGE
 	}
 	
 	String header;

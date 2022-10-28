@@ -1,5 +1,6 @@
-package org.openforis.collect.io.data.csv;
+package org.openforis.collect.io.data.csv.columnProviders;
 
+import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;

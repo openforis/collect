@@ -1,9 +1,10 @@
-package org.openforis.collect.io.data.csv;
+package org.openforis.collect.io.data.csv.columnProviders;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.InvalidExpressionException;

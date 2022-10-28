@@ -10,6 +10,7 @@ import org.openforis.collect.model.validation.CollectValidator;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.ExternalCodeListProvider;
+import org.openforis.idm.metamodel.RecordFileService;
 import org.openforis.idm.metamodel.SpeciesListService;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.validation.Validator;
@@ -30,6 +31,7 @@ public class CollectSurveyContext implements SurveyContext<CollectSurvey>, Seria
 	private transient Validator validator;
 	private transient ExternalCodeListProvider externalCodeListProvider;
 	private transient CodeListService codeListService;
+	private transient RecordFileService recordFileService;
 	private transient SpeciesListService speciesListService;
 	private transient CoordinateOperations coordinateOperations;
 
@@ -38,18 +40,20 @@ public class CollectSurveyContext implements SurveyContext<CollectSurvey>, Seria
 	}
 
 	public CollectSurveyContext(ExpressionFactory expressionFactory, Validator validator) {
-		this(expressionFactory, validator, (CodeListService) null, (SpeciesListService) null);
+		this(expressionFactory, validator, (CodeListService) null, (SpeciesListService) null, (RecordFileService) null);
 	}
 	
 	public CollectSurveyContext(ExpressionFactory expressionFactory, Validator validator, CodeListService codeListService) {
-		this(expressionFactory, validator, codeListService, (SpeciesListService) null);
+		this(expressionFactory, validator, codeListService, (SpeciesListService) null, (RecordFileService) null);
 	}
 	
 	public CollectSurveyContext(ExpressionFactory expressionFactory, Validator validator, 
-			CodeListService codeListService, SpeciesListService speciesListService) {
+			CodeListService codeListService, SpeciesListService speciesListService, RecordFileService recordFileService) {
 		this.expressionFactory = expressionFactory;
 		this.validator = validator;
 		this.codeListService = codeListService;
+		this.recordFileService = recordFileService;
+		this.speciesListService = speciesListService;
 		this.expressionEvaluator = new ExpressionEvaluator(expressionFactory);
 		this.coordinateOperations = new CoordinateOperations();
 		this.coordinateOperations.initialize();
@@ -99,6 +103,15 @@ public class CollectSurveyContext implements SurveyContext<CollectSurvey>, Seria
 	
 	public void setCodeListService(CodeListService codeListService) {
 		this.codeListService = codeListService;
+	}
+	
+	@Override
+	public RecordFileService getRecordFileService() {
+		return recordFileService;
+	}
+	
+	public void setRecordFileService(RecordFileService recordFileService) {
+		this.recordFileService = recordFileService;
 	}
 
 	@Override
