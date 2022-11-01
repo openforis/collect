@@ -3,9 +3,12 @@
  */
 package org.openforis.collect.io.data.csv.columnProviders;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.data.csv.Column;
 import org.openforis.collect.io.data.csv.Column.DataType;
@@ -44,7 +47,7 @@ public class FileColumnProvider extends CompositeAttributeColumnProvider<FileAtt
 		if (FileAttributeDefinition.FILE_SIZE_FIELD.equals(fieldName)) {
 			column.setDataType(DataType.INTEGER);
 		} else if (FILE_CONTENT_COLUMN.equals(fieldName)) {
-			column.setDataType(DataType.IMAGE);
+			column.setDataType(DataType.IMAGE_BYTE_ARRAY);
 		}
 		return column;
 	}
@@ -54,7 +57,15 @@ public class FileColumnProvider extends CompositeAttributeColumnProvider<FileAtt
 		if (FILE_CONTENT_COLUMN.equals(fieldName)) {
 			CollectSurveyContext ctx = attr.getSurveyContext();
 			RecordFileService recordFileService = ctx.getRecordFileService();
-			return recordFileService.getRepositoryFile((FileAttribute) attr);
+			File file = recordFileService.getRepositoryFile((FileAttribute) attr);
+			if (file == null || !file.canRead() || file.length() == 0) {
+				return null;
+			}
+			try {
+				return FileUtils.readFileToByteArray(file);
+			} catch (IOException e) {
+				return null;
+			}
 		} else {
 			return super.extractValue(attr, fieldName);
 		}

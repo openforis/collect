@@ -145,6 +145,7 @@
 
 	<!--  Services -->
 	<bean id="codeListService"	 		class="org.openforis.collect.service.CollectCodeListService" />
+	<bean id="recordFileService"	 	class="org.openforis.collect.service.CollectRecordFileService" />
 	<bean id="speciesListService"	 	class="org.openforis.collect.service.CollectSpeciesListService" />
 	
 	<!-- Expression Factory -->

@@ -204,7 +204,8 @@
         "includeCodeItemLabelColumn": "Include code item label column*",
         "includeCreatedByUserColumn": "Include 'created by user' column*",
         "includeEnumeratedEntities": "Include enumerated multiple entities as additional columns",
-        "includeGroupingLabels": "Prepend grouping (single entity) name to column name"
+        "includeGroupingLabels": "Prepend grouping (single entity) name to column name",
+        "includeImages": "Include images"
       },
       "exportDialog": {
         "title": "Exporting data",
@@ -225,7 +226,7 @@
         "csv": "CSV",
         "xlsx": "Excel (.xlsx)"
       },
-      "notCompatibleWithCSVDataImportNote": "Not compatible with CSV data import",
+      "notCompatibleWithCSVDataImportNote": "Not compatible with CSV/Excel data import",
       "selectEntities": "Select entities to export",
       "sourceForFileHeadings": {
         "label": "Source for headings",
