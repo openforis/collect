@@ -1,4 +1,4 @@
-package org.openforis.collect.io.data.csv;
+package org.openforis.collect.io.data.csv.columnProviders;
 
 import java.text.NumberFormat;
 import java.util.Locale;

@@ -1,8 +1,10 @@
-package org.openforis.collect.io.data.csv;
+package org.openforis.collect.io.data.csv.columnProviders;
 
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.io.data.csv.CSVDataExportParameters;
+import org.openforis.collect.io.data.csv.Column;
 
 /**
  * 

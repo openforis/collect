@@ -1,9 +1,11 @@
-package org.openforis.collect.io.data.csv;
+package org.openforis.collect.io.data.csv.columnProviders;
 
+import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
+import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
@@ -20,6 +22,8 @@ public class ColumnProviders {
 			return new CoordinateColumnProvider(config, (CoordinateAttributeDefinition) defn);
 		} else if(defn instanceof DateAttributeDefinition) {
 			return new DateColumnProvider(config, (DateAttributeDefinition) defn);
+		} else if (defn instanceof FileAttributeDefinition) {
+			return new FileColumnProvider(config, (FileAttributeDefinition) defn);
 		} else if(defn instanceof NumberAttributeDefinition){
 			return new NumberColumnProvider(config, (NumberAttributeDefinition) defn);
 		} else if(defn instanceof RangeAttributeDefinition){

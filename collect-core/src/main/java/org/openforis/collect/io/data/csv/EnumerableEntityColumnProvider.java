@@ -3,6 +3,10 @@ package org.openforis.collect.io.data.csv;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openforis.collect.io.data.csv.columnProviders.AutomaticColumnProvider;
+import org.openforis.collect.io.data.csv.columnProviders.ColumnProvider;
+import org.openforis.collect.io.data.csv.columnProviders.ColumnProviderChain;
+import org.openforis.collect.io.data.csv.columnProviders.ColumnProviders;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;

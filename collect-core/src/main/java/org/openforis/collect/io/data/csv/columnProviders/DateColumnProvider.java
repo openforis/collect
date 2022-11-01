@@ -1,8 +1,10 @@
 /**
  * 
  */
-package org.openforis.collect.io.data.csv;
+package org.openforis.collect.io.data.csv.columnProviders;
 
+import org.openforis.collect.io.data.csv.CSVDataExportParameters;
+import org.openforis.collect.io.data.csv.Column;
 import org.openforis.collect.io.data.csv.Column.DataType;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 

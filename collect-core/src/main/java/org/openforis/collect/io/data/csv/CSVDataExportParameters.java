@@ -28,4 +28,5 @@ public class CSVDataExportParameters extends CSVDataExportParametersBase {
 	public void setNodeFilter(NodeFilter nodeFilter) {
 		this.nodeFilter = nodeFilter;
 	}
+
 }

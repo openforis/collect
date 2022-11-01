@@ -1,4 +1,4 @@
-package org.openforis.collect.io.data.csv;
+package org.openforis.collect.io.data.csv.columnProviders;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,6 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.openforis.collect.io.data.csv.CSVDataExportParameters;
+import org.openforis.collect.io.data.csv.Column;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.model.Node;

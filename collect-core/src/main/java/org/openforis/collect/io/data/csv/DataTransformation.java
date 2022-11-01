@@ -1,5 +1,7 @@
 package org.openforis.collect.io.data.csv;
 
+import org.openforis.collect.io.data.csv.columnProviders.ColumnProvider;
+
 /**
  * @author G. Miceli
  */

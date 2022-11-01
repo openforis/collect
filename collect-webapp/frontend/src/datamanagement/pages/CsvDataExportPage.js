@@ -16,7 +16,12 @@ import Objects from 'utils/Objects'
 import Arrays from 'utils/Arrays'
 import L from 'utils/Labels'
 
-const csvExportAdditionalOptions = [
+const outputFormats = {
+  CSV: 'CSV',
+  XLSX: 'XLSX',
+}
+
+const additionalOptions = [
   'includeKMLColumnForCoordinates',
   'includeAllAncestorAttributes',
   'includeCompositeAttributeMergedColumn',
@@ -25,7 +30,10 @@ const csvExportAdditionalOptions = [
   'includeCodeItemLabelColumn',
   'includeCreatedByUserColumn',
   'includeGroupingLabels',
+  'includeImages',
 ]
+
+const onlyExcelAdditionalOptions = ['includeImages']
 
 const exportModes = {
   allEntities: 'ALL_ENTITIES',
@@ -51,6 +59,7 @@ const defaultState = {
   headingSource: headingSources.attributeName,
   languageCode: '',
   includeGroupingLabels: true,
+  includeImages: false,
 }
 
 class CsvDataExportPage extends Component {
@@ -62,6 +71,7 @@ class CsvDataExportPage extends Component {
     this.handleExportButtonClick = this.handleExportButtonClick.bind(this)
     this.handleCsvDataExportModalOkButtonClick = this.handleCsvDataExportModalOkButtonClick.bind(this)
     this.handleEntitySelect = this.handleEntitySelect.bind(this)
+    this.handleOutputFormatChange = this.handleOutputFormatChange.bind(this)
   }
 
   static getDerivedStateFromProps(prevProps, prevState) {
@@ -115,7 +125,7 @@ class CsvDataExportPage extends Component {
       summaryAttributeValues,
     }
 
-    csvExportAdditionalOptions.forEach((o) => {
+    additionalOptions.forEach((o) => {
       const val = this.state[o]
       parameters[o] = Objects.isNullOrUndefined(val) ? null : val
     })
@@ -160,6 +170,19 @@ class CsvDataExportPage extends Component {
     })
   }
 
+  handleOutputFormatChange(event) {
+    this.setState((statePrev) => {
+      const newOutputFormat = event.target.value
+      const newState = { ...statePrev, outputFormat: newOutputFormat }
+      if (newOutputFormat === outputFormats.CSV) {
+        Object.values(onlyExcelAdditionalOptions).forEach((onlyExcelOption) => {
+          newState[onlyExcelOption] = false
+        })
+      }
+      return newState
+    })
+  }
+
   render() {
     const { survey, keyAttributes, summaryAttributes, loggedUser, roleInSurvey } = this.props
 
@@ -177,22 +200,24 @@ class CsvDataExportPage extends Component {
       languageCode,
     } = this.state
 
-    const additionalOptionsFormGroups = csvExportAdditionalOptions.map((o) => (
-      <FormGroup check key={o}>
-        <Label check>
-          <Input
-            type="checkbox"
-            onChange={(event) => {
-              this.setState({
-                [o]: event.target.checked,
-              })
-            }}
-            checked={this.state[o]}
-          />{' '}
-          {L.l('dataManagement.export.additionalOptions.' + o)}
-        </Label>
-      </FormGroup>
-    ))
+    const additionalOptionsFormGroups = additionalOptions
+      .filter((option) => !onlyExcelAdditionalOptions.includes(option) || outputFormat === outputFormats.XLSX)
+      .map((option) => (
+        <FormGroup check key={option}>
+          <Label check>
+            <Input
+              type="checkbox"
+              onChange={(event) => {
+                this.setState({
+                  [option]: event.target.checked,
+                })
+              }}
+              checked={this.state[option]}
+            />{' '}
+            {L.l('dataManagement.export.additionalOptions.' + option)}
+          </Label>
+        </FormGroup>
+      ))
 
     const stepsOptions = Workflow.STEP_CODES.map((stepCode) => (
       <option key={stepCode} value={stepCode}>
@@ -211,9 +236,7 @@ class CsvDataExportPage extends Component {
               name={name}
               value={value}
               onChange={(e) => {
-                const newState = {}
-                newState[name] = e.target.value
-                context.setState(newState)
+                context.setState({ name: e.target.value })
               }}
             />
           </Col>
@@ -245,10 +268,10 @@ class CsvDataExportPage extends Component {
                   <Label check>
                     <Input
                       type="radio"
-                      value="CSV"
+                      value={outputFormats.CSV}
                       name="outputFormat"
-                      checked={outputFormat === 'CSV'}
-                      onChange={(event) => this.setState({ ...this.state, outputFormat: event.target.value })}
+                      checked={outputFormat === outputFormats.CSV}
+                      onChange={this.handleOutputFormatChange}
                     />
                     {L.l('dataManagement.export.outputFormat.csv')}
                   </Label>
@@ -256,10 +279,10 @@ class CsvDataExportPage extends Component {
                   <Label check>
                     <Input
                       type="radio"
-                      value="XLSX"
+                      value={outputFormats.XLSX}
                       name="outputFormat"
-                      checked={outputFormat === 'XLSX'}
-                      onChange={(event) => this.setState({ ...this.state, outputFormat: event.target.value })}
+                      checked={outputFormat === outputFormats.XLSX}
+                      onChange={this.handleOutputFormatChange}
                     />
                     {L.l('dataManagement.export.outputFormat.xlsx')}
                   </Label>
@@ -378,10 +401,10 @@ class CsvDataExportPage extends Component {
                 <AccordionDetails>
                   <div>
                     <FormGroup row>
-                      <Col md={6}>
+                      <Col md={2}>
                         <Label for="headingsSourceSelect">{L.l('dataManagement.export.sourceForFileHeadings')}:</Label>
                       </Col>
-                      <Col md={6}>
+                      <Col>
                         <Input
                           type="select"
                           name="headingsSource"

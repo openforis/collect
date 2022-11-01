@@ -23,6 +23,8 @@ public interface SurveyContext<S extends Survey> {
 	
 	CodeListService getCodeListService();
 	
+	RecordFileService getRecordFileService();
+
 	SpeciesListService getSpeciesListService();
 	
 	ExternalCodeListProvider getExternalCodeListProvider();
@@ -30,4 +32,5 @@ public interface SurveyContext<S extends Survey> {
 	CoordinateOperations getCoordinateOperations();
 	
 	S createSurvey();
+
 }

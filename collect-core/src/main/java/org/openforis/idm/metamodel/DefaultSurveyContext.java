@@ -55,6 +55,11 @@ public class DefaultSurveyContext implements SurveyContext<Survey> {
 	}
 	
 	@Override
+	public RecordFileService getRecordFileService() {
+		return null;
+	};
+	
+	@Override
 	public SpeciesListService getSpeciesListService() {
 		return null;
 	}
