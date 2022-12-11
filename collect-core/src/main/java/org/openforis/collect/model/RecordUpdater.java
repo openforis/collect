@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -23,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
@@ -326,10 +328,65 @@ public class RecordUpdater {
 		return afterAttributeInsertOrUpdate(changeMap, attribute);
 	}
 	
+	private boolean calculateRelevance(NodePointer nodePointer) {
+		NodeDefinition childDef = nodePointer.getChildDefinition();
+		String expr = childDef.getRelevantExpression();
+		if (StringUtils.isBlank(expr)) {
+			return true;
+		}
+		try {
+			Entity entity = nodePointer.getEntity();
+			Survey survey = entity.getSurvey();
+			ExpressionEvaluator expressionEvaluator = survey.getContext().getExpressionEvaluator();
+			return expressionEvaluator.evaluateBoolean(entity, null, expr);
+		} catch (InvalidExpressionException e) {
+			throw new IdmInterpretationError(childDef.getPath() + " - Unable to evaluate expression: " + expr, e);
+		}
+	}
+	
 	private NodeChangeSet afterAttributeInsertOrUpdate(NodeChangeMap changeMap, Attribute<?, ?> attribute) {
 		attribute.updateSummaryInfo();
-		
+
+		CollectRecord record = (CollectRecord) attribute.getRecord();
+
 		NodePointer selfPointer = new NodePointer(attribute);
+		
+		final Queue<NodePointer> queue = new LinkedList<NodePointer>();
+		queue.add(selfPointer);
+		
+		while (!queue.isEmpty()) {
+			NodePointer nodePointer = queue.peek();
+			
+			// update relevance
+			record.visitRelevanceDependencies(nodePointer, new Visitor<NodePointer>() {
+				public void visit(NodePointer nodePointerVisited) {
+					Entity entity = nodePointerVisited.getEntity();
+					NodeDefinition childDef = nodePointerVisited.getChildDefinition();
+					boolean oldRelevance = entity.isRelevant() && entity.isRelevant(childDef);
+					boolean relevance = entity.isRelevant() && calculateRelevance(nodePointerVisited);
+					if (oldRelevance != relevance) {
+						entity.setRelevant(childDef, relevance);
+						// updatedNodePointers.add(nodePointer);
+						queue.add(nodePointerVisited);
+					}
+				}
+			});
+			
+			record.visitDefaultValueDependencies(nodePointer, new Visitor<NodePointer>() {
+				@SuppressWarnings("unchecked")
+				public void visit(NodePointer nodePointerVisited) {
+					Entity entity = nodePointerVisited.getEntity();
+					AttributeDefinition childDef = (AttributeDefinition) nodePointerVisited.getChildDefinition();
+					if (childDef.isCalculated()) {
+						@SuppressWarnings("rawtypes")
+						Collection nodes = nodePointerVisited.getNodes();
+						List<Attribute<?, ?>> recalculatedAttributes = recalculateValues(nodes);
+					}
+				}
+				
+			});
+		}
+		
 		
 		List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?,?>>();
 		
@@ -507,6 +564,22 @@ public class RecordUpdater {
 			}
 		}
 		return updatedAttributes;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private Attribute<?, ?> recalculateValueIfNecessary(Attribute calcAttr) {
+		CollectSurvey survey = (CollectSurvey) calcAttr.getSurvey();
+		CollectAnnotations annotations = survey.getAnnotations();
+		Value previousValue = calcAttr.getValue();
+		Value newValue = !annotations.isCalculatedOnlyOneTime(calcAttr.getDefinition()) || calcAttr.isEmpty() 
+				? recalculateValue(calcAttr)
+				: previousValue;
+		if ( ! ( (previousValue == newValue) || (previousValue != null && previousValue.equals(newValue)) ) ) {
+			calcAttr.setValue(newValue);
+			calcAttr.updateSummaryInfo();
+			return calcAttr;
+		}
+		return null;
 	}
 
 	private Collection<NodePointer> updateMinCount(Collection<NodePointer> nodePointers) {

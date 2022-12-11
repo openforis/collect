@@ -13,15 +13,23 @@ import static org.openforis.idm.testfixture.NodeBuilder.entity;
 import static org.openforis.idm.testfixture.NodeDefinitionBuilder.attributeDef;
 import static org.openforis.idm.testfixture.NodeDefinitionBuilder.entityDef;
 
+import java.util.List;
+
 import org.junit.Test;
 import org.openforis.collect.utils.Dates;
+import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.AttributeType;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.IntegerAttribute;
+import org.openforis.idm.model.IntegerValue;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.TextAttribute;
 import org.openforis.idm.model.TextValue;
 import org.openforis.idm.testfixture.NodeBuilder;
@@ -863,6 +871,41 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		
 		// expected entity_2 max count = 2
 		assertEquals(Integer.valueOf(2), rootEntity.getMaxCount(entity2Def));
+	}
+
+	@Test
+	public void testDependentDefaultValueInNestedEntityUpdated() {
+		record(rootEntityDef(attributeDef("root_key").key(), entityDef("item",
+				attributeDef("item_key").type(AttributeType.NUMBER).numericType(Type.INTEGER)
+						.defaultValue("math:max(parent()/item/item_key) + 1").key(),
+				attributeDef("source").defaultValue("'2'"),
+				attributeDef("dependent").relevant("source = '2'").defaultValue("item_key + 1")).multiple()));
+
+		Entity rootEntity = record.getRootEntity();
+
+		// insert a new item
+		updater.addEntity(rootEntity, "item");
+		Entity itemEntity = record.getNodeByPath("/root/item[1]");
+		assertNotNull(itemEntity);
+		
+		// check key attribute value set
+		IntegerAttribute itemKeyAttribute = record.getNodeByPath("/root/item[1]/item_key");
+		assertNotNull(itemKeyAttribute);
+		assertEquals(new IntegerValue(1), itemKeyAttribute.getValue());
+
+		// check source attribute default value set
+		TextAttribute sourceAttribute = record.getNodeByPath("/root/item[1]/source");
+		assertNotNull(sourceAttribute);
+		assertEquals(new TextValue("2"), sourceAttribute.getValue());
+
+		// check dependent is relevant
+		AttributeDefinition dependentDefinition = (AttributeDefinition) survey.getSchema().getDefinitionByPath("/root/item/dependent");
+		assertTrue(itemEntity.isRelevant(dependentDefinition));
+		
+		// check dependent default value applied
+//		TextAttribute dependentAttribute = record.getNodeByPath("/root/item[1]/dependent");
+//		assertNotNull(dependentAttribute);
+//		assertEquals(new TextValue("2"), dependentAttribute.getValue());
 	}
 	
 }

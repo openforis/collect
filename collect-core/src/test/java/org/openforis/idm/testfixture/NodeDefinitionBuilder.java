@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.idm.metamodel.*;
+import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.validation.CustomCheck;
 
 /**
@@ -168,6 +169,7 @@ public abstract class NodeDefinitionBuilder {
 	public static class AttributeDefinitionBuilder extends NodeDefinitionBuilder {
 
 		private AttributeType type = AttributeType.TEXT;
+		private Type numericType = NumericAttributeDefinition.Type.REAL;
 		private boolean key;
 		private boolean calculated;
 		private List<AttributeDefault> defaultValues;
@@ -180,6 +182,11 @@ public abstract class NodeDefinitionBuilder {
 		
 		public AttributeDefinitionBuilder type(AttributeType type) {
 			this.type = type;
+			return this;
+		}
+		
+		public AttributeDefinitionBuilder numericType(NumericAttributeDefinition.Type type) {
+			this.numericType = type;
 			return this;
 		}
 		
@@ -242,6 +249,9 @@ public abstract class NodeDefinitionBuilder {
 			initNodeDefinition(def);
 			if ( def instanceof KeyAttributeDefinition) {
 				((KeyAttributeDefinition) def).setKey(key);
+			}
+			if (def instanceof NumberAttributeDefinition) {
+				((NumericAttributeDefinition) def).setType(numericType);
 			}
 			def.setCalculated(calculated);
 			for (AttributeDefault attributeDefault : defaultValues) {

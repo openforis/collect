@@ -47,7 +47,7 @@ class SurveyDependencies {
 
 	private Survey survey;
 
-	private StateDependencyMap calculatedValueDependencies;
+	private StateDependencyMap defaultValueDependencies;
 	private StateDependencyMap minCountDependencies;
 	private StateDependencyMap maxCountDependencies;
 	private StateDependencyMap relevanceDependencies;
@@ -59,7 +59,7 @@ class SurveyDependencies {
 		SurveyContext surveyContext = this.survey.getContext();
 		ExpressionEvaluator expressionEvaluator = surveyContext.getExpressionEvaluator();
 		
-		this.calculatedValueDependencies = new StateDependencyMap(expressionEvaluator);
+		this.defaultValueDependencies = new StateDependencyMap(expressionEvaluator);
 		this.minCountDependencies = new StateDependencyMap(expressionEvaluator);
 		this.maxCountDependencies = new StateDependencyMap(expressionEvaluator);
 		this.relevanceDependencies = new StateDependencyMap(expressionEvaluator);
@@ -127,13 +127,11 @@ class SurveyDependencies {
 				currentCodeDefn = currentCodeDefn.getParentCodeAttributeDefinition();
 			}
 		}
-		//calculated values
-		if ( defn.isCalculated() ) {
-			List<AttributeDefault> attributeDefaults = defn.getAttributeDefaults();
-			for (AttributeDefault attributeDefault : attributeDefaults) {
-				calculatedValueDependencies.registerDependencies(defn, attributeDefault.getCondition());
-				calculatedValueDependencies.registerDependencies(defn, attributeDefault.getExpression());
-			}
+		// default values
+		List<AttributeDefault> attributeDefaults = defn.getAttributeDefaults();
+		for (AttributeDefault attributeDefault : attributeDefaults) {
+			defaultValueDependencies.registerDependencies(defn, attributeDefault.getCondition());
+			defaultValueDependencies.registerDependencies(defn, attributeDefault.getExpression());
 		}
 	}
 
@@ -172,12 +170,12 @@ class SurveyDependencies {
 		}
 	}
 
-	Set<NodePathPointer> getCalculatedValueDependencies(NodeDefinition definition) {
-		return calculatedValueDependencies.getDependents(definition);
+	Set<NodePathPointer> getDefaultValueDependencies(NodeDefinition definition) {
+		return defaultValueDependencies.getDependents(definition);
 	}
 	
-	Set<NodePathPointer> getCalculatedValueSources(NodeDefinition definition) {
-		return calculatedValueDependencies.getSources(definition);
+	Set<NodePathPointer> getDefaultValueSources(NodeDefinition definition) {
+		return defaultValueDependencies.getSources(definition);
 	}
 	
 	Set<NodePathPointer> getMinCountDependencies(NodeDefinition definition) {

@@ -8,11 +8,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+import org.openforis.commons.collection.Visitor;
 import org.openforis.commons.lang.DeepComparable;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -411,6 +414,32 @@ public class Record implements DeepComparable {
 		@SuppressWarnings("unchecked")
 		List<NodePointer> result = relevanceDependencies.dependenciesFor((Collection<Node<?>>) nodes);
 		return result;
+	}
+	
+	private void visitDependencies(NodePointer nodePointer, Set<NodePathPointer> dependencies,
+			Visitor<NodePointer> visitor) {
+		Set<NodePathPointer> dependenciesInVersion = NodePathPointer.filterPointersByVersion(dependencies, nodePointer.getModelVersion());
+		for (NodePathPointer nodePathPointer : dependenciesInVersion) {
+			NodePointer nodePointerToVisit;
+			String entityPath = nodePathPointer.getEntityPath();
+			if ( StringUtils.isBlank(entityPath) ) {
+				nodePointerToVisit = new NodePointer(nodePointer.getEntity(), nodePathPointer.getReferencedNodeDefinition());
+			} else {
+				Entity entity = getNodeByPath(entityPath);
+				nodePointerToVisit = new NodePointer(entity, nodePathPointer.getReferencedNodeDefinition());
+			}
+			visitor.visit(nodePointerToVisit);
+		}
+	}
+	
+	public void visitDefaultValueDependencies(NodePointer nodePointer, Visitor<NodePointer> visitor) {
+		Set<NodePathPointer> dependencies = survey.getDefaultValueDependencies(nodePointer.getChildDefinition());
+		visitDependencies(nodePointer, dependencies, visitor);
+	}
+	
+	public void visitRelevanceDependencies(NodePointer nodePointer, Visitor<NodePointer> visitor) {
+		Set<NodePathPointer> relevanceDependencies = survey.getRelevanceDependencies(nodePointer.getChildDefinition());
+		visitDependencies(nodePointer, relevanceDependencies, visitor);
 	}
 	
 	public List<NodePointer> determineRelevanceDependentNodePointers(Collection<NodePointer> nodePointers) {

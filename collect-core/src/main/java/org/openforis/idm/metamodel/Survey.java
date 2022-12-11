@@ -679,12 +679,12 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 		return getSurveyDependencies().getMaxCountSources(definition);
 	}
 	
-	public Set<NodePathPointer> getCalculatedValueDependencies(NodeDefinition definition) {
-		return getSurveyDependencies().getCalculatedValueDependencies(definition);
+	public Set<NodePathPointer> getDefaultValueDependencies(NodeDefinition definition) {
+		return getSurveyDependencies().getDefaultValueDependencies(definition);
 	}
 	
-	public Set<NodePathPointer> getCalculatedValueSources(NodeDefinition definition) {
-		return getSurveyDependencies().getCalculatedValueSources(definition);
+	public Set<NodePathPointer> getDefaultdValueSources(NodeDefinition definition) {
+		return getSurveyDependencies().getDefaultValueSources(definition);
 	}
 	
 	public Set<NodePathPointer> getRelatedCodeDependencies(CodeAttributeDefinition definition) {
