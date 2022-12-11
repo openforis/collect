@@ -958,7 +958,8 @@ public class RecordUpdater {
 		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitionsInVersion(version);
 		for (NodeDefinition childDefn : childDefinitions) {
 			if(entity.getCount(childDefn) == 0) {
-				if (addEmptyMultipleEntitiesWhenAddingNewEntities || ! (childDefn instanceof EntityDefinition && childDefn.isMultiple())) {
+				boolean isMultipleEntity = childDefn instanceof EntityDefinition && childDefn.isMultiple();
+				if (addEmptyMultipleEntitiesWhenAddingNewEntities || !isMultipleEntity) {
 					int toBeInserted = entity.getMinCount(childDefn);
 					if ( toBeInserted <= 0 && childDefn instanceof AttributeDefinition || ! childDefn.isMultiple() ) {
 						//insert at least one node
