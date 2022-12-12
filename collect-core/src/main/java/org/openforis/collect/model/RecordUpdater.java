@@ -3,7 +3,6 @@ package org.openforis.collect.model;
 
 import static org.openforis.collect.model.CollectRecord.APPROVED_MISSING_POSITION;
 import static org.openforis.collect.model.CollectRecord.CONFIRMED_ERROR_POSITION;
-import static org.openforis.collect.model.CollectRecord.DEFAULT_APPLIED_POSITION;
 import static org.openforis.idm.model.NodePointers.nodesToPointers;
 import static org.openforis.idm.model.NodePointers.pointersToNodes;
 
@@ -12,22 +11,19 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.commons.collection.Visitor;
+import org.openforis.collect.model.recordUpdater.RecordDependentsUpdater;
+import org.openforis.collect.model.recordUpdater.RecordDependentsUpdater.RecordDependentsUpdateResult;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
@@ -65,8 +61,6 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
  *
  */
 public class RecordUpdater {
-	
-	protected static final int MAX_DEPENDENT_NODE_VISITING_COUNT = 2;
 	
 	private boolean validateAfterUpdate = true;
 	private boolean clearNotRelevantAttributes = false;
@@ -333,114 +327,24 @@ public class RecordUpdater {
 		return afterAttributeInsertOrUpdate(changeMap, attribute);
 	}
 	
-	private boolean calculateRelevance(NodePointer nodePointer) {
-		NodeDefinition childDef = nodePointer.getChildDefinition();
-		String expr = childDef.getRelevantExpression();
-		if (StringUtils.isBlank(expr)) {
-			return true;
-		}
-		try {
-			Entity entity = nodePointer.getEntity();
-			Survey survey = entity.getSurvey();
-			ExpressionEvaluator expressionEvaluator = survey.getContext().getExpressionEvaluator();
-			return expressionEvaluator.evaluateBoolean(entity, null, expr);
-		} catch (InvalidExpressionException e) {
-			throw new IdmInterpretationError(childDef.getPath() + " - Unable to evaluate expression: " + expr, e);
-		}
-	}
-	
 	private NodeChangeSet afterAttributeInsertOrUpdate(final NodeChangeMap changeMap, Attribute<?, ?> attribute) {
 		attribute.updateSummaryInfo();
-
-		final List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?,?>>();
 
 		CollectRecord record = (CollectRecord) attribute.getRecord();
 
 		NodePointer selfPointer = new NodePointer(attribute);
 		
-		final Queue<NodePointer> queue = new LinkedList<NodePointer>();
-		queue.add(selfPointer);
+		RecordDependentsUpdater recordDependentsUpdater = new RecordDependentsUpdater();
+		RecordDependentsUpdateResult recordDependentsUpdateResult = recordDependentsUpdater.updateDependentsAndSelf(record, selfPointer);
 		
-		final Set<NodePointer> totalUpdatedRelevancePointers = new LinkedHashSet<NodePointer>();
+		List<Attribute<?, ?>> updatedAttributes = recordDependentsUpdateResult.getUpdatedAttributes();
+		Set<NodePointer> updatedRelevancePointers = recordDependentsUpdateResult.getUpdatedRelevancePointers();
 		
-		final Map<NodePointer, Integer> visitingCountByNodePointer = new HashMap<NodePointer, Integer>();
-				
-		while (!queue.isEmpty()) {
-			NodePointer nodePointer = queue.remove();
-			Integer visitingCount = visitingCountByNodePointer.containsKey(nodePointer) ? visitingCountByNodePointer.get(nodePointer) : 0;
-			visitingCountByNodePointer.put(nodePointer, visitingCount + 1);
-			
-			final Set<NodePointer> updatedRelevancePointers = new LinkedHashSet<NodePointer>();
-
-			// update relevance
-			record.visitRelevanceDependencies(nodePointer, new Visitor<NodePointer>() {
-				public void visit(NodePointer nodePointerVisited) {
-					Entity entity = nodePointerVisited.getEntity();
-					NodeDefinition childDef = nodePointerVisited.getChildDefinition();
-					boolean oldRelevance = entity.isRelevant() && entity.isRelevant(childDef);
-					boolean relevance = entity.isRelevant() && calculateRelevance(nodePointerVisited);
-					if (oldRelevance != relevance) {
-						entity.setRelevant(childDef, relevance);
-						
-						Integer visitedCount = visitingCountByNodePointer.get(nodePointerVisited);
-						updatedRelevancePointers.add(nodePointerVisited);
-						if (visitedCount == null || visitedCount < MAX_DEPENDENT_NODE_VISITING_COUNT) {
-							queue.add(nodePointerVisited);
-						}
-						
-						if (childDef instanceof EntityDefinition) {
-							List<Node<?>> childNodes = nodePointerVisited.getNodes();
-							for (Node<?> childNode : childNodes) {
-								Entity childEntity = (Entity) childNode;
-								EntityDefinition childDefinition = childEntity.getDefinition();
-								List<NodeDefinition> nestedChildDefinitions = childDefinition.getChildDefinitions();
-								for (NodeDefinition nodestedChildDefinition : nestedChildDefinitions) {
-									updatedRelevancePointers.add(new NodePointer(childEntity, nodestedChildDefinition));
-								}
-								
-							}
-						}
-					}
-					totalUpdatedRelevancePointers.addAll(updatedRelevancePointers);
-				}
-			});
-			changeMap.addRelevanceChanges(updatedRelevancePointers);
-			
-			// update default values
-			Visitor<NodePointer> defaultValueApplyVisitor = new Visitor<NodePointer>() {
-				@SuppressWarnings("unchecked")
-				public void visit(NodePointer nodePointerVisited) {
-					@SuppressWarnings("rawtypes")
-					Collection nodes = nodePointerVisited.getNodes();
-					List<Attribute<?, ?>> recalculatedAttributes = recalculateValues(nodes);
-					updatedAttributes.addAll(recalculatedAttributes);
-					changeMap.addValueChanges(recalculatedAttributes);
-					
-					Integer visitedCount = visitingCountByNodePointer.get(nodePointerVisited);
-					if (visitedCount == null || visitedCount < MAX_DEPENDENT_NODE_VISITING_COUNT) {
-						queue.add(nodePointerVisited);
-					}
-				}
-				
-			};
-			
-			for (NodePointer relevanceUpdatedPointer : updatedRelevancePointers) {
-				NodeDefinition referencedNodeDef = relevanceUpdatedPointer.getChildDefinition();
-				if (referencedNodeDef instanceof AttributeDefinition && !((AttributeDefinition) referencedNodeDef).getAttributeDefaults().isEmpty()) {
-					defaultValueApplyVisitor.visit(relevanceUpdatedPointer);
-				}
-			}
-			
-			record.visitDefaultValueDependencies(nodePointer, defaultValueApplyVisitor);
-		}
+		changeMap.addRelevanceChanges(updatedRelevancePointers);
+		changeMap.addValueChanges(updatedAttributes);
 		
 		List<NodePointer> ancestorsAndSelfPointers = getAncestorsAndSelfPointers(selfPointer);
 
-		// calculated attributes
-//		List<Attribute<?, ?>> updatedCalculatedAttributes = recalculateDependentCalculatedAttributes(selfPointer);
-//		updatedAttributes.addAll(updatedCalculatedAttributes);
-//		changeMap.addValueChanges(updatedCalculatedAttributes);
-		
 		Collection<CodeAttribute> updatedCodeAttributes = filterCodeAttributes(updatedAttributes);
 		if (attribute instanceof CodeAttribute) {
 			updatedCodeAttributes.add((CodeAttribute) attribute);
@@ -458,7 +362,7 @@ public class RecordUpdater {
 			Set<Attribute<?, ?>> validationDependenciesToSelf = new HashSet<Attribute<?,?>>();
 			
 			performValidationAfterUpdate(selfPointer, ancestorsAndSelfPointers, updatedAttributes,
-					totalUpdatedRelevancePointers, minCountDependenciesToSelf, maxCountDependenciesToSelf,
+					updatedRelevancePointers, minCountDependenciesToSelf, maxCountDependenciesToSelf,
 					validationDependenciesToSelf, changeMap);
 		}
 		return changeMap;
@@ -584,12 +488,6 @@ public class RecordUpdater {
 		return recalculateValues(entity.getRecord().determineCalculatedAttributes(entity));
 	}
 	
-	private List<Attribute<?, ?>> recalculateDependentCalculatedAttributes(NodePointer nodePointer) {
-		Record record = nodePointer.getRecord();
-		List<Attribute<?, ?>> attributesToRecalculate = record.determineCalculatedAttributes(nodePointer);
-		return recalculateValues(attributesToRecalculate);
-	}
-
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private List<Attribute<?, ?>> recalculateValues(Collection<Attribute<?, ?>> attributesToRecalculate) {
 		List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?,?>>();
@@ -612,27 +510,6 @@ public class RecordUpdater {
 			}
 		}
 		return updatedAttributes;
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private Attribute<?, ?> recalculateValueIfNecessary(Attribute calcAttr) {
-		CollectSurvey survey = (CollectSurvey) calcAttr.getSurvey();
-		CollectAnnotations annotations = survey.getAnnotations();
-		Value previousValue = calcAttr.getValue();
-		Value newValue;
-		if (!calcAttr.isRelevant() && calcAttr.isDefaultValueApplied()) {
-			newValue = null;
-		} else if (!annotations.isCalculatedOnlyOneTime(calcAttr.getDefinition()) || calcAttr.isEmpty()) {
-			newValue = recalculateValue(calcAttr);
-		} else {
-			newValue = previousValue;
-		}
-		if ( ! ( (previousValue == newValue) || (previousValue != null && previousValue.equals(newValue)) ) ) {
-			calcAttr.setValue(newValue);
-			calcAttr.updateSummaryInfo();
-			return calcAttr;
-		}
-		return null;
 	}
 
 	private Collection<NodePointer> updateMinCount(Collection<NodePointer> nodePointers) {
@@ -727,6 +604,7 @@ public class RecordUpdater {
 		List<NodePointer> ancestorsAndSelfPointers = getAncestorsAndSelfPointers(nodePointer);
 
 		// calculated attributes
+		
 		List<Attribute<?, ?>> dependentCalculatedAttributes = record.determineCalculatedAttributes(nodesToBeDeleted);
 		dependentCalculatedAttributes.removeAll(nodesToBeDeleted);
 		
