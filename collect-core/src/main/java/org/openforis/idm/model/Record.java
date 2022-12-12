@@ -422,12 +422,15 @@ public class Record implements DeepComparable {
 		for (NodePathPointer nodePathPointer : dependenciesInVersion) {
 			NodePointer nodePointerToVisit;
 			String entityPath = nodePathPointer.getEntityPath();
-			if ( StringUtils.isBlank(entityPath) ) {
-				nodePointerToVisit = new NodePointer(nodePointer.getEntity(), nodePathPointer.getReferencedNodeDefinition());
+			Entity entity;
+			if ( StringUtils.isBlank(entityPath) || Path.THIS_ALIASES.contains(entityPath)) {
+				entity = nodePointer.getEntity();
+			} else if (Path.PARENT_ALIASES.contains(entityPath)) {
+				entity = nodePointer.getEntity().getParent();
 			} else {
-				Entity entity = getNodeByPath(entityPath);
-				nodePointerToVisit = new NodePointer(entity, nodePathPointer.getReferencedNodeDefinition());
+				entity = getNodeByPath(entityPath);
 			}
+			nodePointerToVisit = new NodePointer(entity, nodePathPointer.getReferencedNodeDefinition());
 			visitor.visit(nodePointerToVisit);
 		}
 	}

@@ -12,15 +12,18 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -62,6 +65,8 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
  *
  */
 public class RecordUpdater {
+	
+	protected static final int MAX_DEPENDENT_NODE_VISITING_COUNT = 2;
 	
 	private boolean validateAfterUpdate = true;
 	private boolean clearNotRelevantAttributes = false;
@@ -319,7 +324,7 @@ public class RecordUpdater {
 		Entity parentEntity = attribute.getParent();
 		setErrorConfirmed(attribute, false);
 		setMissingValueApproved(parentEntity, attribute.getName(), false);
-		setDefaultValueApplied(attribute, false);
+		attribute.setDefaultValueApplied(false);
 	}
 
 	private NodeChangeSet afterAttributeUpdate(Attribute<?, ?> attribute) {
@@ -344,8 +349,10 @@ public class RecordUpdater {
 		}
 	}
 	
-	private NodeChangeSet afterAttributeInsertOrUpdate(NodeChangeMap changeMap, Attribute<?, ?> attribute) {
+	private NodeChangeSet afterAttributeInsertOrUpdate(final NodeChangeMap changeMap, Attribute<?, ?> attribute) {
 		attribute.updateSummaryInfo();
+
+		final List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?,?>>();
 
 		CollectRecord record = (CollectRecord) attribute.getRecord();
 
@@ -354,9 +361,17 @@ public class RecordUpdater {
 		final Queue<NodePointer> queue = new LinkedList<NodePointer>();
 		queue.add(selfPointer);
 		
+		final Set<NodePointer> totalUpdatedRelevancePointers = new LinkedHashSet<NodePointer>();
+		
+		final Map<NodePointer, Integer> visitingCountByNodePointer = new HashMap<NodePointer, Integer>();
+				
 		while (!queue.isEmpty()) {
-			NodePointer nodePointer = queue.peek();
+			NodePointer nodePointer = queue.remove();
+			Integer visitingCount = visitingCountByNodePointer.containsKey(nodePointer) ? visitingCountByNodePointer.get(nodePointer) : 0;
+			visitingCountByNodePointer.put(nodePointer, visitingCount + 1);
 			
+			final Set<NodePointer> updatedRelevancePointers = new LinkedHashSet<NodePointer>();
+
 			// update relevance
 			record.visitRelevanceDependencies(nodePointer, new Visitor<NodePointer>() {
 				public void visit(NodePointer nodePointerVisited) {
@@ -366,36 +381,65 @@ public class RecordUpdater {
 					boolean relevance = entity.isRelevant() && calculateRelevance(nodePointerVisited);
 					if (oldRelevance != relevance) {
 						entity.setRelevant(childDef, relevance);
-						// updatedNodePointers.add(nodePointer);
+						
+						Integer visitedCount = visitingCountByNodePointer.get(nodePointerVisited);
+						updatedRelevancePointers.add(nodePointerVisited);
+						if (visitedCount == null || visitedCount < MAX_DEPENDENT_NODE_VISITING_COUNT) {
+							queue.add(nodePointerVisited);
+						}
+						
+						if (childDef instanceof EntityDefinition) {
+							List<Node<?>> childNodes = nodePointerVisited.getNodes();
+							for (Node<?> childNode : childNodes) {
+								Entity childEntity = (Entity) childNode;
+								EntityDefinition childDefinition = childEntity.getDefinition();
+								List<NodeDefinition> nestedChildDefinitions = childDefinition.getChildDefinitions();
+								for (NodeDefinition nodestedChildDefinition : nestedChildDefinitions) {
+									updatedRelevancePointers.add(new NodePointer(childEntity, nodestedChildDefinition));
+								}
+								
+							}
+						}
+					}
+					totalUpdatedRelevancePointers.addAll(updatedRelevancePointers);
+				}
+			});
+			changeMap.addRelevanceChanges(updatedRelevancePointers);
+			
+			// update default values
+			Visitor<NodePointer> defaultValueApplyVisitor = new Visitor<NodePointer>() {
+				@SuppressWarnings("unchecked")
+				public void visit(NodePointer nodePointerVisited) {
+					@SuppressWarnings("rawtypes")
+					Collection nodes = nodePointerVisited.getNodes();
+					List<Attribute<?, ?>> recalculatedAttributes = recalculateValues(nodes);
+					updatedAttributes.addAll(recalculatedAttributes);
+					changeMap.addValueChanges(recalculatedAttributes);
+					
+					Integer visitedCount = visitingCountByNodePointer.get(nodePointerVisited);
+					if (visitedCount == null || visitedCount < MAX_DEPENDENT_NODE_VISITING_COUNT) {
 						queue.add(nodePointerVisited);
 					}
 				}
-			});
-			
-			record.visitDefaultValueDependencies(nodePointer, new Visitor<NodePointer>() {
-				@SuppressWarnings("unchecked")
-				public void visit(NodePointer nodePointerVisited) {
-					Entity entity = nodePointerVisited.getEntity();
-					AttributeDefinition childDef = (AttributeDefinition) nodePointerVisited.getChildDefinition();
-					if (childDef.isCalculated()) {
-						@SuppressWarnings("rawtypes")
-						Collection nodes = nodePointerVisited.getNodes();
-						List<Attribute<?, ?>> recalculatedAttributes = recalculateValues(nodes);
-					}
-				}
 				
-			});
+			};
+			
+			for (NodePointer relevanceUpdatedPointer : updatedRelevancePointers) {
+				NodeDefinition referencedNodeDef = relevanceUpdatedPointer.getChildDefinition();
+				if (referencedNodeDef instanceof AttributeDefinition && !((AttributeDefinition) referencedNodeDef).getAttributeDefaults().isEmpty()) {
+					defaultValueApplyVisitor.visit(relevanceUpdatedPointer);
+				}
+			}
+			
+			record.visitDefaultValueDependencies(nodePointer, defaultValueApplyVisitor);
 		}
-		
-		
-		List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?,?>>();
 		
 		List<NodePointer> ancestorsAndSelfPointers = getAncestorsAndSelfPointers(selfPointer);
 
 		// calculated attributes
-		List<Attribute<?, ?>> updatedCalculatedAttributes = recalculateDependentCalculatedAttributes(selfPointer);
-		updatedAttributes.addAll(updatedCalculatedAttributes);
-		changeMap.addValueChanges(updatedCalculatedAttributes);
+//		List<Attribute<?, ?>> updatedCalculatedAttributes = recalculateDependentCalculatedAttributes(selfPointer);
+//		updatedAttributes.addAll(updatedCalculatedAttributes);
+//		changeMap.addValueChanges(updatedCalculatedAttributes);
 		
 		Collection<CodeAttribute> updatedCodeAttributes = filterCodeAttributes(updatedAttributes);
 		if (attribute instanceof CodeAttribute) {
@@ -412,10 +456,9 @@ public class RecordUpdater {
 			Set<NodePointer> minCountDependenciesToSelf = new HashSet<NodePointer>();
 			Set<NodePointer> maxCountDependenciesToSelf = new HashSet<NodePointer>();
 			Set<Attribute<?, ?>> validationDependenciesToSelf = new HashSet<Attribute<?,?>>();
-			Set<NodePointer> relevanceDependenciesToSelf = new HashSet<NodePointer>();
 			
 			performValidationAfterUpdate(selfPointer, ancestorsAndSelfPointers, updatedAttributes,
-					relevanceDependenciesToSelf, minCountDependenciesToSelf, maxCountDependenciesToSelf,
+					totalUpdatedRelevancePointers, minCountDependenciesToSelf, maxCountDependenciesToSelf,
 					validationDependenciesToSelf, changeMap);
 		}
 		return changeMap;
@@ -503,7 +546,7 @@ public class RecordUpdater {
 
 	private boolean clearNoMoreRelevantAttribute(Attribute<?, ?> attr) {
 		if (!attr.isRelevant() && !attr.isEmpty() && 
-				((clearNotRelevantAttributes && attr.isUserSpecified()) || isDefaultValueApplied(attr))) {
+				((clearNotRelevantAttributes && attr.isUserSpecified()) || attr.isDefaultValueApplied())) {
 			attr.clearValue();
 			attr.updateSummaryInfo();
 			return true;
@@ -554,9 +597,14 @@ public class RecordUpdater {
 			CollectSurvey survey = (CollectSurvey) calcAttr.getSurvey();
 			CollectAnnotations annotations = survey.getAnnotations();
 			Value previousValue = calcAttr.getValue();
-			Value newValue = !annotations.isCalculatedOnlyOneTime(calcAttr.getDefinition()) || calcAttr.isEmpty() 
-					? recalculateValue(calcAttr)
-					: previousValue;
+			Value newValue;
+			if (!calcAttr.isRelevant() && calcAttr.isDefaultValueApplied()) {
+				newValue = null;
+			} else if (!annotations.isCalculatedOnlyOneTime(calcAttr.getDefinition()) || calcAttr.isEmpty()) {
+				newValue = recalculateValue(calcAttr);
+			} else {
+				newValue = previousValue;
+			}
 			if ( ! ( (previousValue == newValue) || (previousValue != null && previousValue.equals(newValue)) ) ) {
 				calcAttr.setValue(newValue);
 				calcAttr.updateSummaryInfo();
@@ -571,9 +619,14 @@ public class RecordUpdater {
 		CollectSurvey survey = (CollectSurvey) calcAttr.getSurvey();
 		CollectAnnotations annotations = survey.getAnnotations();
 		Value previousValue = calcAttr.getValue();
-		Value newValue = !annotations.isCalculatedOnlyOneTime(calcAttr.getDefinition()) || calcAttr.isEmpty() 
-				? recalculateValue(calcAttr)
-				: previousValue;
+		Value newValue;
+		if (!calcAttr.isRelevant() && calcAttr.isDefaultValueApplied()) {
+			newValue = null;
+		} else if (!annotations.isCalculatedOnlyOneTime(calcAttr.getDefinition()) || calcAttr.isEmpty()) {
+			newValue = recalculateValue(calcAttr);
+		} else {
+			newValue = previousValue;
+		}
 		if ( ! ( (previousValue == newValue) || (previousValue != null && previousValue.equals(newValue)) ) ) {
 			calcAttr.setValue(newValue);
 			calcAttr.updateSummaryInfo();
@@ -718,28 +771,28 @@ public class RecordUpdater {
 	}
 
 	private void performValidationAfterUpdate(NodePointer nodePointer, List<NodePointer> ancestorsAndSelfPointers,
-			List<Attribute<?, ?>> updatedAttributes, Set<NodePointer> relevanceDependenciesToSelf,
+			List<Attribute<?, ?>> updatedAttributes, Set<NodePointer> updatedRelevancePointers,
 			Set<NodePointer> minCountDependenciesToSelf, Set<NodePointer> maxCountDependenciesToSelf,
 			Set<Attribute<?, ?>> validationDependenciesToSelf, NodeChangeMap changeMap) {
 		Record record = nodePointer.getRecord();
 		
-		// relevance
-		Set<NodePointer> pointersToRecalculateRelevanceFor = new HashSet<NodePointer>();
-		pointersToRecalculateRelevanceFor.addAll(ancestorsAndSelfPointers);
-		pointersToRecalculateRelevanceFor.addAll(record.determineRelevanceDependentNodes(updatedAttributes));
-		pointersToRecalculateRelevanceFor.addAll(relevanceDependenciesToSelf);
-		
-		List<Attribute<?,?>> updatedNoMoreRelevantAttributes = new ArrayList<Attribute<?,?>>();
-		Set<NodePointer> updatedRelevancePointers = updateRelevance(record, pointersToRecalculateRelevanceFor, updatedNoMoreRelevantAttributes, changeMap);
-		changeMap.addValueChanges(updatedNoMoreRelevantAttributes);
-		
-		updatedAttributes.addAll(updatedNoMoreRelevantAttributes);
+//		// relevance
+//		Set<NodePointer> pointersToRecalculateRelevanceFor = new HashSet<NodePointer>();
+//		pointersToRecalculateRelevanceFor.addAll(ancestorsAndSelfPointers);
+//		pointersToRecalculateRelevanceFor.addAll(record.determineRelevanceDependentNodes(updatedAttributes));
+//		pointersToRecalculateRelevanceFor.addAll(relevanceDependenciesToSelf);
+//		
+//		List<Attribute<?,?>> updatedNoMoreRelevantAttributes = new ArrayList<Attribute<?,?>>();
+//		Set<NodePointer> updatedRelevancePointers = updateRelevance(record, pointersToRecalculateRelevanceFor, updatedNoMoreRelevantAttributes, changeMap);
+//		changeMap.addValueChanges(updatedNoMoreRelevantAttributes);
+//		
+//		updatedAttributes.addAll(updatedNoMoreRelevantAttributes);
 		Set<NodePointer> updatedAttributePointers = nodesToPointers(updatedAttributes);
 		
 		// min count
 		Collection<NodePointer> pointersToCheckMinCountFor = new HashSet<NodePointer>();
 		pointersToCheckMinCountFor.addAll(ancestorsAndSelfPointers);
-		pointersToCheckMinCountFor.addAll(updatedRelevancePointers);
+//		pointersToCheckMinCountFor.addAll(updatedRelevancePointers);
 		pointersToCheckMinCountFor.addAll(minCountDependenciesToSelf);
 		pointersToCheckMinCountFor.addAll(updatedAttributePointers);
 		
@@ -750,7 +803,7 @@ public class RecordUpdater {
 		// max count
 		Collection<NodePointer> pointersToCheckMaxCountFor = new HashSet<NodePointer>();
 		pointersToCheckMaxCountFor.addAll(ancestorsAndSelfPointers);
-		pointersToCheckMaxCountFor.addAll(updatedRelevancePointers);
+//		pointersToCheckMaxCountFor.addAll(updatedRelevancePointers);
 		pointersToCheckMaxCountFor.addAll(maxCountDependenciesToSelf);
 		pointersToCheckMaxCountFor.addAll(updatedAttributePointers);
 		
@@ -772,7 +825,7 @@ public class RecordUpdater {
 		pointersToValidateCardinalityFor.addAll(updatedAttributePointers);
 		pointersToValidateCardinalityFor.addAll(updatedMinCountPointers);
 		pointersToValidateCardinalityFor.addAll(updatedMaxCountPointers);
-		pointersToValidateCardinalityFor.addAll(updatedRelevancePointers);
+//		pointersToValidateCardinalityFor.addAll(updatedRelevancePointers);
 		pointersToValidateCardinalityFor.addAll(dependentCodeAttributesPointers);
 		// validate cardinality on ancestor node pointers because we are considering empty nodes as missing nodes
 		pointersToValidateCardinalityFor.addAll(ancestorsAndSelfPointers);
@@ -842,16 +895,6 @@ public class RecordUpdater {
 		childState.set(APPROVED_MISSING_POSITION, approved);
 	}
 	
-	private void setDefaultValueApplied(Attribute<?, ?> attribute, boolean applied) {
-		for (Field<?> field : attribute.getFields()) {
-			field.getState().set(DEFAULT_APPLIED_POSITION, applied);
-		}
-	}
-	
-	private boolean isDefaultValueApplied(Attribute<?, ?> attribute) {
-		return attribute.getField(0).getState().get(DEFAULT_APPLIED_POSITION);
-	}
-	
 	/**
 	 * Applies the first default value (if any) that is applicable to the attribute.
 	 * The condition of the corresponding DefaultValue will be verified.
@@ -868,7 +911,7 @@ public class RecordUpdater {
 					V value = attributeDefault.evaluate(attribute);
 					if ( value != null ) {
 						attribute.setValue(value);
-						setDefaultValueApplied(attribute, true);
+						attribute.setDefaultValueApplied(true);
 						attribute.updateSummaryInfo();
 						return value;
 					}
@@ -1093,7 +1136,7 @@ public class RecordUpdater {
 
 	private Value applyInitialValue(Attribute<?, ?> attr, boolean onlyIfEmpty) {
 		if (!attr.getDefinition().isCalculated() && attr.isRelevant() && 
-				(attr.isEmpty() || (!onlyIfEmpty && isDefaultValueApplied(attr)))) {
+				(attr.isEmpty() || (!onlyIfEmpty && attr.isDefaultValueApplied()))) {
 			if (canApplyDefaultValueInCurrentPhase(attr)) {
 				// check if default value can be applied
 				Value value = performDefaultValueApply(attr);
