@@ -9,14 +9,17 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.commons.collection.ItemAddVisitor;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.commons.lang.DeepComparable;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -393,12 +396,6 @@ public class Record implements DeepComparable {
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<Attribute<?, ?>> determineCalculatedAttributes(NodePointer nodePointer) {
-		List dependencies = calculatedAttributeDependencies.dependenciesFor(nodePointer.getNodes());
-		return dependencies;
-	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<Attribute<?, ?>> determineCalculatedAttributes(Node<?> node) {
 		List dependenciesFor = calculatedAttributeDependencies.dependenciesFor(node);
 		return dependenciesFor;
@@ -435,9 +432,37 @@ public class Record implements DeepComparable {
 		visitDependencies(nodePointer, dependencies, visitor);
 	}
 	
+	public void visitDefaultValueDependenciesAndSelf(NodePointer nodePointer, Visitor<NodePointer> visitor) {
+		if (nodePointer.getChildDefinition() instanceof AttributeDefinition) {
+			visitor.visit(nodePointer);
+		}
+		visitDefaultValueDependencies(nodePointer, visitor);
+	}
+		
 	public void visitRelevanceDependencies(NodePointer nodePointer, Visitor<NodePointer> visitor) {
 		Set<NodePathPointer> relevanceDependencies = survey.getRelevanceDependencies(nodePointer.getChildDefinition());
 		visitDependencies(nodePointer, relevanceDependencies, visitor);
+	}
+	
+	public void visitRelevanceDependenciesAndSelf(NodePointer nodePointer, Visitor<NodePointer> visitor) {
+		visitor.visit(nodePointer);
+		visitRelevanceDependencies(nodePointer, visitor);
+	}
+	
+	
+	public void visitDependenciesThatRequireUpdates(NodePointer nodePointer, Visitor<NodePointer> visitor) {
+		visitDefaultValueDependencies(nodePointer, visitor);
+		visitRelevanceDependencies(nodePointer, visitor);
+	}
+	
+	public Set<NodePointer> determineDependenciesThatRequireUpdates(Collection<Node<?>> nodes) {
+		final Set<NodePointer> result = new LinkedHashSet<NodePointer>();
+		
+		Set<NodePointer> nodePointers = NodePointers.nodesToPointers(nodes);
+		for (NodePointer nodePointer : nodePointers) {
+			visitDependenciesThatRequireUpdates(nodePointer, new ItemAddVisitor<NodePointer>(result));
+		}
+		return result;
 	}
 	
 	public List<NodePointer> determineRelevanceDependentNodePointers(Collection<NodePointer> nodePointers) {

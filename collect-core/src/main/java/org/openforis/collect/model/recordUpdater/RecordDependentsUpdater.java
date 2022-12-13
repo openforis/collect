@@ -1,6 +1,7 @@
 package org.openforis.collect.model.recordUpdater;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordUpdater.RecordUpdateConfiguration;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -34,19 +36,19 @@ public class RecordDependentsUpdater {
 
 	protected static final int MAX_DEPENDENT_NODE_VISITING_COUNT = 2;
 
-	private boolean clearNotRelevantAttributes = false;
+	private RecordUpdateConfiguration configuration;
 
-	public RecordDependentsUpdater() {
-		this(false);
+	public RecordDependentsUpdater(RecordUpdateConfiguration configuration) {
+		this.configuration = configuration;
 	}
-
-	public RecordDependentsUpdater(boolean clearNotRelevantAttributes) {
-		this.clearNotRelevantAttributes = clearNotRelevantAttributes;
-	}
-
+	
 	public RecordDependentsUpdateResult updateDependentsAndSelf(CollectRecord record, NodePointer nodePointer) {
+		return updateDependentsAndSelf(record, Arrays.asList(nodePointer));
+	}
+	
+	public RecordDependentsUpdateResult updateDependentsAndSelf(CollectRecord record, Collection<NodePointer> nodePointers) {
 		final Queue<NodePointer> queue = new LinkedList<NodePointer>();
-		queue.add(nodePointer);
+		queue.addAll(nodePointers);
 
 		final Set<NodePointer> updatedRelevancePointers = new LinkedHashSet<NodePointer>();
 		final List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?, ?>>();
@@ -60,7 +62,6 @@ public class RecordDependentsUpdater {
 					: 0;
 			visitingCountByNodePointer.put(visitedNodePointer, visitingCount + 1);
 
-			RecordDependentsUpdater recordDependentsUpdater = new RecordDependentsUpdater();
 			final Visitor<NodePointer> nodePointerDependentVisitor = new Visitor<NodePointer>() {
 				public void visit(NodePointer nodePointerDependent) {
 					Integer visitedCount = visitingCountByNodePointer.get(nodePointerDependent);
@@ -70,12 +71,11 @@ public class RecordDependentsUpdater {
 				}
 			};
 			// update relevance
-			Set<NodePointer> updatedDependentRelevancePointers = recordDependentsUpdater
-					.updateRelevanceDependents(record, visitedNodePointer, nodePointerDependentVisitor);
+			Set<NodePointer> updatedDependentRelevancePointers = updateRelevanceDependents(record, visitedNodePointer, nodePointerDependentVisitor);
 			updatedRelevancePointers.addAll(updatedDependentRelevancePointers);
 
 			// update default values
-			Set<Attribute<?, ?>> dependentAttributesUpdated = recordDependentsUpdater.updateDependentDefaultValues(
+			Set<Attribute<?, ?>> dependentAttributesUpdated = updateDependentDefaultValues(
 					record, visitedNodePointer, updatedDependentRelevancePointers, nodePointerDependentVisitor);
 			updatedAttributes.addAll(dependentAttributesUpdated);
 		}
@@ -87,7 +87,7 @@ public class RecordDependentsUpdater {
 		final Set<NodePointer> updatedRelevancePointers = new LinkedHashSet<NodePointer>();
 
 		// update relevance
-		record.visitRelevanceDependencies(nodePointer, new Visitor<NodePointer>() {
+		record.visitRelevanceDependenciesAndSelf(nodePointer, new Visitor<NodePointer>() {
 			public void visit(NodePointer nodePointerVisited) {
 				Entity entity = nodePointerVisited.getEntity();
 				NodeDefinition childDef = nodePointerVisited.getChildDefinition();
@@ -132,16 +132,16 @@ public class RecordDependentsUpdater {
 				nodePointerDependentVisitor.visit(nodePointerVisited);
 			}
 		};
-
-		for (NodePointer relevanceUpdatedPointer : updatedRelevancePointers) {
-			NodeDefinition referencedNodeDef = relevanceUpdatedPointer.getChildDefinition();
+		
+		for (NodePointer updatedRelevancePointer : updatedRelevancePointers) {
+			NodeDefinition referencedNodeDef = updatedRelevancePointer.getChildDefinition();
 			if (referencedNodeDef instanceof AttributeDefinition
 					&& !((AttributeDefinition) referencedNodeDef).getAttributeDefaults().isEmpty()) {
-				defaultValueApplyVisitor.visit(relevanceUpdatedPointer);
+				defaultValueApplyVisitor.visit(updatedRelevancePointer);
 			}
 		}
 
-		record.visitDefaultValueDependencies(nodePointer, defaultValueApplyVisitor);
+		record.visitDefaultValueDependenciesAndSelf(nodePointer, defaultValueApplyVisitor);
 
 		return updatedAttributes;
 	}
@@ -180,7 +180,7 @@ public class RecordDependentsUpdater {
 		Value previousValue = attr.getValue();
 		Value newValue;
 		if (!attr.isRelevant() && !attr.isEmpty()
-				&& ((clearNotRelevantAttributes && attr.isUserSpecified()) || attr.isDefaultValueApplied())) {
+				&& ((configuration.isClearNotRelevantAttributes() && attr.isUserSpecified()) || attr.isDefaultValueApplied())) {
 			newValue = null;
 		} else if (!annotations.isCalculatedOnlyOneTime(attr.getDefinition()) || attr.isEmpty()) {
 			newValue = recalculateValue(attr);

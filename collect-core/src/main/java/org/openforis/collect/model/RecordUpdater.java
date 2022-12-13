@@ -24,6 +24,8 @@ import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.recordUpdater.RecordDependentsUpdater;
 import org.openforis.collect.model.recordUpdater.RecordDependentsUpdater.RecordDependentsUpdateResult;
+import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
@@ -62,10 +64,48 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
  */
 public class RecordUpdater {
 	
-	private boolean validateAfterUpdate = true;
-	private boolean clearNotRelevantAttributes = false;
-	private boolean clearDependentCodeAttributes = false;
-	private boolean addEmptyMultipleEntitiesWhenAddingNewEntities = true;
+	public static class RecordUpdateConfiguration {
+		private boolean validateAfterUpdate = true;
+		private boolean clearNotRelevantAttributes = false;
+		private boolean clearDependentCodeAttributes = false;
+		private boolean addEmptyMultipleEntitiesWhenAddingNewEntities = true;
+		
+		public boolean isValidateAfterUpdate() {
+			return validateAfterUpdate;
+		}
+		
+		public void setValidateAfterUpdate(boolean validateAfterUpdate) {
+			this.validateAfterUpdate = validateAfterUpdate;
+		}
+		
+		public boolean isClearDependentCodeAttributes() {
+			return clearDependentCodeAttributes;
+		}
+		
+		public void setClearDependentCodeAttributes(boolean clearDependentCodeAttributes) {
+			this.clearDependentCodeAttributes = clearDependentCodeAttributes;
+		}
+		
+		public boolean isClearNotRelevantAttributes() {
+			return clearNotRelevantAttributes;
+		}
+		
+		public void setClearNotRelevantAttributes(boolean clearNotRelevantAttributes) {
+			this.clearNotRelevantAttributes = clearNotRelevantAttributes;
+		}
+		
+		public boolean isAddEmptyMultipleEntitiesWhenAddingNewEntities() {
+			return addEmptyMultipleEntitiesWhenAddingNewEntities;
+		}
+		
+		public void setAddEmptyMultipleEntitiesWhenAddingNewEntities(
+				boolean addEmptyMultipleEntitiesWhenAddingNewEntities) {
+			this.addEmptyMultipleEntitiesWhenAddingNewEntities = addEmptyMultipleEntitiesWhenAddingNewEntities;
+		}
+	}
+	
+	private RecordUpdateConfiguration configuration = new RecordUpdateConfiguration();
+	
 	
 	/**
 	 * Updates an attribute with a new value
@@ -126,13 +166,13 @@ public class RecordUpdater {
 		changeMap.addValueChanges(updatedCalculatedAttributes);
 		
 		// dependent code attributes
-		if (attrDef instanceof CodeAttributeDefinition && clearDependentCodeAttributes) {
+		if (attrDef instanceof CodeAttributeDefinition && configuration.clearDependentCodeAttributes) {
 			Set<CodeAttribute> updatedCodeAttributes = clearDependentCodeAttributes(nodePointer);
 			updatedAttributes.addAll(updatedCodeAttributes);
 			changeMap.addValueChanges(updatedCodeAttributes);
 		}
 
-		if (validateAfterUpdate) {
+		if (configuration.validateAfterUpdate) {
 			List<NodePointer> ancestorsAndSelfPointers = getAncestorsAndSelfPointers(nodePointer);
 			
 			performValidationAfterUpdate(nodePointer, ancestorsAndSelfPointers, updatedAttributes,
@@ -334,7 +374,7 @@ public class RecordUpdater {
 
 		NodePointer selfPointer = new NodePointer(attribute);
 		
-		RecordDependentsUpdater recordDependentsUpdater = new RecordDependentsUpdater();
+		RecordDependentsUpdater recordDependentsUpdater = new RecordDependentsUpdater(configuration);
 		RecordDependentsUpdateResult recordDependentsUpdateResult = recordDependentsUpdater.updateDependentsAndSelf(record, selfPointer);
 		
 		List<Attribute<?, ?>> updatedAttributes = recordDependentsUpdateResult.getUpdatedAttributes();
@@ -350,13 +390,13 @@ public class RecordUpdater {
 			updatedCodeAttributes.add((CodeAttribute) attribute);
 		}
 		// dependent code attributes
-		if (clearDependentCodeAttributes && !updatedCodeAttributes.isEmpty()) {
+		if (configuration.clearDependentCodeAttributes && !updatedCodeAttributes.isEmpty()) {
 			Set<CodeAttribute> dependentCodeAttributes = clearDependentCodeAttributes(attribute.getRecord(), updatedCodeAttributes);
 			updatedAttributes.addAll(dependentCodeAttributes);
 			changeMap.addValueChanges(dependentCodeAttributes);
 		}
 
-		if (validateAfterUpdate) {
+		if (configuration.validateAfterUpdate) {
 			Set<NodePointer> minCountDependenciesToSelf = new HashSet<NodePointer>();
 			Set<NodePointer> maxCountDependenciesToSelf = new HashSet<NodePointer>();
 			Set<Attribute<?, ?>> validationDependenciesToSelf = new HashSet<Attribute<?,?>>();
@@ -450,7 +490,7 @@ public class RecordUpdater {
 
 	private boolean clearNoMoreRelevantAttribute(Attribute<?, ?> attr) {
 		if (!attr.isRelevant() && !attr.isEmpty() && 
-				((clearNotRelevantAttributes && attr.isUserSpecified()) || attr.isDefaultValueApplied())) {
+				((configuration.clearNotRelevantAttributes && attr.isUserSpecified()) || attr.isDefaultValueApplied())) {
 			attr.clearValue();
 			attr.updateSummaryInfo();
 			return true;
@@ -587,11 +627,11 @@ public class RecordUpdater {
 	 * @return
 	 */
 	public NodeChangeSet deleteNode(Node<?> node) {
-		Record record = node.getRecord();
+		CollectRecord record = (CollectRecord) node.getRecord();
 		
 		NodeChangeMap changeMap = new NodeChangeMap();
 		
-		Set<Node<?>> nodesToBeDeleted = new HashSet<Node<?>>();
+		final Set<Node<?>> nodesToBeDeleted = new HashSet<Node<?>>();
 		nodesToBeDeleted.add(node);
 		if (node instanceof Entity) {
 			nodesToBeDeleted.addAll(((Entity) node).getDescendants());
@@ -605,16 +645,19 @@ public class RecordUpdater {
 
 		// calculated attributes
 		
-		List<Attribute<?, ?>> dependentCalculatedAttributes = record.determineCalculatedAttributes(nodesToBeDeleted);
-		dependentCalculatedAttributes.removeAll(nodesToBeDeleted);
+		Collection<NodePointer> dependentPointers = record.determineDependenciesThatRequireUpdates(nodesToBeDeleted);
+		CollectionUtils.filter(dependentPointers, new Predicate<NodePointer>() {
+			public boolean evaluate(NodePointer dependentNodePointer) {
+				return !nodesToBeDeleted.contains(dependentNodePointer.getEntity());
+			}
+		});
 		
-		List<Attribute<?,?>> updatedAttributes = new ArrayList<Attribute<?,?>>();
 		Set<NodePointer> minCountDependenciesToSelf = new HashSet<NodePointer>();
 		Set<NodePointer> maxCountDependenciesToSelf = new HashSet<NodePointer>();
 		Set<Attribute<?, ?>> validationDependenciesToSelf = new HashSet<Attribute<?,?>>();
 		Set<NodePointer> relevanceDependenciesToSelf = new HashSet<NodePointer>();
 		
-		if (validateAfterUpdate) {
+		if (configuration.validateAfterUpdate) {
 			// relevance
 			relevanceDependenciesToSelf.addAll(record.determineRelevanceDependentNodes(nodesToBeDeleted));
 	
@@ -633,16 +676,18 @@ public class RecordUpdater {
 		List<Integer> ancestorIds = node.getAncestorIds();
 		Entity parentEntity = node.getParent();
 		performNodeDeletion(node);
-		changeMap.addNodeDeleteChange(record.getId(), ((CollectRecord) record).getStep(), ancestorIds, parentEntity.getPath(), node);
-		// re-evaluate calculated attributes
-		List<Attribute<?, ?>> updatedCalculatedAttributes = recalculateValues(dependentCalculatedAttributes);
-		changeMap.addValueChanges(updatedCalculatedAttributes);
+		changeMap.addNodeDeleteChange(record.getId(), record.getStep(), ancestorIds, parentEntity.getPath(), node);
+
+		// update dependents
+		RecordDependentsUpdateResult dependentsUpdateResult = new RecordDependentsUpdater(configuration).updateDependentsAndSelf(record, dependentPointers);
+		List<Attribute<?, ?>> updatedAttributes = dependentsUpdateResult.getUpdatedAttributes();
+		changeMap.addValueChanges(updatedAttributes);
+		Set<NodePointer> updatedRelevancePointers = dependentsUpdateResult.getUpdatedRelevancePointers();
+		changeMap.addRelevanceChanges(updatedRelevancePointers);
 		
-		updatedAttributes.addAll(updatedCalculatedAttributes);
-		
-		if (validateAfterUpdate) {
+		if (configuration.validateAfterUpdate) {
 			performValidationAfterUpdate(nodePointer, ancestorsAndSelfPointers, updatedAttributes,
-					relevanceDependenciesToSelf, minCountDependenciesToSelf, maxCountDependenciesToSelf,
+					updatedRelevancePointers, minCountDependenciesToSelf, maxCountDependenciesToSelf,
 					validationDependenciesToSelf, changeMap);
 		}
 		return changeMap;
@@ -911,7 +956,7 @@ public class RecordUpdater {
 			changeMap.addRelevanceChanges(updatedRelevancePointers);
 		}
 		
-		if (validateAfterUpdate) {
+		if (configuration.validateAfterUpdate) {
 			//recalculate descendant pointers after empty nodes have been added
 			entityDescendantAndSelfPointers = getDescendantAndSelfNodePointers(entity);
 			//min/max count
@@ -953,7 +998,7 @@ public class RecordUpdater {
 		for (NodeDefinition childDefn : childDefinitions) {
 			if(entity.getCount(childDefn) == 0) {
 				boolean isMultipleEntity = childDefn instanceof EntityDefinition && childDefn.isMultiple();
-				if (addEmptyMultipleEntitiesWhenAddingNewEntities || !isMultipleEntity) {
+				if (configuration.addEmptyMultipleEntitiesWhenAddingNewEntities || !isMultipleEntity) {
 					int toBeInserted = entity.getMinCount(childDefn);
 					if ( toBeInserted <= 0 && childDefn instanceof AttributeDefinition || ! childDefn.isMultiple() ) {
 						//insert at least one node
@@ -1237,20 +1282,20 @@ public class RecordUpdater {
 	}
 	
 	public void setValidateAfterUpdate(boolean validateAfterUpdate) {
-		this.validateAfterUpdate = validateAfterUpdate;
+		this.configuration.validateAfterUpdate = validateAfterUpdate;
 	}
 	
 	public void setClearNotRelevantAttributes(boolean clearNotRelevantAttributes) {
-		this.clearNotRelevantAttributes = clearNotRelevantAttributes;
+		this.configuration.clearNotRelevantAttributes = clearNotRelevantAttributes;
 	}
 	
 	public void setClearDependentCodeAttributes(boolean clearDependentCodeAttributes) {
-		this.clearDependentCodeAttributes = clearDependentCodeAttributes;
+		this.configuration.clearDependentCodeAttributes = clearDependentCodeAttributes;
 	}
 	
 	public void setAddEmptyMultipleEntitiesWhenAddingNewEntities(
 			boolean addEmptyMultipleEntitiesWhenAddingNewEntities) {
-		this.addEmptyMultipleEntitiesWhenAddingNewEntities = addEmptyMultipleEntitiesWhenAddingNewEntities;
+		this.configuration.addEmptyMultipleEntitiesWhenAddingNewEntities = addEmptyMultipleEntitiesWhenAddingNewEntities;
 	}
 	
 	private static class RelevanceUpdater {
