@@ -175,19 +175,30 @@ public class RecordDependentsUpdater {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private Attribute<?, ?> recalculateValueIfNecessary(Attribute attr) {
+		AttributeDefinition def = (AttributeDefinition) attr.getDefinition();
+		if (def.getAttributeDefaults().isEmpty()) {
+			// ignore attributes without default values specified
+			return null;
+		}
+		if (attr.isRelevant() && !def.isCalculated() && !attr.isEmpty() && attr.isUserSpecified() && !attr.isDefaultValueApplied()) {
+			// do not update attributes updated by the user
+			return null;
+		}
 		CollectSurvey survey = (CollectSurvey) attr.getSurvey();
 		CollectAnnotations annotations = survey.getAnnotations();
 		Value previousValue = attr.getValue();
 		Value newValue;
-		if (!attr.isRelevant() && !attr.isEmpty()
-				&& ((configuration.isClearNotRelevantAttributes() && attr.isUserSpecified()) || attr.isDefaultValueApplied())) {
+		if (!attr.isRelevant() && !attr.isEmpty() && ((configuration.isClearNotRelevantAttributes() && attr.isUserSpecified()) || attr.isDefaultValueApplied())) {
+			// clear non relevant attributes
 			newValue = null;
 		} else if (!annotations.isCalculatedOnlyOneTime(attr.getDefinition()) || attr.isEmpty()) {
+			// calculate value or default value
 			newValue = recalculateValue(attr);
 		} else {
-			newValue = previousValue;
+			// keep old value
+			return null;
 		}
-		if (!((previousValue == newValue) || (previousValue != null && previousValue.equals(newValue)))) {
+		if ((previousValue != newValue) && (previousValue == null || !previousValue.equals(newValue))) {
 			attr.setValue(newValue);
 			attr.updateSummaryInfo();
 			return attr;

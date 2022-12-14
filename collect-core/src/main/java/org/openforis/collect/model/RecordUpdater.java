@@ -113,6 +113,7 @@ public class RecordUpdater {
 	public <V extends Value> NodeChangeSet updateAttribute(Attribute<?, V> attribute, V value) {
 		beforeAttributeUpdate(attribute);
 		attribute.setValue(value);
+		attribute.updateSummaryInfo();
 		return afterAttributeUpdate(attribute);
 	}
 	
@@ -408,68 +409,6 @@ public class RecordUpdater {
 		return changeMap;
 	}
 
-	private Set<NodePointer> updateRelevance(Record record, Collection<NodePointer> nodesToCheckRelevanceFor, 
-			List<Attribute<?,?>> updatedAttributes, NodeChangeMap changeMap) {
-		Set<NodePointer> totalUpdatedRelevancePointers = new HashSet<NodePointer>();
-		Deque<Collection<NodePointer>> stack = new LinkedList<Collection<NodePointer>>();
-		stack.add(nodesToCheckRelevanceFor);
-		while(!stack.isEmpty()) {
-			Collection<NodePointer> nodes = stack.pop();
-			List<NodePointer> relevanceToUpdate = record.determineRelevanceDependentNodePointers(nodes);
-			RelevanceUpdater relevanceUpdater = new RelevanceUpdater(relevanceToUpdate);
-			Set<NodePointer> updatedRelevancePointers = relevanceUpdater.update();
-			if (! updatedRelevancePointers.isEmpty()) {
-				totalUpdatedRelevancePointers.addAll(updatedRelevancePointers);
-				Set<Node<?>> updatedRelevanceNodes = pointersToNodes(updatedRelevancePointers);
-				
-				//apply default values to relevant nodes (if not applied yet)
-				for (Node<?> updatedRelevanceNode: updatedRelevanceNodes) {
-					if (updatedRelevanceNode instanceof Attribute && updatedRelevanceNode.isRelevant()) {
-						Attribute<?, ?> updatedRelevanceAttr = (Attribute<?, ?>) updatedRelevanceNode;
-						Value appliedValue = applyInitialValue(updatedRelevanceAttr);
-						if (appliedValue != null) {
-							updatedAttributes.add(updatedRelevanceAttr);
-						}
-					}
-				}
-				changeMap.addRelevanceChanges(updatedRelevancePointers);
-				
-				// clear no more relevant attributes (not empty, not calculated or with default value applied)
-				final Set<Attribute<?, ?>> clearedAttributes = clearNoMoreRelevantAttributes(updatedRelevanceNodes);
-				if (! clearedAttributes.isEmpty()) {
-					updatedAttributes.addAll(clearedAttributes);
-					changeMap.addValueChanges(clearedAttributes);
-					stack.add(nodesToPointers(clearedAttributes));
-				}
-			}
-		}
-		return totalUpdatedRelevancePointers;
-	}
-
-	private Set<Attribute<?, ?>> clearNoMoreRelevantAttributes(Set<Node<?>> updatedRelevanceNodes) {
-		final Set<Attribute<?, ?>> clearedAttributes = new HashSet<Attribute<?,?>>();
-		for (Node<?> updatedRelevanceNode: updatedRelevanceNodes) {
-			if (updatedRelevanceNode instanceof Entity) {
-				((Entity) updatedRelevanceNode).traverseDescendants(new NodeVisitor() {
-					public void visit(Node<? extends NodeDefinition> node, int idx) {
-						if (node instanceof Attribute) {
-							Attribute<?, ?> attr = (Attribute<?, ?>) node;
-							if (clearNoMoreRelevantAttribute(attr)) {
-								clearedAttributes.add(attr);
-							}
-						}
-					}
-				});
-			} else {
-				Attribute<?, ?> attr = (Attribute<?, ?>) updatedRelevanceNode;
-				if (clearNoMoreRelevantAttribute(attr)) {
-					clearedAttributes.add(attr);
-				}
-			}
-		}
-		return clearedAttributes;
-	}
-
 	private Set<CodeAttribute> clearDependentCodeAttributes(NodePointer nodePointer) {
 		if (!(nodePointer.getChildDefinition() instanceof CodeAttributeDefinition)) {
 			return Collections.emptySet();
@@ -488,16 +427,6 @@ public class RecordUpdater {
 		return allDependentCodeAttributes;
 	}
 
-	private boolean clearNoMoreRelevantAttribute(Attribute<?, ?> attr) {
-		if (!attr.isRelevant() && !attr.isEmpty() && 
-				((configuration.clearNotRelevantAttributes && attr.isUserSpecified()) || attr.isDefaultValueApplied())) {
-			attr.clearValue();
-			attr.updateSummaryInfo();
-			return true;
-		}
-		return false;
-	}
-	
 	private <A extends Attribute<?, ?>> Set<A> clearUserSpecifiedAttributes(Set<A> attributes) {
 		Set<A> updatedAttributes = new HashSet<A>();
 		for (A attr : attributes) {
@@ -655,12 +584,8 @@ public class RecordUpdater {
 		Set<NodePointer> minCountDependenciesToSelf = new HashSet<NodePointer>();
 		Set<NodePointer> maxCountDependenciesToSelf = new HashSet<NodePointer>();
 		Set<Attribute<?, ?>> validationDependenciesToSelf = new HashSet<Attribute<?,?>>();
-		Set<NodePointer> relevanceDependenciesToSelf = new HashSet<NodePointer>();
 		
 		if (configuration.validateAfterUpdate) {
-			// relevance
-			relevanceDependenciesToSelf.addAll(record.determineRelevanceDependentNodes(nodesToBeDeleted));
-	
 			// min/max
 			Collection<NodePointer> preDeletionMinMaxDependenciesToCheck = new HashSet<NodePointer>(pointersToBeDeleted);
 			preDeletionMinMaxDependenciesToCheck.addAll(getAncestorsAndSelfPointers(node));
