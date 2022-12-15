@@ -339,12 +339,16 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 			),
 			entity("tree")
 		);
+		Entity tree = entityByPath("/root/tree[1]");
 		Attribute<?, ?> treeNum = attributeByPath("/root/tree[1]/tree_num");
 		
-		assertFalse(treeNum.isRelevant());
+		assertFalse(tree.isRelevant());
+		// descendant relevant not affected
+		assertTrue(treeNum.isRelevant());
 
 		update("/root/tree_relevant", "yes");
 		
+		assertTrue(tree.isRelevant());
 		assertTrue(treeNum.isRelevant());
 	}
 	

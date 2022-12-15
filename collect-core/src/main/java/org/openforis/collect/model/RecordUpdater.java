@@ -7,13 +7,10 @@ import static org.openforis.idm.model.NodePointers.nodesToPointers;
 import static org.openforis.idm.model.NodePointers.pointersToNodes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -842,7 +839,7 @@ public class RecordUpdater {
 	}
 	
 	protected NodeChangeMap initializeEntity(Entity entity, boolean newEntity) {
-		Record record = entity.getRecord();
+		CollectRecord record = (CollectRecord) entity.getRecord();
 		
 		NodeChangeMap changeMap = new NodeChangeMap();
 		changeMap.addEntityAddChange(entity);
@@ -854,33 +851,19 @@ public class RecordUpdater {
 
 		addEmptyNodes(entity);
 		
+		RecordDependentsUpdater recordDependentsUpdater = new RecordDependentsUpdater(configuration);
 		//recalculate attributes
 		//TODO exclude this when exporting for backup (not for Calc)
-		List<Attribute<?, ?>> calculatedAttributes = recalculateDependentCalculatedAttributes(entity);
-		changeMap.addValueChanges(calculatedAttributes);
+		RecordDependentsUpdateResult recordDependentsUpdateResult = recordDependentsUpdater.updateDependentsAndSelf(record, entityDescendantAndSelfPointers);
 		
-		//relevance
-		{
-			Set<NodePointer> pointersToRecalculateRelevanceFor = new HashSet<NodePointer>();
-			pointersToRecalculateRelevanceFor.addAll(getChildNodePointers(entity));
-			pointersToRecalculateRelevanceFor.addAll(record.determineRelevanceDependentNodes(calculatedAttributes));
-			if (entity.getParent() != null) {
-				pointersToRecalculateRelevanceFor.addAll(record.determineRelevanceDependentNodePointers(
-						Arrays.asList(new NodePointer(entity))));
-			}
-			Set<NodePointer> updatedRelevancePointers = new RelevanceUpdater(new ArrayList<NodePointer>(pointersToRecalculateRelevanceFor)).update();
-			changeMap.addRelevanceChanges(updatedRelevancePointers);
-		}
-		
-		//default values
-		List<Attribute<?, ?>> attributesWithInitialValuesApplied = applyInitialValues(entity);
-		if (!attributesWithInitialValuesApplied.isEmpty()) {
-			//re-calculate relevance of default value applied attributes dependents
-			Set<NodePointer> pointersToRecalculateRelevanceFor = new HashSet<NodePointer>(record.determineRelevanceDependentNodes(attributesWithInitialValuesApplied));
-			Set<NodePointer> updatedRelevancePointers = new RelevanceUpdater(new ArrayList<NodePointer>(pointersToRecalculateRelevanceFor)).update();
-			changeMap.addRelevanceChanges(updatedRelevancePointers);
-		}
-		
+		// calculated attributes and default values
+		List<Attribute<?, ?>> updatedAttributes = recordDependentsUpdateResult.getUpdatedAttributes();
+		changeMap.addValueChanges(updatedAttributes);
+
+		// relevance
+		Set<NodePointer> updatedRelevancePointers = recordDependentsUpdateResult.getUpdatedRelevancePointers();
+		changeMap.addRelevanceChanges(updatedRelevancePointers);
+
 		if (configuration.validateAfterUpdate) {
 			//recalculate descendant pointers after empty nodes have been added
 			entityDescendantAndSelfPointers = getDescendantAndSelfNodePointers(entity);
@@ -1234,47 +1217,61 @@ public class RecordUpdater {
 		
 		Set<NodePointer> update() {
 			for (NodePointer nodePointer : pointersToUpdate) {
-				updatePointerAndDescendantsRelevance(nodePointer);
+				updatePointerRelevance(nodePointer);
 			}
 			return updatedNodePointers;
 		}
 		
-		private void updatePointerAndDescendantsRelevance(NodePointer rootPointer) {
-			Deque<NodePointer> stack = new LinkedList<NodePointer>();
-			stack.push(rootPointer);
-			
-			while (!stack.isEmpty()) {
-				NodePointer nodePointer = stack.pop();
-				if (updatedNodePointers.contains(nodePointer)) {
-					continue;
-				}
-				Entity entity = nodePointer.getEntity();
-				ModelVersion version = entity.getRecord().getVersion();
-				
-				boolean parentRelevance = entity.getParent() == null || entity.isRelevant();
-				
-				boolean relevant = parentRelevance ? calculateRelevance(nodePointer): false;
+		void updatePointerRelevance(NodePointer nodePointer) {
+			Entity entity = nodePointer.getEntity();
+			NodeDefinition childDef = nodePointer.getChildDefinition();
 
-				NodeDefinition childDef = nodePointer.getChildDefinition();
-				Boolean oldRelevance = entity.getRelevance(childDef);
-				
-				if ( oldRelevance == null || oldRelevance.booleanValue() != relevant ) {
-					entity.setRelevant(childDef, relevant);
-					updatedNodePointers.add(nodePointer);
-					if ( childDef instanceof EntityDefinition ) {
-						List<Node<?>> nodes = entity.getChildren(childDef);
-						for (Node<?> node : nodes) {
-							Entity childEntity = (Entity) node;
-							EntityDefinition childEntityDef = childEntity.getDefinition();
-							for (NodeDefinition nextChildDef : childEntityDef.getChildDefinitionsInVersion(version)) {
-								NodePointer nextNodePointer = new NodePointer(childEntity, nextChildDef);
-								stack.push(nextNodePointer);
-							}
-						}
-					}
-				}
+			boolean entityIsRelevant = entity.isRelevant();
+			boolean oldRelevance = entityIsRelevant && entity.isRelevant(childDef);
+			boolean relevant = entityIsRelevant && calculateRelevance(nodePointer);
+			
+			if (oldRelevance != relevant) {
+				entity.setRelevant(childDef, relevant);
+				updatedNodePointers.add(nodePointer);
 			}
 		}
+		
+//		private void updatePointerAndDescendantsRelevance(NodePointer rootPointer) {
+//			Deque<NodePointer> stack = new LinkedList<NodePointer>();
+//			stack.push(rootPointer);
+//			
+//			while (!stack.isEmpty()) {
+//				NodePointer nodePointer = stack.pop();
+//				if (updatedNodePointers.contains(nodePointer)) {
+//					continue;
+//				}
+//				Entity entity = nodePointer.getEntity();
+//				ModelVersion version = entity.getRecord().getVersion();
+//				
+//				boolean parentRelevance = entity.getParent() == null || entity.isRelevant();
+//				
+//				boolean relevant = parentRelevance ? calculateRelevance(nodePointer): false;
+//
+//				NodeDefinition childDef = nodePointer.getChildDefinition();
+//				Boolean oldRelevance = entity.getRelevance(childDef);
+//				
+//				if ( oldRelevance == null || oldRelevance.booleanValue() != relevant ) {
+//					entity.setRelevant(childDef, relevant);
+//					updatedNodePointers.add(nodePointer);
+//					if ( childDef instanceof EntityDefinition ) {
+//						List<Node<?>> nodes = entity.getChildren(childDef);
+//						for (Node<?> node : nodes) {
+//							Entity childEntity = (Entity) node;
+//							EntityDefinition childEntityDef = childEntity.getDefinition();
+//							for (NodeDefinition nextChildDef : childEntityDef.getChildDefinitionsInVersion(version)) {
+//								NodePointer nextNodePointer = new NodePointer(childEntity, nextChildDef);
+//								stack.push(nextNodePointer);
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
 		
 		private boolean calculateRelevance(NodePointer nodePointer) {
 			NodeDefinition childDef = nodePointer.getChildDefinition();

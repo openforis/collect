@@ -28,6 +28,7 @@ import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
+import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.Value;
 import org.openforis.idm.model.expression.ExpressionEvaluator;
 import org.openforis.idm.model.expression.InvalidExpressionException;
@@ -78,6 +79,11 @@ public class RecordDependentsUpdater {
 			Set<Attribute<?, ?>> dependentAttributesUpdated = updateDependentDefaultValues(
 					record, visitedNodePointer, updatedDependentRelevancePointers, nodePointerDependentVisitor);
 			updatedAttributes.addAll(dependentAttributesUpdated);
+
+			if (configuration.isClearDependentCodeAttributes()) {
+				Collection<Attribute<?, ?>> nonRelevantAttributesCleared = clearNonRelevantAttributes(record, updatedDependentRelevancePointers);
+				updatedAttributes.addAll(nonRelevantAttributesCleared);
+			}
 		}
 		return new RecordDependentsUpdateResult(updatedRelevancePointers, updatedAttributes);
 	}
@@ -91,8 +97,8 @@ public class RecordDependentsUpdater {
 			public void visit(NodePointer nodePointerVisited) {
 				Entity entity = nodePointerVisited.getEntity();
 				NodeDefinition childDef = nodePointerVisited.getChildDefinition();
-				boolean oldRelevance = entity.isRelevant() && entity.isRelevant(childDef);
-				boolean relevance = entity.isRelevant() && calculateRelevance(nodePointerVisited);
+				boolean oldRelevance = entity.isRelevant(childDef);
+				boolean relevance = calculateRelevance(nodePointerVisited);
 				if (oldRelevance != relevance) {
 					entity.setRelevant(childDef, relevance);
 
@@ -221,6 +227,36 @@ public class RecordDependentsUpdater {
 			throw new IllegalStateException(
 					String.format("Invalid expression for calculated attribute %s", attribute.getPath()));
 		}
+	}
+	
+	private List<Attribute<?, ?>> clearNonRelevantAttributes(CollectRecord record, Collection<NodePointer> nodePointers) {
+		final List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?, ?>>();
+		
+		NodeVisitor valueClearVisitor = new NodeVisitor() {
+			public void visit(Node<?> node, int idx) {
+				if (node instanceof Attribute && node.isUserSpecified()) {
+					Attribute<?, ?> attr = (Attribute<?, ?>) node;
+					attr.clearValue();
+					updatedAttributes.add(attr);
+				}
+			}
+		};
+		
+		for (NodePointer nodePointer : nodePointers) {
+			Entity entity = nodePointer.getEntity();
+			NodeDefinition childDefinition = nodePointer.getChildDefinition();
+			if (!entity.isRelevant() || !entity.isRelevant(childDefinition)) {
+				List<Node<?>> nodes = nodePointer.getNodes();
+				for (Node<?> node: nodes) {
+					if (node instanceof Attribute) {
+						valueClearVisitor.visit(node, 0);
+					} else {
+						((Entity) node).traverseDescendants(valueClearVisitor);
+					}
+				}
+			}
+		}
+		return updatedAttributes;
 	}
 
 	public static class RecordDependentsUpdateResult {
