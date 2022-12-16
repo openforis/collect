@@ -80,7 +80,7 @@ public class RecordDependentsUpdater {
 					record, visitedNodePointer, updatedDependentRelevancePointers, nodePointerDependentVisitor);
 			updatedAttributes.addAll(dependentAttributesUpdated);
 
-			if (configuration.isClearDependentCodeAttributes()) {
+			if (configuration.isClearNotRelevantAttributes()) {
 				Collection<Attribute<?, ?>> nonRelevantAttributesCleared = clearNonRelevantAttributes(record, updatedDependentRelevancePointers);
 				updatedAttributes.addAll(nonRelevantAttributesCleared);
 			}

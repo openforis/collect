@@ -97,6 +97,45 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 	}
 
 	@Test
+	public void testUpdateMultipleAttribute() {
+		record(
+			rootEntityDef(
+				attributeDef("attribute").multiple()
+			),
+			attribute("attribute", "value 1"),
+			attribute("attribute", "value 2")
+		);
+		
+		Attribute<?,?> attr1 = attributeByPath("root/attribute[1]");
+		Attribute<?,?> attr2 = attributeByPath("root/attribute[2]");
+		
+		NodeChangeSet result = updateMultipleAttribute("root", "attribute", "value A", "value B");
+		
+		assertNotNull(result);
+		assertEquals(4, result.size());
+		
+		
+		NodeChange<?> attr1Change = result.getChange(attr1);
+		assertNotNull(attr1Change);
+		assertTrue(attr1Change instanceof NodeDeleteChange);
+		
+		NodeChange<?> attr2Change = result.getChange(attr2);
+		assertNotNull(attr2Change);
+		assertTrue(attr2Change instanceof NodeDeleteChange);
+		
+		Attribute<?,?> attr1New = attributeByPath("root/attribute[1]");
+		Attribute<?,?> attr2New = attributeByPath("root/attribute[2]");
+		
+		NodeChange<?> attr1NewChange = result.getChange(attr1New);
+		assertNotNull(attr1NewChange);
+		assertTrue(attr1NewChange instanceof AttributeAddChange);
+		
+		NodeChange<?> attr2NewChange = result.getChange(attr2New);
+		assertNotNull(attr2NewChange);
+		assertTrue(attr2NewChange instanceof AttributeAddChange);
+	}
+	
+	@Test
 	public void testCardinalityValidatedOnRecordInitialization() {
 		record(
 			rootEntityDef(
@@ -346,7 +385,7 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		// descendant relevant not affected
 		assertTrue(treeNum.isRelevant());
 
-		update("/root/tree_relevant", "yes");
+		updateAttribute("/root/tree_relevant", "yes");
 		
 		assertTrue(tree.isRelevant());
 		assertTrue(treeNum.isRelevant());
@@ -375,7 +414,7 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		assertFalse(attr.isRelevant());
 		assertFalse(notRelevantAttr.isRelevant());
 
-		update("/root/attr", "yes");
+		updateAttribute("/root/attr", "yes");
 		
 		assertTrue(tree.isRelevant());
 		assertFalse(notRelevantAttr.isRelevant());
