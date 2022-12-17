@@ -919,7 +919,9 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 				attributeDef("item_key").type(AttributeType.NUMBER).numericType(Type.INTEGER)
 						.defaultValue("math:max(parent()/item/item_key) + 1").key(),
 				attributeDef("source").defaultValue("'2'"),
-				attributeDef("dependent").relevant("source = '2'").defaultValue("item_key + 1")).multiple()));
+				attributeDef("dependent").type(AttributeType.NUMBER).numericType(Type.INTEGER).relevant("source = '2'")
+						.defaultValue("item_key + 1"))
+				.multiple()));
 
 		Entity rootEntity = record.getRootEntity();
 
@@ -943,9 +945,9 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		assertTrue(itemEntity.isRelevant(dependentDefinition));
 		
 		// check dependent default value applied
-//		TextAttribute dependentAttribute = record.getNodeByPath("/root/item[1]/dependent");
-//		assertNotNull(dependentAttribute);
-//		assertEquals(new TextValue("2"), dependentAttribute.getValue());
+		IntegerAttribute dependentAttribute = record.getNodeByPath("/root/item[1]/dependent");
+		assertNotNull(dependentAttribute);
+		assertEquals(new IntegerValue(2), dependentAttribute.getValue());
 	}
 	
 }
