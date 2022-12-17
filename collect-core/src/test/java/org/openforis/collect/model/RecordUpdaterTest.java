@@ -13,8 +13,6 @@ import static org.openforis.idm.testfixture.NodeBuilder.entity;
 import static org.openforis.idm.testfixture.NodeDefinitionBuilder.attributeDef;
 import static org.openforis.idm.testfixture.NodeDefinitionBuilder.entityDef;
 
-import java.util.List;
-
 import org.junit.Test;
 import org.openforis.collect.utils.Dates;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -29,7 +27,6 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.IntegerAttribute;
 import org.openforis.idm.model.IntegerValue;
 import org.openforis.idm.model.Node;
-import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.TextAttribute;
 import org.openforis.idm.model.TextValue;
 import org.openforis.idm.testfixture.NodeBuilder;

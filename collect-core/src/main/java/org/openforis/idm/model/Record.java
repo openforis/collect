@@ -4,18 +4,17 @@
 package org.openforis.idm.model;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.commons.collection.ItemAddVisitor;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.commons.lang.DeepComparable;
@@ -24,6 +23,7 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.Survey.DependencyType;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.expression.InvalidExpressionException;
 import org.openforis.idm.path.Path;
@@ -45,17 +45,8 @@ public class Record implements DeepComparable {
 	private Entity rootEntity;
 	private Integer rootEntityDefinitionId;
 	
-	boolean dependencyGraphsEnabled = true;
 	boolean validationDependencyGraphsEnabled = true;
 	boolean ignoreDuplicateRecordKeyValidationErrors = false;
-	NodeDependencyGraph calculatedAttributeDependencies;
-	RelevanceDependencyGraph relevanceDependencies;
-	MinCountDependencyGraph minCountDependencies;
-	MaxCountDependencyGraph maxCountDependencies;
-	ValidationDependencyGraph validationDependencies;
-	CodeAttributeDependencyGraph codeAttributeDependencies;
-
-	List<DependencyGraph<?>> dependencyGraphs;
 	
 	public Record(Survey survey, String version, String rootEntityDefName) {
 		this(survey, version, survey.getSchema().getRootEntityDefinition(rootEntityDefName));
@@ -86,8 +77,6 @@ public class Record implements DeepComparable {
 		if (rootEntityDefinition == null) {
 			rootEntityDefinition = survey.getSchema().getFirstRootEntityDefinition();
 		}
-		this.dependencyGraphsEnabled = dependencyGraphsEnabled;
-		this.validationDependencyGraphsEnabled = enableValidationDependencyGraphs;
 		this.ignoreDuplicateRecordKeyValidationErrors = ignoreDuplicateRecordKeyValidationErrors;
 		reset();
 		setRootEntity((Entity) rootEntityDefinition.createNode());
@@ -116,26 +105,6 @@ public class Record implements DeepComparable {
 	protected void reset() {
 		this.nodesByInternalId = new HashMap<Integer, Node<? extends NodeDefinition>>();
 		this.nextId = 1;
-		resetValidationDependencies();
-	}
-
-	@SuppressWarnings("unchecked")
-	protected void resetValidationDependencies() {
-		this.calculatedAttributeDependencies = new CalculatedAttributeDependencyGraph(survey);
-		this.minCountDependencies = new MinCountDependencyGraph(survey);
-		this.maxCountDependencies = new MaxCountDependencyGraph(survey);
-		this.relevanceDependencies = new RelevanceDependencyGraph(survey);
-		this.validationDependencies = new ValidationDependencyGraph(survey);
-		this.codeAttributeDependencies = new CodeAttributeDependencyGraph(survey);
-		
-		this.dependencyGraphs = Arrays.asList(
-				calculatedAttributeDependencies,
-				minCountDependencies,
-				maxCountDependencies,
-				relevanceDependencies,
-				validationDependencies,
-				codeAttributeDependencies
-				);
 	}
 
 	/**
@@ -275,34 +244,6 @@ public class Record implements DeepComparable {
 	
 	void put(Node<?> node) {
 		initialize(node);
-		if (dependencyGraphsEnabled) {
-			if ( validationDependencyGraphsEnabled ) {
-				registerInAllDependencyGraphs(node);
-			} else {
-				//register only calculated attribute dependencies
-				registerInDependencyGraph(calculatedAttributeDependencies, node);
-				registerInDependencyGraph(codeAttributeDependencies, node);
-			}
-		}
-	}
-
-	private void registerInDependencyGraph(final DependencyGraph<?> graph, Node<?> node) {
-		if (node instanceof Entity) {
-			((Entity) node).traverse(new NodeVisitor() {
-				@Override
-				public void visit(Node<? extends NodeDefinition> node, int idx) {
-					graph.add(node);
-				}
-			});
-		} else {
-			graph.add(node);
-		}
-	}
-
-	protected void registerInAllDependencyGraphs(Node<?> node) {
-		for (DependencyGraph<?> graph : dependencyGraphs) {
-			registerInDependencyGraph(graph, node);
-		}
 	}
 
 	protected void initialize(Node<?> node) {
@@ -325,10 +266,6 @@ public class Record implements DeepComparable {
 		node.setRecord(null);
 		node.detached = true;
 		nodesByInternalId.remove(node.internalId);
-
-		for (DependencyGraph<?> graph : dependencyGraphs) {
-			graph.remove(node);
-		}
 	}
 	
 	int nextId() {
@@ -370,14 +307,6 @@ public class Record implements DeepComparable {
 	public ModelVersion getVersion() {
 		return this.modelVersion;
 	}
-
-	public boolean isDependencyGraphsEnabled() {
-		return dependencyGraphsEnabled;
-	}
-	
-	public void setDependencyGraphsEnabled(boolean dependencyGraphsEnabled) {
-		this.dependencyGraphsEnabled = dependencyGraphsEnabled;
-	}
 	
 	public boolean isIgnoreDuplicateRecordKeyValidationErrors() {
 		return ignoreDuplicateRecordKeyValidationErrors;
@@ -395,25 +324,7 @@ public class Record implements DeepComparable {
 		this.ignoreDuplicateRecordKeyValidationErrors = ignoreDuplicateRecordKeyValidationErrors;
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<Attribute<?, ?>> determineCalculatedAttributes(Node<?> node) {
-		List dependenciesFor = calculatedAttributeDependencies.dependenciesFor(node);
-		return dependenciesFor;
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<Attribute<?, ?>> determineCalculatedAttributes(Set<Node<?>> nodes) {
-		List dependenciesFor = calculatedAttributeDependencies.dependenciesFor(nodes);
-		return dependenciesFor;
-	}
-
-	public <N extends Node<?>> List<NodePointer> determineRelevanceDependentNodes(Collection<N> nodes) {
-		@SuppressWarnings("unchecked")
-		List<NodePointer> result = relevanceDependencies.dependenciesFor((Collection<Node<?>>) nodes);
-		return result;
-	}
-	
-	private void visitDependencies(NodePointer nodePointer, Set<NodePathPointer> dependencies,
+	private void visitNodePointerDependencies(NodePointer nodePointer, Set<NodePathPointer> dependencies,
 			Visitor<NodePointer> visitor) {
 		Set<NodePathPointer> dependenciesInVersion = NodePathPointer.filterPointersByVersion(dependencies, nodePointer.getModelVersion());
 		for (NodePathPointer nodePathPointer : dependenciesInVersion) {
@@ -427,9 +338,21 @@ public class Record implements DeepComparable {
 		}
 	}
 	
+	private Set<NodePointer> determineNodePointersDependentNodes(Collection<NodePointer> nodePointers, DependencyType dependencyType) {
+		final Set<NodePointer> result = new LinkedHashSet<NodePointer>();
+		for (NodePointer nodePointer : nodePointers) {
+			visitNodePointerDependencies(nodePointer, dependencyType, new ItemAddVisitor<NodePointer>(result));
+		}
+		return result;
+	}
+	
+	private void visitNodePointerDependencies(NodePointer nodePointer, DependencyType dependencyType, Visitor<NodePointer> visitor) {
+		Set<NodePathPointer> dependencies = survey.getDependencies(nodePointer.getChildDefinition(), dependencyType);
+		visitNodePointerDependencies(nodePointer, dependencies, visitor);
+	}
+	
 	public void visitDefaultValueDependencies(NodePointer nodePointer, Visitor<NodePointer> visitor) {
-		Set<NodePathPointer> dependencies = survey.getDefaultValueDependencies(nodePointer.getChildDefinition());
-		visitDependencies(nodePointer, dependencies, visitor);
+		visitNodePointerDependencies(nodePointer, DependencyType.DEFAULT_VALUE, visitor);
 	}
 	
 	public void visitDefaultValueDependenciesAndSelf(NodePointer nodePointer, Visitor<NodePointer> visitor) {
@@ -440,15 +363,13 @@ public class Record implements DeepComparable {
 	}
 		
 	public void visitRelevanceDependencies(NodePointer nodePointer, Visitor<NodePointer> visitor) {
-		Set<NodePathPointer> relevanceDependencies = survey.getRelevanceDependencies(nodePointer.getChildDefinition());
-		visitDependencies(nodePointer, relevanceDependencies, visitor);
+		visitNodePointerDependencies(nodePointer, DependencyType.RELEVANCE, visitor);
 	}
 	
 	public void visitRelevanceDependenciesAndSelf(NodePointer nodePointer, Visitor<NodePointer> visitor) {
 		visitor.visit(nodePointer);
 		visitRelevanceDependencies(nodePointer, visitor);
 	}
-	
 	
 	public void visitDependenciesThatRequireUpdates(NodePointer nodePointer, Visitor<NodePointer> visitor) {
 		visitDefaultValueDependencies(nodePointer, visitor);
@@ -465,38 +386,61 @@ public class Record implements DeepComparable {
 		return result;
 	}
 	
-	public List<NodePointer> determineRelevanceDependentNodePointers(Collection<NodePointer> nodePointers) {
-		List<NodePointer> result = relevanceDependencies.dependenciesForPointers(nodePointers);
+	@SuppressWarnings("unchecked")
+	private <T extends Node<?>> void visitNodeDependencies(Node<?> node, Set<NodePathPointer> dependencies, Visitor<T> visitor) {
+		Set<NodePathPointer> dependenciesInVersion = NodePathPointer.filterPointersByVersion(dependencies, node.getModelVersion());
+		for (NodePathPointer nodePathPointer : dependenciesInVersion) {
+			String entityPath = nodePathPointer.getEntityPath();
+			if (node.getParent() != null) {
+				List<Node<?>> entities = Path.parse(entityPath).evaluate(node.getParent());
+				for (Node<?> entity: entities) {
+					List<Node<?>> children = ((Entity) entity).getChildren(nodePathPointer.getReferencedNodeDefinition());
+					for (Node<?> child: children) {
+						visitor.visit((T) child);
+					}
+				}
+			}
+		}
+	}
+	
+	private <T extends Node<?>> void visitNodeDependencies(Node<?> node, DependencyType dependencyType, Visitor<T> visitor) {
+		Set<NodePathPointer> dependencies = survey.getDependencies(node.getDefinition(), dependencyType);
+		visitNodeDependencies(node, dependencies, visitor);
+	}
+	
+	private <T extends Node<?>> Set<T> determineDependentNodes(Collection<Node<?>> nodes, DependencyType dependencyType) {
+		final Set<T> result = new LinkedHashSet<T>();
+		for (Node<?> node : nodes) {
+			visitNodeDependencies(node, dependencyType, new ItemAddVisitor<T>(result));
+		}
 		return result;
 	}
-
-	public Collection<NodePointer> determineMinCountDependentNodes(Collection<NodePointer> nodePointers) {
-		Collection<NodePointer> result = minCountDependencies.dependenciesForNodePointers(nodePointers);
-		return result;
+	
+	public Set<NodePointer> determineMinCountDependentNodes(Collection<NodePointer> nodePointers) {
+		return determineNodePointersDependentNodes(nodePointers, DependencyType.MIN_COUNT);
 	}
 
-	public Collection<NodePointer> determineMaxCountDependentNodes(Collection<NodePointer> nodePointers) {
-		Collection<NodePointer> result = maxCountDependencies.dependenciesForNodePointers(nodePointers);
-		return result;
+	public Set<NodePointer> determineMaxCountDependentNodes(Collection<NodePointer> nodePointers) {
+		return determineNodePointersDependentNodes(nodePointers, DependencyType.MAX_COUNT);
 	}
 
 	public Set<Attribute<?, ?>> determineValidationDependentNodes(Collection<Node<?>> nodes) {
-		Set<Attribute<?, ?>> result = validationDependencies.dependentAttributes(nodes);
-		return result;
+		return determineDependentNodes(nodes, DependencyType.VALIDATION);
 	}
 	
 	public Set<CodeAttribute> determineDependentCodeAttributes(NodePointer nodePointer) {
-		return codeAttributeDependencies.dependentCodeAttributes(nodePointer);
+		return determineDependentNodes(nodePointer.getNodes(), DependencyType.PARENT_CODE);
 	}
 	
 	public Set<CodeAttribute> determineDependentCodeAttributes(CodeAttribute codeAttr) {
-		Set<CodeAttribute> result = codeAttributeDependencies.dependentCodeAttributes(codeAttr);
-		return result;
+		return determineDependentNodes(Arrays.<Node<?>>asList(codeAttr), DependencyType.PARENT_CODE);
 	}
 	
 	public CodeAttribute determineParentCodeAttribute(CodeAttribute codeAttr) {
-		CodeAttribute result = codeAttributeDependencies.parentCodeAttribute(codeAttr);
-		return result; 
+		final List<CodeAttribute> result = new ArrayList<CodeAttribute>();
+		Set<NodePathPointer> sources = survey.getRelatedCodeSources(codeAttr.getDefinition());
+		visitNodeDependencies(codeAttr, sources, new ItemAddVisitor<CodeAttribute>(result));
+		return result.isEmpty() ? null : result.get(0);
 	}
 	
 	@Override

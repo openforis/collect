@@ -6,6 +6,7 @@ package org.openforis.idm.metamodel;
 import java.util.List;
 import java.util.Set;
 
+import org.openforis.idm.metamodel.Survey.DependencyType;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.ComparisonCheck;
 import org.openforis.idm.metamodel.validation.CustomCheck;
@@ -53,7 +54,7 @@ class SurveyDependencies {
 	private StateDependencyMap relevanceDependencies;
 	private StateDependencyMap validationDependencies;
 	private StateDependencyMap parentCodeDependencies;
-
+	
 	SurveyDependencies(Survey survey) {
 		this.survey = survey;
 		SurveyContext surveyContext = this.survey.getContext();
@@ -221,5 +222,23 @@ class SurveyDependencies {
 	Set<NodePathPointer> getRelatedCodeSources(CodeAttributeDefinition definition) {
 		return parentCodeDependencies.getSources(definition);
 	}
-
+	
+	Set<NodePathPointer> getDependencies(NodeDefinition definition, DependencyType dependencyType) {
+		switch (dependencyType) {
+		case DEFAULT_VALUE:
+			return defaultValueDependencies.getDependents(definition);
+		case MAX_COUNT:
+			return maxCountDependencies.getDependents(definition);
+		case MIN_COUNT:
+			return minCountDependencies.getDependents(definition);
+		case PARENT_CODE:
+			return parentCodeDependencies.getDependents(definition);
+		case RELEVANCE:
+			return relevanceDependencies.getDependents(definition);
+		case VALIDATION:
+			return validationDependencies.getDependents(definition);
+		default:
+			throw new IllegalArgumentException("DependencyType not supported: " + dependencyType);
+		}		
+	}
 }

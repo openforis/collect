@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -442,34 +441,6 @@ public class RecordUpdater {
 				changeMap.addValidationResultChange(a, validationResultsNew);
 			}
 		}
-	}
-
-	private List<Attribute<?, ?>> recalculateDependentCalculatedAttributes(Entity entity) {
-		return recalculateValues(entity.getRecord().determineCalculatedAttributes(entity));
-	}
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private List<Attribute<?, ?>> recalculateValues(Collection<Attribute<?, ?>> attributesToRecalculate) {
-		List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?,?>>();
-		for (Attribute calcAttr : attributesToRecalculate) {
-			CollectSurvey survey = (CollectSurvey) calcAttr.getSurvey();
-			CollectAnnotations annotations = survey.getAnnotations();
-			Value previousValue = calcAttr.getValue();
-			Value newValue;
-			if (!calcAttr.isRelevant() && calcAttr.isDefaultValueApplied()) {
-				newValue = null;
-			} else if (!annotations.isCalculatedOnlyOneTime(calcAttr.getDefinition()) || calcAttr.isEmpty()) {
-				newValue = recalculateValue(calcAttr);
-			} else {
-				newValue = previousValue;
-			}
-			if ( ! ( (previousValue == newValue) || (previousValue != null && previousValue.equals(newValue)) ) ) {
-				calcAttr.setValue(newValue);
-				calcAttr.updateSummaryInfo();
-				updatedAttributes.add(calcAttr);
-			}
-		}
-		return updatedAttributes;
 	}
 
 	private Collection<NodePointer> updateMinCount(Collection<NodePointer> nodePointers) {
@@ -928,23 +899,7 @@ public class RecordUpdater {
 		}
 		return count;
 	}
-	
-	private List<Attribute<?, ?>> applyInitialValues(Entity entity) {
-		final List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?,?>>();
-		entity.traverse(new NodeVisitor() {
-			public void visit(Node<?> node, int idx) {
-				if (node instanceof Attribute) {
-					Attribute<?, ?> attr = (Attribute<?, ?>) node;
-					Value value = applyInitialValue(attr, true);
-					if (value != null) {
-						updatedAttributes.add(attr);
-					}
-				}
-			}
-		});
-		return updatedAttributes;
-	}
-	
+
 	private Value applyInitialValue(Attribute<?, ?> attr) {
 		return applyInitialValue(attr, false);
 	}
@@ -1073,32 +1028,6 @@ public class RecordUpdater {
 		}
 	}
 	
-	private Value recalculateValue(Attribute<?, ?> attribute) {
-		try {
-			AttributeDefinition defn = attribute.getDefinition();
-			List<AttributeDefault> attributeDefaults = defn.getAttributeDefaults();
-			for (AttributeDefault attributeDefault : attributeDefaults) {
-				if ( attributeDefault.evaluateCondition(attribute) ) {
-					Value value = attributeDefault.evaluate(attribute);
-					return value;
-				}
-			}
-			return null;
-		} catch (InvalidExpressionException e) {
-			throw new IllegalStateException(String.format("Invalid expression for calculated attribute %s", attribute.getPath()));
-		}
-	}
-
-	private List<NodePointer> getChildNodePointers(Entity entity) {
-		ModelVersion version = entity.getRecord().getVersion();
-		List<NodePointer> pointers = new ArrayList<NodePointer>();
-		EntityDefinition definition = entity.getDefinition();
-		for (NodeDefinition childDef : definition.getChildDefinitionsInVersion(version)) {
-			pointers.add(new NodePointer(entity, childDef));
-		}
-		return pointers;
-	}
-	
 	private List<NodePointer> getDescendantNodePointers(Entity entity) {
 		ModelVersion version = entity.getRecord().getVersion();
 		List<NodePointer> pointers = new ArrayList<NodePointer>();
@@ -1189,91 +1118,6 @@ public class RecordUpdater {
 			boolean addEmptyMultipleEntitiesWhenAddingNewEntities) {
 		this.configuration.addEmptyMultipleEntitiesWhenAddingNewEntities = addEmptyMultipleEntitiesWhenAddingNewEntities;
 	}
-	
-	private static class RelevanceUpdater {
-		private final List<NodePointer> pointersToUpdate;
-		private final Set<NodePointer> updatedNodePointers;
-		
-		RelevanceUpdater(List<NodePointer> pointersToUpdate) {
-			this.pointersToUpdate = pointersToUpdate;
-			this.updatedNodePointers = new LinkedHashSet<NodePointer>();
-		}
-		
-		Set<NodePointer> update() {
-			for (NodePointer nodePointer : pointersToUpdate) {
-				updatePointerRelevance(nodePointer);
-			}
-			return updatedNodePointers;
-		}
-		
-		void updatePointerRelevance(NodePointer nodePointer) {
-			Entity entity = nodePointer.getEntity();
-			NodeDefinition childDef = nodePointer.getChildDefinition();
-
-			boolean entityIsRelevant = entity.isRelevant();
-			boolean oldRelevance = entityIsRelevant && entity.isRelevant(childDef);
-			boolean relevant = entityIsRelevant && calculateRelevance(nodePointer);
-			
-			if (oldRelevance != relevant) {
-				entity.setRelevant(childDef, relevant);
-				updatedNodePointers.add(nodePointer);
-			}
-		}
-		
-//		private void updatePointerAndDescendantsRelevance(NodePointer rootPointer) {
-//			Deque<NodePointer> stack = new LinkedList<NodePointer>();
-//			stack.push(rootPointer);
-//			
-//			while (!stack.isEmpty()) {
-//				NodePointer nodePointer = stack.pop();
-//				if (updatedNodePointers.contains(nodePointer)) {
-//					continue;
-//				}
-//				Entity entity = nodePointer.getEntity();
-//				ModelVersion version = entity.getRecord().getVersion();
-//				
-//				boolean parentRelevance = entity.getParent() == null || entity.isRelevant();
-//				
-//				boolean relevant = parentRelevance ? calculateRelevance(nodePointer): false;
-//
-//				NodeDefinition childDef = nodePointer.getChildDefinition();
-//				Boolean oldRelevance = entity.getRelevance(childDef);
-//				
-//				if ( oldRelevance == null || oldRelevance.booleanValue() != relevant ) {
-//					entity.setRelevant(childDef, relevant);
-//					updatedNodePointers.add(nodePointer);
-//					if ( childDef instanceof EntityDefinition ) {
-//						List<Node<?>> nodes = entity.getChildren(childDef);
-//						for (Node<?> node : nodes) {
-//							Entity childEntity = (Entity) node;
-//							EntityDefinition childEntityDef = childEntity.getDefinition();
-//							for (NodeDefinition nextChildDef : childEntityDef.getChildDefinitionsInVersion(version)) {
-//								NodePointer nextNodePointer = new NodePointer(childEntity, nextChildDef);
-//								stack.push(nextNodePointer);
-//							}
-//						}
-//					}
-//				}
-//			}
-//		}
-		
-		private boolean calculateRelevance(NodePointer nodePointer) {
-			NodeDefinition childDef = nodePointer.getChildDefinition();
-			String expr = childDef.getRelevantExpression();
-			if (StringUtils.isBlank(expr)) {
-				return true;
-			}
-			try {
-				Entity entity = nodePointer.getEntity();
-				Survey survey = entity.getSurvey();
-				ExpressionEvaluator expressionEvaluator = survey.getContext().getExpressionEvaluator();
-				return expressionEvaluator.evaluateBoolean(entity, null, expr);
-			} catch (InvalidExpressionException e) {
-				throw new IdmInterpretationError(childDef.getPath() + " - Unable to evaluate expression: " + expr, e);
-			}
-		}
-	}
-
 	
 	public static class VirtualEntityPopuplator {
 		

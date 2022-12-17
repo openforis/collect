@@ -247,8 +247,7 @@ public class CollectRecord extends Record {
 	}
 	
 	@Override
-	protected void resetValidationDependencies() {
-		super.resetValidationDependencies();
+	protected void reset() {
 		resetValidationInfo();
 	}
 	

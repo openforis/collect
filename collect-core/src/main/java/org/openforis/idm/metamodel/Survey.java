@@ -21,6 +21,7 @@ import org.openforis.collect.utils.Dates;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.lang.DeepComparable;
 import org.openforis.idm.geospatial.CoordinateOperations;
+import org.openforis.idm.metamodel.Survey.DependencyType;
 import org.openforis.idm.model.NodePathPointer;
 import org.openforis.idm.model.Record;
 
@@ -33,6 +34,10 @@ import org.openforis.idm.model.Record;
  */
 public class Survey implements Serializable, Annotatable, DeepComparable {
 
+	public enum DependencyType {
+		DEFAULT_VALUE, MIN_COUNT, MAX_COUNT, PARENT_CODE, RELEVANCE, VALIDATION
+	}
+	
 	private static final long serialVersionUID = 1L;
 	
 	public static final String INTERNAL_NAME_REGEX = "[a-z][a-z0-9_]*";
@@ -693,6 +698,10 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 	
 	public Set<NodePathPointer> getRelatedCodeSources(CodeAttributeDefinition definition) {
 		return getSurveyDependencies().getRelatedCodeSources(definition);
+	}
+	
+	public Set<NodePathPointer> getDependencies(NodeDefinition definition, DependencyType dependencyType) {
+		return getSurveyDependencies().getDependencies(definition, dependencyType);
 	}
 	
 	public void refreshSurveyDependencies() {
