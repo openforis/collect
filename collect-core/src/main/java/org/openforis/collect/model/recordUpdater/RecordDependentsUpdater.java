@@ -3,6 +3,7 @@ package org.openforis.collect.model.recordUpdater;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -20,15 +21,18 @@ import org.openforis.collect.model.RecordUpdater.RecordUpdateConfiguration;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.IdmInterpretationError;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
 import org.openforis.idm.model.NodeVisitor;
+import org.openforis.idm.model.Record;
 import org.openforis.idm.model.Value;
 import org.openforis.idm.model.expression.ExpressionEvaluator;
 import org.openforis.idm.model.expression.InvalidExpressionException;
@@ -71,18 +75,25 @@ public class RecordDependentsUpdater {
 					}
 				}
 			};
-			// update relevance
+			// relevance
 			Set<NodePointer> updatedDependentRelevancePointers = updateRelevanceDependents(record, visitedNodePointer, nodePointerDependentVisitor);
 			updatedRelevancePointers.addAll(updatedDependentRelevancePointers);
 
-			// update default values
+			// default values
 			Set<Attribute<?, ?>> dependentAttributesUpdated = updateDependentDefaultValues(
 					record, visitedNodePointer, updatedDependentRelevancePointers, nodePointerDependentVisitor);
 			updatedAttributes.addAll(dependentAttributesUpdated);
 
+			// clear not relevant attributes
 			if (configuration.isClearNotRelevantAttributes()) {
 				Collection<Attribute<?, ?>> nonRelevantAttributesCleared = clearNonRelevantAttributes(record, updatedDependentRelevancePointers);
 				updatedAttributes.addAll(nonRelevantAttributesCleared);
+			}
+			
+			// clear dependent code attributes
+			if (visitedNodePointer.getChildDefinition() instanceof CodeAttributeDefinition && configuration.isClearDependentCodeAttributes()) {
+				Set<CodeAttribute> updatedCodeAttributes = clearDependentCodeAttributes(visitedNodePointer);
+				updatedAttributes.addAll(updatedCodeAttributes);
 			}
 		}
 		return new RecordDependentsUpdateResult(updatedRelevancePointers, updatedAttributes);
@@ -254,6 +265,43 @@ public class RecordDependentsUpdater {
 						((Entity) node).traverseDescendants(valueClearVisitor);
 					}
 				}
+			}
+		}
+		return updatedAttributes;
+	}
+	
+	private Set<CodeAttribute> clearDependentCodeAttributes(NodePointer nodePointer) {
+		if (!(nodePointer.getChildDefinition() instanceof CodeAttributeDefinition)) {
+			return Collections.emptySet();
+		}
+		Set<CodeAttribute> allDependentCodeAttributes = new HashSet<CodeAttribute>();
+		Record record = nodePointer.getRecord();
+		Collection<CodeAttribute> codeAttributes = filterCodeAttributes(nodePointer.getNodes());
+		for (CodeAttribute codeAttribute : codeAttributes) {
+			Set<CodeAttribute> dependentCodeAttributes = record.determineDependentCodeAttributes(codeAttribute);
+			clearUserSpecifiedAttributes(dependentCodeAttributes);
+			allDependentCodeAttributes.addAll(dependentCodeAttributes);
+		}
+		return allDependentCodeAttributes;
+	}
+
+	private <T extends Node<?>> Collection<CodeAttribute> filterCodeAttributes(Collection<T> nodes) {
+		Collection<CodeAttribute> codeAttributes = new ArrayList<CodeAttribute>();
+		for (Node<?> node : nodes) {
+			if (node instanceof CodeAttribute) {
+				codeAttributes.add((CodeAttribute) node);
+			}
+		}
+		return codeAttributes;
+	}
+	
+	private <A extends Attribute<?, ?>> Set<A> clearUserSpecifiedAttributes(Set<A> attributes) {
+		Set<A> updatedAttributes = new HashSet<A>();
+		for (A attr : attributes) {
+			if (attr.isUserSpecified() && ! attr.isEmpty()) {
+				attr.clearValue();
+				attr.updateSummaryInfo();
+				updatedAttributes.add(attr);
 			}
 		}
 		return updatedAttributes;

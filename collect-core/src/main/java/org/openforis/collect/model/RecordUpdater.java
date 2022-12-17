@@ -155,13 +155,6 @@ public class RecordUpdater {
 		changeMap.addValueChanges(updatedAttributes);
 		Set<NodePointer> updatedRelevancePointers = dependentsUpdateResult.getUpdatedRelevancePointers();
 		changeMap.addRelevanceChanges(updatedRelevancePointers);
-		
-		// dependent code attributes
-		if (attrDef instanceof CodeAttributeDefinition && configuration.clearDependentCodeAttributes) {
-			Set<CodeAttribute> updatedCodeAttributes = clearDependentCodeAttributes(selfNodePointer);
-			updatedAttributes.addAll(updatedCodeAttributes);
-			changeMap.addValueChanges(updatedCodeAttributes);
-		}
 
 		if (configuration.validateAfterUpdate) {
 			List<NodePointer> ancestorsAndSelfPointers = getAncestorsAndSelfPointers(selfNodePointer);
@@ -376,17 +369,6 @@ public class RecordUpdater {
 		
 		List<NodePointer> ancestorsAndSelfPointers = getAncestorsAndSelfPointers(selfPointer);
 
-		Collection<CodeAttribute> updatedCodeAttributes = filterCodeAttributes(updatedAttributes);
-		if (attribute instanceof CodeAttribute) {
-			updatedCodeAttributes.add((CodeAttribute) attribute);
-		}
-		// dependent code attributes
-		if (configuration.clearDependentCodeAttributes && !updatedCodeAttributes.isEmpty()) {
-			Set<CodeAttribute> dependentCodeAttributes = clearDependentCodeAttributes(attribute.getRecord(), updatedCodeAttributes);
-			updatedAttributes.addAll(dependentCodeAttributes);
-			changeMap.addValueChanges(dependentCodeAttributes);
-		}
-
 		if (configuration.validateAfterUpdate) {
 			Set<NodePointer> minCountDependenciesToSelf = new HashSet<NodePointer>();
 			Set<NodePointer> maxCountDependenciesToSelf = new HashSet<NodePointer>();
@@ -397,36 +379,6 @@ public class RecordUpdater {
 					validationDependenciesToSelf, changeMap);
 		}
 		return changeMap;
-	}
-
-	private Set<CodeAttribute> clearDependentCodeAttributes(NodePointer nodePointer) {
-		if (!(nodePointer.getChildDefinition() instanceof CodeAttributeDefinition)) {
-			return Collections.emptySet();
-		}
-		Collection<CodeAttribute> codeAttributes = filterCodeAttributes(nodePointer.getNodes());
-		return clearDependentCodeAttributes(nodePointer.getRecord(), codeAttributes);
-	}
-
-	private Set<CodeAttribute> clearDependentCodeAttributes(Record record, Collection<CodeAttribute> codeAttributes) {
-		Set<CodeAttribute> allDependentCodeAttributes = new HashSet<CodeAttribute>();
-		for (CodeAttribute codeAttribute : codeAttributes) {
-			Set<CodeAttribute> dependentCodeAttributes = record.determineDependentCodeAttributes(codeAttribute);
-			clearUserSpecifiedAttributes(dependentCodeAttributes);
-			allDependentCodeAttributes.addAll(dependentCodeAttributes);
-		}
-		return allDependentCodeAttributes;
-	}
-
-	private <A extends Attribute<?, ?>> Set<A> clearUserSpecifiedAttributes(Set<A> attributes) {
-		Set<A> updatedAttributes = new HashSet<A>();
-		for (A attr : attributes) {
-			if (attr.isUserSpecified() && ! attr.isEmpty()) {
-				attr.clearValue();
-				attr.updateSummaryInfo();
-				updatedAttributes.add(attr);
-			}
-		}
-		return updatedAttributes;
 	}
 
 	private void validateAttributes(Record record, Set<Attribute<?, ?>> attributes, NodeChangeMap changeMap) {
@@ -1090,16 +1042,6 @@ public class RecordUpdater {
 		}
 		Set<NodePointer> dependentAttributesPointers = nodesToPointers(dependentAttributes);
 		return dependentAttributesPointers;
-	}
-	
-	private <T extends Node<?>> Collection<CodeAttribute> filterCodeAttributes(Collection<T> nodes) {
-		Collection<CodeAttribute> codeAttributes = new ArrayList<CodeAttribute>();
-		for (Node<?> node : nodes) {
-			if (node instanceof CodeAttribute) {
-				codeAttributes.add((CodeAttribute) node);
-			}
-		}
-		return codeAttributes;
 	}
 	
 	public void setValidateAfterUpdate(boolean validateAfterUpdate) {

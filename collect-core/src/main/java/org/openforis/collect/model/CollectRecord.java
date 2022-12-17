@@ -248,6 +248,7 @@ public class CollectRecord extends Record {
 	
 	@Override
 	protected void reset() {
+		super.reset();
 		resetValidationInfo();
 	}
 	
