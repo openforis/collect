@@ -12,6 +12,7 @@ import static org.openforis.idm.testfixture.NodeBuilder.attribute;
 import static org.openforis.idm.testfixture.NodeBuilder.entity;
 import static org.openforis.idm.testfixture.NodeDefinitionBuilder.attributeDef;
 import static org.openforis.idm.testfixture.NodeDefinitionBuilder.entityDef;
+import static org.openforis.idm.testfixture.SurveyBuilder.codeList;
 
 import org.junit.Test;
 import org.openforis.collect.utils.Dates;
@@ -23,6 +24,8 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Code;
+import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.IntegerAttribute;
 import org.openforis.idm.model.IntegerValue;
@@ -30,6 +33,7 @@ import org.openforis.idm.model.Node;
 import org.openforis.idm.model.TextAttribute;
 import org.openforis.idm.model.TextValue;
 import org.openforis.idm.testfixture.NodeBuilder;
+import org.openforis.idm.testfixture.SurveyBuilder;
 
 /**
  * @author D. Wiell
@@ -950,4 +954,32 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		assertEquals(new IntegerValue(2), dependentAttribute.getValue());
 	}
 	
+	@Test
+	public void testDependentCodeAttributesCleared() {
+		CollectSurvey survey = new SurveyBuilder().codeLists(codeList("hierarchical_list").level("level_1").level("level_2"))
+				.rootEntityDef(entityDef("root", attributeDef("root_key").key(),
+						attributeDef("code1").type(AttributeType.CODE).codeList("hierarchical_list"),
+						attributeDef("code2").type(AttributeType.CODE).codeList("hierarchical_list")
+								.parentCodeAttribute("code1")))
+				.build();
+
+		record = NodeBuilder.record(survey);
+		updater.initializeRecord(record);
+
+		RecordUpdater updater = new RecordUpdater();
+		updater.setClearDependentCodeAttributes(true);
+
+		CodeAttribute code1 = record.getNodeByPath("/root/code1");
+		CodeAttribute code2 = record.getNodeByPath("/root/code2");
+
+		updater.updateAttribute(code1, new Code("1"));
+		updater.updateAttribute(code2, new Code("1a"));
+
+		assertNotNull(code1.getValue());
+		assertNotNull(code2.getValue());
+
+		updater.updateAttribute(code1, new Code("2"));
+
+		assertTrue(code2.isEmpty());
+	}
 }
