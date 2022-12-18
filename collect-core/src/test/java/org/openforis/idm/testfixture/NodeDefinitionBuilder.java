@@ -3,6 +3,7 @@ package org.openforis.idm.testfixture;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.*;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.validation.CustomCheck;
@@ -70,7 +71,7 @@ public abstract class NodeDefinitionBuilder {
 	
 	public static EntityDefinition rootEntityDef(Survey survey, String name, NodeDefinitionBuilder... builders) {
 		EntityDefinitionBuilder entityBuilder = new EntityDefinitionBuilder(name, builders);
-		EntityDefinition rootEntityDef = (EntityDefinition) entityBuilder.buildInternal(survey);
+		EntityDefinition rootEntityDef = (EntityDefinition) entityBuilder.buildInternal(survey, null);
 		Schema schema = survey.getSchema();
 		if ( schema.getRootEntityDefinition(name) != null ) {
 			schema.removeRootEntityDefinition(name);
@@ -92,7 +93,7 @@ public abstract class NodeDefinitionBuilder {
 		return new AttributeDefinitionBuilder(name);
 	}
 	
-	protected abstract NodeDefinition buildInternal(Survey survey);
+	protected abstract NodeDefinition buildInternal(Survey survey, EntityDefinition parentDef);
 	
 	protected void initNodeDefinition(NodeDefinition def) {
 		def.setName(name);
@@ -152,11 +153,11 @@ public abstract class NodeDefinitionBuilder {
 		}
 
 		@Override
-		protected NodeDefinition buildInternal(Survey survey) {
+		protected NodeDefinition buildInternal(Survey survey, EntityDefinition parentDef) {
 			EntityDefinition def = survey.getSchema().createEntityDefinition();
 			initNodeDefinition(def);
 			for (NodeDefinitionBuilder childBuilder : builders) {
-				NodeDefinition childDef = childBuilder.buildInternal(survey);
+				NodeDefinition childDef = childBuilder.buildInternal(survey, def);
 				def.addChildDefinition(childDef);
 			}
 			def.setVirtual(virtual);
@@ -174,6 +175,8 @@ public abstract class NodeDefinitionBuilder {
 		private boolean calculated;
 		private List<AttributeDefault> defaultValues;
 		private String validationExpression;
+		private String codeList;
+		private String parentCodeAttribute;
 
 		AttributeDefinitionBuilder(String name) {
 			super(name);
@@ -243,8 +246,18 @@ public abstract class NodeDefinitionBuilder {
 			return this;
 		}
 		
+		public AttributeDefinitionBuilder codeList(String codeList) {
+			this.codeList = codeList;
+			return this;
+		}
+		
+		public AttributeDefinitionBuilder parentCodeAttribute(String parentCodeAttribute) {
+			this.parentCodeAttribute = parentCodeAttribute;
+			return this;
+		}
+		
 		@Override
-		protected NodeDefinition buildInternal(Survey survey) {
+		protected NodeDefinition buildInternal(Survey survey, EntityDefinition parentDef) {
 			AttributeDefinition def = createAttributeDefinition(survey);
 			initNodeDefinition(def);
 			if ( def instanceof KeyAttributeDefinition) {
@@ -252,6 +265,15 @@ public abstract class NodeDefinitionBuilder {
 			}
 			if (def instanceof NumberAttributeDefinition) {
 				((NumericAttributeDefinition) def).setType(numericType);
+			}
+			if (def instanceof CodeAttributeDefinition) {
+				CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) def;
+				codeAttrDef.setListName(codeList);
+				if (StringUtils.isNotBlank(parentCodeAttribute) && parentDef != null) {
+					CodeAttributeDefinition parentCodeAttributeDefinition = (CodeAttributeDefinition) parentDef
+							.getDefinitionByPath(parentCodeAttribute);
+					codeAttrDef.setParentCodeAttributeDefinition(parentCodeAttributeDefinition);
+				}
 			}
 			def.setCalculated(calculated);
 			for (AttributeDefault attributeDefault : defaultValues) {

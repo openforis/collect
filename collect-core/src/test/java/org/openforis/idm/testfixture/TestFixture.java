@@ -23,7 +23,7 @@ public class TestFixture {
 	                                 RecordBuilder... recordBuilders) {
 		SurveyContext surveyContext = new TestSurveyContext();
 		Survey survey = surveyContext.createSurvey();
-		EntityDefinition rootEntityDef = (EntityDefinition) entityDefinitionBuilder.buildInternal(survey);
+		EntityDefinition rootEntityDef = (EntityDefinition) entityDefinitionBuilder.buildInternal(survey, null);
 		survey.getSchema().addRootEntityDefinition(rootEntityDef);
 		survey.refreshSurveyDependencies();
 
