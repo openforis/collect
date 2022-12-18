@@ -981,6 +981,7 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 
 		assertNotNull(code1.getValue());
 		assertNotNull(code2.getValue());
+		assertNotNull(code3.getValue());
 
 		updater.updateAttribute(code1, new Code("2"));
 
