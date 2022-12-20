@@ -19,7 +19,6 @@ public class TestSurveyContext extends CollectSurveyContext {
 		lookupProvider = new TestLookupProvider();
 		getExpressionFactory().setLookupProvider(lookupProvider);
 		setValidator(new TestValidator());
-		
 	}
 	
 	private class TestValidator extends CollectValidator {

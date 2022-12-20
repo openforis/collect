@@ -151,12 +151,17 @@ public class RecordUpdater {
 		
 		// re-calculate values and relevance
 		RecordDependentsUpdateResult dependentsUpdateResult = new RecordDependentsUpdater(configuration).updateDependentsAndSelf(record, dependentPointers);
-		List<Attribute<?, ?>> updatedAttributes = dependentsUpdateResult.getUpdatedAttributes();
-		changeMap.addValueChanges(updatedAttributes);
+		List<Attribute<?, ?>> dependentUpdatedAttributes = dependentsUpdateResult.getUpdatedAttributes();
+		changeMap.addValueChanges(dependentUpdatedAttributes);
+		
 		Set<NodePointer> updatedRelevancePointers = dependentsUpdateResult.getUpdatedRelevancePointers();
 		changeMap.addRelevanceChanges(updatedRelevancePointers);
 
 		if (configuration.validateAfterUpdate) {
+			List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?,?>>();
+			updatedAttributes.addAll(newAttrs);
+			updatedAttributes.addAll(dependentUpdatedAttributes);
+			
 			List<NodePointer> ancestorsAndSelfPointers = getAncestorsAndSelfPointers(selfNodePointer);
 			
 			performValidationAfterUpdate(selfNodePointer, ancestorsAndSelfPointers, updatedAttributes,
@@ -175,6 +180,7 @@ public class RecordUpdater {
 		beforeAttributeUpdate(attribute);
 		
 		field.setValue(value);
+		attribute.updateSummaryInfo();
 		
 		return afterAttributeUpdate(attribute);
 	}
@@ -190,7 +196,8 @@ public class RecordUpdater {
 
 		field.setValue(null);
 		setFieldSymbol(field, symbol);
-		
+		attribute.updateSummaryInfo();
+
 		return afterAttributeUpdate(attribute);
 	}
 	
@@ -352,8 +359,6 @@ public class RecordUpdater {
 	}
 	
 	private NodeChangeSet afterAttributeInsertOrUpdate(final NodeChangeMap changeMap, Attribute<?, ?> attribute) {
-		attribute.updateSummaryInfo();
-
 		CollectRecord record = (CollectRecord) attribute.getRecord();
 
 		NodePointer selfPointer = new NodePointer(attribute);
@@ -361,11 +366,13 @@ public class RecordUpdater {
 		RecordDependentsUpdater recordDependentsUpdater = new RecordDependentsUpdater(configuration);
 		RecordDependentsUpdateResult recordDependentsUpdateResult = recordDependentsUpdater.updateDependentsAndSelf(record, selfPointer);
 		
-		List<Attribute<?, ?>> updatedAttributes = recordDependentsUpdateResult.getUpdatedAttributes();
-		Set<NodePointer> updatedRelevancePointers = recordDependentsUpdateResult.getUpdatedRelevancePointers();
-		
-		changeMap.addRelevanceChanges(updatedRelevancePointers);
+		List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?,?>>();
+		updatedAttributes.add(attribute);
+		updatedAttributes.addAll(recordDependentsUpdateResult.getUpdatedAttributes());
 		changeMap.addValueChanges(updatedAttributes);
+		
+		Set<NodePointer> updatedRelevancePointers = recordDependentsUpdateResult.getUpdatedRelevancePointers();
+		changeMap.addRelevanceChanges(updatedRelevancePointers);
 		
 		List<NodePointer> ancestorsAndSelfPointers = getAncestorsAndSelfPointers(selfPointer);
 
@@ -593,7 +600,8 @@ public class RecordUpdater {
 		nodesToCheckValidationFor.addAll(pointersToNodes(updatedRelevancePointers));
 		nodesToCheckValidationFor.addAll(pointersToNodes(updatedCardinalityPointers));
 		
-		Set<Attribute<?, ?>> attributesToRevalidate = record.determineValidationDependentNodes(nodesToCheckValidationFor);
+		Set<Attribute<?, ?>> attributesToRevalidate = filterAttributes(nodesToCheckValidationFor);
+		attributesToRevalidate.addAll(record.determineValidationDependentNodes(nodesToCheckValidationFor));
 
 		validateAttributes(record, attributesToRevalidate, changeMap);
 	}
@@ -795,10 +803,11 @@ public class RecordUpdater {
 			
 			//validate attributes
 			Set<Node<?>> nodesToCheckValidationFor = new HashSet<Node<?>>();
-			nodesToCheckValidationFor.add(entity);
+			nodesToCheckValidationFor.addAll(pointersToNodes(entityDescendantAndSelfPointers));
 			nodesToCheckValidationFor.addAll(pointersToNodes(updatedCardinalityPointers));
 			
-			Set<Attribute<?, ?>> attributesToValidate = record.determineValidationDependentNodes(nodesToCheckValidationFor);
+			Set<Attribute<?, ?>> attributesToValidate = filterAttributes(nodesToCheckValidationFor);
+			attributesToValidate.addAll(record.determineValidationDependentNodes(nodesToCheckValidationFor));
 			validateAttributes(record, attributesToValidate, changeMap);
 		}
 		return changeMap;
@@ -1042,6 +1051,16 @@ public class RecordUpdater {
 		}
 		Set<NodePointer> dependentAttributesPointers = nodesToPointers(dependentAttributes);
 		return dependentAttributesPointers;
+	}
+	
+	private Set<Attribute<?, ?>> filterAttributes(Collection<Node<?>> nodes) {
+		Set<Attribute<?, ?>> attributes = new HashSet<Attribute<?,?>>();
+		for (Node<?> node : nodes) {
+			if (node instanceof Attribute) {
+				attributes.add((Attribute<?, ?>) node);
+			}
+		}
+		return attributes;
 	}
 	
 	public void setValidateAfterUpdate(boolean validateAfterUpdate) {

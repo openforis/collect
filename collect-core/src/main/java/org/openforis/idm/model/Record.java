@@ -326,6 +326,8 @@ public class Record implements DeepComparable {
 	
 	private void visitNodePointerDependencies(NodePointer nodePointer, Set<NodePathPointer> dependencies,
 			Visitor<NodePointer> visitor) {
+		if (nodePointer.isNodesDeleted()) return;
+		
 		Set<NodePathPointer> dependenciesInVersion = NodePathPointer.filterPointersByVersion(dependencies, nodePointer.getModelVersion());
 		for (NodePathPointer nodePathPointer : dependenciesInVersion) {
 			NodePointer nodePointerToVisit;

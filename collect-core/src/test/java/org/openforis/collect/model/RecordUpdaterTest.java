@@ -956,6 +956,9 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 	
 	@Test
 	public void testDependentCodeAttributesCleared() {
+		RecordUpdater updater = new RecordUpdater();
+		updater.setClearDependentCodeAttributes(true);
+		
 		CollectSurvey survey = new SurveyBuilder().codeLists(codeList("hierarchical_list").level("level_1").level("level_2").level("level_3"))
 				.rootEntityDef(entityDef("root", attributeDef("root_key").key(),
 						attributeDef("code1").type(AttributeType.CODE).codeList("hierarchical_list"),
@@ -966,10 +969,8 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 				.build();
 
 		record = NodeBuilder.record(survey);
+		
 		updater.initializeRecord(record);
-
-		RecordUpdater updater = new RecordUpdater();
-		updater.setClearDependentCodeAttributes(true);
 
 		CodeAttribute code1 = record.getNodeByPath("/root/code1");
 		CodeAttribute code2 = record.getNodeByPath("/root/code2");
