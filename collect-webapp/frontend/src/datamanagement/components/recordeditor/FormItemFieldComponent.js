@@ -47,7 +47,7 @@ const FormItemFieldComponent = (props) => {
   const wrapperId = wrapperIdRef.current
 
   const calculateIsRelevant = useCallback(
-    () => parentEntity.childrenRelevanceByDefinitionId[attributeDefinitionId],
+    () => parentEntity.relevant && parentEntity.isChildRelevant(attributeDefinition),
     [parentEntity]
   )
 

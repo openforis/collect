@@ -39,7 +39,7 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
 
 public class RecordDependentsUpdater {
 
-	protected static final int MAX_DEPENDENT_NODE_VISITING_COUNT = 2;
+	protected static final int MAX_DEPENDENT_NODE_VISITING_COUNT = 3;
 
 	private RecordUpdateConfiguration configuration;
 
@@ -54,27 +54,36 @@ public class RecordDependentsUpdater {
 	public RecordDependentsUpdateResult updateDependentsAndSelf(CollectRecord record, Collection<NodePointer> nodePointers) {
 		final Queue<NodePointer> queue = new LinkedList<NodePointer>();
 		queue.addAll(nodePointers);
-
-		final Set<NodePointer> updatedRelevancePointers = new LinkedHashSet<NodePointer>();
-		final List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?, ?>>();
-
+		
 		final Map<NodePointer, Integer> visitingCountByNodePointer = new HashMap<NodePointer, Integer>();
 
-		while (!queue.isEmpty()) {
-			NodePointer visitedNodePointer = queue.remove();
-			Integer visitingCount = visitingCountByNodePointer.containsKey(visitedNodePointer)
-					? visitingCountByNodePointer.get(visitedNodePointer)
-					: 0;
-			visitingCountByNodePointer.put(visitedNodePointer, visitingCount + 1);
+		// update relevance first
+		final Set<NodePointer> updatedRelevancePointers = new LinkedHashSet<NodePointer>();
+		
+		for (NodePointer nodePointer : nodePointers) {
+			Set<NodePointer> updatedDependentRelevancePointers = updateRelevanceDependents(record, nodePointer);
+			updatedRelevancePointers.addAll(updatedDependentRelevancePointers);
+		}
+		
+		final List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?, ?>>();
 
+		while (!queue.isEmpty()) {
+			final NodePointer visitedNodePointer = queue.remove();
+			
 			final Visitor<NodePointer> nodePointerDependentVisitor = new Visitor<NodePointer>() {
 				public void visit(NodePointer nodePointerDependent) {
 					Integer visitedCount = visitingCountByNodePointer.get(nodePointerDependent);
-					if (visitedCount == null || visitedCount < MAX_DEPENDENT_NODE_VISITING_COUNT) {
+					if (!nodePointerDependent.equals(visitedNodePointer) && visitedCount == null
+							|| visitedCount < MAX_DEPENDENT_NODE_VISITING_COUNT) {
 						queue.add(nodePointerDependent);
 					}
 				}
 			};
+			Integer visitingCount = visitingCountByNodePointer.containsKey(visitedNodePointer)
+					? visitingCountByNodePointer.get(visitedNodePointer)
+					: 0;
+			visitingCountByNodePointer.put(visitedNodePointer, visitingCount + 1);
+			
 			// relevance
 			Set<NodePointer> updatedDependentRelevancePointers = updateRelevanceDependents(record, visitedNodePointer, nodePointerDependentVisitor);
 			updatedRelevancePointers.addAll(updatedDependentRelevancePointers);
@@ -98,6 +107,10 @@ public class RecordDependentsUpdater {
 		}
 		return new RecordDependentsUpdateResult(updatedRelevancePointers, updatedAttributes);
 	}
+	
+	private Set<NodePointer> updateRelevanceDependents(CollectRecord record, NodePointer nodePointer) {
+		return updateRelevanceDependents(record, nodePointer, null);
+	}
 
 	private Set<NodePointer> updateRelevanceDependents(CollectRecord record, NodePointer nodePointer,
 			final Visitor<NodePointer> nodePointerDependentVisitor) {
@@ -113,7 +126,9 @@ public class RecordDependentsUpdater {
 				if (oldRelevance != relevance) {
 					entity.setRelevant(childDef, relevance);
 
-					nodePointerDependentVisitor.visit(nodePointerVisited);
+					if (nodePointerDependentVisitor != null) {
+						nodePointerDependentVisitor.visit(nodePointerVisited);
+					}
 					updatedRelevancePointers.add(nodePointerVisited);
 
 					if (childDef instanceof EntityDefinition) {
@@ -205,18 +220,25 @@ public class RecordDependentsUpdater {
 		CollectAnnotations annotations = survey.getAnnotations();
 		Value previousValue = attr.getValue();
 		Value newValue;
-		if (!attr.isRelevant() && !attr.isEmpty() && ((configuration.isClearNotRelevantAttributes() && attr.isUserSpecified()) || attr.isDefaultValueApplied())) {
+		if (attr.isRelevant()) {
+			if (def.isCalculated() && !annotations.isCalculatedOnlyOneTime(def) || attr.isEmpty()) {
+				// calculate value or default value
+				newValue = recalculateValue(attr);
+			} else {
+				// keep old value
+				return null;
+			}
+		} else if (!attr.isEmpty() && attr.isUserSpecified() && (configuration.isClearNotRelevantAttributes() || attr.isDefaultValueApplied())) {
 			// clear non relevant attributes
 			newValue = null;
-		} else if (!annotations.isCalculatedOnlyOneTime(attr.getDefinition()) || attr.isEmpty()) {
-			// calculate value or default value
-			newValue = recalculateValue(attr);
 		} else {
 			// keep old value
 			return null;
 		}
 		if ((previousValue != newValue) && (previousValue == null || !previousValue.equals(newValue))) {
 			attr.setValue(newValue);
+			boolean defaultValueApplied = newValue != null;
+			attr.setDefaultValueApplied(defaultValueApplied);
 			attr.updateSummaryInfo();
 			return attr;
 		}

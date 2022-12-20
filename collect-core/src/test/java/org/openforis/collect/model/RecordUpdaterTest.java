@@ -620,13 +620,10 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 			rootEntityDef(
 				attributeDef("attribute1"),
 				attributeDef("attribute2")
-					.relevant("attribute1 = 1"),
-				attributeDef("attribute3")
-					.relevant("attribute2 = 2")
+					.relevant("attribute1 = 1")
 			),
 			attribute("attribute1", "1"),
-			attribute("attribute2", "2"),
-			attribute("attribute3", "3")
+			attribute("attribute2", "2")
 		);
 		Attribute<?, ?> attribute1 = record.findNodeByPath("/root/attribute1");
 		
@@ -639,10 +636,6 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		Boolean attribute2Relevance = rootEntityChange.getChildrenRelevance().get(attribute2Def.getId());
 		assertNotNull(attribute2Relevance);
 		assertFalse(attribute2Relevance);
-		NodeDefinition attribute3Def = record.getRootEntity().getDefinition().getChildDefinition("attribute3");
-		Boolean attribute3Relevance = rootEntityChange.getChildrenRelevance().get(attribute3Def.getId());
-		assertNotNull(attribute3Relevance);
-		assertFalse(attribute3Relevance);
 	}
 	
 	@Test
