@@ -3,6 +3,7 @@ package org.openforis.idm.model;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.validation.CollectValidator;
 import org.openforis.idm.metamodel.validation.CodeParentValidator;
+import org.openforis.idm.metamodel.validation.CodeValidator;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
 /**
@@ -23,8 +24,19 @@ public class TestSurveyContext extends CollectSurveyContext {
 	
 	private class TestValidator extends CollectValidator {
 		@Override
+		protected CodeValidator getCodeValidator() {
+			return new TestCodeValidator();
+		};
+		@Override
 		protected CodeParentValidator getCodeParentValidator() {
 			return new TestCodeParentValidator();
+		}
+	}
+	
+	private class TestCodeValidator extends CodeValidator {
+		@Override
+		public ValidationResultFlag evaluate(CodeAttribute attribute) {
+			return ValidationResultFlag.OK;
 		}
 	}
 	
