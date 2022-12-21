@@ -22,6 +22,7 @@ import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.utils.SurveyObjects;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.AttributeType;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -264,6 +265,10 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	@DependsOn("editedItem")
 	public boolean isAttribute() {
 		return editedItem != null && editedItem instanceof AttributeDefinition;
+	}
+	@DependsOn("editedItem")
+	public boolean isCodeAttribute() {
+		return editedItem != null && editedItem instanceof CodeAttributeDefinition;
 	}
 
 	@DependsOn("editedItem")

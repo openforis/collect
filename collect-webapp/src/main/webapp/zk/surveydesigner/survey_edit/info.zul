@@ -11,7 +11,7 @@
 			<caption label="${labels.survey.details}" />
 			<grid>
 				<columns>
-					<column width="150px" />
+					<column width="170px" />
 					<column />
 				</columns>
 				<rows>
@@ -58,7 +58,7 @@
 			</grid>
 		</groupbox>
 
-		<hlayout spacing="30px" style="padding: 30px">
+		<hlayout spacing="30px" style="padding: 30px" visible="@load(not vm.collectEarthSurvey)">
 			<hlayout>
 				<button label="${labels.survey.versioning_manager}"
 					onClick="@global-command('openVersioningManagerPopUp')"
@@ -76,7 +76,7 @@
 			</hlayout>
 		</hlayout>
 
-		<collapsiblepanel open="${not empty vm.surveyFiles}"
+		<collapsiblepanel open="${not empty vm.surveyFiles or vm.collectEarthSurvey}"
 			captionLabel="${labels.survey.files}">
 			<box>
 				<include src="survey_edit/survey_file_list.zul" />
