@@ -295,6 +295,45 @@
 
   	<include src="${arg.otherMinorGeneralDetailsForm}" />
   	
+    <collapsiblepanel captionLabel="${labels.survey.schema.attribute.collect_earth.section_title}" 
+   		open="true"
+		visible="@load(vm.attribute and vm.collectEarthSurvey)">
+    	<grid class="inner">
+    		<columns>
+    			<column width="150px" />
+    			<column />
+    		</columns>
+    		<rows>
+    			<row>
+					<fieldErrorHandler message="@load(vmsgs['fromCollectEarthCSV'])">
+		    			<label value="${labels.survey.schema.attribute.collect_earth.fromcsv}:" />
+		    		</fieldErrorHandler>
+		    		<hbox spacing="20px">
+			    		<fieldErrorHandler message="@load(vmsgs['fromCollectEarthCSV'])">
+			    			<checkbox
+			    				checked="@load(fx.fromCollectEarthCSV eq true) @save(fx.fromCollectEarthCSV)" 
+			    				onCheck="@command('applyChanges')" />
+			    		</fieldErrorHandler>
+						<fieldErrorHandler message="@load(vmsgs['showReadOnlyFieldInCollectEarth'])" 
+								visible="@load(fx.fromCollectEarthCSV)">
+			    			<label value="${labels.survey.schema.attribute.collect_earth.show_readonly_field.$}:" />
+							<image popup="showReadOnlyFieldInCollectEarthInfoTooltip" style="cursor:pointer" src="/assets/images/info-small.png" />
+			    			<checkbox checked="@bind(fx.showReadOnlyFieldInCollectEarth)" 
+			    				onCheck="@command('applyChanges')" />
+			    		</fieldErrorHandler>
+			    		<fieldErrorHandler message="@load(vmsgs['includedInCollectEarthHeader'])"
+    							visible="@load(fx.fromCollectEarthCSV)">
+			    			<label value="${labels.survey.schema.attribute.collect_earth.includeInHeader}:" />
+			    			<checkbox
+			    				checked="@load(fx.includedInCollectEarthHeader eq true) @save(fx.includedInCollectEarthHeader)" 
+			    				onCheck="@command('applyChanges')" />
+			    		</fieldErrorHandler>
+			    	</hbox>
+    			</row>
+    		</rows>
+    	</grid>
+    </collapsiblepanel>
+
   	<collapsiblepanel open="false" visible="@load(not vm.rootEntity)"
 		captionLabel="${labels.survey.schema.node.dependent_paths}">
 		<listbox id="dependentNodeListbox" rows="4"
@@ -319,6 +358,130 @@
   </groupbox>
 
   <include src="${arg.otherAttributesForm}" />
+    
+	<collapsiblepanel captionLabel="${labels.survey.schema.node.layout.$}" 
+		open="@load(vm.collectEarthSurvey and vm.codeAttribute)"
+		visible="@load(not vm.rootEntity and (not vm.collectEarthSurvey or vm.codeAttribute))">
+    	<vlayout width="100%">
+    		<grid class="inner" visible="@load(not vm.insideTableEntity and not vm.collectEarthSurvey)">
+    			<columns>
+    				<column width="150px" />
+    				<column width="200px" />
+    				<column width="200px" />
+    				<column width="200px" />
+    			</columns>
+    			<rows>
+    				<row>
+		  				<fieldErrorHandler message="@load(vmsgs['column'])">
+		  					<label value="${labels.survey.schema.node.layout.column.$}:" />
+							<image popup="columnInfoTooltip" style="cursor:pointer"
+								src="/assets/images/info-small.png" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['column'])">
+		  					<intbox value="@bind(fx.column)"
+		  						onChange="@command('applyChanges')" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['columnSpan'])">
+		  					<label value="${labels.survey.schema.node.layout.column_span.$}:" />
+							<image popup="columnSpanInfoTooltip" style="cursor:pointer"
+								src="/assets/images/info-small.png" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['columnSpan'])">
+		  					<intbox value="@bind(fx.columnSpan)"
+		  						onChange="@command('applyChanges')" />
+		  				</fieldErrorHandler>
+		  			</row>
+		  		</rows>
+		  	</grid>
+		  	<grid class="inner" visible="@load(not vm.collectEarthSurvey)">
+    			<columns>
+    				<column width="150px" />
+    				<column width="200px" />
+    				<column width="200px" />
+    				<column width="200px" />
+    			</columns>
+    			<rows>
+    				<row>
+		  				<fieldErrorHandler message="@load(vmsgs['width'])">
+		  					<label value="${labels.survey.schema.node.layout.width}:" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['width'])">
+		  					<intbox value="@bind(fx.width)"
+		  						onChange="@command('applyChanges')" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['labelWidth'])">
+		  					<label value="${labels.survey.schema.node.layout.label_width}:" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['labelWidth'])">
+		  					<intbox value="@bind(fx.labelWidth)"
+		  						onChange="@command('applyChanges')" />
+		  				</fieldErrorHandler>
+		  			</row>
+		  		</rows>
+		  	</grid>
+		  	<grid class="inner" visible="@load(not vm.insideTableEntity and not vm.collectEarthSurvey)">
+    			<columns>
+    				<column width="150px" />
+    				<column />
+    			</columns>
+    			<rows>
+			  		<row>
+		  				<fieldErrorHandler message="@load(vmsgs['labelOrientation'])">
+		  					<label value="${labels.survey.schema.node.layout.label_orientation.$}:" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['labelOrientation'])">
+		  					<radiogroup selectedItem="@bind(fx.labelOrientation)"
+								onCheck="@command('applyChanges')">
+								<radio 
+									label="${labels.survey.schema.node.layout.label_orientation.horizontal}"
+									value="HORIZONTAL" />
+								<radio
+									label="${labels.survey.schema.node.layout.label_orientation.vertical}"
+									value="VERTICAL" />
+							</radiogroup>
+		  				</fieldErrorHandler>
+		  			</row>
+    			</rows>
+    		</grid>
+			
+			<grid class="inner" visible="@load(not (vm.collectEarthSurvey or vm.attribute))">
+    			<columns>
+    				<column width="150px" />
+    				<column width="200px" />
+    				<column width="200px" />
+    				<column width="200px" />
+    			</columns>
+    			<rows>
+    				<row>
+		  				<fieldErrorHandler message="@load(vmsgs['backgroundColor'])">
+		  					<label value="${labels.survey.schema.node.layout.background_color}:" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['backgroundColor'])">
+		  					<textbox id="backgroundColorHiddenField" visible="false" 
+		  						value="@bind(fx.backgroundColor)"
+		  						onChange="@command('applyChanges')" />
+		  					<colorbox id="backgroundColorBox" 
+		  						value="@load(backgroundColorHiddenField.value)"
+		  						w:onChange="var t = zk.Widget.$('$backgroundColorHiddenField'); t.setValue(event.value); t.fireOnChange();"
+		  						hash="true" pickerPosition="right" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['backgroundTransparency'])">
+		  					<label value="${labels.survey.schema.node.layout.background_transparency}:" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['backgroundTransparency'])">
+		  					<spinner
+		  						value="@bind(fx.backgroundTransparency)"
+		  						onChange="@command('applyChanges')"
+		  						width="50px" />
+		  				</fieldErrorHandler>
+		  			</row>
+    			</rows>
+    		</grid>
+    		
+    		<include src="${arg.otherLayoutForm}" />
+
+    	</vlayout>
+    </collapsiblepanel>
     
     <collapsiblepanel open="false" captionLabel="${labels.survey.schema.node.other_labels}">
       	<grid class="inner">
@@ -453,7 +616,7 @@
       	<include src="${arg.otherLabelsForm}" />
     </collapsiblepanel>
 
-	<collapsiblepanel open="false" visible="@load(not vm.rootEntity)"
+	<collapsiblepanel open="false" visible="@load(not vm.rootEntity and not vm.collectEarthSurvey)"
 		captionLabel="${labels.survey.schema.node.versioning}">
 		<grid class="inner">
     		<columns>
@@ -500,169 +663,7 @@
     		</rows>
     	</grid>
 	</collapsiblepanel>
-	
-	<collapsiblepanel captionLabel="${labels.survey.schema.node.layout.$}" open="false"
-		visible="@load(not vm.rootEntity)">
-    	<vlayout width="100%">
-    		<grid class="inner" visible="@load(not vm.insideTableEntity)">
-    			<columns>
-    				<column width="150px" />
-    				<column width="200px" />
-    				<column width="200px" />
-    				<column width="200px" />
-    			</columns>
-    			<rows>
-    				<row visible="@load(not vm.collectEarthSurvey)">
-		  				<fieldErrorHandler message="@load(vmsgs['column'])">
-		  					<label value="${labels.survey.schema.node.layout.column.$}:" />
-							<image popup="columnInfoTooltip" style="cursor:pointer"
-								src="/assets/images/info-small.png" />
-		  				</fieldErrorHandler>
-		  				<fieldErrorHandler message="@load(vmsgs['column'])">
-		  					<intbox value="@bind(fx.column)"
-		  						onChange="@command('applyChanges')" />
-		  				</fieldErrorHandler>
-		  				<fieldErrorHandler message="@load(vmsgs['columnSpan'])">
-		  					<label value="${labels.survey.schema.node.layout.column_span.$}:" />
-							<image popup="columnSpanInfoTooltip" style="cursor:pointer"
-								src="/assets/images/info-small.png" />
-		  				</fieldErrorHandler>
-		  				<fieldErrorHandler message="@load(vmsgs['columnSpan'])">
-		  					<intbox value="@bind(fx.columnSpan)"
-		  						onChange="@command('applyChanges')" />
-		  				</fieldErrorHandler>
-		  			</row>
-		  		</rows>
-		  	</grid>
-		  	<grid class="inner">
-    			<columns>
-    				<column width="150px" />
-    				<column width="200px" />
-    				<column width="200px" />
-    				<column width="200px" />
-    			</columns>
-    			<rows>
-    				<row visible="@load(not vm.collectEarthSurvey)">
-		  				<fieldErrorHandler message="@load(vmsgs['width'])">
-		  					<label value="${labels.survey.schema.node.layout.width}:" />
-		  				</fieldErrorHandler>
-		  				<fieldErrorHandler message="@load(vmsgs['width'])">
-		  					<intbox value="@bind(fx.width)"
-		  						onChange="@command('applyChanges')" />
-		  				</fieldErrorHandler>
-		  				<fieldErrorHandler message="@load(vmsgs['labelWidth'])">
-		  					<label value="${labels.survey.schema.node.layout.label_width}:" />
-		  				</fieldErrorHandler>
-		  				<fieldErrorHandler message="@load(vmsgs['labelWidth'])">
-		  					<intbox value="@bind(fx.labelWidth)"
-		  						onChange="@command('applyChanges')" />
-		  				</fieldErrorHandler>
-		  			</row>
-		  		</rows>
-		  	</grid>
-		  	<grid class="inner" visible="@load(not vm.insideTableEntity)">
-    			<columns>
-    				<column width="150px" />
-    				<column />
-    			</columns>
-    			<rows>
-			  		<row visible="@load(not vm.collectEarthSurvey)">
-		  				<fieldErrorHandler message="@load(vmsgs['labelOrientation'])">
-		  					<label value="${labels.survey.schema.node.layout.label_orientation.$}:" />
-		  				</fieldErrorHandler>
-		  				<fieldErrorHandler message="@load(vmsgs['labelOrientation'])">
-		  					<radiogroup selectedItem="@bind(fx.labelOrientation)"
-								onCheck="@command('applyChanges')">
-								<radio 
-									label="${labels.survey.schema.node.layout.label_orientation.horizontal}"
-									value="HORIZONTAL" />
-								<radio
-									label="${labels.survey.schema.node.layout.label_orientation.vertical}"
-									value="VERTICAL" />
-							</radiogroup>
-		  				</fieldErrorHandler>
-		  			</row>
-    			</rows>
-    		</grid>
-			
-			<grid class="inner">
-    			<columns>
-    				<column width="150px" />
-    				<column width="200px" />
-    				<column width="200px" />
-    				<column width="200px" />
-    			</columns>
-    			<rows>
-    				<row visible="@load(not (vm.collectEarthSurvey or vm.attribute))">
-		  				<fieldErrorHandler message="@load(vmsgs['backgroundColor'])">
-		  					<label value="${labels.survey.schema.node.layout.background_color}:" />
-		  				</fieldErrorHandler>
-		  				<fieldErrorHandler message="@load(vmsgs['backgroundColor'])">
-		  					<textbox id="backgroundColorHiddenField" visible="false" 
-		  						value="@bind(fx.backgroundColor)"
-		  						onChange="@command('applyChanges')" />
-		  					<colorbox id="backgroundColorBox" 
-		  						value="@load(backgroundColorHiddenField.value)"
-		  						w:onChange="var t = zk.Widget.$('$backgroundColorHiddenField'); t.setValue(event.value); t.fireOnChange();"
-		  						hash="true" pickerPosition="right" />
-		  				</fieldErrorHandler>
-		  				<fieldErrorHandler message="@load(vmsgs['backgroundTransparency'])">
-		  					<label value="${labels.survey.schema.node.layout.background_transparency}:" />
-		  				</fieldErrorHandler>
-		  				<fieldErrorHandler message="@load(vmsgs['backgroundTransparency'])">
-		  					<spinner
-		  						value="@bind(fx.backgroundTransparency)"
-		  						onChange="@command('applyChanges')"
-		  						width="50px" />
-		  				</fieldErrorHandler>
-		  			</row>
-    			</rows>
-    		</grid>
-    		
-    		<include src="${arg.otherLayoutForm}" />
 
-    	</vlayout>
-    </collapsiblepanel>
-    
-    <collapsiblepanel captionLabel="${labels.survey.schema.attribute.collect_earth.section_title}" 
-   		open="@load(fx.fromCollectEarthCSV)"
-		visible="@load(vm.attribute)">
-    	<grid class="inner">
-    		<columns>
-    			<column width="150px" />
-    			<column />
-    		</columns>
-    		<rows>
-    			<row>
-					<fieldErrorHandler message="@load(vmsgs['fromCollectEarthCSV'])">
-		    			<label value="${labels.survey.schema.attribute.collect_earth.fromcsv}:" />
-		    		</fieldErrorHandler>
-		    		<hbox spacing="20px">
-			    		<fieldErrorHandler message="@load(vmsgs['fromCollectEarthCSV'])">
-			    			<checkbox
-			    				checked="@load(fx.fromCollectEarthCSV eq true) @save(fx.fromCollectEarthCSV)" 
-			    				onCheck="@command('applyChanges')" />
-			    		</fieldErrorHandler>
-						<fieldErrorHandler message="@load(vmsgs['showReadOnlyFieldInCollectEarth'])" 
-								visible="@load(fx.fromCollectEarthCSV)">
-			    			<label value="${labels.survey.schema.attribute.collect_earth.show_readonly_field.$}:" />
-							<image popup="showReadOnlyFieldInCollectEarthInfoTooltip" style="cursor:pointer" src="/assets/images/info-small.png" />
-			    			<checkbox checked="@bind(fx.showReadOnlyFieldInCollectEarth)" 
-			    				onCheck="@command('applyChanges')" />
-			    		</fieldErrorHandler>
-			    		<fieldErrorHandler message="@load(vmsgs['includedInCollectEarthHeader'])"
-    							visible="@load(fx.fromCollectEarthCSV)">
-			    			<label value="${labels.survey.schema.attribute.collect_earth.includeInHeader}:" />
-			    			<checkbox
-			    				checked="@load(fx.includedInCollectEarthHeader eq true) @save(fx.includedInCollectEarthHeader)" 
-			    				onCheck="@command('applyChanges')" />
-			    		</fieldErrorHandler>
-			    	</hbox>
-    			</row>
-    		</rows>
-    	</grid>
-    </collapsiblepanel>
-	
 	<popup id="nameInfoTooltip" width="300px">
 		<html><![CDATA[
       		${labels.global.item.name.info}
