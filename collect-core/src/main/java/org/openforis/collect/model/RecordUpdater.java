@@ -150,7 +150,7 @@ public class RecordUpdater {
 		}
 		
 		// re-calculate values and relevance
-		RecordDependentsUpdateResult dependentsUpdateResult = new RecordDependentsUpdater(configuration).updateDependentsAndSelf(record, dependentPointers);
+		RecordDependentsUpdateResult dependentsUpdateResult = new RecordDependentsUpdater(configuration).updateDependents(record, dependentPointers);
 		List<Attribute<?, ?>> dependentUpdatedAttributes = dependentsUpdateResult.getUpdatedAttributes();
 		changeMap.addValueChanges(dependentUpdatedAttributes);
 		
@@ -364,7 +364,7 @@ public class RecordUpdater {
 		NodePointer selfPointer = new NodePointer(attribute);
 		
 		RecordDependentsUpdater recordDependentsUpdater = new RecordDependentsUpdater(configuration);
-		RecordDependentsUpdateResult recordDependentsUpdateResult = recordDependentsUpdater.updateDependentsAndSelf(record, selfPointer);
+		RecordDependentsUpdateResult recordDependentsUpdateResult = recordDependentsUpdater.updateDependents(record, selfPointer);
 		
 		List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?,?>>();
 		updatedAttributes.add(attribute);
@@ -525,7 +525,7 @@ public class RecordUpdater {
 		changeMap.addNodeDeleteChange(record.getId(), record.getStep(), ancestorIds, parentEntity.getPath(), node);
 
 		// update dependents
-		RecordDependentsUpdateResult dependentsUpdateResult = new RecordDependentsUpdater(configuration).updateDependentsAndSelf(record, dependentPointers);
+		RecordDependentsUpdateResult dependentsUpdateResult = new RecordDependentsUpdater(configuration).updateDependents(record, dependentPointers);
 		List<Attribute<?, ?>> updatedAttributes = dependentsUpdateResult.getUpdatedAttributes();
 		changeMap.addValueChanges(updatedAttributes);
 		Set<NodePointer> updatedRelevancePointers = dependentsUpdateResult.getUpdatedRelevancePointers();

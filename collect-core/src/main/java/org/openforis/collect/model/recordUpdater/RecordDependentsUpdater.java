@@ -47,24 +47,36 @@ public class RecordDependentsUpdater {
 		this.configuration = configuration;
 	}
 	
+	public RecordDependentsUpdateResult updateDependents(CollectRecord record, NodePointer nodePointer) {
+		return updateDependents(record, Arrays.asList(nodePointer));
+	}
+
 	public RecordDependentsUpdateResult updateDependentsAndSelf(CollectRecord record, NodePointer nodePointer) {
 		return updateDependentsAndSelf(record, Arrays.asList(nodePointer));
 	}
-	
+
 	public RecordDependentsUpdateResult updateDependentsAndSelf(CollectRecord record, Collection<NodePointer> nodePointers) {
+		// update relevance first
+		Set<NodePointer> updatedRelevancePointers = new LinkedHashSet<NodePointer>();
+		
+		for (NodePointer nodePointer : nodePointers) {
+			Set<NodePointer> updatedDependentRelevancePointers = updateRelevance(record, nodePointer);
+			updatedRelevancePointers.addAll(updatedDependentRelevancePointers);
+		}
+		
+		RecordDependentsUpdateResult updateDependentsResult = updateDependents(record, nodePointers);
+		updateDependentsResult.updatedRelevancePointers.addAll(updatedRelevancePointers);
+
+		return updateDependentsResult;
+	}
+	
+	public RecordDependentsUpdateResult updateDependents(CollectRecord record, Collection<NodePointer> nodePointers) {
 		final Queue<NodePointer> queue = new LinkedList<NodePointer>();
 		queue.addAll(nodePointers);
 		
 		final Map<NodePointer, Integer> visitingCountByNodePointer = new HashMap<NodePointer, Integer>();
 
-		// update relevance first
 		final Set<NodePointer> updatedRelevancePointers = new LinkedHashSet<NodePointer>();
-		
-		for (NodePointer nodePointer : nodePointers) {
-			Set<NodePointer> updatedDependentRelevancePointers = updateRelevanceDependents(record, nodePointer);
-			updatedRelevancePointers.addAll(updatedDependentRelevancePointers);
-		}
-		
 		final List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?, ?>>();
 
 		while (!queue.isEmpty()) {
@@ -108,45 +120,17 @@ public class RecordDependentsUpdater {
 		return new RecordDependentsUpdateResult(updatedRelevancePointers, updatedAttributes);
 	}
 	
-	private Set<NodePointer> updateRelevanceDependents(CollectRecord record, NodePointer nodePointer) {
-		return updateRelevanceDependents(record, nodePointer, null);
-	}
-
 	private Set<NodePointer> updateRelevanceDependents(CollectRecord record, NodePointer nodePointer,
 			final Visitor<NodePointer> nodePointerDependentVisitor) {
-		final Set<NodePointer> updatedRelevancePointers = new LinkedHashSet<NodePointer>();
-
-		// update relevance
-		record.visitRelevanceDependenciesAndSelf(nodePointer, new Visitor<NodePointer>() {
-			public void visit(NodePointer nodePointerVisited) {
-				Entity entity = nodePointerVisited.getEntity();
-				NodeDefinition childDef = nodePointerVisited.getChildDefinition();
-				boolean oldRelevance = entity.isRelevant(childDef);
-				boolean relevance = calculateRelevance(nodePointerVisited);
-				if (oldRelevance != relevance) {
-					entity.setRelevant(childDef, relevance);
-
-					if (nodePointerDependentVisitor != null) {
-						nodePointerDependentVisitor.visit(nodePointerVisited);
-					}
-					updatedRelevancePointers.add(nodePointerVisited);
-
-					if (childDef instanceof EntityDefinition) {
-						List<Node<?>> childNodes = nodePointerVisited.getNodes();
-						for (Node<?> childNode : childNodes) {
-							Entity childEntity = (Entity) childNode;
-							EntityDefinition childDefinition = childEntity.getDefinition();
-							List<NodeDefinition> nestedChildDefinitions = childDefinition.getChildDefinitions();
-							for (NodeDefinition nodestedChildDefinition : nestedChildDefinitions) {
-								updatedRelevancePointers.add(new NodePointer(childEntity, nodestedChildDefinition));
-							}
-
-						}
-					}
-				}
-			}
-		});
-		return updatedRelevancePointers;
+		RelevanceUpdateVisitor relevanceUpdateVisitor = new RelevanceUpdateVisitor(nodePointerDependentVisitor);
+		record.visitRelevanceDependenciesAndSelf(nodePointer, relevanceUpdateVisitor);
+		return relevanceUpdateVisitor.getUpdatedRelevancePointers();
+	}
+	
+	private Set<NodePointer> updateRelevance(CollectRecord record, NodePointer nodePointer) {
+		RelevanceUpdateVisitor relevanceUpdateVisitor = new RelevanceUpdateVisitor();
+		relevanceUpdateVisitor.visit(nodePointer);
+		return relevanceUpdateVisitor.getUpdatedRelevancePointers();
 	}
 
 	private Set<Attribute<?, ?>> updateDependentDefaultValues(CollectRecord record, NodePointer nodePointer,
@@ -251,8 +235,7 @@ public class RecordDependentsUpdater {
 			List<AttributeDefault> attributeDefaults = defn.getAttributeDefaults();
 			for (AttributeDefault attributeDefault : attributeDefaults) {
 				if (attributeDefault.evaluateCondition(attribute)) {
-					Value value = attributeDefault.evaluate(attribute);
-					return value;
+					return attributeDefault.evaluate(attribute);
 				}
 			}
 			return null;
@@ -328,6 +311,52 @@ public class RecordDependentsUpdater {
 		}
 		return updatedAttributes;
 	}
+	
+	private class RelevanceUpdateVisitor implements Visitor<NodePointer> {
+		
+		private Set<NodePointer> updatedRelevancePointers = new LinkedHashSet<NodePointer>();
+		private Visitor<NodePointer> onRelevanceUpdateVisitor;
+
+		public RelevanceUpdateVisitor() {
+			this(null);
+		}
+		
+		public RelevanceUpdateVisitor(Visitor<NodePointer> onRelevanceUpdateVisitor) {
+			this.onRelevanceUpdateVisitor = onRelevanceUpdateVisitor;
+		}
+		
+		public void visit(NodePointer nodePointerVisited) {
+			Entity entity = nodePointerVisited.getEntity();
+			NodeDefinition childDef = nodePointerVisited.getChildDefinition();
+			boolean oldRelevance = entity.isRelevant(childDef);
+			boolean relevance = calculateRelevance(nodePointerVisited);
+			if (oldRelevance != relevance) {
+				entity.setRelevant(childDef, relevance);
+
+				if (onRelevanceUpdateVisitor != null) {
+					onRelevanceUpdateVisitor.visit(nodePointerVisited);
+				}
+				updatedRelevancePointers.add(nodePointerVisited);
+
+				if (childDef instanceof EntityDefinition) {
+					List<Node<?>> childNodes = nodePointerVisited.getNodes();
+					for (Node<?> childNode : childNodes) {
+						Entity childEntity = (Entity) childNode;
+						EntityDefinition childDefinition = childEntity.getDefinition();
+						List<NodeDefinition> nestedChildDefinitions = childDefinition.getChildDefinitions();
+						for (NodeDefinition nodestedChildDefinition : nestedChildDefinitions) {
+							updatedRelevancePointers.add(new NodePointer(childEntity, nodestedChildDefinition));
+						}
+
+					}
+				}
+			}
+		}
+		
+		public Set<NodePointer> getUpdatedRelevancePointers() {
+			return updatedRelevancePointers;
+		}
+	};
 
 	public static class RecordDependentsUpdateResult {
 

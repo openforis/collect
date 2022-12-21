@@ -241,7 +241,7 @@ public abstract class NodeDefinitionBuilder {
 			return (AttributeDefinitionBuilder) super.multiple();
 		}
 		
-		public NodeDefinitionBuilder key() {
+		public AttributeDefinitionBuilder key() {
 			this.key = true;
 			return this;
 		}

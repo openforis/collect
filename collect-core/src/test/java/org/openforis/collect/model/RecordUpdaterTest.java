@@ -979,8 +979,31 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 
 		updater.updateAttribute(code1, new Code("2"));
 
-		assertTrue(code1.getValue().equals(new Code("2")));
+		assertEquals(new Code("2"), code1.getValue());
 		assertTrue(code2.isEmpty());
 		assertTrue(code3.isEmpty());
 	}
+	
+	@Test
+	public void testRelevanceAndDefaultValueDependingOnDefaultValue() {
+		record(rootEntityDef(attributeDef("root_key").key(),
+				attributeDef("source")
+					.defaultValue("'false'"),
+				attributeDef("dependent")
+					.relevant("source = 'true'")
+					.defaultValue("root_key")
+			),
+			attribute("root_key", "1")
+		);
+		
+		TextAttribute source = record.getNodeByPath("/root/source");
+		TextAttribute dependent = record.getNodeByPath("/root/dependent");
+		
+		assertTrue(dependent.isEmpty());
+
+		updater.updateAttribute(source, new TextValue("true"));
+
+		assertEquals(new TextValue("1"), dependent.getValue());
+	}
+	
 }
