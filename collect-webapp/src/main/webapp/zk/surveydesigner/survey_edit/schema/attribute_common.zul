@@ -21,6 +21,7 @@
 		otherLayoutForm="${otherLayoutForm}" />
 
 	<collapsiblepanel open="false"
+		visible="@load(not vm.collectEarthSurvey)"
 		captionLabel="${labels.survey.schema.attribute.map_options.caption}">
 		<grid class="inner">
 			<columns>

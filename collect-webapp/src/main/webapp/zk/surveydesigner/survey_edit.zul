@@ -183,7 +183,8 @@
 						<!-- Advanced options -->
 						<combobutton
 							label="${labels.survey.preview.show_preview}"
-							onClick="@command('showDataCleansingPreview')">
+							onClick="@command('showDataCleansingPreview')"
+							visible="@load(not vm.collectEarthSurvey)">
 							<menupopup>
 								<menuitem
 									label="${labels.survey.preview.data_cleansing}"
@@ -193,6 +194,10 @@
 									onClick="@command('showDataEntryPreview')" />
 							</menupopup>
 						</combobutton>
+						
+						<button label="${labels.survey.preview.show_preview}"
+								onClick="@command('showDataCleansingPreview')"
+								visible="@load(vm.collectEarthSurvey)" />
 					</hlayout>
 				</east>
 			</borderlayout>

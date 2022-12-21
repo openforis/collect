@@ -41,20 +41,22 @@
       	visible="@load(not vm.singleRootEntityDefined)" />
     </hlayout>
     
-    <label value="${labels.survey.schema.form_version}:" />
-    
-    <combobox width="150px" model="@load(vm.formVersionsWithEmptyOption)"
-      selectedItem="@load(vm.selectedVersion)"
-      onChange="@command('versionSelected', version=self.selectedItem.value)">
-      <template name="model">
-        <comboitem label="@load(each.name)" />
-      </template>
-    </combobox>
-    
-    <button sclass="icon"
-      tooltiptext="${labels.survey.versioning_manager}"
-      onClick="@global-command('openVersioningManagerPopUp')"
-      image="/assets/images/edit-small.png" />
+    <hlayout visible="@load(not vm.collectEarthSurvey)">
+	    <label value="${labels.survey.schema.form_version}:" />
+	    
+	    <combobox width="150px" model="@load(vm.formVersionsWithEmptyOption)"
+	      selectedItem="@load(vm.selectedVersion)"
+	      onChange="@command('versionSelected', version=self.selectedItem.value)">
+	      <template name="model">
+	        <comboitem label="@load(each.name)" />
+	      </template>
+	    </combobox>
+	    
+	    <button sclass="icon"
+	      tooltiptext="${labels.survey.versioning_manager}"
+	      onClick="@global-command('openVersioningManagerPopUp')"
+	      image="/assets/images/edit-small.png" />
+  	</hlayout>
     
   </hlayout>
 </zk>
