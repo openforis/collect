@@ -337,19 +337,6 @@ public class RecordDependentsUpdater {
 					onRelevanceUpdateVisitor.visit(nodePointerVisited);
 				}
 				updatedRelevancePointers.add(nodePointerVisited);
-
-				if (childDef instanceof EntityDefinition) {
-					List<Node<?>> childNodes = nodePointerVisited.getNodes();
-					for (Node<?> childNode : childNodes) {
-						Entity childEntity = (Entity) childNode;
-						EntityDefinition childDefinition = childEntity.getDefinition();
-						List<NodeDefinition> nestedChildDefinitions = childDefinition.getChildDefinitions();
-						for (NodeDefinition nodestedChildDefinition : nestedChildDefinitions) {
-							updatedRelevancePointers.add(new NodePointer(childEntity, nodestedChildDefinition));
-						}
-
-					}
-				}
 			}
 		}
 		

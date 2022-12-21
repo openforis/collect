@@ -120,6 +120,7 @@ public class RecordUpdater {
 		beforeAttributeUpdate(attribute);
 		attribute.clearValue();
 		setSymbolOnFields(attribute, symbol);
+		attribute.updateSummaryInfo();
 		return afterAttributeUpdate(attribute);
 	}
 	
