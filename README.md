@@ -24,6 +24,17 @@ Developed under the [Open Foris Initiative](https://www.openforis.org)
 If you are not interested in the code but rather on the Collect features you might want to run it right away!
 Go to our [website](https://www.openforis.org/tools/collect.html) and download the installer directly there. There are versions for Windows, Mac OS X and Linux 32-bit and 64-bit. 
 
+
+## Install using Docker container
+
+Running the following command from command line will install Collect as a Docker container:
+```console
+$ docker run -m 4GB --env-file ./collect.env openforis/collect:latest
+```
+You can run this command in the same folder where you have defined the collect.env file or specify its path in the command, in the '--env-file' parameter.
+Collect will start on the port specified in the collect.env file (8080 by default).
+You can use the same command to start up Collect again once you stop it.
+
 ## Do you have any questions?
 
 Please register into our [Community Support Forum](https://www.openforis.support) and raise your question or feature request there. 
