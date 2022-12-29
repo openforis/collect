@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/collect" reloadable="false">
+	
+	<Resource 
+		name="jdbc/collectDs" 
+		auth="Container"
+		type="javax.sql.DataSource"
+		factory="org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory"
+		driverClassName="${collect.db.driver}"
+		url="${collect.db.url}"
+		username="${collect.db.username}"
+		password="${collect.db.password}"
+		maxActive="20"
+		maxIdle="5"
+	/>
+
+</Context>
