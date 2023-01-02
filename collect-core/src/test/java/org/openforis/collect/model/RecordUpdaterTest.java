@@ -678,6 +678,24 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		assertEquals("40.0", ((TextValue) doubleHeight.getValue()).getValue());
 	}
 	
+
+	@Test
+	public void testInitializeCalculatedAttributeInNestedSingleEntity() {
+		record(
+			rootEntityDef(
+				attributeDef("root_id").key(),
+				entityDef("single_entity",
+					attributeDef("source"),
+					attributeDef("dependent").calculated("idm:blank(source)")
+				)
+			)
+		);
+		
+		Attribute<?, TextValue> dependent = record.findNodeByPath("/root/single_entity/dependent");
+
+		assertEquals(new TextValue("true"), dependent.getValue());
+	}
+	
 	@Test
 	public void testCardinalityRevalidatedOnAttributeUpdate() {
 		record(

@@ -767,6 +767,9 @@ public class RecordUpdater {
 
 		addEmptyNodes(entity);
 		
+		// descendant pointers could have been changed
+		entityDescendantAndSelfPointers = getDescendantAndSelfNodePointers(entity);
+				
 		RecordDependentsUpdater recordDependentsUpdater = new RecordDependentsUpdater(configuration);
 		//recalculate attributes
 		//TODO exclude this when exporting for backup (not for Calc)
@@ -1006,9 +1009,13 @@ public class RecordUpdater {
 	}
 	
 	private List<NodePointer> getDescendantAndSelfNodePointers(Entity entity) {
-		List<NodePointer> pointers = new ArrayList<NodePointer>(getDescendantNodePointers(entity));
+		List<NodePointer> descendantNodePointers = getDescendantNodePointers(entity);
+		
+		List<NodePointer> pointers = new ArrayList<NodePointer>(descendantNodePointers);
+
 		if (!entity.isRoot()) {
-			pointers.add(new NodePointer(entity));
+			NodePointer selfPointer = new NodePointer(entity);
+			pointers.add(selfPointer);
 		}
 		return pointers;
 	}
