@@ -25,9 +25,33 @@ If you are not interested in the code but rather on the Collect features you mig
 Go to our [website](https://www.openforis.org/tools/collect.html) and download the installer directly there. There are versions for Windows, Mac OS X and Linux 32-bit and 64-bit. 
 
 
-## Install using Docker container
+## Install and run Collect as a Docker container
 
+### Prerequisites
+
+- [download and install Docker](https://www.docker.com/). Docker is an open platform for developing, shipping, and running applications.
+
+- Install a local database (PostgreSQL) as a Docker container. Run this command from command line; it will create also a database named 'arena' and a user 'arena' with password 'arena' and will make the DBMS listen on port 5444 (you can change those parameters as you wish):
+
+```console
+$ docker run -d --name collect-db -p 5432:5432 -e POSTGRES_DB=collect -e POSTGRES_PASSWORD=collect123 -e POSTGRES_USER=collect postgis/postgis:12-3.0
+```
+You can also use an already existing PostgreSQL database installed in a different way and configure Collect to connect to it.
+
+### Prepare a file with the parameters to pass to Collect
+
+The file (call it **collect.env**) must be a text file with this content:
+
+```properties
+COLLECT_DB_DRIVER=org.postgresql.Driver
+COLLECT_DB_URL=jdbc:postgresql://localhost:5432/collect
+COLLECT_DB_USERNAME=collect
+COLLECT_DB_PASSWORD=collect123
+```
+
+### Install and run Collect
 Running the following command from command line will install Collect as a Docker container:
+
 ```console
 $ docker run -m 4GB --env-file ./collect.env openforis/collect:latest
 ```
