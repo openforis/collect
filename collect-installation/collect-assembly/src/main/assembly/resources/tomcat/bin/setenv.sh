@@ -1,1 +1,1 @@
-export JAVA_OPTS="-Xmx1024m -Duser.language=en -Duser.country=US"
+export JAVA_OPTS="$JAVA_OPTS -XX:InitialRAMPercentage=10 -XX:MinRAMPercentage=50 -XX:MaxRAMPercentage=80 -Duser.language=en -Duser.country=US -server"

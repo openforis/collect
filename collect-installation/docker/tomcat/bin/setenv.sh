@@ -1,0 +1,1 @@
+export JAVA_OPTS="$JAVA_OPTS -XX:InitialRAMPercentage=10 -XX:MinRAMPercentage=50 -XX:MaxRAMPercentage=80 -Duser.language=en -Duser.country=US -Dcollect.db.driver=$COLLECT_DB_DRIVER -Dcollect.db.url=$COLLECT_DB_URL -Dcollect.db.username=$COLLECT_DB_USERNAME -Dcollect.db.password=$COLLECT_DB_PASSWORD -server"
