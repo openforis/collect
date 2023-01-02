@@ -53,11 +53,14 @@ COLLECT_DB_PASSWORD=collect123
 Running the following command from command line will install Collect as a Docker container:
 
 ```console
-$ docker run -m 4GB --env-file ./collect.env openforis/collect:latest
+$ docker run -m 4GB -p 8080:8080 --env-file ./collect.env openforis/collect:latest
 ```
 You can run this command in the same folder where you have defined the collect.env file or specify its path in the command, in the '--env-file' parameter.
 Collect will start on the port specified in the collect.env file (8080 by default).
 You can use the same command to start up Collect again once you stop it.
+
+### Open Collect in the web browser
+Once the Collect Docker container is started, you can access Collect user interface through your web browser at the address: <http://localhost:8080/collect>
 
 ## Do you have any questions?
 
