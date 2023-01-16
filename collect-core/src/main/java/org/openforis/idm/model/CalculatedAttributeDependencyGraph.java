@@ -41,14 +41,14 @@ public class CalculatedAttributeDependencyGraph extends NodeDependencyGraph {
 	@Override
 	protected Set<NodePathPointer> determineDependents(Node<?> source) throws InvalidExpressionException {
 		Survey survey = source.getSurvey();
-		Set<NodePathPointer> dependentPointers = survey.getCalculatedValueDependencies(source.getDefinition());
+		Set<NodePathPointer> dependentPointers = survey.getDefaultValueDependencies(source.getDefinition());
 		return dependentPointers;
 	}
 
 	@Override
 	protected Set<NodePathPointer> determineSources(Node<?> dependent) throws InvalidExpressionException {
 		Survey survey = dependent.getSurvey();
-		Set<NodePathPointer> sourcePointers = survey.getCalculatedValueSources(dependent.getDefinition());
+		Set<NodePathPointer> sourcePointers = survey.getDefaultdValueSources(dependent.getDefinition());
 		return sourcePointers;
 	}
 	

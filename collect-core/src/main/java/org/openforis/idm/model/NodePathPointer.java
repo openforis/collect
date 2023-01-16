@@ -1,5 +1,9 @@
 package org.openforis.idm.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 
 /**
@@ -62,5 +66,16 @@ public class NodePathPointer {
 		return true;
 	}
 	
-	
+	public static Set<NodePathPointer> filterPointersByVersion(Set<NodePathPointer> pointers, ModelVersion version) {
+		if (version == null) {
+			return pointers;
+		}
+		Set<NodePathPointer> result = new HashSet<NodePathPointer>(pointers.size());
+		for (NodePathPointer pointer : pointers) {
+			if (version.isApplicable(pointer.getReferencedNodeDefinition())) {
+				result.add(pointer);
+			}
+		}
+		return result;
+	}
 }

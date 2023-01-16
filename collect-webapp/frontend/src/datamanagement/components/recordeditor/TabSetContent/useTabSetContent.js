@@ -18,11 +18,11 @@ const useTabSetContent = (props) => {
         // check if all items in each tab is relevant or is not empty
         tab.items.some((itemDef) => {
           const { nodeDefinition } = itemDef
-          const { alwaysRelevant, hideWhenNotRelevant, id: nodeDefinitionId } = nodeDefinition
+          const { alwaysRelevant, hideWhenNotRelevant } = nodeDefinition
           return (
             alwaysRelevant ||
             !hideWhenNotRelevant ||
-            parentEntity.childrenRelevanceByDefinitionId[nodeDefinitionId] ||
+            parentEntity.isChildRelevant(nodeDefinition) ||
             parentEntity.hasSomeDescendantNotEmpty({ nodeDefinition })
           )
         })

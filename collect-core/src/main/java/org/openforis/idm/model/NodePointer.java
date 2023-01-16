@@ -81,7 +81,11 @@ public class NodePointer {
 		Record record = getRecord();
 		return record.getVersion();
 	}
-
+	
+	public boolean isNodesDeleted() {
+		return getRecord() == null;
+	}
+	
 	@Override
 	public String toString() {
 		return getEntityPath() + "/" + getChildName();

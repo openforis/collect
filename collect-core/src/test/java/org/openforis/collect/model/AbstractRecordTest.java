@@ -1,11 +1,14 @@
 package org.openforis.collect.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.Record;
 import org.openforis.idm.model.TextValue;
 import org.openforis.idm.model.Value;
 import org.openforis.idm.testfixture.NodeBuilder;
@@ -14,7 +17,7 @@ import org.openforis.idm.testfixture.NodeDefinitionBuilder;
 public abstract class AbstractRecordTest {
 	protected Survey survey;
 	protected RecordUpdater updater;
-	protected Record record;
+	protected CollectRecord record;
 
 	@Before
 	public void init() {
@@ -47,23 +50,33 @@ public abstract class AbstractRecordTest {
 		return record.findNodeByPath(path);
 	}
 
+	protected Attribute<?,?> attributeByPath(String path) {
+		return record.findNodeByPath(path);
+	}
+
 	protected NodeChangeSet updateAttribute(String path, String value) {
 		Attribute<?,?> attr = attributeByPath(path);
 		NodeChangeSet result = update(attr, value);
 		return result;
 	}
 
-	protected NodeChangeSet update(String path, String value) {
-		return update(attributeByPath(path), value);
-	}
-
 	@SuppressWarnings("unchecked")
 	protected NodeChangeSet update(Attribute<?, ?> attr, String value) {
 		return updater.updateAttribute((Attribute<?, Value>) attr, new TextValue(value));
 	}
-
-	protected Attribute<?,?> attributeByPath(String path) {
-		return record.findNodeByPath(path);
+	
+	protected NodeChangeSet updateMultipleAttribute(String entityPath, String attributeName, String... stringValues) {
+		Entity parentEntity = entityByPath(entityPath);
+		AttributeDefinition attrDef = (AttributeDefinition) parentEntity.getDefinition().getChildDefinition(attributeName);
+		return updateMultipleAttribute(parentEntity, attrDef, stringValues);
+	}
+	
+	protected NodeChangeSet updateMultipleAttribute(Entity parentEntity, AttributeDefinition def, String... stringValues) {
+		List<Value> values = new ArrayList<Value>();
+		for (String stringValue : stringValues) {
+			values.add(new TextValue(stringValue));
+		}
+		return updater.updateMultipleAttribute(parentEntity, def, values);
 	}
 
 }
