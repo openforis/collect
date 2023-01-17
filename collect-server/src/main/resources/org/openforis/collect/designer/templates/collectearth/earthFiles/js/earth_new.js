@@ -574,20 +574,47 @@ var initBooleanButtons = function() {
 };
 
 var initDateTimePickers = function() {
-	// http://eonasdan.github.io/bootstrap-datetimepicker/
-	$('.datepicker').datetimepicker({
-		format : DATE_FORMAT
-	}).on('dp.change', function(e) {
-		var inputField = $(this).find(".form-control");
-		// inputField.change();
-		updateData(inputField);
-	});
+	
 
-	$('.timepicker').datetimepicker({
-		format : TIME_FORMAT
-	}).on('dp.change', function(e) {
+	// http://eonasdan.github.io/bootstrap-datetimepicker/
+	$('.datepicker').tempusDominus({
+		display: {
+	    viewMode: 'decades',
+	    components: {
+	      decades: false,
+	      year: true,
+	      month: true,
+	      date: true,
+	      hours: false,
+	      minutes: false,
+	      seconds: false
+	    }
+	  }
+	});
+	
+
+
+	$('.timepicker').tempusDominus({
+		display: {
+	    viewMode: 'clock',
+	    components: {
+	      decades: false,
+	      year: false,
+	      month: false,
+	      date: false,
+	      hours: true,
+	      minutes: true,
+	      seconds: false
+	    }
+	  }
+	});
+	
+	$('.timepicker, .datepicker').each( function(){
 		var inputField = $(this).find(".form-control");
-		updateData(inputField);
+		inputField.on("change.td", function(e) {
+				// inputField.change();
+				updateData($(this));
+		})
 	});
 };
 

@@ -276,16 +276,19 @@ public class CEComponentHTMLFormatter {
 			case TIME:
 				XMLBuilder groupContainerBuilder = formControlContainer
 				.e("div") //$NON-NLS-1$
-					.a("class", "input-group date " + (((CEField) comp).getType() == CEFieldType.DATE ? "datepicker" : "timepicker")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					.a("class", "input-group date " + (((CEField) comp).getType() == CEFieldType.DATE ? "datepicker" : "timepicker")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					.a("id", elId + "timepicker"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				XMLBuilder inputFieldBuilder = groupContainerBuilder
 					.e("input") //$NON-NLS-1$
 						.a("id", elId) //$NON-NLS-1$
 						.a("name", elId) //$NON-NLS-1$
 						.a("class", "form-control"); //$NON-NLS-1$ //$NON-NLS-2$
 				groupContainerBuilder.e("span") //$NON-NLS-1$
-						.a("class", "input-group-addon") //$NON-NLS-1$ //$NON-NLS-2$
+						.a("class", "input-group-text") //$NON-NLS-1$ //$NON-NLS-2$
+						.a("data-td-target", "#" + elId + "timepicker") //$NON-NLS-1$ //$NON-NLS-2$
+						
 						.e("span") //$NON-NLS-1$
-							.a("class", "glyphicon glyphicon-time") //$NON-NLS-1$ //$NON-NLS-2$
+							.a("class", ((CEField) comp).getType() == CEFieldType.DATE ?  "fas fa-calendar" : "fas fa-clock" ) //$NON-NLS-1$ //$NON-NLS-2$
 				;
 				if (comp.isReadOnly()) {
 					inputFieldBuilder.a("disabled", "disabled");
