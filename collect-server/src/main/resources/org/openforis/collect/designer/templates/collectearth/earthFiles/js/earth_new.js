@@ -574,8 +574,6 @@ var initBooleanButtons = function() {
 };
 
 var initDateTimePickers = function() {
-	
-
 	// http://eonasdan.github.io/bootstrap-datetimepicker/
 	$('.datepicker').tempusDominus({
 		display: {
@@ -591,8 +589,6 @@ var initDateTimePickers = function() {
 	    }
 	  }
 	});
-	
-
 
 	$('.timepicker').tempusDominus({
 		display: {
