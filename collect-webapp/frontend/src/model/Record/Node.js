@@ -76,6 +76,7 @@ export class Node extends Serializable {
   }
 
   get relevant() {
-    return this.parent.childrenRelevanceByDefinitionId[this.definition.id]
+    if (!this.parent) return true
+    return this.parent.relevant && this.parent.isChildRelevant(this.definition)
   }
 }

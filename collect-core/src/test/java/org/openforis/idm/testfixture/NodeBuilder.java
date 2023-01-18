@@ -3,6 +3,8 @@ package org.openforis.idm.testfixture;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -45,7 +47,7 @@ public class NodeBuilder {
 			}
 		}
 		@SuppressWarnings("unchecked")
-		R record = (R) survey.createRecord(versionName, rootEntityName);
+		R record = (R) new CollectRecord((CollectSurvey) survey, versionName, rootEntityName);
 		addChildren(record.getRootEntity(), builders);
 		return record;
 	}

@@ -216,6 +216,7 @@ export class Entity extends Node {
   }
 
   isChildRelevant(childDef) {
-    return this.childrenRelevanceByDefinitionId[childDef.id]
+    const relevant = this.childrenRelevanceByDefinitionId[childDef.id]
+    return relevant !== false // relevance true by default
   }
 }

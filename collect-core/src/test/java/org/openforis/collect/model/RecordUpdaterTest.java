@@ -12,19 +12,28 @@ import static org.openforis.idm.testfixture.NodeBuilder.attribute;
 import static org.openforis.idm.testfixture.NodeBuilder.entity;
 import static org.openforis.idm.testfixture.NodeDefinitionBuilder.attributeDef;
 import static org.openforis.idm.testfixture.NodeDefinitionBuilder.entityDef;
+import static org.openforis.idm.testfixture.SurveyBuilder.codeList;
 
 import org.junit.Test;
 import org.openforis.collect.utils.Dates;
+import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.AttributeType;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Code;
+import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.IntegerAttribute;
+import org.openforis.idm.model.IntegerValue;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.TextAttribute;
 import org.openforis.idm.model.TextValue;
 import org.openforis.idm.testfixture.NodeBuilder;
+import org.openforis.idm.testfixture.SurveyBuilder;
 
 /**
  * @author D. Wiell
@@ -88,6 +97,45 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		assertNotNull(attrChange);
 	}
 
+	@Test
+	public void testUpdateMultipleAttribute() {
+		record(
+			rootEntityDef(
+				attributeDef("attribute").multiple()
+			),
+			attribute("attribute", "value 1"),
+			attribute("attribute", "value 2")
+		);
+		
+		Attribute<?,?> attr1 = attributeByPath("root/attribute[1]");
+		Attribute<?,?> attr2 = attributeByPath("root/attribute[2]");
+		
+		NodeChangeSet result = updateMultipleAttribute("root", "attribute", "value A", "value B");
+		
+		assertNotNull(result);
+		assertEquals(4, result.size());
+		
+		
+		NodeChange<?> attr1Change = result.getChange(attr1);
+		assertNotNull(attr1Change);
+		assertTrue(attr1Change instanceof NodeDeleteChange);
+		
+		NodeChange<?> attr2Change = result.getChange(attr2);
+		assertNotNull(attr2Change);
+		assertTrue(attr2Change instanceof NodeDeleteChange);
+		
+		Attribute<?,?> attr1New = attributeByPath("root/attribute[1]");
+		Attribute<?,?> attr2New = attributeByPath("root/attribute[2]");
+		
+		NodeChange<?> attr1NewChange = result.getChange(attr1New);
+		assertNotNull(attr1NewChange);
+		assertTrue(attr1NewChange instanceof AttributeAddChange);
+		
+		NodeChange<?> attr2NewChange = result.getChange(attr2New);
+		assertNotNull(attr2NewChange);
+		assertTrue(attr2NewChange instanceof AttributeAddChange);
+	}
+	
 	@Test
 	public void testCardinalityValidatedOnRecordInitialization() {
 		record(
@@ -331,12 +379,16 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 			),
 			entity("tree")
 		);
+		Entity tree = entityByPath("/root/tree[1]");
 		Attribute<?, ?> treeNum = attributeByPath("/root/tree[1]/tree_num");
 		
-		assertFalse(treeNum.isRelevant());
+		assertFalse(tree.isRelevant());
+		// descendant relevant not affected
+		assertTrue(treeNum.isRelevant());
 
-		update("/root/tree_relevant", "yes");
+		updateAttribute("/root/tree_relevant", "yes");
 		
+		assertTrue(tree.isRelevant());
 		assertTrue(treeNum.isRelevant());
 	}
 	
@@ -363,7 +415,7 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		assertFalse(attr.isRelevant());
 		assertFalse(notRelevantAttr.isRelevant());
 
-		update("/root/attr", "yes");
+		updateAttribute("/root/attr", "yes");
 		
 		assertTrue(tree.isRelevant());
 		assertFalse(notRelevantAttr.isRelevant());
@@ -568,13 +620,10 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 			rootEntityDef(
 				attributeDef("attribute1"),
 				attributeDef("attribute2")
-					.relevant("attribute1 = 1"),
-				attributeDef("attribute3")
-					.relevant("attribute2 = 2")
+					.relevant("attribute1 = 1")
 			),
 			attribute("attribute1", "1"),
-			attribute("attribute2", "2"),
-			attribute("attribute3", "3")
+			attribute("attribute2", "2")
 		);
 		Attribute<?, ?> attribute1 = record.findNodeByPath("/root/attribute1");
 		
@@ -587,10 +636,6 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		Boolean attribute2Relevance = rootEntityChange.getChildrenRelevance().get(attribute2Def.getId());
 		assertNotNull(attribute2Relevance);
 		assertFalse(attribute2Relevance);
-		NodeDefinition attribute3Def = record.getRootEntity().getDefinition().getChildDefinition("attribute3");
-		Boolean attribute3Relevance = rootEntityChange.getChildrenRelevance().get(attribute3Def.getId());
-		assertNotNull(attribute3Relevance);
-		assertFalse(attribute3Relevance);
 	}
 	
 	@Test
@@ -631,6 +676,24 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		TextAttribute doubleHeight = record.findNodeByPath("/root/tree[1]/double_height");
 		
 		assertEquals("40.0", ((TextValue) doubleHeight.getValue()).getValue());
+	}
+	
+
+	@Test
+	public void testInitializeCalculatedAttributeInNestedSingleEntity() {
+		record(
+			rootEntityDef(
+				attributeDef("root_id").key(),
+				entityDef("single_entity",
+					attributeDef("source"),
+					attributeDef("dependent").calculated("idm:blank(source)")
+				)
+			)
+		);
+		
+		Attribute<?, TextValue> dependent = record.findNodeByPath("/root/single_entity/dependent");
+
+		assertEquals(new TextValue("true"), dependent.getValue());
 	}
 	
 	@Test
@@ -863,6 +926,102 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		
 		// expected entity_2 max count = 2
 		assertEquals(Integer.valueOf(2), rootEntity.getMaxCount(entity2Def));
+	}
+
+	@Test
+	public void testDependentDefaultValueInNestedEntityUpdated() {
+		record(rootEntityDef(attributeDef("root_key").key(), entityDef("item",
+				attributeDef("item_key").type(AttributeType.NUMBER).numericType(Type.INTEGER)
+						.defaultValue("math:max(parent()/item/item_key) + 1").key(),
+				attributeDef("source").defaultValue("'2'"),
+				attributeDef("dependent").type(AttributeType.NUMBER).numericType(Type.INTEGER).relevant("source = '2'")
+						.defaultValue("item_key + 1"))
+				.multiple()));
+
+		Entity rootEntity = record.getRootEntity();
+
+		// insert a new item
+		updater.addEntity(rootEntity, "item");
+		Entity itemEntity = record.getNodeByPath("/root/item[1]");
+		assertNotNull(itemEntity);
+		
+		// check key attribute value set
+		IntegerAttribute itemKeyAttribute = record.getNodeByPath("/root/item[1]/item_key");
+		assertNotNull(itemKeyAttribute);
+		assertEquals(new IntegerValue(1), itemKeyAttribute.getValue());
+
+		// check source attribute default value set
+		TextAttribute sourceAttribute = record.getNodeByPath("/root/item[1]/source");
+		assertNotNull(sourceAttribute);
+		assertEquals(new TextValue("2"), sourceAttribute.getValue());
+
+		// check dependent is relevant
+		AttributeDefinition dependentDefinition = (AttributeDefinition) survey.getSchema().getDefinitionByPath("/root/item/dependent");
+		assertTrue(itemEntity.isRelevant(dependentDefinition));
+		
+		// check dependent default value applied
+		IntegerAttribute dependentAttribute = record.getNodeByPath("/root/item[1]/dependent");
+		assertNotNull(dependentAttribute);
+		assertEquals(new IntegerValue(2), dependentAttribute.getValue());
+	}
+	
+	@Test
+	public void testDependentCodeAttributesCleared() {
+		RecordUpdater updater = new RecordUpdater();
+		updater.setClearDependentCodeAttributes(true);
+		
+		CollectSurvey survey = new SurveyBuilder().codeLists(codeList("hierarchical_list").level("level_1").level("level_2").level("level_3"))
+				.rootEntityDef(entityDef("root", attributeDef("root_key").key(),
+						attributeDef("code1").type(AttributeType.CODE).codeList("hierarchical_list"),
+						attributeDef("code2").type(AttributeType.CODE).codeList("hierarchical_list").parentCodeAttribute("code1"),
+						attributeDef("code3").type(AttributeType.CODE).codeList("hierarchical_list").parentCodeAttribute("code2")
+						)
+				)
+				.build();
+
+		record = NodeBuilder.record(survey);
+		
+		updater.initializeRecord(record);
+
+		CodeAttribute code1 = record.getNodeByPath("/root/code1");
+		CodeAttribute code2 = record.getNodeByPath("/root/code2");
+		CodeAttribute code3 = record.getNodeByPath("/root/code3");
+		
+		updater.updateAttribute(code1, new Code("1"));
+		updater.updateAttribute(code2, new Code("1a"));
+		updater.updateAttribute(code3, new Code("1aB"));
+
+		assertNotNull(code1.getValue());
+		assertNotNull(code2.getValue());
+		assertNotNull(code3.getValue());
+
+		updater.updateAttribute(code1, new Code("2"));
+
+		assertEquals(new Code("2"), code1.getValue());
+		assertTrue(code2.isEmpty());
+		assertTrue(code3.isEmpty());
+	}
+	
+	@Test
+	public void testRelevanceAndDefaultValueDependingOnDefaultValue() {
+		record(rootEntityDef(attributeDef("root_key").key(),
+				attributeDef("source")
+					.defaultValue("'false'"),
+				attributeDef("dependent")
+					.relevant("source = 'true'")
+					.defaultValue("root_key")
+			),
+			attribute("root_key", "1")
+		);
+		
+		TextAttribute source = record.getNodeByPath("/root/source");
+		TextAttribute dependent = record.getNodeByPath("/root/dependent");
+		
+		assertTrue(dependent.isEmpty());
+
+		updater.updateAttribute(source, new TextValue("true"));
+
+		assertEquals(new TextValue("1"), dependent.getValue());
 	}
 	
 }

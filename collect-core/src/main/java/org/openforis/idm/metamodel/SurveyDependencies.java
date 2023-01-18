@@ -6,6 +6,7 @@ package org.openforis.idm.metamodel;
 import java.util.List;
 import java.util.Set;
 
+import org.openforis.idm.metamodel.Survey.DependencyType;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.ComparisonCheck;
 import org.openforis.idm.metamodel.validation.CustomCheck;
@@ -47,19 +48,19 @@ class SurveyDependencies {
 
 	private Survey survey;
 
-	private StateDependencyMap calculatedValueDependencies;
+	private StateDependencyMap defaultValueDependencies;
 	private StateDependencyMap minCountDependencies;
 	private StateDependencyMap maxCountDependencies;
 	private StateDependencyMap relevanceDependencies;
 	private StateDependencyMap validationDependencies;
 	private StateDependencyMap parentCodeDependencies;
-
+	
 	SurveyDependencies(Survey survey) {
 		this.survey = survey;
 		SurveyContext surveyContext = this.survey.getContext();
 		ExpressionEvaluator expressionEvaluator = surveyContext.getExpressionEvaluator();
 		
-		this.calculatedValueDependencies = new StateDependencyMap(expressionEvaluator);
+		this.defaultValueDependencies = new StateDependencyMap(expressionEvaluator);
 		this.minCountDependencies = new StateDependencyMap(expressionEvaluator);
 		this.maxCountDependencies = new StateDependencyMap(expressionEvaluator);
 		this.relevanceDependencies = new StateDependencyMap(expressionEvaluator);
@@ -127,13 +128,11 @@ class SurveyDependencies {
 				currentCodeDefn = currentCodeDefn.getParentCodeAttributeDefinition();
 			}
 		}
-		//calculated values
-		if ( defn.isCalculated() ) {
-			List<AttributeDefault> attributeDefaults = defn.getAttributeDefaults();
-			for (AttributeDefault attributeDefault : attributeDefaults) {
-				calculatedValueDependencies.registerDependencies(defn, attributeDefault.getCondition());
-				calculatedValueDependencies.registerDependencies(defn, attributeDefault.getExpression());
-			}
+		// default values
+		List<AttributeDefault> attributeDefaults = defn.getAttributeDefaults();
+		for (AttributeDefault attributeDefault : attributeDefaults) {
+			defaultValueDependencies.registerDependencies(defn, attributeDefault.getCondition());
+			defaultValueDependencies.registerDependencies(defn, attributeDefault.getExpression());
 		}
 	}
 
@@ -172,12 +171,12 @@ class SurveyDependencies {
 		}
 	}
 
-	Set<NodePathPointer> getCalculatedValueDependencies(NodeDefinition definition) {
-		return calculatedValueDependencies.getDependents(definition);
+	Set<NodePathPointer> getDefaultValueDependencies(NodeDefinition definition) {
+		return defaultValueDependencies.getDependents(definition);
 	}
 	
-	Set<NodePathPointer> getCalculatedValueSources(NodeDefinition definition) {
-		return calculatedValueDependencies.getSources(definition);
+	Set<NodePathPointer> getDefaultValueSources(NodeDefinition definition) {
+		return defaultValueDependencies.getSources(definition);
 	}
 	
 	Set<NodePathPointer> getMinCountDependencies(NodeDefinition definition) {
@@ -223,5 +222,23 @@ class SurveyDependencies {
 	Set<NodePathPointer> getRelatedCodeSources(CodeAttributeDefinition definition) {
 		return parentCodeDependencies.getSources(definition);
 	}
-
+	
+	Set<NodePathPointer> getDependencies(NodeDefinition definition, DependencyType dependencyType) {
+		switch (dependencyType) {
+		case DEFAULT_VALUE:
+			return defaultValueDependencies.getDependents(definition);
+		case MAX_COUNT:
+			return maxCountDependencies.getDependents(definition);
+		case MIN_COUNT:
+			return minCountDependencies.getDependents(definition);
+		case PARENT_CODE:
+			return parentCodeDependencies.getDependents(definition);
+		case RELEVANCE:
+			return relevanceDependencies.getDependents(definition);
+		case VALIDATION:
+			return validationDependencies.getDependents(definition);
+		default:
+			throw new IllegalArgumentException("DependencyType not supported: " + dependencyType);
+		}		
+	}
 }

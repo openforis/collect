@@ -3,6 +3,8 @@
  */
 package org.openforis.idm.model;
 
+import static org.openforis.collect.model.CollectRecord.DEFAULT_APPLIED_POSITION;
+
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -203,6 +205,16 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 	public String extractTextValue() {
 		AbstractValue value = (AbstractValue) getValue();
 		return value == null ? null : value.toInternalString();
+	}
+	
+	public boolean isDefaultValueApplied() {
+		return getField(0).getState().get(DEFAULT_APPLIED_POSITION);
+	}
+
+	public void setDefaultValueApplied(boolean applied) {
+		for (Field<?> field : getFields()) {
+			field.getState().set(DEFAULT_APPLIED_POSITION, applied);
+		}
 	}
 	
 	@Override

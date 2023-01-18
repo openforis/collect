@@ -18,6 +18,7 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.io.ReferenceDataImportStatus;
 import org.openforis.collect.io.data.DataLine.EntityIdentifier;
@@ -87,7 +88,7 @@ public class CSVDataImportJob extends Job {
 	private CSVDataImportInput input;
 	//transient
 	private File tempInputFilesFolder;
-	
+
 	public CSVDataImportJob() {
 		super();
 	}
@@ -239,7 +240,7 @@ public class CSVDataImportJob extends Job {
 		private EntityDefinition parentEntityDefinition;
 		
 		private CSVDataImportSettings settings;
-
+		
 		public CSVDataImportInput(File file, CollectSurvey survey, Step[] steps, Integer parentEntityDefinitionId,
 				CSVDataImportSettings settings) {
 			this(file, survey, toSet(steps), parentEntityDefinitionId, settings);
@@ -343,6 +344,10 @@ public class CSVDataImportJob extends Job {
 		private Set<RecordStepKey> deletedEntitiesRecordKeys;
 		private transient DataCSVReader reader;
 		private ReferenceDataImportStatus<ParsingError> dataImportStatus;
+
+		// output
+		private int skippedFieldValues;
+		private int updatedFieldValues;
 
 		public CSVDataImportTask() {
 			deletedEntitiesRecordKeys = new HashSet<RecordStepKey>();
@@ -601,11 +606,9 @@ public class CSVDataImportJob extends Job {
 			//delete all multiple attributes
 			for (Entry<FieldValueKey, String> entry : entrySet) {
 				FieldValueKey fieldValueKey = entry.getKey();
-				EntityDefinition ancestorDefn = ancestorEntity.getDefinition();
-				Schema schema = ancestorDefn.getSchema();
-				AttributeDefinition attrDefn = (AttributeDefinition) schema.getDefinitionById(fieldValueKey.getAttributeDefinitionId());
-				Entity parentEntity = getOrCreateParentEntity(ancestorEntity, attrDefn);
+				AttributeDefinition attrDefn = (AttributeDefinition) ancestorEntity.getSchema().getDefinitionById(fieldValueKey.getAttributeDefinitionId());
 				if (attrDefn.isMultiple()) {
+					Entity parentEntity = getOrCreateParentEntity(ancestorEntity, attrDefn);
 					List<Node<?>> attributes = parentEntity.getChildren(attrDefn);
 					int tot = attributes.size();
 					for (int i = 0; i < tot; i++) {
@@ -674,9 +677,14 @@ public class CSVDataImportJob extends Job {
 				@SuppressWarnings("unchecked")
 				Field<Object> field = (Field<Object>) attr.getField(fieldName);
 				Object fieldValue = field.parseValue(value);
-				NodeChangeSet changes = recordUpdater.updateField(field, fieldValue);
-				if (nodeChangeBatchProcessor != null) {
-					nodeChangeBatchProcessor.add(changes, adminUser.getUsername());
+				if (ObjectUtils.equals(fieldValue, field.getValue())) {
+					skippedFieldValues ++;
+				} else {
+					NodeChangeSet changes = recordUpdater.updateField(field, fieldValue);
+					if (nodeChangeBatchProcessor != null) {
+						nodeChangeBatchProcessor.add(changes, adminUser.getUsername());
+					}
+					updatedFieldValues ++;
 				}
 			}
 		}
@@ -920,6 +928,14 @@ public class CSVDataImportJob extends Job {
 		
 		public ReferenceDataImportStatus<ParsingError> getDataImportStatus() {
 			return dataImportStatus;
+		}
+		
+		public int getSkippedFieldValues() {
+			return skippedFieldValues;
+		}
+		
+		public int getUpdatedFieldValues() {
+			return updatedFieldValues;
 		}
 	}
 	

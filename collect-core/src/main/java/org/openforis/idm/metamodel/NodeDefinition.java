@@ -485,7 +485,7 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 
 	public Set<NodePathPointer> getCalculatedValueDependencies() {
 		Survey survey = getSurvey();
-		return survey.getCalculatedValueDependencies(this);
+		return survey.getDefaultValueDependencies(this);
 	}
 
 	public List<NodeDefinition> getCalculatedValueDependentDefinitions() {
