@@ -3,8 +3,8 @@
  */
 package org.openforis.collect.persistence.jooq.tables;
 
-import java.sql.Types;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.jooq.DataType;
@@ -23,6 +23,17 @@ import org.openforis.collect.persistence.utils.TableMetaData.ColumnMetaData;
 public class Lookup extends TableImpl<LookupRecord> {
 
 	private static final long serialVersionUID = 1L;
+	
+	private static final Map<String, DataType<?>> TYPES_BY_NAME = new HashMap<String, DataType<?>>(){
+		private static final long serialVersionUID = 1L;
+	{
+		put(SQLDataType.CHAR.getTypeName(), SQLDataType.CHAR);
+		put(SQLDataType.DECIMAL.getTypeName(), SQLDataType.DECIMAL);
+		put(SQLDataType.FLOAT.getTypeName(), SQLDataType.FLOAT);
+		put(SQLDataType.INTEGER.getTypeName(), SQLDataType.INTEGER);
+		put(SQLDataType.VARCHAR.getTypeName(), SQLDataType.VARCHAR);
+	}};
+	
 	private static Map<String, Lookup> nameToLookup;
 	
 	private boolean initialized = false;
@@ -48,7 +59,7 @@ public class Lookup extends TableImpl<LookupRecord> {
 		for (ColumnMetaData colMetadata : tableMetaData.getColumnsMetaData()) {
 			String colName = colMetadata.getName();
 			if ( this.field(colName) == null ) {
-				Integer dataType = colMetadata.getDataType();
+				String dataType = colMetadata.getDataTypeName();
 				this.createField(colName, dataType);
 			}
 		}
@@ -63,21 +74,16 @@ public class Lookup extends TableImpl<LookupRecord> {
 		return createField(name, org.jooq.impl.SQLDataType.INTEGER, this);
 	}
 	
-	public TableField<LookupRecord, ?> createField(String name, int sqlDataType) {
-		return createField(name, getDataType(sqlDataType), this);
+	public TableField<LookupRecord, ?> createField(String name, String sqlDataTypeName) {
+		return createField(name, getDataType(sqlDataTypeName), this);
 	}
 
-	private DataType<?> getDataType(int sqlDataType) {
-		switch(sqlDataType) {
-		case Types.INTEGER:
-			return SQLDataType.INTEGER;
-		case Types.CHAR:
-			return SQLDataType.CHAR;
-		case Types.VARCHAR:
-			return SQLDataType.VARCHAR;
-		default:
-			throw new IllegalArgumentException("Unsupported SQL data type: " + sqlDataType);
+	private DataType<?> getDataType(String sqlDataTypeName) {
+		DataType<?> sqlDataType = TYPES_BY_NAME.get(sqlDataTypeName.toLowerCase(Locale.ENGLISH));
+		if (sqlDataType == null) {
+			throw new IllegalArgumentException("Unsupported SQL data type: " + sqlDataTypeName);
 		}
+		return sqlDataType;
 	}
 	
 	public boolean isInitialized() {

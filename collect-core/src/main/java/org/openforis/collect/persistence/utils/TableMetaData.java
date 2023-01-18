@@ -22,20 +22,20 @@ public class TableMetaData {
 	public static class ColumnMetaData {
 		
 		private String name;
-		private Integer dataType;
+		private String dataTypeName;
 		
-		public ColumnMetaData(String name, Integer dataType) {
+		public ColumnMetaData(String name, String dataTypeName) {
 			super();
 			this.name = name;
-			this.dataType = dataType;
+			this.dataTypeName = dataTypeName;
 		}
 		
 		public String getName() {
 			return name;
 		}
 		
-		public Integer getDataType() {
-			return dataType;
+		public String getDataTypeName() {
+			return dataTypeName;
 		}
 	}
 }

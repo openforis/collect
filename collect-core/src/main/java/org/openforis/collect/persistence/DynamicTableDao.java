@@ -180,8 +180,9 @@ public class DynamicTableDao extends JooqDaoSupport {
 			TableMetaData tableMetaData = new TableMetaData();
 			do {
 				String colName = columnRs.getString("COLUMN_NAME").toLowerCase(Locale.ENGLISH);
-				int dataType = columnRs.getInt("DATA_TYPE");
-				tableMetaData.addColumnMetaData(new ColumnMetaData(colName, dataType));
+				String dataTypeName = columnRs.getString("TYPE_NAME");
+
+				tableMetaData.addColumnMetaData(new ColumnMetaData(colName, dataTypeName));
 			} while (columnRs.next());
 			return tableMetaData;
 		} else {
