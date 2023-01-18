@@ -318,7 +318,7 @@ public class CEComponentHTMLFormatter {
 			.a("id", elId) //$NON-NLS-1$
 			.a("name", elId) //$NON-NLS-1$
 			.a("data-field-type", comp.getType().name()) //$NON-NLS-1$
-			.a("class", "form-control selectboxit show-menu-arrow show-tick") //$NON-NLS-1$ //$NON-NLS-2$
+			.a("class", "form-select") //$NON-NLS-1$ //$NON-NLS-2$
 			.a("data-width", "75px"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (comp.getParentName() != null) {
 			selectBuilder.a("data-parent-id-field-id", comp.getParentName()); //$NON-NLS-1$
@@ -360,7 +360,7 @@ public class CEComponentHTMLFormatter {
 			.a("id", elId) //$NON-NLS-1$
 			.a("name", elId) //$NON-NLS-1$
 			.a("data-field-type", comp.getType().name()) //$NON-NLS-1$
-			.a("class", "form-control selectboxit show-menu-arrow show-tick") //$NON-NLS-1$ //$NON-NLS-2$
+			.a("class", "form-select") //$NON-NLS-1$ //$NON-NLS-2$
 			.a("data-width", "75px"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		//add root items, if any
