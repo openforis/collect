@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 
-const HEADER_HEIGHT = 55
-const PADDING = 10
+const HEADER_HEIGHT = 57
+const PADDING = 6
 
 class MaxAvailableSpaceContainer extends Component {
   constructor() {
