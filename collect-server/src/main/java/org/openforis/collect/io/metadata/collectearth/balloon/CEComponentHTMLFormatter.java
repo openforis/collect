@@ -92,7 +92,7 @@ public class CEComponentHTMLFormatter {
 
 					cellBuilder
 						.e("label") //$NON-NLS-1$
-							.a("class", "control-label col") //$NON-NLS-1$ //$NON-NLS-2$
+							.a("class", "control-label col-sm-4") //$NON-NLS-1$ //$NON-NLS-2$
 							.t( row.getLabelOrName() );
 
 
@@ -149,7 +149,7 @@ public class CEComponentHTMLFormatter {
 			//label element
 			formGroupBuilder.e("label") //$NON-NLS-1$
 				.a("for", elId) //$NON-NLS-1$
-				.a("class", "control-label col") //$NON-NLS-1$ //$NON-NLS-2$
+				.a("class", "control-label col-sm-4") //$NON-NLS-1$ //$NON-NLS-2$
 				.t( comp.getLabelOrName() );
 
 			String tooltip = comp.getTooltip();
@@ -157,7 +157,7 @@ public class CEComponentHTMLFormatter {
 		}
 		//form control external container (for grid alignment)
 		XMLBuilder formControlContainer = formGroupBuilder.e("div") //$NON-NLS-1$
-				.a("class", "col"); //$NON-NLS-1$ //$NON-NLS-2$
+				.a("class", "col-sm-8"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		String componentAdditionalClass =  comp.isExtra() || comp.isCalculated() ? " " + CollectEarthBalloonGenerator.EXTRA_HIDDEN_FIELD_CLASS : "";
 
@@ -318,7 +318,7 @@ public class CEComponentHTMLFormatter {
 			.a("id", elId) //$NON-NLS-1$
 			.a("name", elId) //$NON-NLS-1$
 			.a("data-field-type", comp.getType().name()) //$NON-NLS-1$
-			.a("class", "form-select") //$NON-NLS-1$ //$NON-NLS-2$
+			.a("class", "form-control selectboxit show-menu-arrow show-tick") //$NON-NLS-1$ //$NON-NLS-2$
 			.a("data-width", "75px"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (comp.getParentName() != null) {
 			selectBuilder.a("data-parent-id-field-id", comp.getParentName()); //$NON-NLS-1$
@@ -360,7 +360,7 @@ public class CEComponentHTMLFormatter {
 			.a("id", elId) //$NON-NLS-1$
 			.a("name", elId) //$NON-NLS-1$
 			.a("data-field-type", comp.getType().name()) //$NON-NLS-1$
-			.a("class", "form-select") //$NON-NLS-1$ //$NON-NLS-2$
+			.a("class", "form-control selectboxit show-menu-arrow show-tick") //$NON-NLS-1$ //$NON-NLS-2$
 			.a("data-width", "75px"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		//add root items, if any
