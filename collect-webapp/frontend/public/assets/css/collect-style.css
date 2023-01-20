@@ -73,11 +73,10 @@ header .breadcrumb {
 
 .main-content-wrapper {
   position: absolute;
-  top: 60px;
+  top: 57px;
   bottom: 0px;
   left: 200px;
   right: 0px;
-  margin: 2px;
   overflow: auto;
 }
 

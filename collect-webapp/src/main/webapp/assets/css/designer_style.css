@@ -334,3 +334,12 @@ div.z-listbox-header th.z-listheader-sort-over {
 	width: 100%;
 }
 
+
+.survey-edit__control-bar-wrapper {
+	right: 0;
+	left: unset !important;
+}
+
+.survey-edit__south-panel .z-south-body {
+	padding: 0;
+}
