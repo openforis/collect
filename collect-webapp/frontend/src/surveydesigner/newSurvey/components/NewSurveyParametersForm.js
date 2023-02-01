@@ -1,8 +1,10 @@
+import './NewSurveyParametersForm.css'
+
 import React from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withFormik } from 'formik'
-import { Form, Row, Col } from 'reactstrap'
+import { Form, Row, Col, FormGroup, Label } from 'reactstrap'
 
 import User from 'model/User'
 
@@ -21,8 +23,12 @@ import Strings from 'utils/Strings'
 
 const templateTypes = ['BLANK', 'BIOPHYSICAL', 'COLLECT_EARTH', 'COLLECT_EARTH_IPCC']
 
+const labelColSpan = 3
+const fieldColSpan = 6
+const fieldProps = { labelColSpan, fieldColSpan }
+
 const NewSurveyParametersForm = (props) => {
-  const { userGroups, handleSubmit, handleChange } = props
+  const { userGroups, handleSubmit, handleChange, values } = props
 
   const EMPTY_OPTION = (
     <option key="-1" value="" hidden>
@@ -61,16 +67,20 @@ const NewSurveyParametersForm = (props) => {
 
   const languageOptions = [EMPTY_OPTION]
     .concat(mainLanguageItems.map(languageItemToOption))
-    .concat([<option disabled>──────────</option>])
+    .concat([
+      <option key="__separator__" disabled>
+        ──────────
+      </option>,
+    ])
     .concat(otherLanguageItems.map(languageItemToOption))
 
-  const fieldProps = { labelColSpan: 4, fieldColSpan: 8 }
   return (
     <Form onSubmit={handleSubmit}>
       <TextFormItem
         name="name"
         label={L.l('survey.name')}
         {...fieldProps}
+        fieldColSpan={9}
         {...props}
         handleChange={(e) => {
           e.target.value = normalizeInternalName(e.target.value)
@@ -80,6 +90,14 @@ const NewSurveyParametersForm = (props) => {
       <SelectFormItem name="templateType" label={L.l('survey.templateType')} {...fieldProps} {...props}>
         {templateTypeOptions}
       </SelectFormItem>
+      {values.templateType && (
+        <FormGroup row>
+          <Label sm={2}></Label>
+          <Col sm={10} className="new-survey-form__template-description-col">
+            {L.l('survey.templateTypeDescription.' + values.templateType)}
+          </Col>
+        </FormGroup>
+      )}
       <SelectFormItem name="defaultLanguageCode" label={L.l('survey.defaultLanguage')} {...fieldProps} {...props}>
         {languageOptions}
       </SelectFormItem>

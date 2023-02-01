@@ -390,6 +390,12 @@
       "COLLECT_EARTH": "Collect Earth",
       "COLLECT_EARTH_IPCC": "Collect Earth + IPCC"
     },
+    "templateTypeDescription": {
+      "BLANK": "Create a completely new survey from scratch with no pre-loaded attributes",
+      "BIOPHYSICAL": "Base for a National Forest Inventory survey based on a Cluster/Plot sampling approach",
+      "COLLECT_EARTH": "Basic Collect Earth survey containing all necessary attributes without extras. Collect Earth needs some standard attributes in a survey and this template provides them, you then need to add your own questions.",
+      "COLLECT_EARTH_IPCC": "Start with a Collect Earth survey already containing the basic IPCC Land Use representation Categories/Conversion/Subdivision. This survey can be used for FREL/GHGi activity data collection. This survey can be extended or modified."
+    },
     "projectName": "Title",
     "language": "Language",
     "defaultLanguage": "Default Language",
