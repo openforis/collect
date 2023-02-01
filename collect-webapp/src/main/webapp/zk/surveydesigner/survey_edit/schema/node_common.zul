@@ -494,7 +494,7 @@
       			<column />
       		</columns>
       		<rows>
-      			<row>
+      			<row visible="@load(not vm.collectEarthSurvey)">
 	      			<fieldErrorHandler
 	      				message="@load(vmsgs['headingLabel'])">
 	      				<label
@@ -510,7 +510,7 @@
 	      					onChange="@command('applyChanges')" />
 	      			</fieldErrorHandler>
 	      		</row>
-	      		<row visible="${not vm.rootEntity}">
+	      		<row visible="${not vm.rootEntity and not vm.collectEarthSurvey}">
 	      			<fieldErrorHandler
 	      				message="@load(vmsgs['numberLabel'])">
 	      				<label
@@ -525,7 +525,7 @@
 	      					onChange="@command('applyChanges')" />
 	      			</fieldErrorHandler>
 	      		</row>
-      			<row>
+      			<row visible="@load(not vm.collectEarthSurvey)">
 	      			<fieldErrorHandler
 	      				message="@load(vmsgs['abbreviatedLabel'])">
 	      				<label
@@ -555,7 +555,7 @@
 	      					onChange="@command('applyChanges')" />
 	      			</fieldErrorHandler>
 	      		</row>
-	      		<row>
+      			<row visible="@load(not vm.collectEarthSurvey)">
 	      			<fieldErrorHandler
 	      				message="@load(vmsgs['pcPromptLabel'])">
 	      				<label
@@ -570,7 +570,7 @@
 	      					onChange="@command('applyChanges')" />
 	      			</fieldErrorHandler>
 	      		</row>
-      			<row>
+      			<row visible="@load(not vm.collectEarthSurvey)">
 	                <fieldErrorHandler
 	                	message="@load(vmsgs['interviewPromptLabel'])">
 		  				<label
@@ -585,7 +585,7 @@
 	                		onChange="@command('applyChanges')" />
 	                </fieldErrorHandler>
       			</row>
-      			<row>
+      			<row visible="@load(not vm.collectEarthSurvey)">
 	                <fieldErrorHandler
 	                	message="@load(vmsgs['paperPromptLabel'])">
 		  				<label
@@ -600,7 +600,7 @@
 	                		onChange="@command('applyChanges')" />
 	                </fieldErrorHandler>
       			</row>
-      			<row>
+      			<row visible="@load(not vm.collectEarthSurvey)">
       				<fieldErrorHandler
       					message="@load(vmsgs['handheldPromptLabel'])">
       					<label
