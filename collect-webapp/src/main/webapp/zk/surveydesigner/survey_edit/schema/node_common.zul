@@ -185,7 +185,7 @@
 		    		</vlayout>
 	    		</hlayout>
 	    	</row>
-	    	<row visible="${vm.attribute}">
+	    	<row visible="${vm.attribute and not vm.collectEarthSurvey}">
 	    		<fieldErrorHandler message="@load(vmsgs['qualifier'])">
 		        	<label value="${labels.survey.schema.attribute.qualifier.$}:" />
 		        	<image popup="qualifierInfoTooltip" style="cursor:pointer"
