@@ -1,386 +1,711 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<survey xmlns="http://www.openforis.org/idml/3.0"
-	xmlns:collect="http://www.openforis.org/collect/3.0/collect"
-	xmlns:ui="http://www.openforis.org/collect/3.0/ui"
-	xmlns:collectearth="http://www.openforis.org/collect/3.0/collectearth"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.openforis.org/idml/3.0 
-		https://raw.github.com/openforis/ollect/master/collect-core/src/main/resources/idml3.xsd      
-		http://www.openforis.org/collect/3.0/ui 
-		https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd"
-	lastId="1300">
-	<project>Collect Earth - blank project please fill name</project>
-	<uri>http://www.openforis.org/idm/collectEarth</uri>
-	<description></description>
-	<language>en</language>
-	<language>es</language>
-	<language>fr</language>
-	<applicationOptions>
-		<options type="ui">
-			<tabSet xmlns="http://www.openforis.org/collect/3.0/ui"
-				name="plot_tab_set">
-				<tab name="plot_tab">
-					<label xml:lang="en">Plot</label>
-					<label xml:lang="es">Parcela</label>
-					<label xml:lang="fr">Parcelle</label>
-				</tab>
-			</tabSet>
-		</options>
-	</applicationOptions>
-	<codeLists>
-		<list id="1145" name="elevation_ranges">
-			<label type="item">Elevation ranges</label>
-			<codingScheme scope="local" />
-			<items>
-				<item id="1146">
-					<code>1</code>
-					<label>0-100</label>
-				</item>
-				<item id="1147">
-					<code>2</code>
-					<label>101-200</label>
-				</item>
-				<item id="1148">
-					<code>3</code>
-					<label>201-300</label>
-				</item>
-				<item id="1149">
-					<code>4</code>
-					<label>301-400</label>
-				</item>
-				<item id="1150">
-					<code>5</code>
-					<label>401-500</label>
-				</item>
-				<item id="1151">
-					<code>6</code>
-					<label>501-600</label>
-				</item>
-				<item id="1152">
-					<code>7</code>
-					<label>601-700</label>
-				</item>
-				<item id="1153">
-					<code>8</code>
-					<label>701-800</label>
-				</item>
-				<item id="1154">
-					<code>9</code>
-					<label>801-900</label>
-				</item>
-				<item id="1155">
-					<code>10</code>
-					<label>901-1000</label>
-				</item>
-				<item id="1156">
-					<code>11</code>
-					<label>1001-1100</label>
-				</item>
-				<item id="1157">
-					<code>12</code>
-					<label>1101-1200</label>
-				</item>
-				<item id="1158">
-					<code>13</code>
-					<label>1201-1300</label>
-				</item>
-				<item id="1159">
-					<code>14</code>
-					<label>1301-1400</label>
-				</item>
-				<item id="1160">
-					<code>15</code>
-					<label>1401-1500</label>
-				</item>
-				<item id="1161">
-					<code>16</code>
-					<label>1501-1600</label>
-				</item>
-				<item id="1162">
-					<code>17</code>
-					<label>1601-1700</label>
-				</item>
-				<item id="1163">
-					<code>18</code>
-					<label>1701-1800</label>
-				</item>
-				<item id="1164">
-					<code>19</code>
-					<label>1801-1900</label>
-				</item>
-				<item id="1165">
-					<code>20</code>
-					<label>1901-2000</label>
-				</item>
-				<item id="1166">
-					<code>21</code>
-					<label>2001-2100</label>
-				</item>
-				<item id="1167">
-					<code>22</code>
-					<label>2101-2200</label>
-				</item>
-				<item id="1168">
-					<code>23</code>
-					<label>2201-2300</label>
-				</item>
-				<item id="1169">
-					<code>24</code>
-					<label>2301-2400</label>
-				</item>
-				<item id="1170">
-					<code>25</code>
-					<label>2401-2500</label>
-				</item>
-				<item id="1171">
-					<code>26</code>
-					<label>2501-2600</label>
-				</item>
-				<item id="1172">
-					<code>27</code>
-					<label>2601-2700</label>
-				</item>
-				<item id="1173">
-					<code>28</code>
-					<label>2701-2800</label>
-				</item>
-				<item id="1174">
-					<code>29</code>
-					<label>2801-2900</label>
-				</item>
-				<item id="1175">
-					<code>30</code>
-					<label>2901-3000</label>
-				</item>
-				<item id="1176">
-					<code>31</code>
-					<label>3001-3100</label>
-				</item>
-				<item id="1177">
-					<code>32</code>
-					<label>3101-3200</label>
-				</item>
-				<item id="1178">
-					<code>33</code>
-					<label>3201-3300</label>
-				</item>
-				<item id="1179">
-					<code>34</code>
-					<label>3301-3400</label>
-				</item>
-				<item id="1180">
-					<code>35</code>
-					<label>3401-3500</label>
-				</item>
-				<item id="1181">
-					<code>36</code>
-					<label>3501-3600</label>
-				</item>
-				<item id="1182">
-					<code>37</code>
-					<label>3601-3700</label>
-				</item>
-				<item id="1183">
-					<code>38</code>
-					<label>3701-3800</label>
-				</item>
-				<item id="1184">
-					<code>39</code>
-					<label>3801-3900</label>
-				</item>
-				<item id="1185">
-					<code>40</code>
-					<label>3901-4000</label>
-				</item>
-				<item id="1186">
-					<code>41</code>
-					<label>4001-4100</label>
-				</item>
-				<item id="1187">
-					<code>42</code>
-					<label>4101-4200</label>
-				</item>
-				<item id="1188">
-					<code>43</code>
-					<label>4201-4300</label>
-				</item>
-				<item id="1189">
-					<code>44</code>
-					<label>4301-4400</label>
-				</item>
-				<item id="1190">
-					<code>45</code>
-					<label>4401-4500</label>
-				</item>
-				<item id="1191">
-					<code>46</code>
-					<label>4501-4600</label>
-				</item>
-				<item id="1192">
-					<code>47</code>
-					<label>4601-4700</label>
-				</item>
-				<item id="1193">
-					<code>48</code>
-					<label>4701-4800</label>
-				</item>
-				<item id="1194">
-					<code>49</code>
-					<label>4801-4900</label>
-				</item>
-				<item id="1195">
-					<code>50</code>
-					<label>4901-5000</label>
-				</item>
-				<item id="1196">
-					<code>51</code>
-					<label>5001-5100</label>
-				</item>
-				<item id="1197">
-					<code>52</code>
-					<label>5101-5200</label>
-				</item>
-				<item id="1198">
-					<code>53</code>
-					<label>5201-5300</label>
-				</item>
-				<item id="1199">
-					<code>54</code>
-					<label>5301-5400</label>
-				</item>
-				<item id="1200">
-					<code>55</code>
-					<label>5401-5500</label>
-				</item>
-				<item id="1201">
-					<code>56</code>
-					<label>5501-5600</label>
-				</item>
-				<item id="1202">
-					<code>57</code>
-					<label>5601-5700</label>
-				</item>
-				<item id="1203">
-					<code>58</code>
-					<label>5701-5800</label>
-				</item>
-				<item id="1204">
-					<code>59</code>
-					<label>5801-5900</label>
-				</item>
-				<item id="1205">
-					<code>60</code>
-					<label>5901-6000</label>
-				</item>
-				<item id="1206">
-					<code>61</code>
-					<label>6001-6100</label>
-				</item>
-				<item id="1207">
-					<code>62</code>
-					<label>6101-6200</label>
-				</item>
-				<item id="1208">
-					<code>63</code>
-					<label>6201-6300</label>
-				</item>
-				<item id="1209">
-					<code>0</code>
-					<label>-100 / 0</label>
-				</item>
-				<item id="1210">
-					<code>-1</code>
-					<label>-200 / -100</label>
-				</item>
-			</items>
-		</list>
-		<list id="1212" name="orientation">
-			<label type="item">Orientation</label>
-			<codingScheme scope="local" />
-			<items>
-				<item id="1213">
-					<code>N</code>
-					<label>North</label>
-				</item>
-				<item id="1214">
-					<code>NE</code>
-					<label>North East</label>
-				</item>
-				<item id="1215">
-					<code>E</code>
-					<label>East</label>
-				</item>
-				<item id="1216">
-					<code>SE</code>
-					<label>South East</label>
-				</item>
-				<item id="1217">
-					<code>S</code>
-					<label>South</label>
-				</item>
-				<item id="1218">
-					<code>SW</code>
-					<label>South West</label>
-				</item>
-				<item id="1219">
-					<code>W</code>
-					<label>West</label>
-				</item>
-				<item id="1220">
-					<code>NW</code>
-					<label>North West</label>
-				</item>
-				<item id="1221">
-					<code>na</code>
-					<label>N/A</label>
-				</item>
-			</items>
-		</list>
-		<list id="1223" name="slope_classes">
-			<label type="item">Slope classes</label>
-			<codingScheme scope="local" />
-			<items>
-				<item id="1224">
-					<code>FLAT</code>
-					<label>0-5 °</label>
-				</item>
-				<item id="1225">
-					<code>SLIGHT</code>
-					<label>6-15 °</label>
-				</item>
-				<item id="1226">
-					<code>STEEP</code>
-					<label>16-30 °</label>
-				</item>
-				<item id="1227">
-					<code>VERY_STEEP</code>
-					<label>31-45 °</label>
-				</item>
-				<item id="1228">
-					<code>EXTREME</code>
-					<label>46-60 °</label>
-				</item>
-				<item id="1229">
-					<code>FALL</code>
-					<label>61-90 °</label>
-				</item>
-				<item id="1230">
-					<code>NA</code>
-					<label>NA</label>
-				</item>
-			</items>
-		</list>
-	</codeLists>
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<survey lastId="1396" created="2023-02-01T11:41:00.567+01:00" modified="2023-02-01T16:49:23.235+01:00" collect:target="CE" xsi:schemaLocation="http://www.openforis.org/idml/3.0  &#9;&#9;https://raw.github.com/openforis/ollect/master/collect-core/src/main/resources/idml3.xsd       &#9;&#9;http://www.openforis.org/collect/3.0/ui  &#9;&#9;https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd" collect:collectVersion="4.0.45-SNAPSHOT" xmlns="http://www.openforis.org/idml/3.0" xmlns:collect="http://www.openforis.org/collect/3.0/collect" xmlns:ui="http://www.openforis.org/collect/3.0/ui" xmlns:collectearth="http://www.openforis.org/collect/3.0/collectearth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <project xml:lang="fr">Projet DEMO - remplissez avec le nom de votre projet</project>
+  <project xml:lang="pt">Projeto DEMO - preencha com o nome do seu projeto</project>
+  <project xml:lang="es">Proyecto DEMO - complete con el nombre de su proyecto</project>
+  <project xml:lang="en">DEMO Project - fill with your project name</project>
+  <uri>http://www.openforis.org/idm/collectEarth</uri>
+  <description xml:lang="es">Esta es la encuesta estándar que contiene todos los atributos necesarios para que funcione una encuesta Collect Earth, además de algunos atributos de demostración que muestran las opciones para el diseño de la encuesta.
 
-	<spatialReferenceSystems>
-		<spatialReferenceSystem srid="EPSG:4326">
-			<label xml:lang="en">EPSG:4326</label>
-			<description xml:lang="en">EPSG:World Geodetic System 1984
+Puede generar el diseño de muestreo utilizando la aplicación Grid Generator GEE: https://collectearth.users.earthengine.app/view/collect-earth-grid-generator.
+
+Los archivos CSV con las ubicaciones de las parcelas deben agregarse a la encuesta a través de la sección Archivos adjuntos (tipo de cuadrícula) debajo de este texto.
+También puede agregar el archivo areas_per_attribute.csv para permitir los cálculos del área del factor de expansión del gráfico. Vea esto: https://openforis.support/questions/1061/assign-area-to-plots
+
+Debe utilizar este texto de descripción para documentar los cambios que realice en la encuesta.
+
+¡Use el botón VISTA PREVIA en la parte inferior de la página para ver el formulario a medida que lo edita!</description>
+  <description xml:lang="pt">Este é o levantamento padrão que contém todos os atributos necessários para que um levantamento Collect Earth funcione, além de alguns atributos de demonstração que mostram as opções para o design do levantamento.
+
+Você pode gerar o projeto de amostragem usando o Grid Generator GEE App: https://collectearth.users.earthengine.app/view/collect-earth-grid-generator.
+
+Os arquivos CSV com as localizações das parcelas devem ser adicionados ao levantamento através da seção Arquivos anexados (tipo grade) abaixo deste texto.
+Você também pode adicionar o arquivo areas_per_attribute.csv para permitir cálculos de área de fator de expansão de plotagem. Veja isto: https://openforis.support/questions/1061/assign-area-to-plots
+
+Você deve usar este texto descritivo para documentar as alterações feitas na pesquisa.
+
+Use o botão VISUALIZAR na parte inferior da página para visualizar o formulário enquanto o edita!</description>
+  <description xml:lang="fr">Il s'agit de l'enquête standard qui contient tous les attributs nécessaires au bon fonctionnement d'une enquête Collect Earth, ainsi que des attributs de démonstration présentant les options de conception de l'enquête.
+
+Vous pouvez générer le plan d'échantillonnage à l'aide de l'application Grid Generator GEE : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator.
+
+Les fichiers CSV avec les emplacements des parcelles doivent être ajoutés à l'enquête via la section Fichiers joints (type de grille) sous ce texte.
+Vous pouvez également ajouter le fichier areas_per_attribute.csv pour permettre les calculs de surface du facteur d'expansion du tracé. Voir ceci : https://openforis.support/questions/1061/assign-area-to-plots
+
+Vous devez utiliser ce texte de description pour documenter les modifications que vous apportez à l'enquête.
+
+Utilisez le bouton PREVIEW en bas de la page pour voir le formulaire au fur et à mesure que vous le modifiez !</description>
+  <description xml:lang="en">This is the standard survey that contains all the necessary attributes for a Collect Earth survey to work plus some demo attributes showcasing the options for the survey design.
+
+You can generate the sampling design using the Grid Generator GEE App : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator.
+
+The CSV files with the plot locations should be added to the survey though the Attached Files (grid type) section below this text.
+You can also add the areas_per_attribute.csv file to allow for plot expansion-factor area calculations. See this : https://openforis.support/questions/1061/assign-area-to-plots
+
+You should use this description text to document the changes you make on the survey.
+
+Use the PREVIEW button on the bottom of the page to view the form as you edit it!</description>
+  <language>en</language>
+  <language>es</language>
+  <language>fr</language>
+  <language>pt</language>
+  <applicationOptions>
+    <options type="ui">
+<n0:tabSet name="plot_tab_set" xmlns:n0="http://www.openforis.org/collect/3.0/ui">
+  <n0:tab name="plot_tab">
+    <n0:label xml:lang="en">First tab with questions CHANGE!</n0:label>
+    <n0:label xml:lang="es">Primera pesta&#241;a con preguntas CAMBIALO!</n0:label>
+    <n0:label xml:lang="fr">Premier onglet avec des questions CHANGEZ-LE&#160;!</n0:label>
+    <n0:label xml:lang="pt">Primeira aba com perguntas MUDE!</n0:label>
+  </n0:tab>
+  <n0:tab name="tab_1312">
+    <n0:label xml:lang="en">Second tab (CHANGE!)</n0:label>
+    <n0:label xml:lang="fr">Deuxi&#232;me onglet (CHANGEMENT&#160;!)</n0:label>
+    <n0:label xml:lang="es">Segunda pesta&#241;a (&#161;CAMBIO!)</n0:label>
+    <n0:label xml:lang="pt">Segunda aba (MUDAR!)</n0:label>
+  </n0:tab>
+</n0:tabSet>
+    </options>
+  </applicationOptions>
+  <codeLists>
+    <list id="1145" name="elevation_ranges">
+      <label type="item" xml:lang="en">Elevation ranges</label>
+      <label type="item" xml:lang="es">Rangos de elevación</label>
+      <label type="item" xml:lang="pt">Faixas de elevação</label>
+      <label type="item" xml:lang="fr">Plages d'altitude</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="1316">
+          <code>1</code>
+          <label xml:lang="en">0-100</label>
+          <label xml:lang="es">0-100</label>
+          <label xml:lang="fr">0-100</label>
+          <label xml:lang="pt">0-100</label>
+        </item>
+        <item id="1317">
+          <code>2</code>
+          <label xml:lang="en">101-200</label>
+          <label xml:lang="es">101-200</label>
+          <label xml:lang="fr">101-200</label>
+          <label xml:lang="pt">101-200</label>
+        </item>
+        <item id="1318">
+          <code>3</code>
+          <label xml:lang="en">201-300</label>
+          <label xml:lang="es">201-300</label>
+          <label xml:lang="fr">201-300</label>
+          <label xml:lang="pt">201-300</label>
+        </item>
+        <item id="1319">
+          <code>4</code>
+          <label xml:lang="en">301-400</label>
+          <label xml:lang="es">301-400</label>
+          <label xml:lang="fr">301-400</label>
+          <label xml:lang="pt">301-400</label>
+        </item>
+        <item id="1320">
+          <code>5</code>
+          <label xml:lang="en">401-500</label>
+          <label xml:lang="es">401-500</label>
+          <label xml:lang="fr">401-500</label>
+          <label xml:lang="pt">401-500</label>
+        </item>
+        <item id="1321">
+          <code>6</code>
+          <label xml:lang="en">501-600</label>
+          <label xml:lang="es">501-600</label>
+          <label xml:lang="fr">501-600</label>
+          <label xml:lang="pt">501-600</label>
+        </item>
+        <item id="1322">
+          <code>7</code>
+          <label xml:lang="en">601-700</label>
+          <label xml:lang="es">601-700</label>
+          <label xml:lang="fr">601-700</label>
+          <label xml:lang="pt">601-700</label>
+        </item>
+        <item id="1323">
+          <code>8</code>
+          <label xml:lang="en">701-800</label>
+          <label xml:lang="es">701-800</label>
+          <label xml:lang="fr">701-800</label>
+          <label xml:lang="pt">701-800</label>
+        </item>
+        <item id="1324">
+          <code>9</code>
+          <label xml:lang="en">801-900</label>
+          <label xml:lang="es">801-900</label>
+          <label xml:lang="fr">801-900</label>
+          <label xml:lang="pt">801-900</label>
+        </item>
+        <item id="1325">
+          <code>10</code>
+          <label xml:lang="en">901-1000</label>
+          <label xml:lang="es">901-1000</label>
+          <label xml:lang="fr">901-1000</label>
+          <label xml:lang="pt">901-1000</label>
+        </item>
+        <item id="1326">
+          <code>11</code>
+          <label xml:lang="en">1001-1100</label>
+          <label xml:lang="es">1001-1100</label>
+          <label xml:lang="fr">1001-1100</label>
+          <label xml:lang="pt">1001-1100</label>
+        </item>
+        <item id="1327">
+          <code>12</code>
+          <label xml:lang="en">1101-1200</label>
+          <label xml:lang="es">1101-1200</label>
+          <label xml:lang="fr">1101-1200</label>
+          <label xml:lang="pt">1101-1200</label>
+        </item>
+        <item id="1328">
+          <code>13</code>
+          <label xml:lang="en">1201-1300</label>
+          <label xml:lang="es">1201-1300</label>
+          <label xml:lang="fr">1201-1300</label>
+          <label xml:lang="pt">1201-1300</label>
+        </item>
+        <item id="1329">
+          <code>14</code>
+          <label xml:lang="en">1301-1400</label>
+          <label xml:lang="es">1301-1400</label>
+          <label xml:lang="fr">1301-1400</label>
+          <label xml:lang="pt">1301-1400</label>
+        </item>
+        <item id="1330">
+          <code>15</code>
+          <label xml:lang="en">1401-1500</label>
+          <label xml:lang="es">1401-1500</label>
+          <label xml:lang="fr">1401-1500</label>
+          <label xml:lang="pt">1401-1500</label>
+        </item>
+        <item id="1331">
+          <code>16</code>
+          <label xml:lang="en">1501-1600</label>
+          <label xml:lang="es">1501-1600</label>
+          <label xml:lang="fr">1501-1600</label>
+          <label xml:lang="pt">1501-1600</label>
+        </item>
+        <item id="1332">
+          <code>17</code>
+          <label xml:lang="en">1601-1700</label>
+          <label xml:lang="es">1601-1700</label>
+          <label xml:lang="fr">1601-1700</label>
+          <label xml:lang="pt">1601-1700</label>
+        </item>
+        <item id="1333">
+          <code>18</code>
+          <label xml:lang="en">1701-1800</label>
+          <label xml:lang="es">1701-1800</label>
+          <label xml:lang="fr">1701-1800</label>
+          <label xml:lang="pt">1701-1800</label>
+        </item>
+        <item id="1334">
+          <code>19</code>
+          <label xml:lang="en">1801-1900</label>
+          <label xml:lang="es">1801-1900</label>
+          <label xml:lang="fr">1801-1900</label>
+          <label xml:lang="pt">1801-1900</label>
+        </item>
+        <item id="1335">
+          <code>20</code>
+          <label xml:lang="en">1901-2000</label>
+          <label xml:lang="es">1901-2000</label>
+          <label xml:lang="fr">1901-2000</label>
+          <label xml:lang="pt">1901-2000</label>
+        </item>
+        <item id="1336">
+          <code>21</code>
+          <label xml:lang="en">2001-2100</label>
+          <label xml:lang="es">2001-2100</label>
+          <label xml:lang="fr">2001-2100</label>
+          <label xml:lang="pt">2001-2100</label>
+        </item>
+        <item id="1337">
+          <code>22</code>
+          <label xml:lang="en">2101-2200</label>
+          <label xml:lang="es">2101-2200</label>
+          <label xml:lang="fr">2101-2200</label>
+          <label xml:lang="pt">2101-2200</label>
+        </item>
+        <item id="1338">
+          <code>23</code>
+          <label xml:lang="en">2201-2300</label>
+          <label xml:lang="es">2201-2300</label>
+          <label xml:lang="fr">2201-2300</label>
+          <label xml:lang="pt">2201-2300</label>
+        </item>
+        <item id="1339">
+          <code>24</code>
+          <label xml:lang="en">2301-2400</label>
+          <label xml:lang="es">2301-2400</label>
+          <label xml:lang="fr">2301-2400</label>
+          <label xml:lang="pt">2301-2400</label>
+        </item>
+        <item id="1340">
+          <code>25</code>
+          <label xml:lang="en">2401-2500</label>
+          <label xml:lang="es">2401-2500</label>
+          <label xml:lang="fr">2401-2500</label>
+          <label xml:lang="pt">2401-2500</label>
+        </item>
+        <item id="1341">
+          <code>26</code>
+          <label xml:lang="en">2501-2600</label>
+          <label xml:lang="es">2501-2600</label>
+          <label xml:lang="fr">2501-2600</label>
+          <label xml:lang="pt">2501-2600</label>
+        </item>
+        <item id="1342">
+          <code>27</code>
+          <label xml:lang="en">2601-2700</label>
+          <label xml:lang="es">2601-2700</label>
+          <label xml:lang="fr">2601-2700</label>
+          <label xml:lang="pt">2601-2700</label>
+        </item>
+        <item id="1343">
+          <code>28</code>
+          <label xml:lang="en">2701-2800</label>
+          <label xml:lang="es">2701-2800</label>
+          <label xml:lang="fr">2701-2800</label>
+          <label xml:lang="pt">2701-2800</label>
+        </item>
+        <item id="1344">
+          <code>29</code>
+          <label xml:lang="en">2801-2900</label>
+          <label xml:lang="es">2801-2900</label>
+          <label xml:lang="fr">2801-2900</label>
+          <label xml:lang="pt">2801-2900</label>
+        </item>
+        <item id="1345">
+          <code>30</code>
+          <label xml:lang="en">2901-3000</label>
+          <label xml:lang="es">2901-3000</label>
+          <label xml:lang="fr">2901-3000</label>
+          <label xml:lang="pt">2901-3000</label>
+        </item>
+        <item id="1346">
+          <code>31</code>
+          <label xml:lang="en">3001-3100</label>
+          <label xml:lang="es">3001-3100</label>
+          <label xml:lang="fr">3001-3100</label>
+          <label xml:lang="pt">3001-3100</label>
+        </item>
+        <item id="1347">
+          <code>32</code>
+          <label xml:lang="en">3101-3200</label>
+          <label xml:lang="es">3101-3200</label>
+          <label xml:lang="fr">3101-3200</label>
+          <label xml:lang="pt">3101-3200</label>
+        </item>
+        <item id="1348">
+          <code>33</code>
+          <label xml:lang="en">3201-3300</label>
+          <label xml:lang="es">3201-3300</label>
+          <label xml:lang="fr">3201-3300</label>
+          <label xml:lang="pt">3201-3300</label>
+        </item>
+        <item id="1349">
+          <code>34</code>
+          <label xml:lang="en">3301-3400</label>
+          <label xml:lang="es">3301-3400</label>
+          <label xml:lang="fr">3301-3400</label>
+          <label xml:lang="pt">3301-3400</label>
+        </item>
+        <item id="1350">
+          <code>35</code>
+          <label xml:lang="en">3401-3500</label>
+          <label xml:lang="es">3401-3500</label>
+          <label xml:lang="fr">3401-3500</label>
+          <label xml:lang="pt">3401-3500</label>
+        </item>
+        <item id="1351">
+          <code>36</code>
+          <label xml:lang="en">3501-3600</label>
+          <label xml:lang="es">3501-3600</label>
+          <label xml:lang="fr">3501-3600</label>
+          <label xml:lang="pt">3501-3600</label>
+        </item>
+        <item id="1352">
+          <code>37</code>
+          <label xml:lang="en">3601-3700</label>
+          <label xml:lang="es">3601-3700</label>
+          <label xml:lang="fr">3601-3700</label>
+          <label xml:lang="pt">3601-3700</label>
+        </item>
+        <item id="1353">
+          <code>38</code>
+          <label xml:lang="en">3701-3800</label>
+          <label xml:lang="es">3701-3800</label>
+          <label xml:lang="fr">3701-3800</label>
+          <label xml:lang="pt">3701-3800</label>
+        </item>
+        <item id="1354">
+          <code>39</code>
+          <label xml:lang="en">3801-3900</label>
+          <label xml:lang="es">3801-3900</label>
+          <label xml:lang="fr">3801-3900</label>
+          <label xml:lang="pt">3801-3900</label>
+        </item>
+        <item id="1355">
+          <code>40</code>
+          <label xml:lang="en">3901-4000</label>
+          <label xml:lang="es">3901-4000</label>
+          <label xml:lang="fr">3901-4000</label>
+          <label xml:lang="pt">3901-4000</label>
+        </item>
+        <item id="1356">
+          <code>41</code>
+          <label xml:lang="en">4001-4100</label>
+          <label xml:lang="es">4001-4100</label>
+          <label xml:lang="fr">4001-4100</label>
+          <label xml:lang="pt">4001-4100</label>
+        </item>
+        <item id="1357">
+          <code>42</code>
+          <label xml:lang="en">4101-4200</label>
+          <label xml:lang="es">4101-4200</label>
+          <label xml:lang="fr">4101-4200</label>
+          <label xml:lang="pt">4101-4200</label>
+        </item>
+        <item id="1358">
+          <code>43</code>
+          <label xml:lang="en">4201-4300</label>
+          <label xml:lang="es">4201-4300</label>
+          <label xml:lang="fr">4201-4300</label>
+          <label xml:lang="pt">4201-4300</label>
+        </item>
+        <item id="1359">
+          <code>44</code>
+          <label xml:lang="en">4301-4400</label>
+          <label xml:lang="es">4301-4400</label>
+          <label xml:lang="fr">4301-4400</label>
+          <label xml:lang="pt">4301-4400</label>
+        </item>
+        <item id="1360">
+          <code>45</code>
+          <label xml:lang="en">4401-4500</label>
+          <label xml:lang="es">4401-4500</label>
+          <label xml:lang="fr">4401-4500</label>
+          <label xml:lang="pt">4401-4500</label>
+        </item>
+        <item id="1361">
+          <code>46</code>
+          <label xml:lang="en">4501-4600</label>
+          <label xml:lang="es">4501-4600</label>
+          <label xml:lang="fr">4501-4600</label>
+          <label xml:lang="pt">4501-4600</label>
+        </item>
+        <item id="1362">
+          <code>47</code>
+          <label xml:lang="en">4601-4700</label>
+          <label xml:lang="es">4601-4700</label>
+          <label xml:lang="fr">4601-4700</label>
+          <label xml:lang="pt">4601-4700</label>
+        </item>
+        <item id="1363">
+          <code>48</code>
+          <label xml:lang="en">4701-4800</label>
+          <label xml:lang="es">4701-4800</label>
+          <label xml:lang="fr">4701-4800</label>
+          <label xml:lang="pt">4701-4800</label>
+        </item>
+        <item id="1364">
+          <code>49</code>
+          <label xml:lang="en">4801-4900</label>
+          <label xml:lang="es">4801-4900</label>
+          <label xml:lang="fr">4801-4900</label>
+          <label xml:lang="pt">4801-4900</label>
+        </item>
+        <item id="1365">
+          <code>50</code>
+          <label xml:lang="en">4901-5000</label>
+          <label xml:lang="es">4901-5000</label>
+          <label xml:lang="fr">4901-5000</label>
+          <label xml:lang="pt">4901-5000</label>
+        </item>
+        <item id="1366">
+          <code>51</code>
+          <label xml:lang="en">5001-5100</label>
+          <label xml:lang="es">5001-5100</label>
+          <label xml:lang="fr">5001-5100</label>
+          <label xml:lang="pt">5001-5100</label>
+        </item>
+        <item id="1367">
+          <code>52</code>
+          <label xml:lang="en">5101-5200</label>
+          <label xml:lang="es">5101-5200</label>
+          <label xml:lang="fr">5101-5200</label>
+          <label xml:lang="pt">5101-5200</label>
+        </item>
+        <item id="1368">
+          <code>53</code>
+          <label xml:lang="en">5201-5300</label>
+          <label xml:lang="es">5201-5300</label>
+          <label xml:lang="fr">5201-5300</label>
+          <label xml:lang="pt">5201-5300</label>
+        </item>
+        <item id="1369">
+          <code>54</code>
+          <label xml:lang="en">5301-5400</label>
+          <label xml:lang="es">5301-5400</label>
+          <label xml:lang="fr">5301-5400</label>
+          <label xml:lang="pt">5301-5400</label>
+        </item>
+        <item id="1370">
+          <code>55</code>
+          <label xml:lang="en">5401-5500</label>
+          <label xml:lang="es">5401-5500</label>
+          <label xml:lang="fr">5401-5500</label>
+          <label xml:lang="pt">5401-5500</label>
+        </item>
+        <item id="1371">
+          <code>56</code>
+          <label xml:lang="en">5501-5600</label>
+          <label xml:lang="es">5501-5600</label>
+          <label xml:lang="fr">5501-5600</label>
+          <label xml:lang="pt">5501-5600</label>
+        </item>
+        <item id="1372">
+          <code>57</code>
+          <label xml:lang="en">5601-5700</label>
+          <label xml:lang="es">5601-5700</label>
+          <label xml:lang="fr">5601-5700</label>
+          <label xml:lang="pt">5601-5700</label>
+        </item>
+        <item id="1373">
+          <code>58</code>
+          <label xml:lang="en">5701-5800</label>
+          <label xml:lang="es">5701-5800</label>
+          <label xml:lang="fr">5701-5800</label>
+          <label xml:lang="pt">5701-5800</label>
+        </item>
+        <item id="1374">
+          <code>59</code>
+          <label xml:lang="en">5801-5900</label>
+          <label xml:lang="es">5801-5900</label>
+          <label xml:lang="fr">5801-5900</label>
+          <label xml:lang="pt">5801-5900</label>
+        </item>
+        <item id="1375">
+          <code>60</code>
+          <label xml:lang="en">5901-6000</label>
+          <label xml:lang="es">5901-6000</label>
+          <label xml:lang="fr">5901-6000</label>
+          <label xml:lang="pt">5901-6000</label>
+        </item>
+        <item id="1376">
+          <code>61</code>
+          <label xml:lang="en">6001-6100</label>
+          <label xml:lang="es">6001-6100</label>
+          <label xml:lang="fr">6001-6100</label>
+          <label xml:lang="pt">6001-6100</label>
+        </item>
+        <item id="1377">
+          <code>62</code>
+          <label xml:lang="en">6101-6200</label>
+          <label xml:lang="es">6101-6200</label>
+          <label xml:lang="fr">6101-6200</label>
+          <label xml:lang="pt">6101-6200</label>
+        </item>
+        <item id="1378">
+          <code>63</code>
+          <label xml:lang="en">6201-6300</label>
+          <label xml:lang="es">6201-6300</label>
+          <label xml:lang="fr">6201-6300</label>
+          <label xml:lang="pt">6201-6300</label>
+        </item>
+        <item id="1379">
+          <code>0</code>
+          <label xml:lang="en">-100 / 0</label>
+          <label xml:lang="es">-100 / 0</label>
+          <label xml:lang="fr">-100 / 0</label>
+          <label xml:lang="pt">-100 / 0</label>
+        </item>
+        <item id="1380">
+          <code>-1</code>
+          <label xml:lang="en">-200 / -100</label>
+          <label xml:lang="es">-200 / -100</label>
+          <label xml:lang="fr">-200 / -100</label>
+          <label xml:lang="pt">-200 / -100</label>
+        </item>
+      </items>
+    </list>
+    <list id="1212" name="orientation">
+      <label type="item" xml:lang="en">Orientation</label>
+      <label type="item" xml:lang="fr">Orientation</label>
+      <label type="item" xml:lang="pt">Orientação</label>
+      <label type="item" xml:lang="es">Orientación</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="1381">
+          <code>N</code>
+          <label xml:lang="en">North</label>
+          <label xml:lang="es">North</label>
+          <label xml:lang="fr">North</label>
+          <label xml:lang="pt">North</label>
+        </item>
+        <item id="1382">
+          <code>NE</code>
+          <label xml:lang="en">North East</label>
+          <label xml:lang="es">North East</label>
+          <label xml:lang="fr">North East</label>
+          <label xml:lang="pt">North East</label>
+        </item>
+        <item id="1383">
+          <code>E</code>
+          <label xml:lang="en">East</label>
+          <label xml:lang="es">East</label>
+          <label xml:lang="fr">East</label>
+          <label xml:lang="pt">East</label>
+        </item>
+        <item id="1384">
+          <code>SE</code>
+          <label xml:lang="en">South East</label>
+          <label xml:lang="es">South East</label>
+          <label xml:lang="fr">South East</label>
+          <label xml:lang="pt">South East</label>
+        </item>
+        <item id="1385">
+          <code>S</code>
+          <label xml:lang="en">South</label>
+          <label xml:lang="es">South</label>
+          <label xml:lang="fr">South</label>
+          <label xml:lang="pt">South</label>
+        </item>
+        <item id="1386">
+          <code>SW</code>
+          <label xml:lang="en">South West</label>
+          <label xml:lang="es">South West</label>
+          <label xml:lang="fr">South West</label>
+          <label xml:lang="pt">South West</label>
+        </item>
+        <item id="1387">
+          <code>W</code>
+          <label xml:lang="en">West</label>
+          <label xml:lang="es">West</label>
+          <label xml:lang="fr">West</label>
+          <label xml:lang="pt">West</label>
+        </item>
+        <item id="1388">
+          <code>NW</code>
+          <label xml:lang="en">North West</label>
+          <label xml:lang="es">North West</label>
+          <label xml:lang="fr">North West</label>
+          <label xml:lang="pt">North West</label>
+        </item>
+        <item id="1389">
+          <code>na</code>
+          <label xml:lang="en">N/A</label>
+          <label xml:lang="es">N/A</label>
+          <label xml:lang="fr">N/A</label>
+          <label xml:lang="pt">N/A</label>
+        </item>
+      </items>
+    </list>
+    <list id="1223" name="slope_classes">
+      <label type="item" xml:lang="en">Slope classes</label>
+      <label type="item" xml:lang="es">Clases de pendiente</label>
+      <label type="item" xml:lang="pt">Classes de inclinação</label>
+      <label type="item" xml:lang="fr">Classes de pente</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="1390">
+          <code>FLAT</code>
+          <label xml:lang="en">0-5 °</label>
+          <label xml:lang="es">0-5 °</label>
+          <label xml:lang="fr">0-5 °</label>
+          <label xml:lang="pt">0-5 °</label>
+        </item>
+        <item id="1391">
+          <code>SLIGHT</code>
+          <label xml:lang="en">6-15 °</label>
+          <label xml:lang="es">6-15 °</label>
+          <label xml:lang="fr">6-15 °</label>
+          <label xml:lang="pt">6-15 °</label>
+        </item>
+        <item id="1392">
+          <code>STEEP</code>
+          <label xml:lang="en">16-30 °</label>
+          <label xml:lang="es">16-30 °</label>
+          <label xml:lang="fr">16-30 °</label>
+          <label xml:lang="pt">16-30 °</label>
+        </item>
+        <item id="1393">
+          <code>VERY_STEEP</code>
+          <label xml:lang="en">31-45 °</label>
+          <label xml:lang="es">31-45 °</label>
+          <label xml:lang="fr">31-45 °</label>
+          <label xml:lang="pt">31-45 °</label>
+        </item>
+        <item id="1394">
+          <code>EXTREME</code>
+          <label xml:lang="en">46-60 °</label>
+          <label xml:lang="es">46-60 °</label>
+          <label xml:lang="fr">46-60 °</label>
+          <label xml:lang="pt">46-60 °</label>
+        </item>
+        <item id="1395">
+          <code>FALL</code>
+          <label xml:lang="en">61-90 °</label>
+          <label xml:lang="es">61-90 °</label>
+          <label xml:lang="fr">61-90 °</label>
+          <label xml:lang="pt">61-90 °</label>
+        </item>
+        <item id="1396">
+          <code>NA</code>
+          <label xml:lang="en">NA</label>
+          <label xml:lang="es">NA</label>
+          <label xml:lang="fr">NA</label>
+          <label xml:lang="pt">NA</label>
+        </item>
+      </items>
+    </list>
+    <list id="1301" name="sampling_design" lookup="ofc_sampling_design">
+      <hierarchy>
+        <level name="level1" />
+        <level name="level2" />
+        <level name="level3" />
+      </hierarchy>
+    </list>
+    <list id="1305" name="demo_codelist">
+      <label type="item" xml:lang="en">Dummy code options</label>
+      <label type="item" xml:lang="es">Opciones de código para la prueba</label>
+      <label type="item" xml:lang="fr">Options de code pour les tests</label>
+      <label type="item" xml:lang="pt">Opções de código para teste</label>
+      <description xml:lang="en">This is a list of options used for demoing purposes.</description>
+      <description xml:lang="pt">Esta é uma lista de opções usadas para fins de demonstração.</description>
+      <description xml:lang="fr">Ceci est une liste d'options utilisées à des fins de démonstration.</description>
+      <description xml:lang="es">Esta es una lista de opciones utilizadas con fines de demostración.</description>
+      <codingScheme scope="local" />
+      <items>
+        <item id="1314">
+          <code>A</code>
+          <label xml:lang="en">First Option A</label>
+          <label xml:lang="es">Primera Opción A</label>
+          <label xml:lang="fr">Première Option A</label>
+          <label xml:lang="pt">Primeira Opção A</label>
+          <description>While the code for the option in the database is A, the user is shown the "First Option A" on the interface.</description>
+        </item>
+        <item id="1315">
+          <code>B</code>
+          <label xml:lang="en">Second Option B</label>
+          <label xml:lang="es">Segunda Opción B</label>
+          <label xml:lang="fr">Deuxième Option B</label>
+          <label xml:lang="pt">Segunda Opção B</label>
+          <description>While the code for the option in the database is B, the user is shown the "Second Option B" on the interface.</description>
+        </item>
+      </items>
+    </list>
+  </codeLists>
+  <spatialReferenceSystems>
+    <spatialReferenceSystem srid="EPSG:4326">
+      <label xml:lang="en">EPSG:4326</label>
+      <description xml:lang="en">EPSG:World Geodetic System 1984
 				Horizontal component of 3D system. Used by the GPS satellite
-				navigation system and for NATO military geodetic surveying.
-			</description>
-			<wkt><![CDATA[
-	        GEOGCS["WGS 84", 
+				navigation system and for NATO military geodetic surveying.</description>
+      <wkt><![CDATA[GEOGCS["WGS 84", 
 			  DATUM["World Geodetic System 1984", 
 			    SPHEROID["WGS 84", 6378137.0, 298.257223563, AUTHORITY["EPSG","7030"]], 
 			    AUTHORITY["EPSG","6326"]], 
@@ -388,104 +713,452 @@
 			  UNIT["degree", 0.017453292519943295], 
 			  AXIS["Geodetic longitude", EAST], 
 			  AXIS["Geodetic latitude", NORTH], 
-			  AUTHORITY["EPSG","4326"]]
-			]]></wkt>
-		</spatialReferenceSystem>
-	</spatialReferenceSystems>
-	<schema>
-		<entity id="1" name="plot" ui:tabSet="plot_tab_set"
-			ui:tab="plot_tab">
-			<label xml:lang="en">Plot</label>
-			<label xml:lang="es">Parcela</label>
-			<label xml:lang="fr">Parcelle</label>
-			<text id="2" name="id" required="true" key="true">
-				<label xml:lang="en">Id</label>
-				<label xml:lang="es">Id</label>
-				<label xml:lang="fr">Id</label>
-			</text>
-			<coordinate id="3" name="location">
-				<label xml:lang="en">Location</label>
-				<label xml:lang="es">Posicion</label>
-				<label xml:lang="fr">Lieu</label>
-			</coordinate>
-			<text id="4" name="operator">
-				<label xml:lang="en">Operator</label>
-				<label xml:lang="es">Operador</label>
-				<label xml:lang="fr">Opérateur</label>
-			</text>
+			  AUTHORITY["EPSG","4326"]]]]>
+      </wkt>
+    </spatialReferenceSystem>
+  </spatialReferenceSystems>
+  <referenceDataSchema>
+    <samplingPoint />
+  </referenceDataSchema>
+  <schema>
+    <entity id="1" name="plot" ui:tab="plot_tab" ui:tabSet="plot_tab_set">
+      <label type="instance" xml:lang="en">Plot</label>
+      <label type="instance" xml:lang="es">Parcela</label>
+      <label type="instance" xml:lang="fr">Parcelle</label>
+      <text id="2" name="id" required="true" key="true" type="short">
+        <label type="instance" xml:lang="en">Plot - Id</label>
+        <label type="instance" xml:lang="es">Parcela - Id</label>
+        <label type="instance" xml:lang="fr">Parcelle - ID</label>
+        <label type="instance" xml:lang="pt">Parcela - Id</label>
+        <description xml:lang="en">Unique identifier of the plot in the Collect Earth database. 
+This data comes from the CSV with the sampling-design.
+It should be contained in the first column of the CSV with the column header "id".
+DO NOT REMOVE!</description>
 
-			<number id="5" name="elevation" type="integer"
-				collectearth:fromcsv="true">
-				<label xml:lang="en">Elevation</label>
-				<label xml:lang="es">Elevacion</label>
-				<label xml:lang="fr">Elevation</label>
-			</number>
-			<number id="6" name="slope" type="real"
-				collectearth:fromcsv="true">
-				<label xml:lang="en">Slope</label>
-				<label xml:lang="es">Pendiente</label>
-				<label xml:lang="fr">Pente</label>
-			</number>
-			<number id="7" name="aspect" type="real"
-				collectearth:fromcsv="true">
-				<label xml:lang="en">Aspect</label>
-				<label xml:lang="es">Exposicion</label>
-				<label xml:lang="fr">Aspect</label>
-			</number>
-			<boolean id="8" name="actively_saved">
-				<label xml:lang="en">Actively saved by user</label>
-				<label xml:lang="es">Guardado por el usuario activamente</label>
-				<label xml:lang="fr">Sauvé par l'utilisateur</label>
-			</boolean>
-			<date id="9" name="actively_saved_on" required="false"
-				relevant="false()">
-				<label xml:lang="en">Last saved on</label>
-				<label xml:lang="es">Guardado por ultima vez</label>
-				<label xml:lang="fr">Sauvé la dernière fois sur</label>
-			</date>
-			<text id="10" name="plot_file" required="false"
-				relevant="false()">
-				<label xml:lang="en">CSV file that contains the plot</label>
-				<label xml:lang="es">Archivo CSV que contiene al plot</label>
-				<label xml:lang="fr">Fichier CSV qui contient le point</label>
-			</text>
-			<code id="11" name="calculated_elevation_range" ui:hide="true"
-				ui:tab="plot_tab" calculated="true" list="elevation_ranges">
-				<label type="instance">DEM - Elevation - range</label>
-				<label type="instance" xml:lang="fr">MNT - Gamme d'altitude</label>
-				<default
-					expr=" format-number(ceiling(elevation div 100 ), '#')" />
-			</code>
-			<code id="12" name="calculated_aspect" ui:hide="true"
-				ui:tab="plot_tab" calculated="true" list="orientation">
-				<label type="instance">DEM - Aspect - ranges</label>
-				<label type="instance" xml:lang="fr">MNT - Gamme d'exposition</label>
-				<default value="na" if="aspect=0 and slope=0" />
-				<default value="N" if="aspect&gt;337.5 or aspect&lt;=22.5" />
-				<default value="NE" if="aspect&gt;22.5 and aspect&lt;=67.5" />
-				<default value="E" if="aspect&gt;67.5 and aspect&lt;=112.5" />
-				<default value="SE"
-					if="aspect&gt;112.5 and aspect&lt;=157.5" />
-				<default value="S" if="aspect&gt;157.5 and aspect&lt;=202.5" />
-				<default value="SW"
-					if="aspect&gt;202.5 and aspect&lt;=247.5" />
-				<default value="W" if="aspect&gt;247.5 and aspect&lt;=292.5" />
-				<default value="NW"
-					if="aspect&gt;292.5 and aspect&lt;=337.5" />
-			</code>
-			<code id="13" name="calculated_slope" ui:hide="true"
-				ui:tab="plot_tab" calculated="true" list="slope_classes">
-				<label type="instance">DEM - Slope - ranges</label>
-				<label type="instance" xml:lang="fr">MNT - Gamme de pente</label>
-				<default value="FLAT" if="slope&gt;=0 and slope&lt;6" />
-				<default value="SLIGHT" if="slope&gt;=6 and slope&lt;16" />
-				<default value="STEEP" if="slope&gt;=16 and slope&lt;31" />
-				<default value="VERY_STEEP"
-					if="slope&gt;=31 and slope&lt;45" />
-				<default value="EXTREME" if="slope&gt;=46 and slope&lt;61" />
-				<default value="FALL" if="slope&gt;=60" />
-				<default value="NA" if="idm:blank(aspect)" />
-			</code>
-		</entity>
-	</schema>
+        <description xml:lang="fr">Identifiant unique de la parcelle dans la base de données Collect Earth.
+Ces données proviennent du CSV avec le plan d'échantillonnage.
+Il doit être contenu dans la première colonne du CSV avec l'en-tête de colonne "id".
+NE PAS ENLEVER!</description>
+
+        <description xml:lang="es">Identificador único de la parcela en la base de datos de Collect Earth.
+Este dato proviene del CSV con el diseño de muestreo.
+Debe estar contenido en la primera columna del CSV con el encabezado de columna "id".
+¡NO QUITAR!</description>
+
+        <description xml:lang="pt">Identificador exclusivo da parcela no banco de dados Collect Earth.
+Esses dados vêm do CSV com o design de amostragem.
+Deve estar contido na primeira coluna do CSV com o cabeçalho da coluna "id".
+NÃO REMOVA!</description>
+
+      </text>
+      <coordinate id="3" name="location">
+        <label type="instance" xml:lang="en">Plot - Central Point coordinates</label>
+        <label type="instance" xml:lang="es">Parcela - Coordenadas del punto central</label>
+        <label type="instance" xml:lang="fr">Parcelle - Coordonnées du point central</label>
+        <label type="instance" xml:lang="pt">Parcela - Coordenadas do ponto central</label>
+        <description xml:lang="en">Central point coordinates of the plot used to generate the KML loaded in Google Earth. 
+This data comes from the CSV with the sampling-design using the columns YCoordinate and XCoordinate.
+DO NOT REMOVE!</description>
+        <description xml:lang="es">Coordenadas del punto central de la trama utilizada para generar el KML cargado en Google Earth.
+Estos datos provienen del CSV con el diseño de muestreo utilizando las columnas YCoordinate y XCoordinate.
+¡NO QUITAR!</description>
+        <description xml:lang="pt">Coordenadas do ponto central do gráfico usado para gerar o KML carregado no Google Earth.
+Esses dados vêm do CSV com o design de amostragem usando as colunas YCoordinate e XCoordinate.
+NÃO REMOVA!</description>
+        <description xml:lang="fr">Coordonnées du point central du tracé utilisé pour générer le KML chargé dans Google Earth.
+Ces données proviennent du CSV avec le plan d'échantillonnage utilisant les colonnes YCoordinate et XCoordinate.
+NE PAS ENLEVER!</description>
+      </coordinate>
+      <number id="5" name="elevation" collectearth:fromcsv="true" type="integer">
+        <label type="instance" xml:lang="en">DEM - Elevation</label>
+        <label type="instance" xml:lang="es">DEM - Elevación</label>
+        <label type="instance" xml:lang="fr">DEM - Altitude</label>
+        <label type="instance" xml:lang="pt">DEM - Elevação</label>
+        <description xml:lang="en">Elevation of the central point of the plot in meters.
+This data comes from the sampling-design CSV file in the "elevation" column.
+
+The data for the elevation usually comes from the NASA SRTM Digital Elevation 30m.
+https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
+
+In Collect Earth we can easily generate CSV files with the sampling-design and containing DEM data using the Collect Earth Grid Generator GEE App : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+This information is not required. If you remove this attribute make sure to also remove "calculated_elevation_range" where the elevation is classified into 100 meter  ranges for easier analysis.</description>
+        <description xml:lang="es">Elevación del punto central de la parcela en metros.
+Estos datos provienen del archivo CSV de diseño de muestreo en la columna "elevation".
+
+Los datos para la elevación generalmente provienen de NASA SRTM Digital Elevation 30m.
+https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
+
+En Collect Earth podemos generar fácilmente archivos CSV con el diseño de muestreo y que contienen datos DEM utilizando la aplicación GEE Collect Earth Grid Generator: https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Esta información no es necesaria. Si elimina este atributo, asegúrese de eliminar también "calculated_elevation_range" donde la elevación se clasifica en rangos de 100 metros para facilitar el análisis.</description>
+        <description xml:lang="fr">Altitude du point central de la parcelle en mètres.
+Ces données proviennent du fichier CSV du plan d'échantillonnage dans la colonne "elevation".
+
+Les données d'élévation proviennent généralement du NASA SRTM Digital Elevation 30m.
+https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
+
+Dans Collect Earth, nous pouvons facilement générer des fichiers CSV avec la conception d'échantillonnage et contenant des données DEM à l'aide de l'application Collect Earth Grid Generator GEE : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Ces informations ne sont pas obligatoires. Si vous supprimez cet attribut, assurez-vous de supprimer également "calculated_elevation_range" où l'élévation est classée en plages de 100 mètres pour une analyse plus facile.</description>
+        <description xml:lang="pt">Elevação do ponto central do terreno em metros.
+Esses dados vêm do arquivo CSV de design de amostragem na coluna "elevation".
+
+Os dados para a elevação geralmente vêm do NASA SRTM Digital Elevation 30m.
+https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
+
+No Collect Earth, podemos gerar facilmente arquivos CSV com o design de amostragem e contendo dados DEM usando o aplicativo Collect Earth Grid Generator GEE: https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Esta informação não é necessária. Se você remover este atributo, certifique-se de remover também "calculated_elevation_range", onde a elevação é classificada em intervalos de 100 metros para facilitar a análise.</description>
+      </number>
+      <number id="6" name="slope" collectearth:fromcsv="true" type="real">
+        <label type="instance" xml:lang="en">DEM - Slope</label>
+        <label type="instance" xml:lang="es">DEM - Pendiente</label>
+        <label type="instance" xml:lang="fr">DEM - Pente</label>
+        <label type="instance" xml:lang="pt">DEM - Inclinação</label>
+        <description xml:lang="en">Slope of the central point of the plot in degrees.
+This data comes from the sampling-design CSV file in the "slope" column.
+
+The data for the slope is derived from the NASA SRTM Digital Elevation 30m.
+https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
+
+In Collect Earth we can easily generate CSV files with the sampling-design and containing DEM data using the Collect Earth Grid Generator GEE App : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+This information is not required. If you remove this attribute make sure to also remove "calculated_slope" where the slope is classified as into 6 classes for easier analysis.</description>
+        <description xml:lang="es">Pendiente del punto central de la parcela en grados.
+Estos datos provienen del archivo CSV de diseño de muestreo en la columna "slope".
+
+Los datos de la pendiente se derivan de NASA SRTM Digital Elevation 30m.
+https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
+
+En Collect Earth podemos generar fácilmente archivos CSV con el diseño de muestreo y que contienen datos DEM utilizando la aplicación GEE Collect Earth Grid Generator: https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Esta información no es necesaria. Si elimina este atributo, asegúrese de eliminar también "calculated_slope", donde la pendiente se clasifica en 6 clases para facilitar el análisis.</description>
+        <description xml:lang="pt">Inclinação do ponto central da parcela em graus.
+Esses dados vêm do arquivo CSV de design de amostragem na coluna "slope".
+
+Os dados para a inclinação são derivados do NASA SRTM Digital Elevation 30m.
+https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
+
+No Collect Earth, podemos gerar facilmente arquivos CSV com o design de amostragem e contendo dados DEM usando o aplicativo Collect Earth Grid Generator GEE: https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Esta informação não é necessária. Se você remover este atributo, certifique-se de remover também "calculated_slope" onde a inclinação é classificada em 6 classes para facilitar a análise.</description>
+        <description xml:lang="fr">Pente du point central du tracé en degrés.
+Ces données proviennent du fichier CSV du plan d'échantillonnage dans la colonne "slope".
+
+Les données pour la pente sont dérivées de la NASA SRTM Digital Elevation 30m.
+https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
+
+Dans Collect Earth, nous pouvons facilement générer des fichiers CSV avec la conception d'échantillonnage et contenant des données DEM à l'aide de l'application Collect Earth Grid Generator GEE : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Ces informations ne sont pas obligatoires. Si vous supprimez cet attribut, assurez-vous de supprimer également "calculated_slope" où la pente est classée en 6 classes pour une analyse plus facile.</description>
+      </number>
+      <number id="7" name="aspect" collectearth:fromcsv="true" type="real">
+        <label type="instance" xml:lang="en">DEM - Aspect</label>
+        <label type="instance" xml:lang="es">DEM - Exposición</label>
+        <label type="instance" xml:lang="fr">DEM - Exposition</label>
+        <label type="instance" xml:lang="pt">DEM - Exposição</label>
+        <description xml:lang="en">Aspect of the central point of the plot in degrees.
+This data comes from the sampling-design CSV file in the "aspect" column.
+
+The data for the aspect is derived from the NASA SRTM Digital Elevation 30m.
+https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
+
+In Collect Earth we can easily generate CSV files with the sampling-design and containing DEM data using the Collect Earth Grid Generator GEE App : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+This information is not required. If you remove this attribute make sure to also remove "calculated_aspect" where the aspect is classified as into N, NE, E, SE, S, SW, W, NW classes for easier analysis.</description>
+        <description xml:lang="es">Exposición del punto central de la parcela en grados.
+Estos datos provienen del archivo CSV del diseño de muestreo en la columna "aspect".
+
+Los datos para el aspecto se derivan de NASA SRTM Digital Elevation 30m.
+https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
+
+En Collect Earth podemos generar fácilmente archivos CSV con el diseño de muestreo y que contienen datos DEM utilizando la aplicación GEE Collect Earth Grid Generator: https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Esta información no es necesaria. Si elimina este atributo, asegúrese de eliminar también "calculated_aspect" donde el aspecto se clasifica en clases N, NE, E, SE, S, SW, W, NW para facilitar el análisis.</description>
+        <description xml:lang="fr">Exposition du point central du tracé en degrés.
+Ces données proviennent du fichier CSV du plan d'échantillonnage dans la colonne "aspect".
+
+Les données pour l'aspect sont dérivées de la NASA SRTM Digital Elevation 30m.
+https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
+
+Dans Collect Earth, nous pouvons facilement générer des fichiers CSV avec la conception d'échantillonnage et contenant des données DEM à l'aide de l'application Collect Earth Grid Generator GEE : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Ces informations ne sont pas obligatoires. Si vous supprimez cet attribut, assurez-vous de supprimer également "calculated_aspect" où l'aspect est classé dans les classes N, NE, E, SE, S, SW, W, NW pour une analyse plus facile.</description>
+        <description xml:lang="pt">Exposição do ponto central da trama em graus.
+Esses dados vêm do arquivo CSV de design de amostragem na coluna "aspect".
+
+Os dados para o aspecto são derivados do NASA SRTM Digital Elevation 30m.
+https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
+
+No Collect Earth, podemos gerar facilmente arquivos CSV com o design de amostragem e contendo dados DEM usando o aplicativo Collect Earth Grid Generator GEE: https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Esta informação não é necessária. Se você remover este atributo, certifique-se de remover também "calculated_aspect" onde o aspecto é classificado como nas classes N, NE, E, SE, S, SW, W, NW para facilitar a análise.</description>
+      </number>
+      <text id="4" name="operator" type="short">
+        <label type="instance" xml:lang="en">Plot - Operator</label>
+        <label type="instance" xml:lang="es">Parcela - Operador</label>
+        <label type="instance" xml:lang="fr">Parcelle - Opérateur</label>
+        <label type="instance" xml:lang="pt">Parcela - Operador</label>
+        <description xml:lang="en">Internal attribute used by Collect Earth to record which interpreter assessed a plot.
+The name of the interpreter comes from Collect Earth main window where the user needs to fill his/her operate identifier.
+
+DO NOT REMOVE!</description>
+        <description xml:lang="pt">Atributo interno usado pelo Collect Earth para registrar qual intérprete avaliou uma parcela.
+O nome do intérprete vem da janela principal do Collect Earth onde o usuário precisa preencher seu identificador de operação.
+
+NÃO REMOVA!</description>
+        <description xml:lang="es">Atributo interno utilizado por Collect Earth para registrar qué intérprete evaluó una parcela.
+El nombre del intérprete proviene de la ventana principal de Collect Earth, donde el usuario debe completar su identificador de operación.
+
+¡NO QUITAR!</description>
+        <description xml:lang="fr">Attribut interne utilisé par Collect Earth pour enregistrer quel interprète a évalué un tracé.
+Le nom de l'interpréteur provient de la fenêtre principale de Collect Earth où l'utilisateur doit remplir son identifiant de fonctionnement.
+
+NE PAS ENLEVER!</description>
+      </text>
+      <boolean id="8" name="actively_saved">
+        <label type="instance" xml:lang="en">Plot - Actively saved by user (green tick)</label>
+        <label type="instance" xml:lang="es">Parcela - guardado activamente por el usuario (marca verde)</label>
+        <label type="instance" xml:lang="fr">Parcelle - Enregistré activement par l'utilisateur (coche verte)</label>
+        <label type="instance" xml:lang="pt">Parcela - salvo ativamente pelo usuário (marca verde)</label>
+        <description xml:lang="en">Internal attribute used by Collect Earth to track if a plot has been fully assessed and has no validation issues.
+If the user starts filling the data of a plot without fully answering all the questions this value will be FALSE (0)
+When the user fills the data on the Google Earth balloon and finally clicks on the send button,, and if the plots attributes validation rules are passes, this value becomes TRUE (1) and the user sees a GREEN TICK on the list of plots on the Google Earth interface.
+
+DO NOT REMOVE!</description>
+        <description xml:lang="es">Atributo interno utilizado por Collect Earth para comprobar si una parcela se ha evaluado completamente y no tiene problemas de validación.
+Si el usuario empieza a llenar los datos de una parcela sin contestar completamente todas las preguntas este valor será FALSO (0)
+Cuando el usuario completa los datos en Google Earth y finalmente hace clic en el botón Enviar, y si se pasan las reglas de validación de los atributos de las parcelas, este valor se convierte en VERDADERO (1) y el usuario ve una MARCA VERDE en la lista de parcelas en la interfaz de Google Earth.
+
+¡NO QUITAR!</description>
+        <description xml:lang="fr">Attribut interne utilisé par Collect Earth pour savoir si une parcelle a été entièrement évaluée et n'a pas de problèmes de validation.
+Si l'utilisateur commence à remplir les données d'un tracé sans répondre complètement à toutes les questions, cette valeur sera FALSE (0)
+Lorsque l'utilisateur renseigne les données sur Google Earth et clique enfin sur le bouton envoyer, et si les règles de validation des attributs des parcelles sont respectées, cette valeur devient TRUE (1) et l'utilisateur voit un COCHE VERT sur la liste des parcelles sur l'interface de Google Earth.
+
+NE PAS ENLEVER!</description>
+        <description xml:lang="pt">Atributo interno usado pelo Collect Earth para rastrear se um lote foi totalmente avaliado e não apresenta problemas de validação.
+Caso o usuário comece a preencher os dados de uma parcela sem responder totalmente a todas as questões este valor será FALSO (0)
+Quando o usuário preenche os dados no balão do Google Earth e finalmente clica no botão enviar, e se as regras de validação dos atributos das parcelas são aprovadas, esse valor se torna VERDADEIRO (1) e o usuário vê um TICK VERDE na lista de parcelas em a interface do Google Earth.
+
+NÃO REMOVA!</description>
+      </boolean>
+      <date id="9" name="actively_saved_on" relevant="false()">
+        <label type="instance" xml:lang="en">Plot - Last saved on</label>
+        <label type="instance" xml:lang="es">Parcela - Guardada por ultima vez</label>
+        <label type="instance" xml:lang="fr">Parcelle – Dernier enregistrement le</label>
+        <label type="instance" xml:lang="pt">Parcela - Último salvo em</label>
+        <description xml:lang="en">Internal attribute used by Collect Earth to track the last time the plot data has been modified.
+
+DO NOT REMOVE!</description>
+        <description xml:lang="es">Atributo interno utilizado por Collect Earth para rastrear la última vez que se modificaron los datos de la parcela.
+
+¡NO QUITAR!</description>
+        <description xml:lang="pt">Atributo interno usado pelo Collect Earth para rastrear a última vez que os dados do gráfico foram modificados.
+
+NÃO REMOVA!</description>
+        <description xml:lang="fr">Attribut interne utilisé par Collect Earth pour suivre la dernière fois que les données du tracé ont été modifiées.
+
+NE PAS ENLEVER!</description>
+      </date>
+      <text id="10" name="plot_file" relevant="false()" type="short">
+        <label type="instance" xml:lang="en">Plot - CSV file that contains the plot</label>
+        <label type="instance" xml:lang="es">Parcela - Archivo CSV que contiene al plot</label>
+        <label type="instance" xml:lang="fr">Placette - Fichier CSV qui contient le point</label>
+        <label type="instance" xml:lang="pt">Parcela - Fichier CSV contenant le tracé</label>
+        <description xml:lang="en">Internal attribute used by Collect Earth to track which CSV with the plot sampling-design contains this plots.
+Usually there will be multiple CSV files, for instance in an assessment of Italy you will have CSV files that contains the plots to be assessed by region, Lazio.csv, Sicilia.csv and so on. This attribute will keep the name of the file.
+This attribute is useful when it is required to re-visit a plot during data cleansing.
+
+DO NOT REMOVE!</description>
+        <description xml:lang="fr">Attribut interne utilisé par Collect Earth pour suivre quel CSV avec le plan d'échantillonnage de parcelle contient ces parcelles.
+Habituellement, il y aura plusieurs fichiers CSV, par exemple dans une évaluation de l'Italie, vous aurez des fichiers CSV qui contiennent les parcelles à évaluer par région, Lazio.csv, Sicilia.csv et ainsi de suite. Cet attribut conservera le nom du fichier.
+Cet attribut est utile lorsqu'il est nécessaire de revisiter une parcelle lors du nettoyage des données.
+
+NE PAS ENLEVER!</description>
+        <description xml:lang="pt">Atributo interno usado pelo Collect Earth para rastrear qual CSV com o desenho de amostragem de parcela contém essas parcelas.
+Normalmente, haverá vários arquivos CSV, por exemplo, em uma avaliação da Itália, você terá arquivos CSV que contêm as parcelas a serem avaliadas por região, Lazio.csv, Sicilia.csv e assim por diante. Este atributo manterá o nome do arquivo.
+Este atributo é útil quando é necessário visitar novamente um gráfico durante a limpeza de dados.
+
+NÃO REMOVA!</description>
+        <description xml:lang="es">Atributo interno utilizado por Collect Earth para rastrear qué CSV con el diseño de muestreo de parcelas contiene estas parcelas.
+Por lo general, habrá varios archivos CSV, por ejemplo, en una evaluación de Italia, tendrá archivos CSV que contienen las parcelas que se evaluarán por región, Lazio.csv, Sicilia.csv, etc. Este atributo mantendrá el nombre del archivo.
+Este atributo es útil cuando se requiere volver a visitar un gráfico durante la limpieza de datos.
+
+¡NO QUITAR!</description>
+      </text>
+      <code id="11" name="calculated_elevation_range" ui:hide="true" ui:tab="plot_tab" calculated="true" list="elevation_ranges">
+        <label type="instance" xml:lang="en">DEM - Elevation - range</label>
+        <label type="instance" xml:lang="fr">DEM - Gamme d'altitude</label>
+        <label type="instance" xml:lang="es">DEM - Elevación - rango</label>
+        <label type="instance" xml:lang="pt">DEM - Elevação - intervalos</label>
+        <description>Calculated attribute dependant on the "elevation" attribute.
+
+Collect uses the "Calculated value expression" to simplify the elevation into a range. i.e. elevation 1.654 m becomes 1600-1700 m.
+
+It is much easier to make analysis in 100 meter ranges rather than actual elevation of the plot.</description>
+        <default expr=" format-number(ceiling(elevation div 100 ), '#')" />
+      </code>
+      <code id="13" name="calculated_slope_class" ui:hide="true" ui:tab="plot_tab" calculated="true" list="slope_classes">
+        <label type="instance" xml:lang="en">DEM - Slope - ranges</label>
+        <label type="instance" xml:lang="fr">DEM - Gamme de pente</label>
+        <label type="instance" xml:lang="es">DEM - Pendiente - rango</label>
+        <label type="instance" xml:lang="pt">DEM - Elevação - intervalos</label>
+        <description xml:lang="en">Calculated attribute dependant on the "slope" attribute.
+
+Collect uses the "Calculated value expression" to simplify the slope into a range. i.e. slope 2 degrees becomes FLAT and 25 degrees become STEEP..
+
+It is much easier to make analysis in slope ranges rather than actual slope of the plot.</description>
+        <description xml:lang="fr">Attribut calculé dépendant de l'attribut "slope".
+
+Collect utilise "l'expression de valeur calculée" pour simplifier la pente en une plage. c'est à dire. une pente de 2 degrés devient PLATE et 25 degrés devient RIGIDE..
+
+Il est beaucoup plus facile d'analyser les plages de pente plutôt que la pente réelle de la parcelle.</description>
+        <description xml:lang="pt">Atributo calculado dependente do atributo "slope".
+
+Coletar usa a "expressão de valor calculado" para simplificar a inclinação em um intervalo. ou seja inclinação de 2 graus torna-se FLAT e 25 graus torna-se ÍNGREME.
+
+É muito mais fácil fazer análises em faixas de inclinação do que a inclinação real do gráfico.</description>
+        <description xml:lang="es">Atributo calculado en función del atributo "slope".
+
+Collect utiliza la "expresión de valor calculado" para simplificar la pendiente en un rango. es decir. la pendiente de 2 grados se vuelve PLANA y la de 25 grados se vuelve EMPINADA.
+
+Es mucho más fácil hacer un análisis en rangos de pendientes que en la pendiente real de la parcela.</description>
+        <default value="FLAT" if="slope&gt;=0 and slope&lt;6" />
+        <default value="SLIGHT" if="slope&gt;=6 and slope&lt;16" />
+        <default value="STEEP" if="slope&gt;=16 and slope&lt;31" />
+        <default value="VERY_STEEP" if="slope&gt;=31 and slope&lt;45" />
+        <default value="EXTREME" if="slope&gt;=46 and slope&lt;61" />
+        <default value="FALL" if="slope&gt;=60" />
+        <default value="NA" if="idm:blank(aspect)" />
+      </code>
+      <code id="12" name="calculated_aspect_class" ui:hide="true" ui:tab="plot_tab" calculated="true" list="orientation">
+        <label type="instance" xml:lang="en">DEM - Aspect - ranges</label>
+        <label type="instance" xml:lang="fr">DEM- Gamme d'exposition</label>
+        <label type="instance" xml:lang="es">DEM - Exposición - rangos</label>
+        <label type="instance" xml:lang="pt">DEM - Exposição - intervalos</label>
+        <description>Calculated attribute dependant on the "aspect" attribute.
+
+Collect uses the "Calculated value expression" to simplify the aspect into a range. i.e. aspect 10 degrees becomes NORTH, 230 degrees becomes SOUTH WEST and so on.
+
+It is much easier to make analysis using bearings rather than aspect degrees.</description>
+        <description xml:lang="es">Atributo calculado que depende del atributo "aspect".
+
+Collect utiliza la "expresión de valor calculado" para simplificar el aspecto en un rango. es decir, el aspecto 10 grados se convierte en NORTE, 230 grados se convierte en SUROESTE y así sucesivamente.
+
+Es mucho más fácil hacer un análisis utilizando orientaciones en lugar de grados de aspecto.</description>
+        <description xml:lang="pt">Atributo calculado dependente do atributo "aspect".
+
+Collect usa a "expressão de valor calculado" para simplificar o aspecto em um intervalo. ou seja, o aspecto de 10 graus torna-se NORTE, 230 graus torna-se SUDOESTE e assim por diante.
+
+É muito mais fácil fazer análises usando rumos em vez de graus de aspecto.</description>
+        <description xml:lang="fr">Attribut calculé dépendant de l'attribut "aspect".
+
+Collect utilise "l'expression de valeur calculée" pour simplifier l'aspect dans une plage. c'est-à-dire que l'aspect 10 degrés devient NORD, 230 degrés devient SUD-OUEST et ainsi de suite.
+
+Il est beaucoup plus facile de faire une analyse en utilisant des relèvements plutôt que des degrés d'aspect.</description>
+        <default value="na" if="aspect=0 and slope=0" />
+        <default value="N" if="aspect&gt;337.5 or aspect&lt;=22.5" />
+        <default value="NE" if="aspect&gt;22.5 and aspect&lt;=67.5" />
+        <default value="E" if="aspect&gt;67.5 and aspect&lt;=112.5" />
+        <default value="SE" if="aspect&gt;112.5 and aspect&lt;=157.5" />
+        <default value="S" if="aspect&gt;157.5 and aspect&lt;=202.5" />
+        <default value="SW" if="aspect&gt;202.5 and aspect&lt;=247.5" />
+        <default value="W" if="aspect&gt;247.5 and aspect&lt;=292.5" />
+        <default value="NW" if="aspect&gt;292.5 and aspect&lt;=337.5" />
+      </code>
+      <text id="1303" name="short_text_demo" ui:tab="plot_tab" type="short">
+        <label type="instance" xml:lang="en">Demo text question (not required | &gt; 5 characters)</label>
+        <label type="instance" xml:lang="fr">Démo - question textuelle (non obligatoire | &gt; 5 caractères)</label>
+        <label type="instance" xml:lang="pt">Demo - pergunta de texto (não obrigatório | &gt; 5 caracteres)</label>
+        <label type="instance" xml:lang="es">Demo - pregunta de texto (no obligatorio | &gt; 5 caracteres)</label>
+        <description>This attribute lets you write anything you want. Don't use unless totally necessary, it is usually better to use Code attributes to standardize the answers rather than have the users write anything they want (makes data analysis harder)</description>
+        <description xml:lang="es">Este atributo te permite escribir lo que quieras. No lo use a menos que sea totalmente necesario; por lo general, es mejor usar atributos de código para estandarizar las respuestas en lugar de que los usuarios escriban lo que quieran (hace que el análisis de datos sea más difícil)</description>
+        <description xml:lang="fr">Cet attribut vous permet d'écrire tout ce que vous voulez. Ne pas utiliser à moins que cela ne soit totalement nécessaire, il est généralement préférable d'utiliser les attributs Code pour standardiser les réponses plutôt que de laisser les utilisateurs écrire ce qu'ils veulent (rend l'analyse des données plus difficile)</description>
+        <description xml:lang="pt">Este atributo permite que você escreva o que quiser. Não use, a menos que seja totalmente necessário, geralmente é melhor usar atributos de código para padronizar as respostas, em vez de fazer com que os usuários escrevam o que quiserem (dificulta a análise de dados)</description>
+        <check flag="error" expr="string-length($this) &gt; 5">
+          <message xml:lang="en">You must fill at least 5 characters</message>
+          <message xml:lang="pt">Você deve preencher pelo menos 5 caracteres</message>
+          <message xml:lang="es">Debes llenar al menos 5 caracteres</message>
+          <message xml:lang="fr">Vous devez remplir au moins 5 caractères</message>
+        </check>
+      </text>
+      <code id="1304" name="code_demo" required="true" ui:tab="plot_tab" list="demo_codelist">
+        <label type="instance" xml:lang="en">Demo Code attribute - Multiple options (Required) </label>
+        <label type="instance" xml:lang="pt">Demo - Atributo de código - Várias opções (obrigatório)</label>
+        <label type="instance" xml:lang="fr">Démo - Attribut de code - Plusieurs options (obligatoire)</label>
+        <label type="instance" xml:lang="es">Demo - Atributo de código - Múltiples opciones (obligatorio)</label>
+        <description>Gives the user a set of options that can be chosen from.
+Modify the codelist "demo_codelist" to add, remove options.</description>
+        <description xml:lang="es">Ofrece al usuario un conjunto de opciones entre las que puede elegir.
+Modifique la lista de códigos "demo_codelist" para agregar, eliminar opciones.</description>
+        <description xml:lang="pt">Dá ao usuário um conjunto de opções que podem ser escolhidas.
+Modifique a lista de códigos "demo_codelist" para adicionar, remover opções.</description>
+        <description xml:lang="fr">Donne à l'utilisateur un ensemble d'options parmi lesquelles il peut choisir.
+Modifiez la liste de codes "demo_codelist" pour ajouter, supprimer des options.</description>
+      </code>
+      <boolean id="1308" name="yes_no_demo" required="true" ui:tab="plot_tab">
+        <label type="instance" xml:lang="en">Demo Yes/No question (shows comments if YES)</label>
+        <label type="instance" xml:lang="fr">Démo - Question Oui/Non (affiche les commentaires si OUI)</label>
+        <label type="instance" xml:lang="pt">Demo - pergunta Sim/Não (mostra comentários se SIM)</label>
+        <label type="instance" xml:lang="es">Demo - pregunta Sí/No (mostrar comentarios si la respuesta es SÍ)</label>
+        <description>Shows an Yes/No question.
+These types of questions are useful in order to present the user  other question based in the answers.</description>
+        <description xml:lang="es">Muestra una pregunta Sí/No.
+Este tipo de preguntas son útiles para presentar al usuario otras preguntas basadas en las respuestas.</description>
+        <description xml:lang="pt">Mostra uma pergunta Sim/Não.
+Esses tipos de perguntas são úteis para apresentar ao usuário outra pergunta com base nas respostas.</description>
+        <description xml:lang="fr">Affiche une question Oui/Non.
+Ces types de questions sont utiles pour présenter à l'utilisateur une autre question basée sur les réponses.</description>
+      </boolean>
+      <text id="1309" name="memo_text_demo" relevant="yes_no_demo = true()" required="true" ui:hideWhenNotRelevant="true" ui:tab="plot_tab" type="memo">
+        <label type="instance" xml:lang="en">Demo of a long text depending on Yes/No question</label>
+        <label type="instance" xml:lang="fr">Démo d'un texte long en fonction de la question Oui/Non</label>
+        <label type="instance" xml:lang="pt">Demo de um texto longo dependendo da pergunta Sim/Não</label>
+        <label type="instance" xml:lang="es">Demo de un texto largo dependiendo de la pregunta Sí/No</label>
+        <description>This is a Multi-Line (Memo) type of text attribute.
+Using the Relevance properties we can show or hide them depending on another question.</description>
+        <description xml:lang="es">Este es un tipo de atributo de texto de varias líneas (Memo).
+Usando las propiedades de Relevancia podemos mostrarlas u ocultarlas dependiendo de otra pregunta.</description>
+        <description xml:lang="pt">Este é um tipo de atributo de texto Multi-Line (Memo).
+Usando as propriedades de relevância, podemos mostrá-las ou ocultá-las dependendo de outra pergunta.</description>
+        <description xml:lang="fr">Il s'agit d'un attribut de texte de type multiligne (mémo).
+En utilisant les propriétés de pertinence, nous pouvons les afficher ou les masquer en fonction d'une autre question.</description>
+      </text>
+      <number id="1310" name="integer_demo" required="true" ui:tab="plot_tab" type="integer">
+        <label type="instance" xml:lang="en">Demo - integer number (required | &gt;5 and &lt;20)</label>
+        <label type="instance" xml:lang="fr">Démo - Nombre entier (obligatoire | &gt;5 et &lt;20)</label>
+        <label type="instance" xml:lang="pt">Demo - Número inteiro (obrigatório | &gt;5 e &lt;20)</label>
+        <label type="instance" xml:lang="es">Demo - número entero (obligatorio | &gt;5 y &lt;20)</label>
+        <description>This is a number attribute of type Integer (can also be a Real number with decimals).
+It includes a validation rule that only approves data between 5 and 20.</description>
+        <description xml:lang="es">Este es un atributo numérico de tipo Entero (también puede ser un número Real con decimales).
+Incluye una regla de validación que solo aprueba datos entre 5 y 20.</description>
+        <description xml:lang="pt">Este é um atributo de número do tipo inteiro (também pode ser um número real com decimais).
+Inclui uma regra de validação que só aprova dados entre 5 e 20.</description>
+        <description xml:lang="fr">Il s'agit d'un attribut numérique de type entier (peut également être un nombre réel avec des décimales).
+Il inclut une règle de validation qui n'approuve que les données entre 5 et 20.</description>
+        <compare flag="error" lt="20" gt="5">
+          <message xml:lang="en">This field should be a value that is more than 5 and less than 20.</message>
+          <message xml:lang="es">Este campo debe tener un valor mayor que 5 y menor que 20.</message>
+          <message xml:lang="fr">Ce champ doit être une valeur supérieure à 5 et inférieure à 20.</message>
+          <message xml:lang="pt">Este campo deve ter um valor maior que 5 e menor que 20.</message>
+        </compare>
+      </number>
+      <date id="1313" name="demo_date" requiredIf="code_demo = 'B'" ui:tab="tab_1312">
+        <label type="instance" xml:lang="en">You can also collect dates and have multiple tabs so that the questionnaire is easier to fill or divided into topics!</label>
+        <label type="instance" xml:lang="pt">Você também pode coletar datas e ter várias abas para que o questionário seja mais fácil de preencher ou dividido em tópicos!</label>
+        <label type="instance" xml:lang="es">¡También puede recopilar fechas y tener múltiples pestañas para que el cuestionario sea más fácil de completar o dividir en temas!</label>
+        <label type="instance" xml:lang="fr">Vous pouvez également collecter des dates et avoir plusieurs onglets pour que le questionnaire soit plus facile à remplir ou divisé en sujets!</label>
+        <description>You can collect dates an times (although this is usually not very useful). 
+This field is required only if you have chosen Option B in the previous questionnaire (code attribute).</description>
+        <description xml:lang="fr">Vous pouvez collecter des dates et des heures (bien que cela ne soit généralement pas très utile).
+Ce champ est obligatoire uniquement si vous avez choisi l'option B dans le questionnaire précédent (attribut code).</description>
+        <description xml:lang="pt">Você pode coletar datas e horários (embora isso geralmente não seja muito útil).
+Este campo é obrigatório apenas se você escolheu a Opção B no questionário anterior (atributo de código).</description>
+        <description xml:lang="es">Puede recopilar fechas y horas (aunque esto no suele ser muy útil).
+Este campo es obligatorio solo si ha elegido la opción B en el cuestionario anterior (atributo de código).</description>
+      </date>
+    </entity>
+  </schema>
 </survey>
