@@ -121,13 +121,15 @@
 	  				</radiogroup>
 	  				<hlayout visible="@load(fx.relevanceType eq 'RELEVANT_WHEN')">
 		  				<fieldErrorHandler message="@load(vmsgs['relevantExpression'])">
-		  					<textbox width="250px"
+		  					<textbox width="400px"
 		  						value="@bind(fx.relevantExpression)"
 		  						onChange="@command('applyChanges')"
 		  						rows="4" />
 		  				</fieldErrorHandler>
 	  					<expressionInfoIcon />
-	  					<label value="${labels.survey.schema.node.hide_when_not_relevant}:" />
+	  				</hlayout>
+	  				<hlayout>
+						<label value="${labels.survey.schema.node.hide_when_not_relevant}:" />
 	  					<checkbox
 	  						checked="@load(fx.hideWhenNotRelevant eq true) @save(fx.hideWhenNotRelevant)"
 	  						onCheck="@command('applyChanges')" />
