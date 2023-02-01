@@ -334,8 +334,10 @@
     	</grid>
     </collapsiblepanel>
 
-  	<collapsiblepanel open="false" visible="@load(not vm.rootEntity)"
-		captionLabel="${labels.survey.schema.node.dependent_paths}">
+  	<collapsiblepanel 
+  		open="false" 
+  		captionLabel="${labels.survey.schema.node.dependent_paths}"
+		visible="@load(not vm.rootEntity and not empty vm.dependentNodes)">
 		<listbox id="dependentNodeListbox" rows="4"
 			model="@load(vm.dependentNodes)">
 			<listhead>
