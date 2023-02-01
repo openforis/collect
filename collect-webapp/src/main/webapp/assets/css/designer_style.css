@@ -180,6 +180,10 @@ div.z-listbox-header th.z-listheader-sort-over {
 	width: 30px;
 }
 
+z-column-content, .z-row-content, .z-group-content, .z-groupfoot-content, .z-footer-content {
+	padding: 6px 4px;
+}
+
 /**
 * Checkbox style
 */
