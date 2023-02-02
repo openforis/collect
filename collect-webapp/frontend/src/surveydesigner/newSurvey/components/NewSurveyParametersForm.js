@@ -20,6 +20,7 @@ import ServiceFactory from 'services/ServiceFactory'
 import L from 'utils/Labels'
 import Languages from 'utils/Languages'
 import Strings from 'utils/Strings'
+import { Alert } from '@mui/material'
 
 const templateTypes = ['BLANK', 'BIOPHYSICAL', 'COLLECT_EARTH', 'COLLECT_EARTH_IPCC']
 
@@ -53,7 +54,7 @@ const NewSurveyParametersForm = (props) => {
   )
 
   const languageItems = Languages.items()
-  const mainLanguageCodes = ['en', 'fr', 'es']
+  const mainLanguageCodes = ['ar', 'zh', 'en', 'fr', 'pt', 'ru', 'es']
   const mainLanguageItems = mainLanguageCodes.map((code) => ({ code, label: Languages.label(code) }))
   const otherLanguageItems = languageItems
     .filter((item) => !mainLanguageCodes.includes(item.code))
@@ -92,9 +93,11 @@ const NewSurveyParametersForm = (props) => {
       </SelectFormItem>
       {values.templateType && (
         <FormGroup row>
-          <Label sm={2}></Label>
-          <Col sm={10} className="new-survey-form__template-description-col">
-            {L.l('survey.templateTypeDescription.' + values.templateType)}
+          <Label sm={3}></Label>
+          <Col sm={9}>
+            <Alert className="new-survey-form__template-description" severity="info">
+              {L.l('survey.templateTypeDescription.' + values.templateType)}
+            </Alert>
           </Col>
         </FormGroup>
       )}

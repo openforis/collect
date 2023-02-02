@@ -2,9 +2,8 @@
     margin-top: 2rem;
 }
 
-.new-survey-form__template-description-col {
-    max-width: 40rem;
-    font-style: italic;
+.new-survey-form__template-description {
+    width: 45rem;
     text-align: justify;
 }
 
