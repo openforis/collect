@@ -91,7 +91,8 @@
 
 	<fieldErrorHandler message="@load(vmsgs['referencedAttributePath'])" sclass="full-width">
 		<collapsiblepanel open="@load(not empty fx.referencedAttributePath)"
-			captionLabel="${labels.survey.schema.attribute.referenced_attribute}">
+			captionLabel="${labels.survey.schema.attribute.referenced_attribute}"
+			visible="@load(not vm.collectEarthSurvey)">
 			<div>
 				<textbox width="400px"
 								value="@bind(fx.referencedAttributePath)" readonly="true" />
