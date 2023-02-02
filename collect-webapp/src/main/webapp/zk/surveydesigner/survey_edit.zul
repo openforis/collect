@@ -7,6 +7,7 @@
 
 <?link rel="shortcut icon" type="image/x-icon" href="/assets/images/favicon.ico"?>
 <?link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico"?>
+<?link rel="stylesheet" href="/assets/fonts/material-icons/material-icons.css" ?>
 
 <?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <zk xmlns:w="client">
@@ -112,7 +113,7 @@
 				<hlayout valign="middle" width="300px">
 					<space width="110px" />
 					<button label="${labels.global.save_item}"
-						image="/assets/images/save-small.png"
+						iconSclass="z-icon-save"
 						onClick="@command('save')"/>
 					<box width="110px">
 						<label
@@ -122,10 +123,12 @@
 				</hlayout>
 				<hlayout hflex="1" style="text-align: right;" spacing="20px" valign="middle">
 					<button
+						iconSclass="z-icon-download"
 						label="${labels.survey.export.$}"
 						onClick="@command('exportSurvey')" />
 					<!-- Advanced options -->
 					<combobutton
+						iconSclass="z-icon-eye"
 						label="${labels.survey.preview.show_preview}"
 						onClick="@command('showDataCleansingPreview')"
 						visible="@load(not vm.collectEarthSurvey)">
@@ -139,60 +142,60 @@
 						</menupopup>
 					</combobutton>
 					
-					<button label="${labels.survey.preview.show_preview}"
+					<button 
+							iconSclass="z-icon-eye"
+							label="${labels.survey.preview.show_preview}"
 							onClick="@command('showDataCleansingPreview')"
 							visible="@load(vm.collectEarthSurvey)" />
 							
 					<!-- Advanced options -->
-					<menubar sclass="transparent">
-						<menu
-							tooltiptext="${labels.global.advanced_functions}"
-							image="/assets/images/settings-small.png">
-							<menupopup>
-								<menuitem
-									visible="@load(not vm.collectEarthSurvey)"
-									label="${labels.survey.validate_collect_desktop}"
-									onClick="@command('validate')" />
-								<menuitem
-									visible="@load(vm.collectEarthSurvey)"
-									label="${labels.survey.validate_collect_earth}"
-									onClick="@command('validate')" />
-								<menuitem
-									visible="@load(not vm.collectEarthSurvey)"
-									label="${labels.survey.validate_collect_mobile}"
-									onClick="@command('validateCollectMobile')" />
-								<menuseparator />
-								<menuitem
-									label="${labels.survey.export.$}"
-									onClick="@command('exportSurvey')" />
-								<menuseparator />
-								<menuitem
-									label="${labels.survey.schema.export_summary.$}"
-									onClick="@command('exportSchemaSummary')" />
-								<menuseparator />
-								<menuitem
-									label="${labels.survey.schema.labels_import_export.$}"
-									onClick="@command('openSchemaLabelsImportExportPopUp')" />
-								<menuseparator />
-								<menuitem
-									label="${labels.survey.schema.attributes_import.$}"
-									onClick="@command('openSchemaAttributesImportPopUp')" />
-								<menuseparator />
-								<menuitem
-									label="${labels.survey.schema.export_csv_data_import_template}"
-									onClick="@command('exportCsvDataImportTemplate')" />
-								<menuitem
-									label="${labels.survey.schema.export_ce_csv_data_import_template}"
-									onClick="@command('exportCeCsvDataImportTemplate')"
-									visible="@load(vm.collectEarthSurvey)" />
-								<menuseparator />
-								<menuitem
-									label="${labels.survey.schema.export_ce_grid_template}"
-									onClick="@command('exportCEGridTemplate')"
-									visible="@load(vm.collectEarthSurvey)" />
-							</menupopup>
-						</menu>
-					</menubar>
+					<combobutton 
+						tooltiptext="${labels.global.advanced_functions}"
+						iconSclass="z-icon-gear">
+						<menupopup>
+							<menuitem
+								visible="@load(not vm.collectEarthSurvey)"
+								label="${labels.survey.validate_collect_desktop}"
+								onClick="@command('validate')" />
+							<menuitem
+								visible="@load(vm.collectEarthSurvey)"
+								label="${labels.survey.validate_collect_earth}"
+								onClick="@command('validate')" />
+							<menuitem
+								visible="@load(not vm.collectEarthSurvey)"
+								label="${labels.survey.validate_collect_mobile}"
+								onClick="@command('validateCollectMobile')" />
+							<menuseparator />
+							<menuitem
+								label="${labels.survey.export.$}"
+								onClick="@command('exportSurvey')" />
+							<menuseparator />
+							<menuitem
+								label="${labels.survey.schema.export_summary.$}"
+								onClick="@command('exportSchemaSummary')" />
+							<menuseparator />
+							<menuitem
+								label="${labels.survey.schema.labels_import_export.$}"
+								onClick="@command('openSchemaLabelsImportExportPopUp')" />
+							<menuseparator />
+							<menuitem
+								label="${labels.survey.schema.attributes_import.$}"
+								onClick="@command('openSchemaAttributesImportPopUp')" />
+							<menuseparator />
+							<menuitem
+								label="${labels.survey.schema.export_csv_data_import_template}"
+								onClick="@command('exportCsvDataImportTemplate')" />
+							<menuitem
+								label="${labels.survey.schema.export_ce_csv_data_import_template}"
+								onClick="@command('exportCeCsvDataImportTemplate')"
+								visible="@load(vm.collectEarthSurvey)" />
+							<menuseparator />
+							<menuitem
+								label="${labels.survey.schema.export_ce_grid_template}"
+								onClick="@command('exportCEGridTemplate')"
+								visible="@load(vm.collectEarthSurvey)" />
+						</menupopup>
+					</combobutton>
 				</hlayout>
 			</hlayout>
 			
