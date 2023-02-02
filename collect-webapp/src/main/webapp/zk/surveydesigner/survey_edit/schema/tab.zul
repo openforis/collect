@@ -12,8 +12,6 @@
 			@save(vm.formObject, before={'validate','applyChanges'})
       		@validator('org.openforis.collect.designer.form.validator.TabFormValidator')">
 
-		<groupbox width="100%" closable="false">
-		  	<caption label="${labels.survey.schema.node.general}" />
 		  	<grid class="inner">
 		  		<columns>
 		  			<column width="150px" />
@@ -37,6 +35,5 @@
 		  			</row>
 		  		</rows>
 		  	</grid>
-		</groupbox>
 	</vlayout>
 </zk>

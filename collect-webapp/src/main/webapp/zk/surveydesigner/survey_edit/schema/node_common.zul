@@ -8,8 +8,7 @@
   <custom-attributes otherLayoutForm="${arg.otherLayoutForm}"/>
   <custom-attributes otherAttributesForm="${arg.otherAttributesForm}"/>
 
-  <groupbox width="100%" closable="false">
-  	<caption label="${labels.survey.schema.node.general}" />
+  
   	<grid class="inner">
   		<columns>
   			<column width="150px" />
@@ -128,7 +127,7 @@
 		  				</fieldErrorHandler>
 	  					<expressionInfoIcon />
 	  				</hlayout>
-	  				<hlayout>
+	  				<hlayout visible="@load(fx.relevanceType eq 'RELEVANT_WHEN')">
 						<label value="${labels.survey.schema.node.hide_when_not_relevant}:" />
 	  					<checkbox
 	  						checked="@load(fx.hideWhenNotRelevant eq true) @save(fx.hideWhenNotRelevant)"
@@ -359,7 +358,6 @@
 			</template>
 		</listbox>
 	</collapsiblepanel>
-  </groupbox>
 
   <include src="${arg.otherAttributesForm}" />
     
@@ -452,7 +450,7 @@
     			<columns>
     				<column width="150px" />
     				<column width="200px" />
-    				<column width="200px" />
+    				<column width="220px" />
     				<column width="200px" />
     			</columns>
     			<rows>
@@ -464,7 +462,7 @@
 		  					<textbox id="backgroundColorHiddenField" visible="false" 
 		  						value="@bind(fx.backgroundColor)"
 		  						onChange="@command('applyChanges')" />
-		  					<colorbox id="backgroundColorBox" 
+		  					<colorbox id="backgroundColorBox" width="100px"
 		  						value="@load(backgroundColorHiddenField.value)"
 		  						w:onChange="var t = zk.Widget.$('$backgroundColorHiddenField'); t.setValue(event.value); t.fireOnChange();"
 		  						hash="true" pickerPosition="right" />
@@ -476,7 +474,7 @@
 		  					<spinner
 		  						value="@bind(fx.backgroundTransparency)"
 		  						onChange="@command('applyChanges')"
-		  						width="50px" />
+		  						width="100px" />
 		  				</fieldErrorHandler>
 		  			</row>
     			</rows>

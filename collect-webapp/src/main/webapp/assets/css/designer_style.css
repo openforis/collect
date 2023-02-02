@@ -270,6 +270,9 @@ z-column-content, .z-row-content, .z-group-content, .z-groupfoot-content, .z-foo
 .form tr.z-row {
 	vertical-align: top;
 }
+.form .z-row .z-row-inner {
+	border-top: none;
+}
 /* END OF GRID STYLE */
 
 /* START OF LANGUAGES LIST STYLE */
