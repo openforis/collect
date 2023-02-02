@@ -992,11 +992,30 @@ Este atributo es útil cuando se requiere volver a visitar un gráfico durante l
         <label type="instance" xml:lang="fr">DEM - Gamme d'altitude</label>
         <label type="instance" xml:lang="es">DEM - Elevación - rango</label>
         <label type="instance" xml:lang="pt">DEM - Elevação - intervalos</label>
-        <description>Calculated attribute dependant on the "elevation" attribute.
+        <description xml:lang="en">Calculated attribute dependant on the "elevation" attribute.
 
 Collect uses the "Calculated value expression" to simplify the elevation into a range. i.e. elevation 1.654 m becomes 1600-1700 m.
 
 It is much easier to make analysis in 100 meter ranges rather than actual elevation of the plot.</description>
+<description xml:lang="es">Atributo calculado dependiente del atributo "elevation".
+
+Collect utiliza la "expresión de valor calculado" para simplificar la elevación en un rango. es decir, la elevación 1.654 m se convierte en 1600-1700 m.
+
+Es mucho más fácil hacer un análisis en rangos de 100 metros en lugar de la elevación real de la parcela.</description>
+
+<description xml:lang="fr">Attribut calculé dépendant de l'attribut "elevation".
+
+Collect utilise "l'expression de valeur calculée" pour simplifier l'élévation dans une plage. c'est-à-dire que l'altitude 1,654 m devient 1600-1700 m.
+
+Il est beaucoup plus facile d'effectuer une analyse sur des plages de 100 mètres plutôt que sur l'élévation réelle de la parcelle.</description>
+
+<description  xml:lang="pt">Atributo calculado dependente do atributo "elevation".
+
+Collect usa a "expressão de valor calculado" para simplificar a elevação em um intervalo. ou seja, a elevação 1,654 m torna-se 1600-1700 m.
+
+É muito mais fácil fazer análises em faixas de 100 metros do que na elevação real do terreno.</description>
+
+
         <default expr=" format-number(ceiling(elevation div 100 ), '#')" />
       </code>
       <code id="13" name="calculated_slope_class" ui:hide="true" ui:tab="plot_tab" calculated="true" list="slope_classes">
