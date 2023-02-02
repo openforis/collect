@@ -1,5 +1,11 @@
+.new-survey-form {
+    margin-top: 2rem;
+}
+
 .new-survey-form__template-description-col {
     max-width: 40rem;
     font-style: italic;
     text-align: justify;
 }
+
+

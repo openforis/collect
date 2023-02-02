@@ -75,7 +75,7 @@ const NewSurveyParametersForm = (props) => {
     .concat(otherLanguageItems.map(languageItemToOption))
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form className="new-survey-form" onSubmit={handleSubmit}>
       <TextFormItem
         name="name"
         label={L.l('survey.name')}

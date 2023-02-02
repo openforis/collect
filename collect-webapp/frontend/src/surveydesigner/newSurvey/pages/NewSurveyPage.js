@@ -20,10 +20,10 @@ class NewSurveyPage extends Component {
     return (
       <Grid container justifyContent="center">
         <Grid item>
-          <NewSurveyParametersForm style={{ width: '500px' }} />
+          <NewSurveyParametersForm />
         </Grid>
       </Grid>
-    );
+    )
   }
 }
 
