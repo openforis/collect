@@ -26,6 +26,7 @@ export const DataGrid = (props) => {
     className,
     columns,
     dataMode,
+    density,
     disableMultipleSelection,
     disableSelectionOnClick,
     exportFileName,
@@ -164,6 +165,7 @@ export const DataGrid = (props) => {
       })}
       components={{ Toolbar: showToolbar ? GridToolbar : null }}
       componentsProps={{ ...(showToolbar ? { toolbar: { csvOptions: { fileName: exportFileName } } } : {}) }}
+      density={density}
       disableMultipleColumnsFiltering={false}
       disableMultipleSelection={disableMultipleSelection}
       disableSelectionOnClick={disableSelectionOnClick}
@@ -195,6 +197,7 @@ export const DataGrid = (props) => {
 DataGrid.defaultProps = {
   checkboxSelection: false,
   dataMode: 'client',
+  density: 'standard',
   disableMultipleSelection: undefined,
   exportFileName: null,
   headerHeight: 56,
