@@ -272,6 +272,7 @@ public class RecordController extends BasicController implements Serializable {
 				? recordManager.checkout(survey, user, recordId, step,
 						sessionManager.getSessionState().getSessionId(), true)
 				: recordManager.load(survey, recordId, step);
+		sessionRecordProvider.putRecord(record);
 		return toProxy(record);
 	}
 
