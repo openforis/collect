@@ -20,12 +20,12 @@
     						</template>
     					</combobox>
     				</fieldErrorHandler>
-    				<button sclass="icon"
-    					tooltiptext="${labels.survey.code_list.manager.title}"
+    				<button 
+    					iconSclass="z-icon-pencil"
+    					label="${labels.survey.schema.attribute.code.edit_code_list}"
     					onClick="@global-command('openCodeListsManagerPopUp', 
 		              		editingAttribute=true, 
-		              		selectedCodeList=fx.list)"
-    					image="/assets/images/edit-small.png" />
+		              		selectedCodeList=fx.list)" />
     			</hlayout>
     		</cell>
     	</row>
