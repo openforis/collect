@@ -260,13 +260,17 @@
   			</row>
   			<row
   				visible="@load(not vm.rootEntity and not (vm.attribute and (fx.key or fx.calculated)) and fx.multiple ne true)">
-  				<label value="${labels.survey.schema.node.required}:" />
+ 				<fieldErrorHandler message="@load(vmsgs['requirenessType'])">
+					<label value="${labels.survey.schema.node.required}:" />
+					<image popup="requiredInfoTooltip" style="cursor:pointer"
+						src="/assets/images/info-small.png" />
+	  			</fieldErrorHandler>
 				<vlayout>
 	  				<fieldErrorHandler message="@load(vmsgs['requirenessType'])">
 		  				<radiogroup selectedItem="@bind(fx.requirenessType)"
 								onCheck="@command('applyChanges')">
 							<radio
-								label="${labels.survey.schema.node.always_required}"
+								label="${labels.survey.schema.node.always_required.$}"
 								value="ALWAYS_REQUIRED"
 								disabled="@load(fx.key and fx.requirenessType eq 'ALWAYS_REQUIRED')" />
 							<radio 
@@ -694,6 +698,11 @@
 	<popup id="autoGenerateMinItemsInfoTooltip" width="300px">
         <html><![CDATA[
     		${labels.survey.schema.node.auto_generate_min_items.tooltip}
+        ]]></html>
+  	</popup>
+  	<popup id="requiredInfoTooltip" width="300px">
+        <html><![CDATA[
+    		${labels.survey.schema.node.always_required.info}
         ]]></html>
   	</popup>
 	<popup id="showInSummaryInfoTooltip" width="300px">
