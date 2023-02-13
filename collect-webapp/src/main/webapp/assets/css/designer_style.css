@@ -329,7 +329,8 @@ z-column-content, .z-row-content, .z-group-content, .z-groupfoot-content, .z-foo
 }
 
 .expression-info {
-	cursor: pointer;
+	padding: 2px;
+	border-radius: 50%;
 }
 
 .icon.loading {
