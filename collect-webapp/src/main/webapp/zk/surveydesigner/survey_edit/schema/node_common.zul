@@ -107,12 +107,12 @@
   		</columns>
   		<rows>
   			<row visible="@load(not vm.rootEntity)">
-  				<label value="${labels.survey.schema.node.relevant}:" />
+  				<label value="${vm.collectEarthSurvey ? labels.survey.schema.node.visible : labels.survey.schema.node.relevant}:" />
   				<vlayout>
 	  				<radiogroup selectedItem="@bind(fx.relevanceType)"
 							onCheck="@command('applyChanges')">
 						<radio 
-							label="${labels.survey.schema.node.always_relevant}"
+							label="${vm.collectEarthSurvey ? labels.survey.schema.node.always_visible : labels.survey.schema.node.always_relevant}"
 							value="ALWAYS_RELEVANT" />
 						<radio
 							label="${labels.survey.schema.node.relevant_when}"
@@ -127,7 +127,7 @@
 		  				</fieldErrorHandler>
 	  					<expressionInfoIcon />
 	  				</hlayout>
-	  				<hlayout visible="@load(fx.relevanceType eq 'RELEVANT_WHEN')">
+	  				<hlayout visible="@load(not vm.collectEarthSurvey and fx.relevanceType eq 'RELEVANT_WHEN')">
 						<label value="${labels.survey.schema.node.hide_when_not_relevant}:" />
 	  					<checkbox
 	  						checked="@load(fx.hideWhenNotRelevant eq true) @save(fx.hideWhenNotRelevant)"
