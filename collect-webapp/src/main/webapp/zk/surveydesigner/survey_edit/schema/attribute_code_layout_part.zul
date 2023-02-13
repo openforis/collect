@@ -13,14 +13,16 @@
 				<cell>
 					<radiogroup selectedItem="@bind(fx.layoutType)"
 						onCheck="@command('layoutTypeChange', layoutType=self.selectedItem.value)">
-						<radio 
+						<radio visible="@load(not vm.collectEarthSurvey)"
 							label="${labels.survey.schema.attribute.code.layout_type.text}"
 							value="TEXT" />
 						<radio
 							label="${labels.survey.schema.attribute.code.layout_type.dropdown}"
 							value="DROPDOWN" />
 						<radio
-							label="${labels.survey.schema.attribute.code.layout_type.radio}"
+							label="${vm.collectEarthSurvey 
+								? labels.survey.schema.attribute.code.layout_type.multiple_buttons
+								: labels.survey.schema.attribute.code.layout_type.radio}"
 							value="RADIO" />
 					</radiogroup>
 				</cell>
