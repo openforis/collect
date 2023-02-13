@@ -351,7 +351,7 @@
 					width="200px" sort="auto(type)" />
 				<listheader
 					label="${labels.survey.schema.node.dependent_node.path}"
-					width="300px" sort="auto(path)" />
+					sort="auto(path)" />
 			</listhead>
 			<template name="model">
 				<listitem>
