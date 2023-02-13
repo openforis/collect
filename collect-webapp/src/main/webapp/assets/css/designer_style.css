@@ -273,6 +273,10 @@ z-column-content, .z-row-content, .z-group-content, .z-groupfoot-content, .z-foo
 .form .z-row .z-row-inner {
 	border-top: none;
 }
+
+.z-grid-body .z-cell {
+	padding: 6px 4px;
+}
 /* END OF GRID STYLE */
 
 /* START OF LANGUAGES LIST STYLE */
@@ -329,7 +333,8 @@ z-column-content, .z-row-content, .z-group-content, .z-groupfoot-content, .z-foo
 }
 
 .expression-info {
-	cursor: pointer;
+	padding: 2px;
+	border-radius: 50%;
 }
 
 .icon.loading {

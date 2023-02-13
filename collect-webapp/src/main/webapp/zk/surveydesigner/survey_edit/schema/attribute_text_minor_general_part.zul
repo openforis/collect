@@ -15,7 +15,7 @@
 		<checkbox checked="@bind(fx.geometry)"
 			onCheck="@command('applyChanges')" />
 	  </row>
-      <row visible="@load(not fx.calculated)">
+      <row visible="@load(not vm.collectEarthSurvey and not fx.calculated)">
         <label
           value="${labels.survey.schema.attribute.text.autocomplete_group}:" />
         <fieldErrorHandler message="@load(vmsgs['autocompleteGroup'])">
@@ -23,7 +23,7 @@
             onChange="@command('applyChanges')" />
         </fieldErrorHandler>
       </row>
-      <row visible="@load(not fx.calculated)">
+      <row visible="@load(not vm.collectEarthSurvey and not fx.calculated)">
         <label
           value="${labels.survey.schema.attribute.text.auto_uppercase}:" />
         <fieldErrorHandler message="@load(vmsgs['autoUppercase'])">

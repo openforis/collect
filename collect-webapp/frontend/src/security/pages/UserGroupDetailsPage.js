@@ -499,7 +499,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                         { field: 'username', headerName: 'Username', flex: 1 },
                         { field: 'role', headerName: 'Role', width: 100 },
                       ]}
-                      hideFooter
+                      density="compact"
                       onSelectedIdsChange={this.handleAvailableUsersSelection}
                       rows={this.state.availableUsers}
                     />
@@ -595,8 +595,8 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                     },
                     { field: 'joinStatus', headerName: 'Status', width: 120 },
                   ]}
+                  density="compact"
                   getRowId={(row) => row.userId}
-                  hideFooter
                   onSelectedIdsChange={this.handleUsersInGroupSelection}
                   rows={this.state.usersInGroup}
                 />

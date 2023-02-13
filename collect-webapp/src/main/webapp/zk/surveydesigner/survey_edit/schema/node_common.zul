@@ -107,12 +107,12 @@
   		</columns>
   		<rows>
   			<row visible="@load(not vm.rootEntity)">
-  				<label value="${labels.survey.schema.node.relevant}:" />
+  				<label value="${vm.collectEarthSurvey ? labels.survey.schema.node.visible : labels.survey.schema.node.relevant}:" />
   				<vlayout>
 	  				<radiogroup selectedItem="@bind(fx.relevanceType)"
 							onCheck="@command('applyChanges')">
 						<radio 
-							label="${labels.survey.schema.node.always_relevant}"
+							label="${vm.collectEarthSurvey ? labels.survey.schema.node.always_visible : labels.survey.schema.node.always_relevant}"
 							value="ALWAYS_RELEVANT" />
 						<radio
 							label="${labels.survey.schema.node.relevant_when}"
@@ -127,7 +127,7 @@
 		  				</fieldErrorHandler>
 	  					<expressionInfoIcon />
 	  				</hlayout>
-	  				<hlayout visible="@load(fx.relevanceType eq 'RELEVANT_WHEN')">
+	  				<hlayout visible="@load(not vm.collectEarthSurvey and fx.relevanceType eq 'RELEVANT_WHEN')">
 						<label value="${labels.survey.schema.node.hide_when_not_relevant}:" />
 	  					<checkbox
 	  						checked="@load(fx.hideWhenNotRelevant eq true) @save(fx.hideWhenNotRelevant)"
@@ -260,13 +260,17 @@
   			</row>
   			<row
   				visible="@load(not vm.rootEntity and not (vm.attribute and (fx.key or fx.calculated)) and fx.multiple ne true)">
-  				<label value="${labels.survey.schema.node.required}:" />
+ 				<fieldErrorHandler message="@load(vmsgs['requirenessType'])">
+					<label value="${labels.survey.schema.node.required}:" />
+					<image popup="requiredInfoTooltip" style="cursor:pointer"
+						src="/assets/images/info-small.png" />
+	  			</fieldErrorHandler>
 				<vlayout>
 	  				<fieldErrorHandler message="@load(vmsgs['requirenessType'])">
 		  				<radiogroup selectedItem="@bind(fx.requirenessType)"
 								onCheck="@command('applyChanges')">
 							<radio
-								label="${labels.survey.schema.node.always_required}"
+								label="${labels.survey.schema.node.always_required.$}"
 								value="ALWAYS_REQUIRED"
 								disabled="@load(fx.key and fx.requirenessType eq 'ALWAYS_REQUIRED')" />
 							<radio 
@@ -347,7 +351,7 @@
 					width="200px" sort="auto(type)" />
 				<listheader
 					label="${labels.survey.schema.node.dependent_node.path}"
-					width="300px" sort="auto(path)" />
+					sort="auto(path)" />
 			</listhead>
 			<template name="model">
 				<listitem>
@@ -694,6 +698,11 @@
 	<popup id="autoGenerateMinItemsInfoTooltip" width="300px">
         <html><![CDATA[
     		${labels.survey.schema.node.auto_generate_min_items.tooltip}
+        ]]></html>
+  	</popup>
+  	<popup id="requiredInfoTooltip" width="300px">
+        <html><![CDATA[
+    		${labels.survey.schema.node.always_required.info}
         ]]></html>
   	</popup>
 	<popup id="showInSummaryInfoTooltip" width="300px">
