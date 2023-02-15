@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.metamodel.CollectAnnotations;
+import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordUpdater.RecordUpdateConfiguration;
@@ -194,15 +195,20 @@ public class RecordDependentsUpdater {
 			// ignore attributes without default values specified
 			return null;
 		}
-		if (attr.isRelevant() && !def.isCalculated() && !attr.isEmpty() && attr.isUserSpecified() && !attr.isDefaultValueApplied()) {
+		CollectSurvey survey = def.getSurvey();
+		CollectAnnotations annotations = survey.getAnnotations();
+		boolean relevant = attr.isRelevant() ||
+				// backwards compatibility with old Collect Earth surveys: hidden calculated attributes were marked as always not-relevant
+				annotations.getSurveyTarget() == SurveyTarget.COLLECT_EARTH && def.isCalculated()
+						&& StringUtils.trimToEmpty(def.getRelevantExpression()).equalsIgnoreCase("false()");
+
+		if (relevant && !def.isCalculated() && !attr.isEmpty() && attr.isUserSpecified() && !attr.isDefaultValueApplied()) {
 			// do not update attributes updated by the user
 			return null;
 		}
-		CollectSurvey survey = (CollectSurvey) attr.getSurvey();
-		CollectAnnotations annotations = survey.getAnnotations();
 		Value previousValue = attr.getValue();
 		Value newValue;
-		if (attr.isRelevant()) {
+		if (relevant) {
 			if (def.isCalculated() && !annotations.isCalculatedOnlyOneTime(def) || attr.isEmpty()) {
 				// calculate value or default value
 				newValue = recalculateValue(attr);
