@@ -19,6 +19,7 @@ import org.openforis.commons.collection.ItemAddVisitor;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.commons.lang.DeepComparable;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -442,7 +443,16 @@ public class Record implements DeepComparable {
 		final List<CodeAttribute> result = new ArrayList<CodeAttribute>();
 		Set<NodePathPointer> sources = survey.getRelatedCodeSources(codeAttr.getDefinition());
 		visitNodeDependencies(codeAttr, sources, new ItemAddVisitor<CodeAttribute>(result));
-		return result.isEmpty() ? null : result.get(0);
+		if (result.isEmpty()) {
+			return null;
+		}
+		CodeAttributeDefinition parentCodeAttributeDef = codeAttr.getDefinition().getParentCodeAttributeDefinition();
+		for (CodeAttribute ancestorCodeAttr : result) {
+			if (ancestorCodeAttr.getDefinition().equals(parentCodeAttributeDef)) {
+				return ancestorCodeAttr;
+			}
+		}
+		return null;
 	}
 	
 	@Override
