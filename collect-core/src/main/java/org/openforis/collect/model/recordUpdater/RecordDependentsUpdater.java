@@ -3,7 +3,6 @@ package org.openforis.collect.model.recordUpdater;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -21,7 +20,6 @@ import org.openforis.collect.model.RecordUpdater.RecordUpdateConfiguration;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.IdmInterpretationError;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
@@ -76,7 +74,13 @@ public class RecordDependentsUpdater {
 		final Map<NodePointer, Integer> visitingCountByNodePointer = new HashMap<NodePointer, Integer>();
 
 		final Set<NodePointer> updatedRelevancePointers = new LinkedHashSet<NodePointer>();
-		final List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?, ?>>();
+		final List<Attribute<?, ?>> totalUpdatedAttributes = new ArrayList<Attribute<?, ?>>();
+		final List<Attribute<?, ?>> updatedAttributesCurrentIteration = new ArrayList<Attribute<?, ?>>();
+		for (NodePointer nodePointer : nodePointers) {
+			if (nodePointer.getChildDefinition() instanceof AttributeDefinition) {
+				updatedAttributesCurrentIteration.addAll(filterAttributes(nodePointer.getNodes()));
+			}
+		}
 
 		while (!queue.isEmpty()) {
 			final NodePointer visitedNodePointer = queue.remove();
@@ -102,21 +106,26 @@ public class RecordDependentsUpdater {
 			// default values
 			Set<Attribute<?, ?>> dependentAttributesUpdated = updateDependentDefaultValues(
 					record, visitedNodePointer, updatedDependentRelevancePointers, nodePointerDependentVisitor);
-			updatedAttributes.addAll(dependentAttributesUpdated);
+			updatedAttributesCurrentIteration.addAll(dependentAttributesUpdated);
 
 			// clear not relevant attributes
 			if (configuration.isClearNotRelevantAttributes()) {
 				Collection<Attribute<?, ?>> nonRelevantAttributesCleared = clearNonRelevantAttributes(record, updatedDependentRelevancePointers);
-				updatedAttributes.addAll(nonRelevantAttributesCleared);
+				updatedAttributesCurrentIteration.addAll(nonRelevantAttributesCleared);
 			}
 			
+			
 			// clear dependent code attributes
-			if (visitedNodePointer.getChildDefinition() instanceof CodeAttributeDefinition && configuration.isClearDependentCodeAttributes()) {
-				Set<CodeAttribute> updatedCodeAttributes = clearDependentCodeAttributes(visitedNodePointer);
-				updatedAttributes.addAll(updatedCodeAttributes);
+			if (configuration.isClearDependentCodeAttributes()) {
+				Collection<CodeAttribute> updatedCodeAttributes = filterCodeAttributes(updatedAttributesCurrentIteration);
+				Set<CodeAttribute> clearedCodeAttributes = clearDependentCodeAttributes(updatedCodeAttributes);
+				updatedAttributesCurrentIteration.addAll(clearedCodeAttributes);
 			}
+			totalUpdatedAttributes.addAll(updatedAttributesCurrentIteration);
+
+			updatedAttributesCurrentIteration.clear();
 		}
-		return new RecordDependentsUpdateResult(updatedRelevancePointers, updatedAttributes);
+		return new RecordDependentsUpdateResult(updatedRelevancePointers, totalUpdatedAttributes);
 	}
 	
 	private Set<NodePointer> updateRelevanceDependents(CollectRecord record, NodePointer nodePointer,
@@ -197,11 +206,8 @@ public class RecordDependentsUpdater {
 		}
 		CollectSurvey survey = def.getSurvey();
 		CollectAnnotations annotations = survey.getAnnotations();
-		boolean relevant = attr.isRelevant() ||
-				// backwards compatibility with old Collect Earth surveys: hidden calculated attributes were marked as always not-relevant
-				annotations.getSurveyTarget() == SurveyTarget.COLLECT_EARTH && def.isCalculated()
-						&& StringUtils.trimToEmpty(def.getRelevantExpression()).equalsIgnoreCase("false()");
-
+		boolean relevant = isChildRelevant(attr.getParent(), def);
+		
 		if (relevant && !def.isCalculated() && !attr.isEmpty() && attr.isUserSpecified() && !attr.isDefaultValueApplied()) {
 			// do not update attributes updated by the user
 			return null;
@@ -265,7 +271,7 @@ public class RecordDependentsUpdater {
 		for (NodePointer nodePointer : nodePointers) {
 			Entity entity = nodePointer.getEntity();
 			NodeDefinition childDefinition = nodePointer.getChildDefinition();
-			if (!entity.isRelevant() || !entity.isRelevant(childDefinition)) {
+			if (!entity.isRelevant() || !isChildRelevant(entity, childDefinition)) {
 				List<Node<?>> nodes = nodePointer.getNodes();
 				for (Node<?> node: nodes) {
 					if (node instanceof Attribute) {
@@ -278,20 +284,38 @@ public class RecordDependentsUpdater {
 		}
 		return updatedAttributes;
 	}
+
+	private boolean isChildRelevant(Entity parentEntity, NodeDefinition childDefinition) {
+		CollectSurvey survey = childDefinition.getSurvey();
+		
+		return parentEntity.isRelevant(childDefinition) ||
+		// backwards compatibility with old Collect Earth surveys: hidden calculated
+		// attributes were marked as always not-relevant
+				survey.getAnnotations().getSurveyTarget() == SurveyTarget.COLLECT_EARTH
+						&& childDefinition instanceof AttributeDefinition
+						&& ((AttributeDefinition) childDefinition).isCalculated()
+						&& StringUtils.trimToEmpty(childDefinition.getRelevantExpression()).equalsIgnoreCase("false()");
+	}
 	
-	private Set<CodeAttribute> clearDependentCodeAttributes(NodePointer nodePointer) {
-		if (!(nodePointer.getChildDefinition() instanceof CodeAttributeDefinition)) {
-			return Collections.emptySet();
-		}
-		Set<CodeAttribute> allDependentCodeAttributes = new HashSet<CodeAttribute>();
-		Record record = nodePointer.getRecord();
-		Collection<CodeAttribute> codeAttributes = filterCodeAttributes(nodePointer.getNodes());
+	private Set<CodeAttribute> clearDependentCodeAttributes(Collection<CodeAttribute> codeAttributes) {
+		Set<CodeAttribute> clearedCodeAttributes = new HashSet<CodeAttribute>();
 		for (CodeAttribute codeAttribute : codeAttributes) {
-			Set<CodeAttribute> dependentCodeAttributes = record.determineDependentCodeAttributes(codeAttribute);
-			clearUserSpecifiedAttributes(dependentCodeAttributes);
-			allDependentCodeAttributes.addAll(dependentCodeAttributes);
+			Record record = codeAttribute.getRecord();
+			Set<CodeAttribute> dependentCodeAttributes = record.determineDependentChildCodeAttributes(codeAttribute);
+			Set<CodeAttribute> updatedDependentCodeAttributes = clearUserSpecifiedAttributes(dependentCodeAttributes);
+			clearedCodeAttributes.addAll(updatedDependentCodeAttributes);
 		}
-		return allDependentCodeAttributes;
+		return clearedCodeAttributes;
+	}
+	
+	private <T extends Node<?>> Collection<Attribute<?, ?>> filterAttributes(Collection<T> nodes) {
+		Collection<Attribute<?,?>> attributes = new ArrayList<Attribute<?,?>>();
+		for (Node<?> node : nodes) {
+			if (node instanceof Attribute) {
+				attributes.add((Attribute<?,?>) node);
+			}
+		}
+		return attributes;
 	}
 
 	private <T extends Node<?>> Collection<CodeAttribute> filterCodeAttributes(Collection<T> nodes) {
@@ -332,7 +356,7 @@ public class RecordDependentsUpdater {
 		public void visit(NodePointer nodePointerVisited) {
 			Entity entity = nodePointerVisited.getEntity();
 			NodeDefinition childDef = nodePointerVisited.getChildDefinition();
-			boolean oldRelevance = entity.isRelevant(childDef);
+			boolean oldRelevance = isChildRelevant(entity, childDef);
 			boolean relevance = calculateRelevance(nodePointerVisited);
 			if (oldRelevance != relevance) {
 				entity.setRelevant(childDef, relevance);

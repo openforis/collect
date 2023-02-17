@@ -22,5 +22,13 @@ public class NodePointers {
 		return result;
 	}
 
+	public static boolean containNode(Collection<NodePointer> nodePointers, Node<?> node) {
+		for (NodePointer np : nodePointers) {
+			if (np.getNodes().contains(node)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 }

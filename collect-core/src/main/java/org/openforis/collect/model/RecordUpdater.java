@@ -1088,6 +1088,14 @@ public class RecordUpdater {
 		this.configuration.addEmptyMultipleEntitiesWhenAddingNewEntities = addEmptyMultipleEntitiesWhenAddingNewEntities;
 	}
 	
+	public RecordUpdateConfiguration getUpdateConfiguration() {
+		return configuration;
+	}
+	
+	public void setUpdateConfiguration(RecordUpdateConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
 	public static class VirtualEntityPopuplator {
 		
 		private RecordUpdater recordUpdater;
