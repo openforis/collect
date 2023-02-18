@@ -17,9 +17,12 @@ import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordUpdater.RecordUpdateConfiguration;
+import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.IdmInterpretationError;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
@@ -28,6 +31,7 @@ import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
+import org.openforis.idm.model.NodePointers;
 import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.Value;
@@ -45,7 +49,12 @@ public class RecordDependentsUpdater {
 	}
 	
 	public RecordDependentsUpdateResult updateDependents(CollectRecord record, NodePointer nodePointer) {
-		return updateDependents(record, Arrays.asList(nodePointer));
+		return updateDependents(record, nodePointer, false);
+	}
+
+	
+	public RecordDependentsUpdateResult updateDependents(CollectRecord record, NodePointer nodePointer, boolean nodePointerValueUpdated) {
+		return updateDependents(record, Arrays.asList(nodePointer), nodePointerValueUpdated);
 	}
 
 	public RecordDependentsUpdateResult updateDependentsAndSelf(CollectRecord record, NodePointer nodePointer) {
@@ -61,13 +70,17 @@ public class RecordDependentsUpdater {
 			updatedRelevancePointers.addAll(updatedDependentRelevancePointers);
 		}
 		
-		RecordDependentsUpdateResult updateDependentsResult = updateDependents(record, nodePointers);
+		RecordDependentsUpdateResult updateDependentsResult = updateDependents(record, nodePointers, false);
 		updateDependentsResult.updatedRelevancePointers.addAll(updatedRelevancePointers);
 
 		return updateDependentsResult;
 	}
 	
 	public RecordDependentsUpdateResult updateDependents(CollectRecord record, Collection<NodePointer> nodePointers) {
+		return updateDependents(record, nodePointers, false);
+	}
+	
+	public RecordDependentsUpdateResult updateDependents(CollectRecord record, Collection<NodePointer> nodePointers, boolean nodePointerValueUpdated) {
 		final Queue<NodePointer> queue = new UniqueQueue<NodePointer>();
 		queue.addAll(nodePointers);
 		
@@ -76,9 +89,12 @@ public class RecordDependentsUpdater {
 		final Set<NodePointer> updatedRelevancePointers = new LinkedHashSet<NodePointer>();
 		final List<Attribute<?, ?>> totalUpdatedAttributes = new ArrayList<Attribute<?, ?>>();
 		final List<Attribute<?, ?>> updatedAttributesCurrentIteration = new ArrayList<Attribute<?, ?>>();
-		for (NodePointer nodePointer : nodePointers) {
-			if (nodePointer.getChildDefinition() instanceof AttributeDefinition) {
-				updatedAttributesCurrentIteration.addAll(filterAttributes(nodePointer.getNodes()));
+		
+		if (nodePointerValueUpdated) {
+			for (NodePointer nodePointer : nodePointers) {
+				if (nodePointer.getChildDefinition() instanceof AttributeDefinition) {
+					updatedAttributesCurrentIteration.addAll(filterAttributes(nodePointer.getNodes()));
+				}
 			}
 		}
 
@@ -114,11 +130,9 @@ public class RecordDependentsUpdater {
 				updatedAttributesCurrentIteration.addAll(nonRelevantAttributesCleared);
 			}
 			
-			
 			// clear dependent code attributes
 			if (configuration.isClearDependentCodeAttributes()) {
-				Collection<CodeAttribute> updatedCodeAttributes = filterCodeAttributes(updatedAttributesCurrentIteration);
-				Set<CodeAttribute> clearedCodeAttributes = clearDependentCodeAttributes(updatedCodeAttributes);
+				Set<CodeAttribute> clearedCodeAttributes = clearDependentCodeAttributes(visitedNodePointer, updatedAttributesCurrentIteration, nodePointerDependentVisitor);
 				updatedAttributesCurrentIteration.addAll(clearedCodeAttributes);
 			}
 			totalUpdatedAttributes.addAll(updatedAttributesCurrentIteration);
@@ -141,7 +155,7 @@ public class RecordDependentsUpdater {
 		return relevanceUpdateVisitor.getUpdatedRelevancePointers();
 	}
 
-	private Set<Attribute<?, ?>> updateDependentDefaultValues(CollectRecord record, NodePointer nodePointer,
+	private Set<Attribute<?, ?>> updateDependentDefaultValues(CollectRecord record, final NodePointer nodePointer,
 			Collection<NodePointer> updatedRelevancePointers, final Visitor<NodePointer> nodePointerDependentVisitor) {
 		final Set<Attribute<?, ?>> updatedAttributes = new HashSet<Attribute<?, ?>>();
 
@@ -153,7 +167,9 @@ public class RecordDependentsUpdater {
 				List<Attribute<?, ?>> recalculatedAttributes = recalculateValues(nodes);
 				updatedAttributes.addAll(recalculatedAttributes);
 
-				nodePointerDependentVisitor.visit(nodePointerVisited);
+				if (!nodePointerVisited.equals(nodePointer)) {
+					nodePointerDependentVisitor.visit(nodePointerVisited);
+				}
 			}
 		};
 		
@@ -304,6 +320,26 @@ public class RecordDependentsUpdater {
 			Set<CodeAttribute> dependentCodeAttributes = record.determineDependentChildCodeAttributes(codeAttribute);
 			Set<CodeAttribute> updatedDependentCodeAttributes = clearUserSpecifiedAttributes(dependentCodeAttributes);
 			clearedCodeAttributes.addAll(updatedDependentCodeAttributes);
+		}
+		return clearedCodeAttributes;
+	}
+	
+	private Set<CodeAttribute> clearDependentCodeAttributes(NodePointer visitedNodePointer,
+			Collection<Attribute<?,?>> updatedAttributesCurrentIteration, Visitor<NodePointer> nodePointerDependentVisitor) {
+		Collection<CodeAttribute> updatedCodeAttributes = filterCodeAttributes(updatedAttributesCurrentIteration);
+		if (visitedNodePointer.getChildDefinition() instanceof CodeAttributeDefinition) {
+			Collection<CodeAttribute> visitedEmptyCodeAttributes = filterCodeAttributes(visitedNodePointer.getNodes());
+			CollectionUtils.filter(visitedEmptyCodeAttributes, new Predicate<CodeAttribute>() {
+				public boolean evaluate(CodeAttribute codeAttr) {
+					return codeAttr.isEmpty();
+				}
+			});
+			updatedCodeAttributes.addAll(visitedEmptyCodeAttributes);
+		}
+		Set<CodeAttribute> clearedCodeAttributes = clearDependentCodeAttributes(updatedCodeAttributes);
+		Set<NodePointer> clearedNodePointers = NodePointers.nodesToPointers(clearedCodeAttributes);
+		for (NodePointer clearedNodePointer : clearedNodePointers) {
+			nodePointerDependentVisitor.visit(clearedNodePointer);
 		}
 		return clearedCodeAttributes;
 	}
