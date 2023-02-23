@@ -41,11 +41,13 @@ public class EventProducerTest extends AbstractRecordTest {
 	@Test
 	public void testEntityCollectionAddedEvent() {
 		record(rootEntityDef(entityDef("plot", entityDef("tree", attributeDef("tree_count")).multiple()).multiple()));
-		assertEventTypes(updater.addEntity(record.getRootEntity(), "plot"), EntityCreatedEvent.class,
+		NodeChangeSet plotAddedChangeSet = updater.addEntity(record.getRootEntity(), "plot");
+		assertEventTypes(plotAddedChangeSet, EntityCreatedEvent.class,
 				EntityCollectionCreatedEvent.class, EntityCreationCompletedEvent.class);
 
 		Entity plot = entityByPath("/root/plot[1]");
-		assertEventTypes(updater.addEntity(plot, "tree"), EntityCreatedEvent.class, AttributeCreatedEvent.class,
+		NodeChangeSet treeAddedChangeSet = updater.addEntity(plot, "tree");
+		assertEventTypes(treeAddedChangeSet, EntityCreatedEvent.class, AttributeCreatedEvent.class,
 				EntityCreationCompletedEvent.class);
 
 	}

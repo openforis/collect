@@ -4,14 +4,14 @@
 	<parent>
 		<artifactId>collect</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>4.0.72-SNAPSHOT</version>
+		<version>4.0.73-SNAPSHOT</version>
 	</parent>
 	<name>Open Foris Collect Server module</name>
 	<artifactId>collect-server</artifactId>
 	<packaging>jar</packaging>
 
 	<properties>
-		<collectearth.version>1.14.17</collectearth.version>
+		<collectearth.version>1.15.03</collectearth.version>
 		<repository-message-broker.version>0.1.3</repository-message-broker.version>
 		<geotools.version>26.3</geotools.version>
 		<aspectj.version>1.9.9.1</aspectj.version>

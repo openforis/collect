@@ -155,8 +155,7 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 	}
 	
 	/**
-	 * @return true if all fields are empty and 
-	 *  no remarks or symbol are specified
+	 * @return true if there is at least one field not empty
 	 */
 	@Override
 	public boolean hasData() {

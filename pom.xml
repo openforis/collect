@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>4.0.72-SNAPSHOT</version>
+	<version>4.0.73-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Open Foris Collect</name>
@@ -562,7 +562,7 @@
 			<dependency>
 				<groupId>commons-fileupload</groupId>
 				<artifactId>commons-fileupload</artifactId>
-				<version>1.4</version>
+				<version>1.5</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
