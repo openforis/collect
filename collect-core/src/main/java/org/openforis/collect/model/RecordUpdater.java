@@ -47,6 +47,7 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
+import org.openforis.idm.model.NodePointers;
 import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.Value;
@@ -149,6 +150,7 @@ public class RecordUpdater {
 			newAttrs.add(a);
 			changeMap.addAttributeAddChange(a);
 		}
+		dependentPointers.addAll(NodePointers.nodesToPointers(newAttrs));
 		
 		// re-calculate values and relevance
 		RecordDependentsUpdateResult dependentsUpdateResult = new RecordDependentsUpdater(configuration).updateDependents(record, dependentPointers);
@@ -365,7 +367,7 @@ public class RecordUpdater {
 		NodePointer selfPointer = new NodePointer(attribute);
 		
 		RecordDependentsUpdater recordDependentsUpdater = new RecordDependentsUpdater(configuration);
-		RecordDependentsUpdateResult recordDependentsUpdateResult = recordDependentsUpdater.updateDependents(record, selfPointer);
+		RecordDependentsUpdateResult recordDependentsUpdateResult = recordDependentsUpdater.updateDependents(record, selfPointer, true);
 		
 		List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?,?>>();
 		updatedAttributes.add(attribute);
@@ -1086,6 +1088,14 @@ public class RecordUpdater {
 	public void setAddEmptyMultipleEntitiesWhenAddingNewEntities(
 			boolean addEmptyMultipleEntitiesWhenAddingNewEntities) {
 		this.configuration.addEmptyMultipleEntitiesWhenAddingNewEntities = addEmptyMultipleEntitiesWhenAddingNewEntities;
+	}
+	
+	public RecordUpdateConfiguration getUpdateConfiguration() {
+		return configuration;
+	}
+	
+	public void setUpdateConfiguration(RecordUpdateConfiguration configuration) {
+		this.configuration = configuration;
 	}
 	
 	public static class VirtualEntityPopuplator {

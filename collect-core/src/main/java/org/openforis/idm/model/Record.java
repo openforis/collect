@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.openforis.commons.collection.ItemAddVisitor;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.commons.lang.DeepComparable;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -438,11 +440,31 @@ public class Record implements DeepComparable {
 		return determineDependentNodes(Arrays.<Node<?>>asList(codeAttr), DependencyType.PARENT_CODE);
 	}
 	
+	public Set<CodeAttribute> determineDependentChildCodeAttributes(CodeAttribute codeAttr) {
+		Set<CodeAttribute> dependentCodeAttributes = determineDependentCodeAttributes(codeAttr);
+		Set<CodeAttribute> dependentChildCodeAttributes = new HashSet<CodeAttribute>(); 
+		for (CodeAttribute dependentCodeAttribute : dependentCodeAttributes) {
+			if  (dependentCodeAttribute.getCodeParent().equals(codeAttr)) {
+				dependentChildCodeAttributes.add(dependentCodeAttribute);
+			}
+		}
+		return dependentChildCodeAttributes;
+	}
+	
 	public CodeAttribute determineParentCodeAttribute(CodeAttribute codeAttr) {
 		final List<CodeAttribute> result = new ArrayList<CodeAttribute>();
 		Set<NodePathPointer> sources = survey.getRelatedCodeSources(codeAttr.getDefinition());
 		visitNodeDependencies(codeAttr, sources, new ItemAddVisitor<CodeAttribute>(result));
-		return result.isEmpty() ? null : result.get(0);
+		if (result.isEmpty()) {
+			return null;
+		}
+		CodeAttributeDefinition parentCodeAttributeDef = codeAttr.getDefinition().getParentCodeAttributeDefinition();
+		for (CodeAttribute ancestorCodeAttr : result) {
+			if (ancestorCodeAttr.getDefinition().equals(parentCodeAttributeDef)) {
+				return ancestorCodeAttr;
+			}
+		}
+		return null;
 	}
 	
 	@Override

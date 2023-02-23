@@ -3,7 +3,6 @@ package org.openforis.collect.model.recordUpdater;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -14,9 +13,12 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.metamodel.CollectAnnotations;
+import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordUpdater.RecordUpdateConfiguration;
+import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -29,6 +31,7 @@ import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
+import org.openforis.idm.model.NodePointers;
 import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.Value;
@@ -46,7 +49,12 @@ public class RecordDependentsUpdater {
 	}
 	
 	public RecordDependentsUpdateResult updateDependents(CollectRecord record, NodePointer nodePointer) {
-		return updateDependents(record, Arrays.asList(nodePointer));
+		return updateDependents(record, nodePointer, false);
+	}
+
+	
+	public RecordDependentsUpdateResult updateDependents(CollectRecord record, NodePointer nodePointer, boolean nodePointerValueUpdated) {
+		return updateDependents(record, Arrays.asList(nodePointer), nodePointerValueUpdated);
 	}
 
 	public RecordDependentsUpdateResult updateDependentsAndSelf(CollectRecord record, NodePointer nodePointer) {
@@ -62,20 +70,33 @@ public class RecordDependentsUpdater {
 			updatedRelevancePointers.addAll(updatedDependentRelevancePointers);
 		}
 		
-		RecordDependentsUpdateResult updateDependentsResult = updateDependents(record, nodePointers);
+		RecordDependentsUpdateResult updateDependentsResult = updateDependents(record, nodePointers, false);
 		updateDependentsResult.updatedRelevancePointers.addAll(updatedRelevancePointers);
 
 		return updateDependentsResult;
 	}
 	
 	public RecordDependentsUpdateResult updateDependents(CollectRecord record, Collection<NodePointer> nodePointers) {
+		return updateDependents(record, nodePointers, false);
+	}
+	
+	public RecordDependentsUpdateResult updateDependents(CollectRecord record, Collection<NodePointer> nodePointers, boolean nodePointerValueUpdated) {
 		final Queue<NodePointer> queue = new UniqueQueue<NodePointer>();
 		queue.addAll(nodePointers);
 		
 		final Map<NodePointer, Integer> visitingCountByNodePointer = new HashMap<NodePointer, Integer>();
 
 		final Set<NodePointer> updatedRelevancePointers = new LinkedHashSet<NodePointer>();
-		final List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?, ?>>();
+		final List<Attribute<?, ?>> totalUpdatedAttributes = new ArrayList<Attribute<?, ?>>();
+		final List<Attribute<?, ?>> updatedAttributesCurrentIteration = new ArrayList<Attribute<?, ?>>();
+		
+		if (nodePointerValueUpdated) {
+			for (NodePointer nodePointer : nodePointers) {
+				if (nodePointer.getChildDefinition() instanceof AttributeDefinition) {
+					updatedAttributesCurrentIteration.addAll(filterAttributes(nodePointer.getNodes()));
+				}
+			}
+		}
 
 		while (!queue.isEmpty()) {
 			final NodePointer visitedNodePointer = queue.remove();
@@ -101,21 +122,24 @@ public class RecordDependentsUpdater {
 			// default values
 			Set<Attribute<?, ?>> dependentAttributesUpdated = updateDependentDefaultValues(
 					record, visitedNodePointer, updatedDependentRelevancePointers, nodePointerDependentVisitor);
-			updatedAttributes.addAll(dependentAttributesUpdated);
+			updatedAttributesCurrentIteration.addAll(dependentAttributesUpdated);
 
 			// clear not relevant attributes
 			if (configuration.isClearNotRelevantAttributes()) {
 				Collection<Attribute<?, ?>> nonRelevantAttributesCleared = clearNonRelevantAttributes(record, updatedDependentRelevancePointers);
-				updatedAttributes.addAll(nonRelevantAttributesCleared);
+				updatedAttributesCurrentIteration.addAll(nonRelevantAttributesCleared);
 			}
 			
 			// clear dependent code attributes
-			if (visitedNodePointer.getChildDefinition() instanceof CodeAttributeDefinition && configuration.isClearDependentCodeAttributes()) {
-				Set<CodeAttribute> updatedCodeAttributes = clearDependentCodeAttributes(visitedNodePointer);
-				updatedAttributes.addAll(updatedCodeAttributes);
+			if (configuration.isClearDependentCodeAttributes()) {
+				Set<CodeAttribute> clearedCodeAttributes = clearDependentCodeAttributes(visitedNodePointer, updatedAttributesCurrentIteration, nodePointerDependentVisitor);
+				updatedAttributesCurrentIteration.addAll(clearedCodeAttributes);
 			}
+			totalUpdatedAttributes.addAll(updatedAttributesCurrentIteration);
+
+			updatedAttributesCurrentIteration.clear();
 		}
-		return new RecordDependentsUpdateResult(updatedRelevancePointers, updatedAttributes);
+		return new RecordDependentsUpdateResult(updatedRelevancePointers, totalUpdatedAttributes);
 	}
 	
 	private Set<NodePointer> updateRelevanceDependents(CollectRecord record, NodePointer nodePointer,
@@ -131,7 +155,7 @@ public class RecordDependentsUpdater {
 		return relevanceUpdateVisitor.getUpdatedRelevancePointers();
 	}
 
-	private Set<Attribute<?, ?>> updateDependentDefaultValues(CollectRecord record, NodePointer nodePointer,
+	private Set<Attribute<?, ?>> updateDependentDefaultValues(CollectRecord record, final NodePointer nodePointer,
 			Collection<NodePointer> updatedRelevancePointers, final Visitor<NodePointer> nodePointerDependentVisitor) {
 		final Set<Attribute<?, ?>> updatedAttributes = new HashSet<Attribute<?, ?>>();
 
@@ -143,7 +167,9 @@ public class RecordDependentsUpdater {
 				List<Attribute<?, ?>> recalculatedAttributes = recalculateValues(nodes);
 				updatedAttributes.addAll(recalculatedAttributes);
 
-				nodePointerDependentVisitor.visit(nodePointerVisited);
+				if (!nodePointerVisited.equals(nodePointer)) {
+					nodePointerDependentVisitor.visit(nodePointerVisited);
+				}
 			}
 		};
 		
@@ -194,15 +220,17 @@ public class RecordDependentsUpdater {
 			// ignore attributes without default values specified
 			return null;
 		}
-		if (attr.isRelevant() && !def.isCalculated() && !attr.isEmpty() && attr.isUserSpecified() && !attr.isDefaultValueApplied()) {
+		CollectSurvey survey = def.getSurvey();
+		CollectAnnotations annotations = survey.getAnnotations();
+		boolean relevant = isChildRelevant(attr.getParent(), def);
+		
+		if (relevant && !def.isCalculated() && !attr.isEmpty() && attr.isUserSpecified() && !attr.isDefaultValueApplied()) {
 			// do not update attributes updated by the user
 			return null;
 		}
-		CollectSurvey survey = (CollectSurvey) attr.getSurvey();
-		CollectAnnotations annotations = survey.getAnnotations();
 		Value previousValue = attr.getValue();
 		Value newValue;
-		if (attr.isRelevant()) {
+		if (relevant) {
 			if (def.isCalculated() && !annotations.isCalculatedOnlyOneTime(def) || attr.isEmpty()) {
 				// calculate value or default value
 				newValue = recalculateValue(attr);
@@ -259,7 +287,7 @@ public class RecordDependentsUpdater {
 		for (NodePointer nodePointer : nodePointers) {
 			Entity entity = nodePointer.getEntity();
 			NodeDefinition childDefinition = nodePointer.getChildDefinition();
-			if (!entity.isRelevant() || !entity.isRelevant(childDefinition)) {
+			if (!entity.isRelevant() || !isChildRelevant(entity, childDefinition)) {
 				List<Node<?>> nodes = nodePointer.getNodes();
 				for (Node<?> node: nodes) {
 					if (node instanceof Attribute) {
@@ -272,20 +300,58 @@ public class RecordDependentsUpdater {
 		}
 		return updatedAttributes;
 	}
+
+	private boolean isChildRelevant(Entity parentEntity, NodeDefinition childDefinition) {
+		CollectSurvey survey = childDefinition.getSurvey();
+		
+		return parentEntity.isRelevant(childDefinition) ||
+		// backwards compatibility with old Collect Earth surveys: hidden calculated
+		// attributes were marked as always not-relevant
+				survey.getAnnotations().getSurveyTarget() == SurveyTarget.COLLECT_EARTH
+						&& childDefinition instanceof AttributeDefinition
+						&& ((AttributeDefinition) childDefinition).isCalculated()
+						&& StringUtils.trimToEmpty(childDefinition.getRelevantExpression()).equalsIgnoreCase("false()");
+	}
 	
-	private Set<CodeAttribute> clearDependentCodeAttributes(NodePointer nodePointer) {
-		if (!(nodePointer.getChildDefinition() instanceof CodeAttributeDefinition)) {
-			return Collections.emptySet();
-		}
-		Set<CodeAttribute> allDependentCodeAttributes = new HashSet<CodeAttribute>();
-		Record record = nodePointer.getRecord();
-		Collection<CodeAttribute> codeAttributes = filterCodeAttributes(nodePointer.getNodes());
+	private Set<CodeAttribute> clearDependentCodeAttributes(Collection<CodeAttribute> codeAttributes) {
+		Set<CodeAttribute> clearedCodeAttributes = new HashSet<CodeAttribute>();
 		for (CodeAttribute codeAttribute : codeAttributes) {
-			Set<CodeAttribute> dependentCodeAttributes = record.determineDependentCodeAttributes(codeAttribute);
-			clearUserSpecifiedAttributes(dependentCodeAttributes);
-			allDependentCodeAttributes.addAll(dependentCodeAttributes);
+			Record record = codeAttribute.getRecord();
+			Set<CodeAttribute> dependentCodeAttributes = record.determineDependentChildCodeAttributes(codeAttribute);
+			Set<CodeAttribute> updatedDependentCodeAttributes = clearUserSpecifiedAttributes(dependentCodeAttributes);
+			clearedCodeAttributes.addAll(updatedDependentCodeAttributes);
 		}
-		return allDependentCodeAttributes;
+		return clearedCodeAttributes;
+	}
+	
+	private Set<CodeAttribute> clearDependentCodeAttributes(NodePointer visitedNodePointer,
+			Collection<Attribute<?,?>> updatedAttributesCurrentIteration, Visitor<NodePointer> nodePointerDependentVisitor) {
+		Collection<CodeAttribute> updatedCodeAttributes = filterCodeAttributes(updatedAttributesCurrentIteration);
+		if (visitedNodePointer.getChildDefinition() instanceof CodeAttributeDefinition) {
+			Collection<CodeAttribute> visitedEmptyCodeAttributes = filterCodeAttributes(visitedNodePointer.getNodes());
+			CollectionUtils.filter(visitedEmptyCodeAttributes, new Predicate<CodeAttribute>() {
+				public boolean evaluate(CodeAttribute codeAttr) {
+					return codeAttr.isEmpty();
+				}
+			});
+			updatedCodeAttributes.addAll(visitedEmptyCodeAttributes);
+		}
+		Set<CodeAttribute> clearedCodeAttributes = clearDependentCodeAttributes(updatedCodeAttributes);
+		Set<NodePointer> clearedNodePointers = NodePointers.nodesToPointers(clearedCodeAttributes);
+		for (NodePointer clearedNodePointer : clearedNodePointers) {
+			nodePointerDependentVisitor.visit(clearedNodePointer);
+		}
+		return clearedCodeAttributes;
+	}
+	
+	private <T extends Node<?>> Collection<Attribute<?, ?>> filterAttributes(Collection<T> nodes) {
+		Collection<Attribute<?,?>> attributes = new ArrayList<Attribute<?,?>>();
+		for (Node<?> node : nodes) {
+			if (node instanceof Attribute) {
+				attributes.add((Attribute<?,?>) node);
+			}
+		}
+		return attributes;
 	}
 
 	private <T extends Node<?>> Collection<CodeAttribute> filterCodeAttributes(Collection<T> nodes) {
@@ -326,7 +392,7 @@ public class RecordDependentsUpdater {
 		public void visit(NodePointer nodePointerVisited) {
 			Entity entity = nodePointerVisited.getEntity();
 			NodeDefinition childDef = nodePointerVisited.getChildDefinition();
-			boolean oldRelevance = entity.isRelevant(childDef);
+			boolean oldRelevance = isChildRelevant(entity, childDef);
 			boolean relevance = calculateRelevance(nodePointerVisited);
 			if (oldRelevance != relevance) {
 				entity.setRelevant(childDef, relevance);
