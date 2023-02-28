@@ -352,7 +352,8 @@
       },
       "multipleNodesComponent": {
         "cannotAddNewNodes": {
-          "maxCountReached": "Only a maximum of {0} {1} can be added"
+          "maxCountReached": "Only a maximum of {0} {1} can be added",
+          "emptyEntityExists": "An empty entity already exists: delete it or fill that one"
         },
         "rowNumberHeading": "N."
       },

@@ -110,6 +110,8 @@ export default class MultipleFieldset extends EntityCollectionComponent {
     const selectedEntity = this.getSelectedEntity()
 
     const maxCountReached = maxCount && entitiesSummary.length >= maxCount
+    const emptyEntitySummaryExists = entitiesSummary.some(entitySummary => Strings.isBlank(entitySummary))
+    const cannotAddNewEntity = maxCountReached || emptyEntitySummaryExists
 
     return (
       <div className="multiple-fieldset-wrapper">
@@ -126,14 +128,14 @@ export default class MultipleFieldset extends EntityCollectionComponent {
             <Button
               color="success"
               onClick={this.onNewButtonClick}
-              disabled={maxCountReached}
+              disabled={cannotAddNewEntity}
               title={
                 maxCountReached
                   ? L.l('dataManagement.dataEntry.multipleNodesComponent.cannotAddNewNodes.maxCountReached', [
                       maxCount,
                       entityDefinition.labelOrName,
                     ])
-                  : ''
+                  : emptyEntitySummaryExists ? L.l('dataManagement.dataEntry.multipleNodesComponent.cannotAddNewNodes.emptyNodeExists'): ''
               }
             >
               {L.l('common.new')}
