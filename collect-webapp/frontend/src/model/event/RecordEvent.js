@@ -48,7 +48,7 @@ export class RecordEvent extends Event {
     return (
       this.isRelativeToRecord(parentEntity.record) &&
       this.parentEntityPath === parentEntity.path &&
-      Number(this.definitionId) === nodeDefId
+      Number(this.definitionId) === Number(nodeDefId)
     )
   }
 
