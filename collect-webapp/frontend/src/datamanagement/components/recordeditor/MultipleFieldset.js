@@ -38,7 +38,7 @@ class MultipleFieldsetHeader extends AbstractFormComponent {
       (event instanceof AttributeValueUpdatedEvent &&
         (entities.some((entity) => event.isRelativeToEntityKeyAttributes({ entity })) ||
           event.isRelativeToDescendantsOf({ parentEntity, entityDefinition: itemDef.entityDefinition }))) ||
-      ((event instanceof EntityDeletedEvent || event instanceof EntityCreationCompletedEvent) &&
+      ((event instanceof EntityCreationCompletedEvent || event instanceof EntityDeletedEvent) &&
         event.isRelativeToNodes({ parentEntity, nodeDefId: itemDef.entityDefinitionId }))
     ) {
       this.updateState()
