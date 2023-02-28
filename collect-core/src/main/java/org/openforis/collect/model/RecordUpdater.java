@@ -374,6 +374,13 @@ public class RecordUpdater {
 		updatedAttributes.addAll(recordDependentsUpdateResult.getUpdatedAttributes());
 		changeMap.addValueChanges(updatedAttributes);
 		
+		// include dependent code attributes in change map (allows the re-rendering of code list items in Collect Earth)
+		Collection<CodeAttribute> updatedCodeAttributes = Nodes.filterCodeAttributes(updatedAttributes);
+		for (CodeAttribute codeAttribute : updatedCodeAttributes) {
+			Set<CodeAttribute> dependentCodeAttributes = record.determineDependentCodeAttributes(codeAttribute);
+			changeMap.addValueChanges(dependentCodeAttributes);
+		}
+	
 		Set<NodePointer> updatedRelevancePointers = recordDependentsUpdateResult.getUpdatedRelevancePointers();
 		changeMap.addRelevanceChanges(updatedRelevancePointers);
 		
