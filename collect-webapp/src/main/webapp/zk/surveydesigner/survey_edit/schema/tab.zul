@@ -27,7 +27,7 @@
 						</fieldErrorHandler>
 		  				<fieldErrorHandler message="@load(vmsgs['label'])">
 		  					<textbox id="labelTextbox"
-		  						width="200px" maxlength="100"
+		  						width="350px" maxlength="100"
 		  						value="@bind(fx.label)"
 		  						placeholder="@load(fx.defaultLabel)"
 		  						onChange="@command('labelChanged', label=self.value)" />

@@ -15,7 +15,7 @@
     
     <textbox  
     	value="@load(vm.selectedRootEntity.name)" 
-    	width="250px"
+    	width="300px"
     	readonly="true"
     	onClick="@command('editRootEntity')"
     	style="cursor: pointer;"
