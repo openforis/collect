@@ -165,7 +165,7 @@ public class CollectSurvey extends Survey {
 	}
 	
 	public boolean isCollectEarth() {
-		return annotations.getSurveyTarget() === SurveyTarget.COLLECT_EARTH;
+		return annotations.getSurveyTarget() == SurveyTarget.COLLECT_EARTH;
 	}
 	
 	public CollectAnnotations getAnnotations() {
