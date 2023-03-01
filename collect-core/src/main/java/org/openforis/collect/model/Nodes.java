@@ -8,6 +8,8 @@ import org.openforis.idm.model.Node;
 
 public abstract class Nodes {
 	
+	private Nodes() {}
+	
 	public static <T extends Node<?>> Collection<CodeAttribute> filterCodeAttributes(Collection<T> nodes) {
 		Collection<CodeAttribute> codeAttributes = new ArrayList<CodeAttribute>();
 		for (Node<?> node : nodes) {
