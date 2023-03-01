@@ -164,6 +164,10 @@ public class CollectSurvey extends Survey {
 		return fromCsvAttributes;
 	}
 	
+	public boolean isCollectEarth() {
+		return annotations.getSurveyTarget() == SurveyTarget.COLLECT_EARTH;
+	}
+	
 	public CollectAnnotations getAnnotations() {
 		return annotations;
 	}

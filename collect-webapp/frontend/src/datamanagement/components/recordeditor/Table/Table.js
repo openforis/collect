@@ -45,7 +45,8 @@ class AddNewRowButton extends AbstractFormComponent {
 
   render() {
     const { addingEntity, entities, labelOrName, maxCount, maxCountReached, onNewButtonClick } = this.props
-    const disabled = addingEntity || maxCountReached || entities.some((entity) => entity.isEmpty())
+    const hasEmptyEntity = entities.some((entity) => entity.isEmpty())
+    const disabled = addingEntity || maxCountReached || hasEmptyEntity
 
     return (
       <Button
@@ -60,6 +61,8 @@ class AddNewRowButton extends AbstractFormComponent {
                 maxCount,
                 labelOrName,
               ])
+            : hasEmptyEntity
+            ? L.l('dataManagement.dataEntry.multipleNodesComponent.cannotAddNewNodes.emptyNodeExists')
             : ''
         }
       >

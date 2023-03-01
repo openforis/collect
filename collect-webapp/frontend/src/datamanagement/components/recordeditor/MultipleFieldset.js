@@ -98,6 +98,8 @@ class MultipleFieldsetHeader extends AbstractFormComponent {
                     maxCount,
                     entityDefinition.labelOrName,
                   ])
+                : hasEmptyEntity
+                ? L.l('dataManagement.dataEntry.multipleNodesComponent.cannotAddNewNodes.emptyNodeExists')
                 : ''
             }
           >
