@@ -2,6 +2,7 @@ import React from 'react'
 import { Button } from 'reactstrap'
 import { MenuItem, Select } from '@mui/material'
 
+import { AttributeValueUpdatedEvent, EntityCreationCompletedEvent, EntityDeletedEvent } from 'model/event/RecordEvent'
 import DeleteIconButton from 'common/components/DeleteIconButton'
 import L from 'utils/Labels'
 import Strings from 'utils/Strings'
@@ -9,8 +10,107 @@ import Strings from 'utils/Strings'
 import FormItems from './FormItems'
 import EntityCollectionComponent from './EntityCollectionComponent'
 import TabSetContent from './TabSetContent'
-import { AttributeValueUpdatedEvent } from 'model/event/RecordEvent'
 import NodeDefLabel from './NodeDefLabel'
+import AbstractFormComponent from './AbstractFormComponent'
+
+class MultipleFieldsetHeader extends AbstractFormComponent {
+  constructor() {
+    super()
+    this.state = {
+      ...this.state,
+      entitiesSummary: [],
+      hasEmptyEntity: false,
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.entities !== this.props.entities || prevProps.maxCount !== this.props.maxCount) {
+      this.updateState()
+    }
+  }
+
+  onRecordEvent(event) {
+    super.onRecordEvent(event)
+
+    const { parentEntity, entities, itemDef } = this.props
+
+    if (
+      (event instanceof AttributeValueUpdatedEvent &&
+        (entities.some((entity) => event.isRelativeToEntityKeyAttributes({ entity })) ||
+          event.isRelativeToDescendantsOf({ parentEntity, entityDefinition: itemDef.entityDefinition }))) ||
+      ((event instanceof EntityCreationCompletedEvent || event instanceof EntityDeletedEvent) &&
+        event.isRelativeToNodes({ parentEntity, nodeDefId: itemDef.entityDefinitionId }))
+    ) {
+      this.updateState()
+    }
+  }
+
+  determineNewState() {
+    const newState = super.determineNewState()
+    const { entities } = this.props
+    const entitiesSummary = this.extractEntitiesSummary()
+    const hasEmptyEntity = entities.some((entity) => entity.isEmpty())
+    return { ...newState, entitiesSummary, hasEmptyEntity }
+  }
+
+  extractEntitiesSummary() {
+    const { entities } = this.props
+    return entities.map((entity) => entity.summaryLabel)
+  }
+
+  render() {
+    const {
+      parentEntity,
+      itemDef,
+      maxCount,
+      onDeleteButtonClick,
+      onNewButtonClick,
+      onSelectedEntityChange,
+      selectedEntityIndex,
+    } = this.props
+    const { record } = parentEntity
+    const { entitiesSummary, hasEmptyEntity } = this.state
+
+    const { readOnly } = record
+    const { entityDefinition } = itemDef
+
+    const maxCountReached = maxCount >= 0 && entitiesSummary.length >= maxCount
+    const newButtonDisabled = maxCountReached || hasEmptyEntity
+
+    return (
+      <div className="multiple-fieldset-header">
+        <NodeDefLabel nodeDefinition={entityDefinition} limitWidth={false} />:
+        {entitiesSummary.length > 0 && (
+          <EntitySelect
+            selectedEntityIndex={selectedEntityIndex}
+            entitiesSummary={entitiesSummary}
+            onChange={(event) => onSelectedEntityChange(Number(event.target.value))}
+          />
+        )}
+        {!readOnly && (
+          <Button
+            color="success"
+            onClick={onNewButtonClick}
+            disabled={newButtonDisabled}
+            title={
+              maxCountReached
+                ? L.l('dataManagement.dataEntry.multipleNodesComponent.cannotAddNewNodes.maxCountReached', [
+                    maxCount,
+                    entityDefinition.labelOrName,
+                  ])
+                : hasEmptyEntity
+                ? L.l('dataManagement.dataEntry.multipleNodesComponent.cannotAddNewNodes.emptyNodeExists')
+                : ''
+            }
+          >
+            {L.l('common.new')}
+          </Button>
+        )}
+        {!readOnly && selectedEntityIndex >= 0 && <DeleteIconButton onClick={onDeleteButtonClick} />}
+      </div>
+    )
+  }
+}
 
 const EntitySelect = (props) => {
   const { entitiesSummary, selectedEntityIndex, onChange } = props
@@ -36,11 +136,11 @@ export default class MultipleFieldset extends EntityCollectionComponent {
     super()
     this.state = {
       ...this.state,
-      entitiesSummary: [],
       selectedEntityIndex: -1,
     }
 
     this.onDeleteButtonClick = this.onDeleteButtonClick.bind(this)
+    this.onSelectedEntityChange = this.onSelectedEntityChange.bind(this)
   }
 
   getSelectedEntity() {
@@ -50,30 +150,7 @@ export default class MultipleFieldset extends EntityCollectionComponent {
 
   determineNewState() {
     const newState = super.determineNewState()
-    const { entities } = newState
-    return { ...newState, selectedEntityIndex: -1, entitiesSummary: this.extractEntitiesSummary(entities) }
-  }
-
-  onRecordEvent(event) {
-    super.onRecordEvent(event)
-
-    const { entities } = this.state
-
-    if (
-      event instanceof AttributeValueUpdatedEvent &&
-      entities.some((entity) => event.isRelativeToEntityKeyAttributes({ entity }))
-    ) {
-      this.updateEntitiesSummary()
-    }
-  }
-
-  extractEntitiesSummary(entities) {
-    return entities.map((entity) => entity.summaryLabel)
-  }
-
-  updateEntitiesSummary() {
-    const { entities } = this.state
-    this.setState({ entitiesSummary: this.extractEntitiesSummary(entities) })
+    return { ...newState, selectedEntityIndex: -1 }
   }
 
   onStateUpdate(entityAdded) {
@@ -98,10 +175,7 @@ export default class MultipleFieldset extends EntityCollectionComponent {
 
   render() {
     const { parentEntity, itemDef } = this.props
-    const { entitiesSummary, selectedEntityIndex, maxCount } = this.state
-    const { record } = parentEntity
-    const { readOnly } = record
-    const { entityDefinition } = itemDef
+    const { entities, maxCount, selectedEntityIndex } = this.state
 
     if (!parentEntity) {
       return <div>Loading...</div>
@@ -109,40 +183,18 @@ export default class MultipleFieldset extends EntityCollectionComponent {
 
     const selectedEntity = this.getSelectedEntity()
 
-    const maxCountReached = maxCount && entitiesSummary.length >= maxCount
-    const emptyEntitySummaryExists = entitiesSummary.some(entitySummary => Strings.isBlank(entitySummary))
-    const cannotAddNewEntity = maxCountReached || emptyEntitySummaryExists
-
     return (
       <div className="multiple-fieldset-wrapper">
-        <div className="multiple-fieldset-header">
-          <NodeDefLabel nodeDefinition={entityDefinition} limitWidth={false} />:
-          {entitiesSummary.length > 0 && (
-            <EntitySelect
-              selectedEntityIndex={selectedEntityIndex}
-              entitiesSummary={entitiesSummary}
-              onChange={(event) => this.onSelectedEntityChange(Number(event.target.value))}
-            />
-          )}
-          {!readOnly && (
-            <Button
-              color="success"
-              onClick={this.onNewButtonClick}
-              disabled={cannotAddNewEntity}
-              title={
-                maxCountReached
-                  ? L.l('dataManagement.dataEntry.multipleNodesComponent.cannotAddNewNodes.maxCountReached', [
-                      maxCount,
-                      entityDefinition.labelOrName,
-                    ])
-                  : emptyEntitySummaryExists ? L.l('dataManagement.dataEntry.multipleNodesComponent.cannotAddNewNodes.emptyNodeExists'): ''
-              }
-            >
-              {L.l('common.new')}
-            </Button>
-          )}
-          {!readOnly && selectedEntity && <DeleteIconButton onClick={this.onDeleteButtonClick} />}
-        </div>
+        <MultipleFieldsetHeader
+          parentEntity={parentEntity}
+          itemDef={itemDef}
+          entities={entities}
+          maxCount={maxCount}
+          onDeleteButtonClick={this.onDeleteButtonClick}
+          onNewButtonClick={this.onNewButtonClick}
+          onSelectedEntityChange={this.onSelectedEntityChange}
+          selectedEntityIndex={selectedEntityIndex}
+        />
         {selectedEntity && (
           <>
             <FormItems parentItemDef={itemDef} parentEntity={selectedEntity} />
