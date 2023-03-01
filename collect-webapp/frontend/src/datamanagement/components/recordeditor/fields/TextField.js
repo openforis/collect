@@ -60,6 +60,7 @@ class TextField extends AbstractField {
     return (
       <>
         <MuiTextField
+          autoComplete="off"
           value={text}
           type={inputFieldType}
           onChange={this.onChange}
