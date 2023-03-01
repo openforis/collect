@@ -17,6 +17,15 @@ export default class AbstractFormComponent extends React.Component {
     EventQueue.unsubscribe(RecordEvent.TYPE, this._onRecordEvent)
   }
 
+  updateState() {
+    this.setState(this.determineNewState())
+  }
+
+  determineNewState() {
+    const newState = {}
+    return newState
+  }
+
   _onRecordEvent(event) {
     const { parentEntity } = this.props
     if (parentEntity) {
