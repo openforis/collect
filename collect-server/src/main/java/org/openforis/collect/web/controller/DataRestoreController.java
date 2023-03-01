@@ -262,7 +262,7 @@ public class DataRestoreController extends BasicController {
 	}
 	
 	private File createTempFile(InputStream inputStream) throws IOException {
-		File file = File.createTempFile("ofc_data_restore", ".collect-data");
+		File file = File.createTempFile("ofc_data_restore", ".collect-backup");
 		file.deleteOnExit();
 		FileUtils.copyInputStreamToFile(inputStream, file);
 		return file;
