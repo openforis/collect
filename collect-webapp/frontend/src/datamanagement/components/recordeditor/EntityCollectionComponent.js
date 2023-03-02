@@ -33,8 +33,9 @@ export default class EntityCollectionComponent extends AbstractFormComponent {
     const { itemDef, parentEntity } = this.props
     const { entityDefinitionId } = itemDef
     const maxCount = parentEntity.childrenMaxCountByDefinitionId[entityDefinitionId]
+    const entities = this.determineEntities()
 
-    return { addingEntity: false, entities: this.determineEntities(), maxCount }
+    return { addingEntity: false, entities, maxCount }
   }
 
   determineEntities() {
@@ -47,7 +48,8 @@ export default class EntityCollectionComponent extends AbstractFormComponent {
 
     const { parentEntity, itemDef } = this.props
     if (
-      (event instanceof EntityCreationCompletedEvent || event instanceof EntityDeletedEvent ||
+      (event instanceof EntityCreationCompletedEvent ||
+        event instanceof EntityDeletedEvent ||
         event instanceof NodeCountUpdatedEvent) &&
       event.isRelativeToNodes({ parentEntity, nodeDefId: itemDef.entityDefinitionId })
     ) {

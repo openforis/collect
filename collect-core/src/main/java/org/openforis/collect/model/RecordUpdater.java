@@ -16,7 +16,6 @@ import java.util.Set;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.metamodel.CollectAnnotations;
-import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.recordUpdater.RecordDependentsUpdater;
 import org.openforis.collect.model.recordUpdater.RecordDependentsUpdater.RecordDependentsUpdateResult;
@@ -363,6 +362,7 @@ public class RecordUpdater {
 	
 	private NodeChangeSet afterAttributeInsertOrUpdate(final NodeChangeMap changeMap, Attribute<?, ?> attribute) {
 		CollectRecord record = (CollectRecord) attribute.getRecord();
+		CollectSurvey survey = (CollectSurvey) record.getSurvey();
 
 		NodePointer selfPointer = new NodePointer(attribute);
 		
@@ -374,6 +374,15 @@ public class RecordUpdater {
 		updatedAttributes.addAll(recordDependentsUpdateResult.getUpdatedAttributes());
 		changeMap.addValueChanges(updatedAttributes);
 		
+		if (survey.isCollectEarth()) {
+			// include dependent code attributes in change map (allows the re-rendering of code list items in Collect Earth)
+			Collection<CodeAttribute> updatedCodeAttributes = Nodes.filterCodeAttributes(updatedAttributes);
+			for (CodeAttribute codeAttribute : updatedCodeAttributes) {
+				Set<CodeAttribute> dependentCodeAttributes = record.determineDependentCodeAttributes(codeAttribute);
+				changeMap.addValueChanges(dependentCodeAttributes);
+			}
+		}
+	
 		Set<NodePointer> updatedRelevancePointers = recordDependentsUpdateResult.getUpdatedRelevancePointers();
 		changeMap.addRelevanceChanges(updatedRelevancePointers);
 		
@@ -852,7 +861,7 @@ public class RecordUpdater {
 		CollectSurvey survey = (CollectSurvey) entity.getSurvey();
 		CollectAnnotations annotations = survey.getAnnotations();
 		int count = 0;
-		if (! childDefn.isMultiple() || annotations.isAutoGenerateMinItems(childDefn) || survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
+		if (! childDefn.isMultiple() || annotations.isAutoGenerateMinItems(childDefn) || survey.isCollectEarth()) {
 			while(count < toBeInserted) {
 				if(childDefn instanceof AttributeDefinition) {
 					Node<?> createdNode = childDefn.createNode();

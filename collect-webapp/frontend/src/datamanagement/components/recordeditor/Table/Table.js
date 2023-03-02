@@ -5,7 +5,12 @@ import { Column, Table as TableVirtualized } from 'react-virtualized'
 import { Button } from 'reactstrap'
 import classNames from 'classnames'
 
-import { NodeRelevanceUpdatedEvent } from 'model/event/RecordEvent'
+import {
+  AttributeValueUpdatedEvent,
+  EntityCreationCompletedEvent,
+  EntityDeletedEvent,
+  NodeRelevanceUpdatedEvent,
+} from 'model/event/RecordEvent'
 import { ColumnDefinition, ColumnGroupDefinition } from 'model/ui/TableDefinition'
 import L from 'utils/Labels'
 
@@ -16,9 +21,56 @@ import FormItemFieldComponent from '../FormItemFieldComponent'
 import HeadingRow from './HeadingRow'
 
 import * as TableColumns from './tableColumns'
+import AbstractFormComponent from '../AbstractFormComponent'
 
 const ROW_NUMBER_COLUMN_WIDTH = 60
 const DELETE_COLUMN_WIDTH = 60
+
+class AddNewRowButton extends AbstractFormComponent {
+  onRecordEvent(event) {
+    super.onRecordEvent(event)
+
+    const { parentEntity, entities, entityDefinition } = this.props
+
+    if (
+      (event instanceof AttributeValueUpdatedEvent &&
+        (entities.some((entity) => event.isRelativeToEntityKeyAttributes({ entity })) ||
+          event.isRelativeToDescendantsOf({ parentEntity, entityDefinition }))) ||
+      ((event instanceof EntityCreationCompletedEvent || event instanceof EntityDeletedEvent) &&
+        event.isRelativeToNodes({ parentEntity, nodeDefId: entityDefinition.id }))
+    ) {
+      this.updateState()
+    }
+  }
+
+  render() {
+    const { addingEntity, entities, labelOrName, maxCount, maxCountReached, onNewButtonClick } = this.props
+    const hasEmptyEntity = entities.some((entity) => entity.isEmpty())
+    const disabled = addingEntity || maxCountReached || hasEmptyEntity
+
+    return (
+      <Button
+        className="add-btn"
+        variant="outlined"
+        color="primary"
+        onClick={onNewButtonClick}
+        disabled={disabled}
+        title={
+          maxCountReached
+            ? L.l('dataManagement.dataEntry.multipleNodesComponent.cannotAddNewNodes.maxCountReached', [
+                maxCount,
+                labelOrName,
+              ])
+            : hasEmptyEntity
+            ? L.l('dataManagement.dataEntry.multipleNodesComponent.cannotAddNewNodes.emptyNodeExists')
+            : ''
+        }
+      >
+        {L.l('common.add')}
+      </Button>
+    )
+  }
+}
 
 export default class Table extends EntityCollectionComponent {
   constructor() {
@@ -182,15 +234,8 @@ export default class Table extends EntityCollectionComponent {
 
   render() {
     const { itemDef, fullSize, parentEntity } = this.props
-    const {
-      addingEntity,
-      columnInfoByDefId,
-      entities,
-      gridTemplateColumns,
-      headingColumns,
-      maxCount,
-      totalWidth,
-    } = this.state
+    const { addingEntity, columnInfoByDefId, entities, gridTemplateColumns, headingColumns, maxCount, totalWidth } =
+      this.state
     const { record } = parentEntity
 
     const { showRowNumbers, entityDefinition } = itemDef
@@ -258,23 +303,16 @@ export default class Table extends EntityCollectionComponent {
         </div>
 
         {canAddOrDeleteRows && (
-          <Button
-            className="add-btn"
-            variant="outlined"
-            color="primary"
-            onClick={this.onNewButtonClick}
-            disabled={addingEntity || maxCountReached}
-            title={
-              maxCountReached
-                ? L.l('dataManagement.dataEntry.multipleNodesComponent.cannotAddNewNodes.maxCountReached', [
-                    maxCount,
-                    labelOrName,
-                  ])
-                : ''
-            }
-          >
-            {L.l('common.add')}
-          </Button>
+          <AddNewRowButton
+            addingEntity={addingEntity}
+            entityDefinition={entityDefinition}
+            entities={entities}
+            labelOrName={labelOrName}
+            maxCount={maxCount}
+            maxCountReached={maxCountReached}
+            onNewButtonClick={this.onNewButtonClick}
+            parentEntity={parentEntity}
+          />
         )}
       </div>
     )

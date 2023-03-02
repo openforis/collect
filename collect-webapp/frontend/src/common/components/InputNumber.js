@@ -10,6 +10,7 @@ const CustomInput = (inputProps) => {
 
   return (
     <TextField
+      autoComplete="off"
       disabled={readOnly}
       variant="outlined"
       onBlur={onBlur}

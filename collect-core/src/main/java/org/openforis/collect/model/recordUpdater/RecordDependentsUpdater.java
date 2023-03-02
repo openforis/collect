@@ -16,6 +16,7 @@ import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.Nodes;
 import org.openforis.collect.model.RecordUpdater.RecordUpdateConfiguration;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.collection.Predicate;
@@ -326,9 +327,9 @@ public class RecordDependentsUpdater {
 	
 	private Set<CodeAttribute> clearDependentCodeAttributes(NodePointer visitedNodePointer,
 			Collection<Attribute<?,?>> updatedAttributesCurrentIteration, Visitor<NodePointer> nodePointerDependentVisitor) {
-		Collection<CodeAttribute> updatedCodeAttributes = filterCodeAttributes(updatedAttributesCurrentIteration);
+		Collection<CodeAttribute> updatedCodeAttributes = Nodes.filterCodeAttributes(updatedAttributesCurrentIteration);
 		if (visitedNodePointer.getChildDefinition() instanceof CodeAttributeDefinition) {
-			Collection<CodeAttribute> visitedEmptyCodeAttributes = filterCodeAttributes(visitedNodePointer.getNodes());
+			Collection<CodeAttribute> visitedEmptyCodeAttributes = Nodes.filterCodeAttributes(visitedNodePointer.getNodes());
 			CollectionUtils.filter(visitedEmptyCodeAttributes, new Predicate<CodeAttribute>() {
 				public boolean evaluate(CodeAttribute codeAttr) {
 					return codeAttr.isEmpty();
@@ -354,16 +355,6 @@ public class RecordDependentsUpdater {
 		return attributes;
 	}
 
-	private <T extends Node<?>> Collection<CodeAttribute> filterCodeAttributes(Collection<T> nodes) {
-		Collection<CodeAttribute> codeAttributes = new ArrayList<CodeAttribute>();
-		for (Node<?> node : nodes) {
-			if (node instanceof CodeAttribute) {
-				codeAttributes.add((CodeAttribute) node);
-			}
-		}
-		return codeAttributes;
-	}
-	
 	private <A extends Attribute<?, ?>> Set<A> clearUserSpecifiedAttributes(Set<A> attributes) {
 		Set<A> updatedAttributes = new HashSet<A>();
 		for (A attr : attributes) {

@@ -273,7 +273,7 @@ public class CollectAnnotations {
 		setAnnotationValue(defn, Annotation.ENUMERATE, value);
 	}
 
-	public Boolean isAutoGenerateMinItems(NodeDefinition defn) {
+	public boolean isAutoGenerateMinItems(NodeDefinition defn) {
 		return getAnnotationValueBoolean(defn, Annotation.AUTO_GENERATE_MIN_ITEMS);
 	}
 
