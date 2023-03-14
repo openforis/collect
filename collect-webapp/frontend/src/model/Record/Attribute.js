@@ -42,9 +42,10 @@ export class Attribute extends Node {
     const fields = this.fields
     const { fieldNames, mandatoryFieldNames } = this.definition
 
-    return fieldNames.some((fieldName, index) => {
+    const fieldNamesToEvaluate = mandatoryFieldNames ? mandatoryFieldNames : fieldNames
+    return fieldNamesToEvaluate.some((_fieldName, index) => {
       const value = fields[index].value
-      return (!mandatoryFieldNames || mandatoryFieldNames.includes(fieldName)) && (value === null || value === '')
+      return value === null || value === ''
     })
   }
 
