@@ -212,7 +212,7 @@ export class Entity extends Node {
   }
 
   isEmpty() {
-    return this._hasDescendant((descendant) => descendant.isEmpty())
+    return !this._hasDescendant((descendant) => (!descendant.isEmpty()))
   }
 
   isChildRelevant(childDef) {
