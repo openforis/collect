@@ -187,16 +187,29 @@ z-column-content, .z-row-content, .z-group-content, .z-groupfoot-content, .z-foo
 /**
 * Checkbox style
 */
+.z-checkbox input[type="checkbox"] {
+	border-color: #505050;
+}
 .z-checkbox.error input[type="checkbox"] {
 	background-color: #D10909;
 }
 .z-checkbox.error input[type="checkbox"]:checked:after {
 	color: white;
 }
-
 /**
 * end of Checkbox style
 */
+
+/**
+* Radiobox style
+**/
+.z-radio input[type="radio"] {
+	border-color: #505050;
+}
+/**
+* End of Radiobox style
+**/
+
 .z-popup.error .z-popup-cnt {
 	background: #CE2929;
 	color: #FFFFFF;

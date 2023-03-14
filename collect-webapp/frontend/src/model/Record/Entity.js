@@ -212,7 +212,11 @@ export class Entity extends Node {
   }
 
   isEmpty() {
-    return this._hasDescendant((descendant) => descendant.isEmpty())
+    const keyNodes = this.keyNodes
+    if (keyNodes.every((keyNode) => keyNode.isEmpty())) {
+      return true
+    }
+    return !this._hasDescendant((descendant) => !descendant.definition.calculated && !descendant.isEmpty())
   }
 
   isChildRelevant(childDef) {
