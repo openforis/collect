@@ -62,6 +62,7 @@ public class SpeciesManager {
 	@Autowired
 	private ExpressionFactory expressionFactory;
 	
+	private transient Map<TaxonomyByNameCacheKey, CollectTaxonomy> taxonomyByNameCache = new HashMap<TaxonomyByNameCacheKey, CollectTaxonomy>();
 	private transient Map<Integer, TaxonTree> taxonTreeByTaxonomyIdCache = new HashMap<Integer, TaxonTree>();
 
 	public List<CollectTaxonomy> loadTaxonomiesBySurvey(CollectSurvey survey) {
@@ -73,7 +74,13 @@ public class SpeciesManager {
 	}
 
 	public CollectTaxonomy loadTaxonomyByName(CollectSurvey survey, String name) {
-		return taxonomyDao.loadByName(survey, name);
+		TaxonomyByNameCacheKey cacheKey = new TaxonomyByNameCacheKey(survey.getId(), name);
+		CollectTaxonomy taxonomy = taxonomyByNameCache.get(cacheKey);
+		if (taxonomy == null) {
+			taxonomy = taxonomyDao.loadByName(survey, name);
+			taxonomyByNameCache.put(cacheKey, taxonomy);
+		}
+		return taxonomy;
 	}
 
 	public List<TaxonOccurrence> findByCode(CollectTaxonomy taxonomy, String searchString, int maxResults,
@@ -181,14 +188,19 @@ public class SpeciesManager {
 		if ( taxonomy.getId() == null ) {
 			taxonomyDao.insert(taxonomy);
 		} else {
+			CollectTaxonomy oldTaxonomy = taxonomyDao.loadById(taxonomy.getSurvey(), taxonomy.getId());
+			taxonomyByNameCache.remove(new TaxonomyByNameCacheKey(oldTaxonomy));
 			taxonomyDao.update(taxonomy);
 		}
+		taxonomyByNameCache.put(new TaxonomyByNameCacheKey(taxonomy), taxonomy);
 	}
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void delete(CollectTaxonomy taxonomy) {
 		deleteTaxonsByTaxonomy(taxonomy);
 		taxonomyDao.delete(taxonomy);
+		taxonTreeByTaxonomyIdCache.remove(taxonomy.getId());
+		taxonomyByNameCache.remove(new TaxonomyByNameCacheKey(taxonomy));
 	}
 
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
@@ -453,4 +465,48 @@ public class SpeciesManager {
 		this.expressionFactory = expressionFactory;
 	}
 
+	private static class TaxonomyByNameCacheKey {
+		private Integer surveyId;
+		private String name;
+		
+		public TaxonomyByNameCacheKey(Integer surveyId, String name) {
+			this.surveyId = surveyId;
+			this.name = name;
+		}
+
+		public TaxonomyByNameCacheKey(CollectTaxonomy taxonomy) {
+			this(taxonomy.getSurveyId(), taxonomy.getName());
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((name == null) ? 0 : name.hashCode());
+			result = prime * result + ((surveyId == null) ? 0 : surveyId.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			TaxonomyByNameCacheKey other = (TaxonomyByNameCacheKey) obj;
+			if (name == null) {
+				if (other.name != null)
+					return false;
+			} else if (!name.equals(other.name))
+				return false;
+			if (surveyId == null) {
+				if (other.surveyId != null)
+					return false;
+			} else if (!surveyId.equals(other.surveyId))
+				return false;
+			return true;
+		}
+	}
 }
