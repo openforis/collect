@@ -94,6 +94,18 @@ public class TaxonTree {
 	}
 
 	public Node findNodeByTaxon(final Taxon taxon) {
+		if (taxon == null) return null;
+		
+		Long taxonSystemId = taxon.getSystemId();
+		if (taxonSystemId != null) {
+			Node node = systemIdToNode.get(taxonSystemId);
+			if (node != null) return node;
+		}
+		Integer taxonId = taxon.getTaxonId();
+		if (taxonId != null) {
+			Node node = taxonIdToNode.get(taxonId);
+			if (node != null) return node;
+		}
 		NodeFinderVisitor visitor = new AbstractNodeFinderVisitor() {
 			@Override
 			public void visit(Node node) {

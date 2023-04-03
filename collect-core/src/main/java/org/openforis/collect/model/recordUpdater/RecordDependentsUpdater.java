@@ -42,6 +42,7 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
 public class RecordDependentsUpdater {
 
 	protected static final int MAX_DEPENDENT_NODE_VISITING_COUNT = 3;
+	private static final Integer MAX_ATTRIBUTE_EVALUATION_COUNT = 2;
 
 	private RecordUpdateConfiguration configuration;
 
@@ -86,6 +87,7 @@ public class RecordDependentsUpdater {
 		queue.addAll(nodePointers);
 		
 		final Map<NodePointer, Integer> visitingCountByNodePointer = new HashMap<NodePointer, Integer>();
+		final Map<Attribute<?, ?>, Integer> evaluatedCountByAttribute = new HashMap<Attribute<?, ?>, Integer>();
 
 		final Set<NodePointer> updatedRelevancePointers = new LinkedHashSet<NodePointer>();
 		final List<Attribute<?, ?>> totalUpdatedAttributes = new ArrayList<Attribute<?, ?>>();
@@ -122,7 +124,7 @@ public class RecordDependentsUpdater {
 
 			// default values
 			Set<Attribute<?, ?>> dependentAttributesUpdated = updateDependentDefaultValues(
-					record, visitedNodePointer, updatedDependentRelevancePointers, nodePointerDependentVisitor);
+					record, visitedNodePointer, updatedDependentRelevancePointers, nodePointerDependentVisitor, evaluatedCountByAttribute);
 			updatedAttributesCurrentIteration.addAll(dependentAttributesUpdated);
 
 			// clear not relevant attributes
@@ -157,7 +159,8 @@ public class RecordDependentsUpdater {
 	}
 
 	private Set<Attribute<?, ?>> updateDependentDefaultValues(CollectRecord record, final NodePointer nodePointer,
-			Collection<NodePointer> updatedRelevancePointers, final Visitor<NodePointer> nodePointerDependentVisitor) {
+			Collection<NodePointer> updatedRelevancePointers, final Visitor<NodePointer> nodePointerDependentVisitor,
+			final Map<Attribute<?, ?>, Integer> evaluatedCountByAttribute) {
 		final Set<Attribute<?, ?>> updatedAttributes = new HashSet<Attribute<?, ?>>();
 
 		Visitor<NodePointer> defaultValueApplyVisitor = new Visitor<NodePointer>() {
@@ -165,7 +168,7 @@ public class RecordDependentsUpdater {
 			public void visit(NodePointer nodePointerVisited) {
 				@SuppressWarnings("rawtypes")
 				Collection nodes = nodePointerVisited.getNodes();
-				List<Attribute<?, ?>> recalculatedAttributes = recalculateValues(nodes);
+				List<Attribute<?, ?>> recalculatedAttributes = recalculateValuesIfNecessary(nodes, evaluatedCountByAttribute);
 				updatedAttributes.addAll(recalculatedAttributes);
 
 				if (!nodePointerVisited.equals(nodePointer)) {
@@ -203,12 +206,19 @@ public class RecordDependentsUpdater {
 		}
 	}
 
-	private List<Attribute<?, ?>> recalculateValues(Collection<Attribute<?, ?>> attributesToRecalculate) {
+	private List<Attribute<?, ?>> recalculateValuesIfNecessary(Collection<Attribute<?, ?>> attributesToRecalculate, Map<Attribute<?, ?>, Integer> evaluatedCountByAttribute) {
 		List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?, ?>>();
 		for (Attribute<?, ?> attr : attributesToRecalculate) {
-			Attribute<?, ?> updatedAttribute = recalculateValueIfNecessary(attr);
-			if (updatedAttribute != null) {
-				updatedAttributes.add(updatedAttribute);
+			Integer evaluatedCount = evaluatedCountByAttribute.get(attr);
+			if (evaluatedCount == null) {
+				evaluatedCount = 0;
+			}
+			if (evaluatedCount < MAX_ATTRIBUTE_EVALUATION_COUNT) {
+				Attribute<?, ?> updatedAttribute = recalculateValueIfNecessary(attr);
+				evaluatedCountByAttribute.put(attr, evaluatedCount + 1);
+				if (updatedAttribute != null) {
+					updatedAttributes.add(updatedAttribute);
+				}
 			}
 		}
 		return updatedAttributes;

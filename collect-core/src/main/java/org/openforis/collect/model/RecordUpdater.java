@@ -1026,7 +1026,7 @@ public class RecordUpdater {
 
 		if (!entity.isRoot()) {
 			NodePointer selfPointer = new NodePointer(entity);
-			pointers.add(selfPointer);
+			pointers.add(0, selfPointer);
 		}
 		return pointers;
 	}
