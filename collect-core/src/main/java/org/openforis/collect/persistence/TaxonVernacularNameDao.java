@@ -94,6 +94,18 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<Long, TaxonVer
 		List<TaxonVernacularName> entities = dsl.fromResult(result);
 		return entities;
 	}
+	
+	public Map<Integer, List<TaxonVernacularName>> findByTaxon(long taxonSystemId) {
+		TaxonVernacularNameDSLContext dsl = dsl();
+		
+		SelectConditionStep selectConditionStep = dsl.select(OFC_TAXON_VERNACULAR_NAME.fields())
+			.from(OFC_TAXON_VERNACULAR_NAME)
+			.where(OFC_TAXON_VERNACULAR_NAME.TAXON_ID.equal(taxonSystemId));
+		
+		Result<?> result = selectConditionStep.fetch();
+		List<TaxonVernacularName> entities = dsl.fromResult(result);
+		return entities;
+	}
 
 	public List<String> loadVernacularLangCodes(int taxonomyId) {
 		return dsl()
