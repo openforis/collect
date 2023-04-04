@@ -360,13 +360,17 @@ public class SpeciesManager {
 			List<Taxon> taxons = taxonDao.loadTaxonsForTreeBuilding(taxonomy);
 			tree = new TaxonTree(taxonDefinition);
 			Map<Long, Taxon> idToTaxon = new HashMap<Long, Taxon>();
+			Map<Long, List<TaxonVernacularName>> vernacularNamesByTaxonId = taxonVernacularNameDao
+					.findByTaxomyyIndexedByTaxon(taxonomy.getSurveyId(), taxonomy.getId());
 			for (Taxon taxon : taxons) {
 				Long systemId = taxon.getSystemId();
 				Long parentId = taxon.getParentId();
 				Taxon parent = parentId == null ? null: idToTaxon.get(parentId);
 				Node newNode = tree.addNode(parent, taxon);
-				List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(systemId);
-				tree.addVernacularNames(newNode, vernacularNames);
+				List<TaxonVernacularName> vernacularNames = vernacularNamesByTaxonId.get(systemId);
+				if (vernacularNames != null) {
+					tree.addVernacularNames(newNode, vernacularNames);
+				}
 				idToTaxon.put(systemId, taxon);
 			}
 			taxonTreeByTaxonomyIdCache.put(taxonomy.getId(), tree);

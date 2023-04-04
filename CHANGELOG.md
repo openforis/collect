@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.79] - 2023-04-04
+### Added
+- Optimized record validator (species data loading);
+
+## [4.0.78] - 2023-04-03
+### Added
+- Optimized record validator (species data loading);
+
+## [4.0.77] - 2023-04-01
+### Fixed
+- Avoiding loops in record validation with nested depending entities;
+
+## [4.0.76] - 2023-03-31
+### Added
+- Optimized record validator (species data loading);
+
+## [4.0.75] - 2023-03-15
+### Fixed
+- Bug fixes;
+
+## [4.0.74] - 2023-03-13
+### Fixed
+- Bug fixes (table add button);
+
 ## [4.0.73] - 2023-03-01
 ### Added
 - Data entry: prevent adding multiple empty entities (in forms and tables);
