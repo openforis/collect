@@ -98,7 +98,7 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<Long, TaxonVer
 		return entities;
 	}
 	
-	public Map<Long, List<TaxonVernacularName>> findByTaxomyyIndexedByTaxon(int surveyId, int taxonomyId) {
+	public Map<Long, List<TaxonVernacularName>> findByTaxonomyIndexedByTaxon(int taxonomyId) {
 		TaxonVernacularNameDSLContext dsl = dsl();
 		Map<Long, List<TaxonVernacularName>> vernacularNamesByTaxon = new HashMap<Long, List<TaxonVernacularName>>();
 		
