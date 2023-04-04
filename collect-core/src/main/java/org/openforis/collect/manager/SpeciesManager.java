@@ -353,23 +353,27 @@ public class SpeciesManager {
 	}
 
 	public TaxonTree loadTaxonTree(CollectTaxonomy taxonomy) {
-		TaxonTree tree = taxonTreeByTaxonomyIdCache.get(taxonomy.getId());
+		Integer taxonomyId = taxonomy.getId();
+		TaxonTree tree = taxonTreeByTaxonomyIdCache.get(taxonomyId);
 		if (tree == null) {
 			String taxonomyName = taxonomy.getName();
 			TaxonomyDefinition taxonDefinition = taxonomy.getSurvey().getReferenceDataSchema().getTaxonomyDefinition(taxonomyName);
 			List<Taxon> taxons = taxonDao.loadTaxonsForTreeBuilding(taxonomy);
 			tree = new TaxonTree(taxonDefinition);
 			Map<Long, Taxon> idToTaxon = new HashMap<Long, Taxon>();
+			Map<Long, List<TaxonVernacularName>> vernacularNamesByTaxonId = taxonVernacularNameDao.findByTaxonomyIndexedByTaxon(taxonomyId);
 			for (Taxon taxon : taxons) {
 				Long systemId = taxon.getSystemId();
 				Long parentId = taxon.getParentId();
 				Taxon parent = parentId == null ? null: idToTaxon.get(parentId);
 				Node newNode = tree.addNode(parent, taxon);
-				List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(systemId);
-				tree.addVernacularNames(newNode, vernacularNames);
+				List<TaxonVernacularName> vernacularNames = vernacularNamesByTaxonId.get(systemId);
+				if (vernacularNames != null) {
+					tree.addVernacularNames(newNode, vernacularNames);
+				}
 				idToTaxon.put(systemId, taxon);
 			}
-			taxonTreeByTaxonomyIdCache.put(taxonomy.getId(), tree);
+			taxonTreeByTaxonomyIdCache.put(taxonomyId, tree);
 		}
 		return tree;
 	}
