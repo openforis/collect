@@ -6,8 +6,10 @@ import static org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularNa
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.jooq.BatchBindStep;
@@ -16,6 +18,7 @@ import org.jooq.Field;
 import org.jooq.Insert;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.ResultQuery;
 import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.StoreQuery;
@@ -93,6 +96,32 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<Long, TaxonVer
 		Result<?> result = selectConditionStep.fetch();
 		List<TaxonVernacularName> entities = dsl.fromResult(result);
 		return entities;
+	}
+	
+	public Map<Long, List<TaxonVernacularName>> findByTaxonomyIndexedByTaxon(int taxonomyId) {
+		TaxonVernacularNameDSLContext dsl = dsl();
+		Map<Long, List<TaxonVernacularName>> vernacularNamesByTaxon = new HashMap<Long, List<TaxonVernacularName>>();
+		
+		ResultQuery<Record> select = dsl.select(OFC_TAXON_VERNACULAR_NAME.fields())
+			.from(OFC_TAXON_VERNACULAR_NAME)
+				.join(OFC_TAXON)
+				.on(OFC_TAXON_VERNACULAR_NAME.TAXON_ID.equal(OFC_TAXON.ID)
+					.and(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId))
+				)
+			.orderBy(OFC_TAXON_VERNACULAR_NAME.TAXON_ID, OFC_TAXON_VERNACULAR_NAME.ID);
+		
+		Result<?> queryResult = select.fetch();
+		List<TaxonVernacularName> vernacularNames = dsl.fromResult(queryResult);
+		for (TaxonVernacularName vernacularName : vernacularNames) {
+			Long taxonSystemId = vernacularName.getTaxonSystemId();
+			List<TaxonVernacularName> vernacularNamesPerTaxon = vernacularNamesByTaxon.get(taxonSystemId);
+			if (vernacularNamesPerTaxon == null) {
+				vernacularNamesPerTaxon = new ArrayList<TaxonVernacularName>();
+				vernacularNamesByTaxon.put(taxonSystemId, vernacularNamesPerTaxon);
+			}
+			vernacularNamesPerTaxon.add(vernacularName);
+		}
+		return vernacularNamesByTaxon;
 	}
 
 	public List<String> loadVernacularLangCodes(int taxonomyId) {
