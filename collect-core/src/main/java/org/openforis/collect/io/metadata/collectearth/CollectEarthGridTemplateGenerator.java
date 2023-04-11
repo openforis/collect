@@ -90,7 +90,7 @@ public class CollectEarthGridTemplateGenerator  {
 		keyAttributes = keyAttributes.substring(0, keyAttributes.lastIndexOf(",") );		
 		content = content.replace(CollectEarthProjectFileCreator.PLACEHOLDER_ID_COLUMNS_HEADER, keyAttributes);
 		
-		for( int i=1; i<=200;i++){
+		for( int i=1; i<=20000;i++){ // We should not have hard limits here, increased from 200 to 20.000 die to large KML imports from CE
 			String keyValues = "";
 			for (AttributeDefinition keyAttributeDefinition : keyAttributeDefinitions) {
 				String value = getDummyValue(keyAttributeDefinition,i);
