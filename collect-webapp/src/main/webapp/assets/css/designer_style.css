@@ -173,6 +173,9 @@ div.z-listbox-header th.z-listheader-sort-over {
 .z-groupbox-header span.z-caption-cnt > .z-label {
 	font-size: 1.0em;
 }
+.collapsible.error.z-groupbox-3d>.z-groupbox-header .z-caption-content {
+	color: red;
+}
 .z-caption .z-caption-r .z-label {
 	font-size: 1.2em;
 }
@@ -210,7 +213,7 @@ z-column-content, .z-row-content, .z-group-content, .z-groupfoot-content, .z-foo
 * End of Radiobox style
 **/
 
-.z-popup.error .z-popup-cnt {
+.z-popup.error .z-popup-content {
 	background: #CE2929;
 	color: #FFFFFF;
 }
