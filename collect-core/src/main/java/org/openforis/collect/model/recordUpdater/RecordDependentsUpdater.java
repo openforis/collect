@@ -249,7 +249,7 @@ public class RecordDependentsUpdater {
 				// keep old value
 				return null;
 			}
-		} else if (!attr.isEmpty() && attr.isUserSpecified() && (configuration.isClearNotRelevantAttributes() || attr.isDefaultValueApplied())) {
+		} else if (!attr.isEmpty() && attr.isDefaultValueApplied() || (attr.isUserSpecified() && configuration.isClearNotRelevantAttributes())) {
 			// clear non relevant attributes
 			newValue = null;
 		} else {
