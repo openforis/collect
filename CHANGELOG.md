@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.80] - 2023-04-13
+### Fixed
+- Fixed Collect Earth surveys nested calculated attributes evaluation;
+
 ## [4.0.79] - 2023-04-04
 ### Added
 - Optimized record validator (species data loading);
