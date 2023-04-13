@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect-installation</artifactId>
-		<version>4.0.80</version>
+		<version>4.0.81-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-autoupdater</artifactId>
 
