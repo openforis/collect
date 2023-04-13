@@ -632,7 +632,9 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		
 		//expected: attribute2 and attribute3 become not relevant
 		EntityChange rootEntityChange = (EntityChange) nodeChangeSet.getChange(record.getRootEntity());
+		assertNotNull(rootEntityChange);
 		NodeDefinition attribute2Def = record.getRootEntity().getDefinition().getChildDefinition("attribute2");
+		assertNotNull(rootEntityChange.getChildrenRelevance());
 		Boolean attribute2Relevance = rootEntityChange.getChildrenRelevance().get(attribute2Def.getId());
 		assertNotNull(attribute2Relevance);
 		assertFalse(attribute2Relevance);
