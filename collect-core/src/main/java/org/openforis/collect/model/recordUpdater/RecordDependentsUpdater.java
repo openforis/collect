@@ -43,6 +43,7 @@ public class RecordDependentsUpdater {
 
 	protected static final int MAX_DEPENDENT_NODE_VISITING_COUNT = 3;
 	private static final Integer MAX_ATTRIBUTE_EVALUATION_COUNT = 3;
+	private static final Integer MAX_ATTRIBUTE_EVALUATION_COUNT_CE = 50;
 
 	private RecordUpdateConfiguration configuration;
 
@@ -91,7 +92,8 @@ public class RecordDependentsUpdater {
 		
 		final Counter<NodePointer> visitingCounter = new Counter<NodePointer>(MAX_DEPENDENT_NODE_VISITING_COUNT);
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
-		final Counter<Attribute<?, ?>> evaluationCounter = new Counter<Attribute<?, ?>>(survey.isCollectEarth() ? Integer.MAX_VALUE: MAX_ATTRIBUTE_EVALUATION_COUNT);
+		final Counter<Attribute<?, ?>> evaluationCounter = new Counter<Attribute<?, ?>>(
+				survey.isCollectEarth() ? MAX_ATTRIBUTE_EVALUATION_COUNT_CE : MAX_ATTRIBUTE_EVALUATION_COUNT);
 
 		final Set<NodePointer> totalUpdatedRelevancePointers = new LinkedHashSet<NodePointer>();
 		final List<Attribute<?, ?>> totalUpdatedAttributes = new ArrayList<Attribute<?, ?>>();
