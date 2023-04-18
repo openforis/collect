@@ -30,6 +30,8 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.IntegerAttribute;
 import org.openforis.idm.model.IntegerValue;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.RealAttribute;
+import org.openforis.idm.model.RealValue;
 import org.openforis.idm.model.TextAttribute;
 import org.openforis.idm.model.TextValue;
 import org.openforis.idm.testfixture.NodeBuilder;
@@ -1030,60 +1032,61 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 	public void testCalculatedAttributesCascadeUpdate() {
 		RecordUpdater updater = new RecordUpdater();
 		updater.setClearDependentCodeAttributes(true);
-		
+
 		CollectSurvey survey = new SurveyBuilder()
 				.codeLists(codeList("land_use").level("level_1"), codeList("coverage"))
-				.rootEntityDef(
-						entityDef("root", 
-								attributeDef("root_key").key(),
-								entityDef("land_use", 
-										attributeDef("lu").key(), 
-										attributeDef("coverage").type(AttributeType.CODE).codeList("coverage"),
-										attributeDef("percentage").calculated("coverage")
-								).multiple(),
-								attributeDef("settlement_percentage").calculated("land_use[lu='S']/percentage"),
-								attributeDef("cropland_percentage").calculated("land_use[lu='C']/percentage"),
-								attributeDef("forest_percentage").calculated("land_use[lu='F']/percentage"),
-								attributeDef("land_use_category")
-									.calculated("'S'", "settlement_percentage >= 20")
-									.defaultValue("'C'", "cropland_percentage >= 20")
-									.defaultValue("'F'", "forest_percentage >= 10")
-									.defaultValue("'O'"),
-								attributeDef("land_use_category_alias").calculated("land_use_category")
-						)
-					).build();
+				.rootEntityDef(entityDef("root", attributeDef("root_key").key(),
+						entityDef("land_use", attributeDef("lu").key(),
+								attributeDef("coverage").type(AttributeType.CODE).codeList("coverage"),
+								attributeDef("percentage").type(AttributeType.NUMBER).calculated("coverage"))
+								.multiple(),
+						attributeDef("settlement_percentage").type(AttributeType.NUMBER)
+								.calculated("land_use[lu='S']/percentage"),
+						attributeDef("cropland_percentage").type(AttributeType.NUMBER)
+								.calculated("land_use[lu='C']/percentage"),
+						attributeDef("forest_percentage").type(AttributeType.NUMBER)
+								.calculated("land_use[lu='F']/percentage"),
+						attributeDef("land_use_category").type(AttributeType.CODE).codeList("land_use")
+								.calculated("'S'", "settlement_percentage >= 20")
+								.defaultValue("'C'", "cropland_percentage >= 20")
+								.defaultValue("'F'", "forest_percentage >= 10").defaultValue("'O'"),
+						attributeDef("land_use_category_alias").type(AttributeType.CODE).codeList("land_use")
+								.calculated("land_use_category")))
+				.build();
 
-		record = NodeBuilder.record(survey, 
-				entity("land_use", attribute("lu", "S"), attribute("coverage", 0)),
+		record = NodeBuilder.record(survey, entity("land_use", attribute("lu", "S"), attribute("coverage", 0)),
 				entity("land_use", attribute("lu", "C"), attribute("coverage", 0)),
-				entity("land_use", attribute("lu", "F"), attribute("coverage", 0))
-			);
-		
+				entity("land_use", attribute("lu", "F"), attribute("coverage", 0)));
+
 		updater.initializeRecord(record);
 
-		TextAttribute luSettlementCoverage = record.getNodeByPath("/root/land_use[1]/coverage");
-		TextAttribute luCroplandCoverage= record.getNodeByPath("/root/land_use[2]/coverage");
-		TextAttribute luForestCoverage = record.getNodeByPath("/root/land_use[3]/coverage");
-		
-		TextAttribute settlementPerc = record.getNodeByPath("/root/settlement_percentage");
-		TextAttribute croplandPerc = record.getNodeByPath("/root/cropland_percentage");
-		TextAttribute forestPerc = record.getNodeByPath("/root/forest_percentage");
-		
-		TextAttribute landUseCategory = record.getNodeByPath("/root/land_use_category");
-		TextAttribute landUseCategoryAlias = record.getNodeByPath("/root/land_use_category_alias");
+		CodeAttribute luSettlementCoverage = record.getNodeByPath("/root/land_use[1]/coverage");
+		CodeAttribute luCroplandCoverage = record.getNodeByPath("/root/land_use[2]/coverage");
+		CodeAttribute luForestCoverage = record.getNodeByPath("/root/land_use[3]/coverage");
 
-		updater.updateAttribute(luSettlementCoverage, new TextValue("25"));
-		
-		assertEquals(new TextValue("25"), settlementPerc.getValue());
-		assertEquals(new TextValue("S"), landUseCategory.getValue());
+		RealAttribute settlementPerc = record.getNodeByPath("/root/settlement_percentage");
+		RealAttribute croplandPerc = record.getNodeByPath("/root/cropland_percentage");
+		RealAttribute forestPerc = record.getNodeByPath("/root/forest_percentage");
+
+		CodeAttribute landUseCategory = record.getNodeByPath("/root/land_use_category");
+		CodeAttribute landUseCategoryAlias = record.getNodeByPath("/root/land_use_category_alias");
+
+		updater.updateAttribute(luSettlementCoverage, new Code("25"));
+
+		assertEquals(new RealValue(25d), settlementPerc.getValue());
+		assertEquals(new Code("S"), landUseCategory.getValue());
 		assertEquals(landUseCategoryAlias.getValue(), landUseCategory.getValue());
-		
-		updater.updateAttribute(luSettlementCoverage, new TextValue("0"));
-		assertEquals(new TextValue("O"), landUseCategoryAlias.getValue());
-		
-		updater.updateAttribute(luForestCoverage, new TextValue("15"));
-		assertEquals(new TextValue("F"), landUseCategoryAlias.getValue());
 
+		updater.updateAttribute(luSettlementCoverage, new Code("0"));
+		assertEquals(new Code("O"), landUseCategoryAlias.getValue());
+
+		updater.updateAttribute(luForestCoverage, new Code("45"));
+		assertEquals(new RealValue(45d), forestPerc.getValue());
+		assertEquals(new Code("F"), landUseCategoryAlias.getValue());
+
+		updater.updateAttribute(luCroplandCoverage, new Code("30"));
+		assertEquals(new RealValue(30d), croplandPerc.getValue());
+		assertEquals(new Code("C"), landUseCategoryAlias.getValue());
 	}
 	
 }

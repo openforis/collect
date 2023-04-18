@@ -41,8 +41,8 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
 
 public class RecordDependentsUpdater {
 
-	protected static final int MAX_DEPENDENT_NODE_VISITING_COUNT = 3;
-	private static final Integer MAX_ATTRIBUTE_EVALUATION_COUNT = 3;
+	protected static final int MAX_DEPENDENT_NODE_VISITING_COUNT = 5;
+	private static final Integer MAX_ATTRIBUTE_EVALUATION_COUNT = 5;
 	private static final Integer MAX_ATTRIBUTE_EVALUATION_COUNT_CE = 50;
 
 	private RecordUpdateConfiguration configuration;
@@ -117,7 +117,7 @@ public class RecordDependentsUpdater {
 			
 			final Visitor<NodePointer> nodePointerDependentVisitor = new Visitor<NodePointer>() {
 				public void visit(NodePointer nodePointerDependent) {
-					if (!nodePointerDependent.equals(visitedNodePointer) && !visitingCounter.isLimitReached(visitedNodePointer)) {
+					if (!nodePointerDependent.equals(visitedNodePointer) && !visitingCounter.isLimitReached(nodePointerDependent)) {
 						queue.add(nodePointerDependent);
 					}
 				}
