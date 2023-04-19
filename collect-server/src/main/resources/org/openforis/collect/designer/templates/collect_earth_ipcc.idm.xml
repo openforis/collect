@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
-<survey lastId="2012496" created="2023-01-26T22:12:12.339+01:00" modified="2023-01-30T16:56:39.614+01:00" collectearth:bingKey="AjVg2KjkXqNtIcnLTZfIwahJATb-LGJigDTj1eCHBah5BTTgWU8rBQD0cTC8-6IA" collectearth:plotarea="0.5" collectearth:samplepoints="49" collectearth:openBingMaps="true" collect:target="CE" collect:collectVersion="4.0.69" xsi:schemaLocation="http://www.openforis.org/idml/3.0  &#9;&#9;https://raw.github.com/openforis/ollect/master/collect-core/src/main/resources/idml3.xsd       &#9;&#9;http://www.openforis.org/collect/3.0/ui  &#9;&#9;https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd" xmlns="http://www.openforis.org/idml/3.0" xmlns:collect="http://www.openforis.org/collect/3.0/collect" xmlns:ui="http://www.openforis.org/collect/3.0/ui" xmlns:collectearth="http://www.openforis.org/collect/3.0/collectearth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<survey lastId="2012623" created="2023-01-26T22:12:12.339+01:00" modified="2023-04-19T12:44:53.178+02:00" collectearth:bingKey="AjVg2KjkXqNtIcnLTZfIwahJATb-LGJigDTj1eCHBah5BTTgWU8rBQD0cTC8-6IA" collectearth:plotarea="0.5" collectearth:samplepoints="49" collectearth:openBingMaps="true" collect:target="CE" collect:collectVersion="4.0.82" xsi:schemaLocation="http://www.openforis.org/idml/3.0  &#9;&#9;https://raw.github.com/openforis/ollect/master/collect-core/src/main/resources/idml3.xsd       &#9;&#9;http://www.openforis.org/collect/3.0/ui  &#9;&#9;https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd" xmlns="http://www.openforis.org/idml/3.0" xmlns:collect="http://www.openforis.org/collect/3.0/collect" xmlns:ui="http://www.openforis.org/collect/3.0/ui" xmlns:collectearth="http://www.openforis.org/collect/3.0/collectearth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <project xml:lang="es">PLANTILLA - IPCC AFOLU 2000-2023 (cambiar nombre)</project>
   <project xml:lang="pt">MODELO - IPCC AFOLU 2000-2023 (alterar nome)</project>
   <project xml:lang="fr">MODÈLE - IPCC AFOLU 2000-2023 (changer le nom)</project>
   <project>TEMPLATE - IPCC AFOLU 2000-2023 (change name)</project>
-  <uri>http://www.openforis.org/idm/ipcc_template_2023</uri>
+  <uri>http://www.openforis.org/idm/fix_ipcc_template</uri>
   <description xml:lang="fr">Il s'agit de l'enquête standard qui devrait être utilisée pour les évaluations des données d'activité afin de se conformer aux lignes directrices proposées par le GIEC pour la représentation cohérente des terres.
 
 Vous pouvez ajouter d'autres questions à l'enquête ou modifier les codes des questions à choix multiples (à l'exception des catégories d'utilisation des terres et des conversions qui ne doivent pas être modifiées. Vous devez adapter les subdivisions d'utilisation des terres à votre situation nationale).
@@ -60,12 +60,6 @@ More on the IPCC Guidelines : https://www.ipcc-nggip.iges.or.jp/public/2006gl/pd
     <n0:label xml:lang="es">Cobertura</n0:label>
     <n0:label xml:lang="pt">Cobertura da terra</n0:label>
   </n0:tab>
-  <n0:tab name="tab_2012485">
-    <n0:label xml:lang="es">Bosque</n0:label>
-    <n0:label xml:lang="fr">Arbres</n0:label>
-    <n0:label xml:lang="en">Trees</n0:label>
-    <n0:label xml:lang="pt">&#193;rvores</n0:label>
-  </n0:tab>
   <n0:tab name="tab_63365">
     <n0:label xml:lang="en">LU 2023</n0:label>
     <n0:label xml:lang="fr">UT 2022</n0:label>
@@ -96,11 +90,11 @@ More on the IPCC Guidelines : https://www.ipcc-nggip.iges.or.jp/public/2006gl/pd
     <n0:label xml:lang="es">Series Temporal UT IPCC - valores calculados</n0:label>
     <n0:label xml:lang="pt">S&#233;rie temporal UT IPCC - valores calculados</n0:label>
   </n0:tab>
-  <n0:tab name="tab_1012">
-    <n0:label xml:lang="en">Disturbance</n0:label>
-    <n0:label xml:lang="fr">Perturbation</n0:label>
-    <n0:label xml:lang="es">Perturbaciones</n0:label>
-    <n0:label xml:lang="pt">Perturba&#231;&#227;o</n0:label>
+  <n0:tab name="tab_2012497">
+    <n0:label xml:lang="en">&#916; Forest Cover</n0:label>
+    <n0:label xml:lang="fr">&#916; Couvert forestier</n0:label>
+    <n0:label xml:lang="pt">&#916; Cobertura Florestal</n0:label>
+    <n0:label xml:lang="es">&#916; Cobertura Forestal</n0:label>
   </n0:tab>
   <n0:tab name="tab_1000154">
     <n0:label xml:lang="en">Comm.</n0:label>
@@ -130,7 +124,7 @@ The categories (Forest/Settlement/Cropland/Grassland/Wetland/Other) are FIXED AN
 DO NOT MODIFY THE CATEGORY/SUBDIVISON structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do the calculations of the yearly changes will not work.
 
 SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representation</description>
-<description xml:lang="fr">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
+      <description xml:lang="fr">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
 
 This codelist represents the Categories and Subdivisions (the conversions are defined in the land_use_conversions codelist ) necessary to classify each of the plots.
 
@@ -143,7 +137,7 @@ The categories (Forest/Settlement/Cropland/Grassland/Wetland/Other) are FIXED AN
 DO NOT MODIFY THE CATEGORY/SUBDIVISON structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do the calculations of the yearly changes will not work.
 
 SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representation</description>
-<description xml:lang="pt">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
+      <description xml:lang="pt">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
 
 This codelist represents the Categories and Subdivisions (the conversions are defined in the land_use_conversions codelist ) necessary to classify each of the plots.
 
@@ -156,7 +150,7 @@ The categories (Forest/Settlement/Cropland/Grassland/Wetland/Other) are FIXED AN
 DO NOT MODIFY THE CATEGORY/SUBDIVISON structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do the calculations of the yearly changes will not work.
 
 SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representation</description>
-<description xml:lang="es">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
+      <description xml:lang="es">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
 
 This codelist represents the Categories and Subdivisions (the conversions are defined in the land_use_conversions codelist ) necessary to classify each of the plots.
 
@@ -357,8 +351,7 @@ Asset ID : users/sanchezpaus/gez_2010_wgs84
 GEE Script code : 
 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
-
-<description xml:lang="fr">Global Ecological Zones (GEZ)
+      <description xml:lang="fr">Global Ecological Zones (GEZ)
 See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/
 
 Source FAO geonetwork https://data.apps.fao.org/map/catalog/srv/eng/catalog.search?id=47105&amp;fname=gez2010.zip&amp;access=private#/metadata/2fb209d0-fd34-4e5e-a3d8-a13c241eb61b
@@ -372,7 +365,7 @@ Asset ID : users/sanchezpaus/gez_2010_wgs84
 GEE Script code : 
 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
-<description xml:lang="es">Global Ecological Zones (GEZ)
+      <description xml:lang="es">Global Ecological Zones (GEZ)
 See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/
 
 Source FAO geonetwork https://data.apps.fao.org/map/catalog/srv/eng/catalog.search?id=47105&amp;fname=gez2010.zip&amp;access=private#/metadata/2fb209d0-fd34-4e5e-a3d8-a13c241eb61b
@@ -386,7 +379,7 @@ Asset ID : users/sanchezpaus/gez_2010_wgs84
 GEE Script code : 
 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
-<description xml:lang="pt">Global Ecological Zones (GEZ)
+      <description xml:lang="pt">Global Ecological Zones (GEZ)
 See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/
 
 Source FAO geonetwork https://data.apps.fao.org/map/catalog/srv/eng/catalog.search?id=47105&amp;fname=gez2010.zip&amp;access=private#/metadata/2fb209d0-fd34-4e5e-a3d8-a13c241eb61b
@@ -400,7 +393,6 @@ Asset ID : users/sanchezpaus/gez_2010_wgs84
 GEE Script code : 
 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
-
       <codingScheme scope="local" />
       <items>
         <item id="2012178">
@@ -617,7 +609,7 @@ For each category there is one remaining (Forest remaining Forest) and five chan
 DO NOT MODIFY THE CATEGORY/CONVERIOSN structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do, the calculations of the yearly changes will not work.
 
 SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representatio</description>
-<description xml:lang="es">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
+      <description xml:lang="es">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
 
 This codelist represents the Categories and Conversions (the land uses are defined in the land_uses codelist ) necessary to classify the LU transitions.
 
@@ -628,7 +620,7 @@ For each category there is one remaining (Forest remaining Forest) and five chan
 DO NOT MODIFY THE CATEGORY/CONVERIOSN structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do, the calculations of the yearly changes will not work.
 
 SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representatio</description>
-<description xml:lang="fr">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
+      <description xml:lang="fr">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
 
 This codelist represents the Categories and Conversions (the land uses are defined in the land_uses codelist ) necessary to classify the LU transitions.
 
@@ -639,7 +631,7 @@ For each category there is one remaining (Forest remaining Forest) and five chan
 DO NOT MODIFY THE CATEGORY/CONVERIOSN structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do, the calculations of the yearly changes will not work.
 
 SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representatio</description>
-<description xml:lang="pt">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
+      <description xml:lang="pt">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
 
 This codelist represents the Categories and Conversions (the land uses are defined in the land_uses codelist ) necessary to classify the LU transitions.
 
@@ -676,7 +668,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">TC &gt; E</label>
             <label xml:lang="pt">TA &gt; A</label>
             <label xml:lang="es">C &gt; A</label>
-            <description xml:lang="en">Crop Land becoming Settlement</description>
+            <description xml:lang="en">Cropland becoming Settlement</description>
             <description xml:lang="fr">Terres cultivees devenues Établissements</description>
             <description xml:lang="es">Tierra de cultivo convertida a Asentamiento</description>
           </item>
@@ -686,7 +678,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">TF &gt; E</label>
             <label xml:lang="pt">F &gt; A</label>
             <label xml:lang="es">F &gt; A</label>
-            <description xml:lang="en">Forest Land becoming Settlement</description>
+            <description xml:lang="en">Forest becoming Settlement</description>
             <description xml:lang="fr">Terres forestieres devenues Établissements</description>
             <description xml:lang="es">Tierra forestal convertida a Asentamiento</description>
           </item>
@@ -696,7 +688,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">P &gt; E</label>
             <label xml:lang="pt">P &gt; A</label>
             <label xml:lang="es">P &gt; A</label>
-            <description xml:lang="en">Grass Land becoming Settlement</description>
+            <description xml:lang="en">Grassland becoming Settlement</description>
             <description xml:lang="fr">Prairies devenues Établissements</description>
             <description xml:lang="es">Pastizal convertido a Asentamiento</description>
           </item>
@@ -706,7 +698,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">TH &gt; E</label>
             <label xml:lang="pt">U &gt; A</label>
             <label xml:lang="es">H &gt; A</label>
-            <description xml:lang="en">Wet Land becoming Settlement</description>
+            <description xml:lang="en">Wetland becoming Settlement</description>
             <description xml:lang="fr">Terres humides devenues Établissements</description>
             <description xml:lang="es">Humedal convertido a Asentamiento</description>
           </item>
@@ -716,7 +708,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">AT &gt; E</label>
             <label xml:lang="pt">O &gt; A</label>
             <label xml:lang="es">O &gt; A</label>
-            <description xml:lang="en">Other Land becoming Settlement</description>
+            <description xml:lang="en">Otherland becoming Settlement</description>
             <description xml:lang="fr">Autres terres devenues Établissements</description>
             <description xml:lang="es">Otra tierra convertida a Asentamiento</description>
           </item>
@@ -732,7 +724,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">TC &gt; TC</label>
             <label xml:lang="pt">TA &gt; TA</label>
             <label xml:lang="es">C &gt; C</label>
-            <description xml:lang="en">Crop Land remaining Crop Land</description>
+            <description xml:lang="en">Cropland remaining Cropland</description>
             <description xml:lang="fr">Terres cultivées terres restantes terres cultivées</description>
             <description xml:lang="es">Tierra de cultivo que se mantiene como Tierra de cultivo</description>
           </item>
@@ -742,7 +734,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">E &gt; TC</label>
             <label xml:lang="pt">A &gt; TA</label>
             <label xml:lang="es">A &gt; C</label>
-            <description xml:lang="en">Settlement becoming Crop Land</description>
+            <description xml:lang="en">Settlement becoming Cropland</description>
             <description xml:lang="fr">Établissements devenus des terres cultivées</description>
             <description xml:lang="es">Asentamiento convertido a Tierra de cultivo</description>
           </item>
@@ -752,7 +744,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">TF &gt; TC</label>
             <label xml:lang="pt">F &gt; TA</label>
             <label xml:lang="es">F &gt; C</label>
-            <description xml:lang="en">Forest Land becoming Crop Land</description>
+            <description xml:lang="en">Forest becoming Cropland</description>
             <description xml:lang="fr">Terres forestières devenues des terres cultivées</description>
             <description xml:lang="es">Tierra forestal convertida a Tierra de cultivo</description>
           </item>
@@ -762,7 +754,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">P &gt; TC</label>
             <label xml:lang="pt">P &gt; TA</label>
             <label xml:lang="es">P &gt; C</label>
-            <description xml:lang="en">Grass Land becoming Crop Land</description>
+            <description xml:lang="en">Grassland becoming Cropland</description>
             <description xml:lang="fr">Prairies devenues des terres cultivées</description>
             <description xml:lang="es">Pastizal convertido a Tierra de cultivo</description>
           </item>
@@ -772,7 +764,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">TH &gt; TC</label>
             <label xml:lang="pt">U &gt; TA</label>
             <label xml:lang="es">H &gt; C</label>
-            <description xml:lang="en">Wet Land becoming Crop Land</description>
+            <description xml:lang="en">Wetland becoming Cropland</description>
             <description xml:lang="fr">Terres humides devenues des terres cultivées</description>
             <description xml:lang="es">Humedal convertido a Tierra de cultivo</description>
           </item>
@@ -782,7 +774,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">AT &gt; TC</label>
             <label xml:lang="pt">O &gt; TA</label>
             <label xml:lang="es">O &gt; C</label>
-            <description xml:lang="en">Other Land becoming Crop Land</description>
+            <description xml:lang="en">Otherland becoming Cropland</description>
             <description xml:lang="fr">Autres terres devenues des terres cultivées</description>
             <description xml:lang="es">Otra tierra convertida a Tierra de cultivo</description>
           </item>
@@ -798,7 +790,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">TF &gt; TF</label>
             <label xml:lang="pt">F &gt; F</label>
             <label xml:lang="es">F &gt; F</label>
-            <description xml:lang="en">Forest Land remaining Forest Land</description>
+            <description xml:lang="en">Forest remaining Forest</description>
             <description xml:lang="fr">Terres forestières restantes terres forestières</description>
             <description xml:lang="es">Tierra forestal que se mantiene como Tierra Forestal</description>
           </item>
@@ -808,7 +800,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">E &gt; TF</label>
             <label xml:lang="pt">A &gt; F</label>
             <label xml:lang="es">A &gt; F</label>
-            <description xml:lang="en">Settlement becoming Forest Land</description>
+            <description xml:lang="en">Settlement becoming Forest</description>
             <description xml:lang="fr">Établissements devenus des terres forestières</description>
             <description xml:lang="es">Asentamiento convertido a Tierra Forestal</description>
           </item>
@@ -818,7 +810,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">TC &gt; TF</label>
             <label xml:lang="pt">TA &gt; F</label>
             <label xml:lang="es">C &gt; F</label>
-            <description xml:lang="en">Crop Land becoming Forest Land</description>
+            <description xml:lang="en">Cropland becoming Forest</description>
             <description xml:lang="fr">Terres cultivées devenues terres forestières</description>
             <description xml:lang="es">Tierra de cultivo convertida a Tierra Forestal</description>
           </item>
@@ -828,7 +820,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">P &gt; TF</label>
             <label xml:lang="pt">P &gt; F</label>
             <label xml:lang="es">P &gt; F</label>
-            <description xml:lang="en">Grass Land becoming Forest Land</description>
+            <description xml:lang="en">Grassland becoming Forest</description>
             <description xml:lang="fr">Prairies devenues des terres forestières</description>
             <description xml:lang="es">Pastizal convertida a Tierra Forestal</description>
           </item>
@@ -838,7 +830,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">TH &gt; TF</label>
             <label xml:lang="pt">U &gt; F</label>
             <label xml:lang="es">H &gt; F</label>
-            <description xml:lang="en">Wet Land becoming Forest Land</description>
+            <description xml:lang="en">Wetland becoming Forest</description>
             <description xml:lang="fr">Terres humides devenues des terres forestières</description>
             <description xml:lang="es">Humedal convertido a Tierra Forestal</description>
           </item>
@@ -848,7 +840,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">AT &gt; TF</label>
             <label xml:lang="pt">O &gt; F</label>
             <label xml:lang="es">O &gt; F</label>
-            <description xml:lang="en">Other Land becoming Forest Land</description>
+            <description xml:lang="en">Otherland becoming Forest</description>
             <description xml:lang="fr">Autres terres devenues terres forestières</description>
             <description xml:lang="es">Otras tierras convertida a Tierra Forestal</description>
           </item>
@@ -864,7 +856,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">P &gt; P</label>
             <label xml:lang="pt">P &gt; P</label>
             <label xml:lang="es">P &gt; P</label>
-            <description xml:lang="en">Grass Land remaining Grass Land</description>
+            <description xml:lang="en">Grassland remaining Grassland</description>
             <description xml:lang="fr">Prairies restantes prairies</description>
             <description xml:lang="es">Pastizal que se mantiene como Pastizal</description>
           </item>
@@ -874,7 +866,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">E &gt; P</label>
             <label xml:lang="pt">A &gt; P</label>
             <label xml:lang="es">A &gt; P</label>
-            <description xml:lang="en">Settlement becoming Grass Land</description>
+            <description xml:lang="en">Settlement becoming Grassland</description>
             <description xml:lang="fr">Établissements devenus prairies</description>
             <description xml:lang="es">Asentamiento convertido a Pastizal</description>
           </item>
@@ -884,7 +876,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">TC &gt; P</label>
             <label xml:lang="pt">TA &gt; P</label>
             <label xml:lang="es">C &gt; P</label>
-            <description xml:lang="en">Crop Land becoming Grass Land</description>
+            <description xml:lang="en">Cropland becoming Grassland</description>
             <description xml:lang="fr">Terres cultivees devenues prairies</description>
             <description xml:lang="es">Tierra de cultivo convertida a Pastizal</description>
           </item>
@@ -894,7 +886,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">TF &gt; P</label>
             <label xml:lang="pt">F &gt; P</label>
             <label xml:lang="es">F &gt; P</label>
-            <description xml:lang="en">Forest Land becoming Grass Land</description>
+            <description xml:lang="en">Forest becoming Grassland</description>
             <description xml:lang="fr">Terres forestieres devenues prairies</description>
             <description xml:lang="es">Tierra forestal convertida a Pastizal</description>
           </item>
@@ -904,7 +896,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">TH &gt; P</label>
             <label xml:lang="pt">U &gt; P</label>
             <label xml:lang="es">H &gt; P</label>
-            <description xml:lang="en">Wet Land becoming Grass Land</description>
+            <description xml:lang="en">Wetland becoming Grassland</description>
             <description xml:lang="fr">Terres humides devenues prairies</description>
             <description xml:lang="es">Humedal convertido a Pastizal</description>
           </item>
@@ -914,7 +906,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">AT &gt; P</label>
             <label xml:lang="pt">O &gt; P</label>
             <label xml:lang="es">O &gt; P</label>
-            <description xml:lang="en">Other Land becoming Grass Land</description>
+            <description xml:lang="en">Otherland becoming Grassland</description>
             <description xml:lang="fr">Autres terres devenues prairies</description>
             <description xml:lang="es">Otra tierra convertida a Pastizal</description>
           </item>
@@ -930,7 +922,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">TH &gt; TH</label>
             <label xml:lang="pt">U &gt; U</label>
             <label xml:lang="es">H &gt; H</label>
-            <description xml:lang="en">Wet Land remaining Wet Land</description>
+            <description xml:lang="en">Wetland remaining Wetland</description>
             <description xml:lang="fr">Terres humides restantes terres humides</description>
             <description xml:lang="es">Humedal que se mantiene como Humedal</description>
           </item>
@@ -940,7 +932,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">E &gt; TH</label>
             <label xml:lang="pt">A &gt; U</label>
             <label xml:lang="es">A &gt; H</label>
-            <description xml:lang="en">Settlement becoming Wet Land</description>
+            <description xml:lang="en">Settlement becoming Wetland</description>
             <description xml:lang="fr">Établissements devenus terres humides</description>
             <description xml:lang="es">Asentamiento convertido a Humedal</description>
           </item>
@@ -950,7 +942,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">TC &gt; TH</label>
             <label xml:lang="pt">TA &gt; U</label>
             <label xml:lang="es">C &gt; H</label>
-            <description xml:lang="en">Crop Land becoming Wet Land</description>
+            <description xml:lang="en">Cropland becoming Wetland</description>
             <description xml:lang="fr">Terres cultivees devenues terres humides</description>
             <description xml:lang="es">Tierra de cultivo convertida a Humedal</description>
           </item>
@@ -960,7 +952,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">TF &gt; TH</label>
             <label xml:lang="pt">F &gt; U</label>
             <label xml:lang="es">F &gt; H</label>
-            <description xml:lang="en">Forest Land becoming Wet Land</description>
+            <description xml:lang="en">Forest becoming Wetland</description>
             <description xml:lang="fr">Terres forestieres devenues terres humides</description>
             <description xml:lang="es">Tierra forestal convertida a Humedal</description>
           </item>
@@ -970,7 +962,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">P &gt; TH</label>
             <label xml:lang="pt">P &gt; U</label>
             <label xml:lang="es">P &gt; H</label>
-            <description xml:lang="en">Grass Land becoming Wet Land</description>
+            <description xml:lang="en">Grassland becoming Wetland</description>
             <description xml:lang="fr">Prairies devenues terres humides</description>
             <description xml:lang="es">Pastizal convertido a Humedal</description>
           </item>
@@ -980,7 +972,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">AT &gt; TH</label>
             <label xml:lang="pt">O &gt; P</label>
             <label xml:lang="es">O &gt; P</label>
-            <description xml:lang="en">Other Land becoming Wet Land</description>
+            <description xml:lang="en">Otherland becoming Wetland</description>
             <description xml:lang="fr">Autres terres devenues terres humides</description>
             <description xml:lang="es">Otra tierra convertida a Humedal</description>
           </item>
@@ -996,7 +988,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">AT &gt; AT</label>
             <label xml:lang="pt">O &gt; O</label>
             <label xml:lang="es">O &gt; O</label>
-            <description xml:lang="en">Other Land remaining Other Land</description>
+            <description xml:lang="en">Otherland remaining Otherland</description>
             <description xml:lang="fr">Autres terres restantes Autres terres</description>
             <description xml:lang="es">Otra tierra que se mantiene como Otra tierra</description>
           </item>
@@ -1006,7 +998,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">E &gt; AT</label>
             <label xml:lang="pt">A &gt; O</label>
             <label xml:lang="es">A &gt; O</label>
-            <description xml:lang="en">Settlement becoming Other Land</description>
+            <description xml:lang="en">Settlement becoming Otherland</description>
             <description xml:lang="fr">Établissements devenus d'autres terres</description>
             <description xml:lang="es">Asentamiento convertido a Otra tierra</description>
           </item>
@@ -1016,7 +1008,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">TC &gt; AT</label>
             <label xml:lang="pt">TA &gt; O</label>
             <label xml:lang="es">C &gt; O</label>
-            <description xml:lang="en">Crop Land becoming Other Land</description>
+            <description xml:lang="en">Cropland becoming Otherland</description>
             <description xml:lang="fr">Terres cultivées devenues d'autres terres</description>
             <description xml:lang="es">Tierra de cultivo convertida a Otra tierra</description>
           </item>
@@ -1026,7 +1018,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">TF &gt; AT</label>
             <label xml:lang="pt">F &gt; O</label>
             <label xml:lang="es">F &gt; O</label>
-            <description xml:lang="en">Forest Land becoming Other Land</description>
+            <description xml:lang="en">Forest becoming Otherland</description>
             <description xml:lang="fr">Forest devenues d'autres terres</description>
             <description xml:lang="es">Tierra forestal convertida a Otra tierra</description>
           </item>
@@ -1036,7 +1028,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">P &gt; AT</label>
             <label xml:lang="pt">P &gt; O</label>
             <label xml:lang="es">P &gt; O</label>
-            <description xml:lang="en">Grass Land becoming Other Land</description>
+            <description xml:lang="en">Grassland becoming Otherland</description>
             <description xml:lang="fr">Prairies devenues d'autres terres</description>
             <description xml:lang="es">Pastizal convertido a Otra tierra</description>
           </item>
@@ -1046,7 +1038,7 @@ SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_L
             <label xml:lang="fr">TH &gt; AT</label>
             <label xml:lang="pt">U &gt; O</label>
             <label xml:lang="es">H &gt; O</label>
-            <description xml:lang="en">Wet Land becoming Other Land</description>
+            <description xml:lang="en">Wetland becoming Otherland</description>
             <description xml:lang="fr">Terres humides devenues d'autres terres</description>
             <description xml:lang="es">Humedal convertido a Otra tierra</description>
           </item>
@@ -1147,24 +1139,21 @@ The user counts the number of dots that fall within certain land use/land cover/
 For plots with 49 dots (7x7). In case of using other type of plots like 5x5 (25 dots) modify the codelist accordingly.
 
 In the case of 49 dots plots, the user is asked to specify the number of plots if less than 5 fall within a land use/cover. Otherwise the user chooses between ranges. The reasoning for this is to improve the speed of the assessment. If other approach is preferred you should change the codelist accordingly.</description>
-<description xml:lang="es">Classes of cover within the plot. 
+      <description xml:lang="es">Classes of cover within the plot. 
 The user counts the number of dots that fall within certain land use/land cover/element to classify the plot.
 For plots with 49 dots (7x7). In case of using other type of plots like 5x5 (25 dots) modify the codelist accordingly.
 
 In the case of 49 dots plots, the user is asked to specify the number of plots if less than 5 fall within a land use/cover. Otherwise the user chooses between ranges. The reasoning for this is to improve the speed of the assessment. If other approach is preferred you should change the codelist accordingly.</description>
-
-<description xml:lang="fr">Classes of cover within the plot. 
+      <description xml:lang="fr">Classes of cover within the plot. 
 The user counts the number of dots that fall within certain land use/land cover/element to classify the plot.
 For plots with 49 dots (7x7). In case of using other type of plots like 5x5 (25 dots) modify the codelist accordingly.
 
 In the case of 49 dots plots, the user is asked to specify the number of plots if less than 5 fall within a land use/cover. Otherwise the user chooses between ranges. The reasoning for this is to improve the speed of the assessment. If other approach is preferred you should change the codelist accordingly.</description>
-
-<description xml:lang="pt">Classes of cover within the plot. 
+      <description xml:lang="pt">Classes of cover within the plot. 
 The user counts the number of dots that fall within certain land use/land cover/element to classify the plot.
 For plots with 49 dots (7x7). In case of using other type of plots like 5x5 (25 dots) modify the codelist accordingly.
 
 In the case of 49 dots plots, the user is asked to specify the number of plots if less than 5 fall within a land use/cover. Otherwise the user chooses between ranges. The reasoning for this is to improve the speed of the assessment. If other approach is preferred you should change the codelist accordingly.</description>
-
       <items>
         <item id="2012323">
           <code>na</code>
@@ -1263,78 +1252,6 @@ In the case of 49 dots plots, the user is asked to specify the number of plots i
           <label xml:lang="fr">45-49 Points</label>
           <label xml:lang="pt">45-49  Pontos</label>
           <label xml:lang="es">45-49 puntos</label>
-        </item>
-      </items>
-    </list>
-    <list id="146" name="disturbance_types">
-      <label type="item" xml:lang="en">Disturbances</label>
-      <label type="list" xml:lang="en">Human Impact Types</label>
-      <label type="item" xml:lang="fr">Perturbations</label>
-      <label type="item" xml:lang="es">Perturbaciones</label>
-      <description xml:lang="en">List of possible anthropogenic disturbances. Modify to adapt to your country conditions.</description>
-      <description xml:lang="es">Lista de posibles perturbaciones antropogénicas. Modifique para adaptarse a las condiciones de su país.</description>
-      <description xml:lang="fr">Liste des perturbations anthropiques possibles. Modifiez pour vous adapter aux conditions de votre pays.</description>
-      <description xml:lang="pt">Lista de possíveis distúrbios antropogênicos. Modifique para se adaptar às condições do seu país.</description>
-      <items>
-        <item id="2012170">
-          <code>fire</code>
-          <label xml:lang="en">Fire</label>
-          <label xml:lang="fr">Incendie - Feu</label>
-          <label xml:lang="pt">Fogo</label>
-          <label xml:lang="es">Fuego</label>
-        </item>
-        <item id="2012171">
-          <code>logging</code>
-          <label xml:lang="en">Logging</label>
-          <label xml:lang="fr">Exploitation Forestiere</label>
-          <label xml:lang="pt">Exploração madeireira</label>
-          <label xml:lang="es">Tala</label>
-        </item>
-        <item id="2012172">
-          <code>grazing</code>
-          <label xml:lang="en">Grazing</label>
-          <label xml:lang="fr">Paturage</label>
-          <label xml:lang="pt">Pasto</label>
-          <label xml:lang="es">Pasto</label>
-        </item>
-        <item id="2012173">
-          <code>crops</code>
-          <label xml:lang="en">Permanent crops</label>
-          <label xml:lang="fr">Exploitation agricole</label>
-          <label xml:lang="pt">Safras permanentes</label>
-          <label xml:lang="es">Cultivos permanentes</label>
-        </item>
-        <item id="2012174">
-          <code>path</code>
-          <label xml:lang="en">Paths</label>
-          <label xml:lang="fr">Piste</label>
-          <label xml:lang="pt">Caminhos</label>
-          <label xml:lang="es">Caminos</label>
-        </item>
-        <item id="2012175">
-          <code>settlement</code>
-          <label xml:lang="en">Settlement</label>
-          <label xml:lang="fr">Etablissements et infrastructures</label>
-          <label xml:lang="pt">Assentamento</label>
-          <label xml:lang="es">Asentamiento</label>
-          <description xml:lang="en">Any type of settlement ( mine, road, roads, infrastructures, urban areas) that impacts the plot</description>
-          <description xml:lang="fr">Tout type d'implantation (mine, route, routes, infrastructures, zones urbaines) qui impacte la parcelle</description>
-          <description xml:lang="pt">Qualquer tipo de assentamento (mina, estrada, estradas, infraestruturas, áreas urbanas) que impacte o lote</description>
-          <description xml:lang="es">Cualquier tipo de asentamiento (mina, camino, caminos, infraestructuras, áreas urbanas) que impacte la parcela</description>
-        </item>
-        <item id="2012176">
-          <code>other_human_impact</code>
-          <label xml:lang="en">Other</label>
-          <label xml:lang="fr">Autre</label>
-          <label xml:lang="pt">Outros</label>
-          <label xml:lang="es">Otro</label>
-        </item>
-        <item id="2012177">
-          <code>none</code>
-          <label xml:lang="en">None</label>
-          <label xml:lang="fr">Rien</label>
-          <label xml:lang="pt">Nenhum</label>
-          <label xml:lang="es">Ninguno</label>
         </item>
       </items>
     </list>
@@ -1909,7 +1826,6 @@ In the case of 49 dots plots, the user is asked to specify the number of plots i
     <list id="1616" name="slope_classes">
       <label type="item" xml:lang="en">Slope ranges</label>
       <label type="item" xml:lang="fr">Gammes de pente</label>
-      <label type="item" xml:lang="es">Rangos de pendiente</label>
       <label type="item" xml:lang="es">Raixas de inclinação</label>
       <codingScheme scope="local" />
       <items>
@@ -2207,7 +2123,7 @@ Asset ID : users/sanchezpaus/SOIL_TYPE_rst
 GEE Script code : 
 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanc</description>
-     <description xml:lang="es">Soil Map From the JRC Support to Renewable Energy Directive
+      <description xml:lang="es">Soil Map From the JRC Support to Renewable Energy Directive
 
 http://esdac.jrc.ec.europa.eu/content/support-renewable-energy-directive#tabs-0-description=0
 
@@ -2235,7 +2151,7 @@ Asset ID : users/sanchezpaus/SOIL_TYPE_rst
 GEE Script code : 
 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanc</description>
-     <description xml:lang="fr">Soil Map From the JRC Support to Renewable Energy Directive
+      <description xml:lang="fr">Soil Map From the JRC Support to Renewable Energy Directive
 
 http://esdac.jrc.ec.europa.eu/content/support-renewable-energy-directive#tabs-0-description=0
 
@@ -2263,7 +2179,7 @@ Asset ID : users/sanchezpaus/SOIL_TYPE_rst
 GEE Script code : 
 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanc</description>
-     <description xml:lang="pt">Soil Map From the JRC Support to Renewable Energy Directive
+      <description xml:lang="pt">Soil Map From the JRC Support to Renewable Energy Directive
 
 http://esdac.jrc.ec.europa.eu/content/support-renewable-energy-directive#tabs-0-description=0
 
@@ -2420,7 +2336,7 @@ Asset ID : users/collectearth/IPCC/ipcc_climate_1985-2015_remapped_for_surveys
 GEE Script code : 
 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
-<description xml:lang="es">IPCC Climate Zones 1985-2015 Updated demonstration of the world climate zones described by IPCC in 2019. Download full dataset here : https://www.ipcc-nggip.iges.or.jp/faq/img/IPCC_Climate_Zones_Map_raster.zip
+      <description xml:lang="es">IPCC Climate Zones 1985-2015 Updated demonstration of the world climate zones described by IPCC in 2019. Download full dataset here : https://www.ipcc-nggip.iges.or.jp/faq/img/IPCC_Climate_Zones_Map_raster.zip
 
 1 WTM Warm Temperate Moist
 2 WTD Warm Temperate Dry
@@ -2442,7 +2358,7 @@ Asset ID : users/collectearth/IPCC/ipcc_climate_1985-2015_remapped_for_surveys
 GEE Script code : 
 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
-<description xml:lang="fr">IPCC Climate Zones 1985-2015 Updated demonstration of the world climate zones described by IPCC in 2019. Download full dataset here : https://www.ipcc-nggip.iges.or.jp/faq/img/IPCC_Climate_Zones_Map_raster.zip
+      <description xml:lang="fr">IPCC Climate Zones 1985-2015 Updated demonstration of the world climate zones described by IPCC in 2019. Download full dataset here : https://www.ipcc-nggip.iges.or.jp/faq/img/IPCC_Climate_Zones_Map_raster.zip
 
 1 WTM Warm Temperate Moist
 2 WTD Warm Temperate Dry
@@ -2464,7 +2380,7 @@ Asset ID : users/collectearth/IPCC/ipcc_climate_1985-2015_remapped_for_surveys
 GEE Script code : 
 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
-<description xml:lang="pt">IPCC Climate Zones 1985-2015 Updated demonstration of the world climate zones described by IPCC in 2019. Download full dataset here : https://www.ipcc-nggip.iges.or.jp/faq/img/IPCC_Climate_Zones_Map_raster.zip
+      <description xml:lang="pt">IPCC Climate Zones 1985-2015 Updated demonstration of the world climate zones described by IPCC in 2019. Download full dataset here : https://www.ipcc-nggip.iges.or.jp/faq/img/IPCC_Climate_Zones_Map_raster.zip
 
 1 WTM Warm Temperate Moist
 2 WTD Warm Temperate Dry
@@ -2629,31 +2545,6 @@ GEE Script code :
         </item>
       </items>
     </list>
- 
-    <list id="63401" name="grassland_management">
-      <label type="item" xml:lang="en">Grassland Management</label>
-      <label type="item" xml:lang="fr">Gestion des prairies</label>
-      <label type="item" xml:lang="pt">Manejo de Pastagens</label>
-      <label type="item" xml:lang="es">Gestión de pastizales</label>
-      <codingScheme scope="local" />
-      <items>
-        <item id="63526">
-          <code>grazing_natural</code>
-          <label xml:lang="en">Grazing / Naturally growing</label>
-          <label xml:lang="fr">Pâturage</label>
-          <label xml:lang="es">Pastoreo / Crecimiento natural</label>
-          <label xml:lang="pt">Pastoreio / Crescimento natural</label>
-          <description xml:lang="fr">Zone pâturée a croissance naturelle</description>
-        </item>
-        <item id="63528">
-          <code>no_grazing</code>
-          <label xml:lang="en">No Grazing</label>
-          <label xml:lang="fr">Pas de pâturage</label>
-          <label xml:lang="es">Sin pastoreo</label>
-          <label xml:lang="pt">Sem pastoreio</label>
-        </item>
-      </items>
-    </list>
     <list id="2006650" name="plot_type">
       <label type="item" xml:lang="en">Distribution of land use in the plot</label>
       <label type="item" xml:lang="fr">Distribution de l'occupation des sols dans la parcelle</label>
@@ -2682,6 +2573,135 @@ GEE Script code :
           <description xml:lang="fr">La parcelle est couverte par plusieurs utilisations des terres, par exemple, la parcelle se situe entre une forêt et une zone agricole</description>
           <description xml:lang="pt">O lote é coberto por múltiplos Usos do Solo, por exemplo, o lote fica entre uma floresta e uma área agrícola</description>
           <description xml:lang="es">La parcela está cubierta por múltiples Usos de la Tierra, por ejemplo, la parcela se encuentra entre un bosque y un área agrícola</description>
+        </item>
+      </items>
+    </list>
+    <list id="2012498" name="drivers">
+      <label type="item" xml:lang="es">Agentes de deforestación</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2012534">
+          <code>logging</code>
+          <label xml:lang="en">Logging</label>
+          <label xml:lang="fr">Abattage</label>
+          <label xml:lang="pt">Desmatamento</label>
+          <label xml:lang="es">Tala</label>
+        </item>
+        <item id="2012535">
+          <code>agro_burning</code>
+          <label xml:lang="en">Agricultural burning</label>
+          <label xml:lang="fr">Brûlage agricole</label>
+          <label xml:lang="pt">Queima agrícola</label>
+          <label xml:lang="es">Quema agropecuaria</label>
+        </item>
+        <item id="2012536">
+          <code>forest_fire</code>
+          <label xml:lang="en">Forest fire</label>
+          <label xml:lang="fr">Incendie de forêt</label>
+          <label xml:lang="pt">Incêndio florestal</label>
+          <label xml:lang="es">Incendio forestal</label>
+        </item>
+      </items>
+    </list>
+    <list id="2012503" name="forest_dynamics">
+      <label type="item" xml:lang="es">Dinamica forestal</label>
+      <codingScheme scope="local" />
+      <hierarchy>
+        <level name="dinamica" />
+        <level name="categoria" />
+      </hierarchy>
+      <items>
+        <item id="2012537">
+          <code>none</code>
+          <label xml:lang="en">No Changes</label>
+          <label xml:lang="fr">Aucun changement</label>
+          <label xml:lang="pt">Sem alterações</label>
+          <label xml:lang="es">Sin cambio</label>
+        </item>
+        <item id="2012538">
+          <code>degradation</code>
+          <label xml:lang="en">Degradation</label>
+          <label xml:lang="fr">Dégradation</label>
+          <label xml:lang="pt">Degradação</label>
+          <label xml:lang="es">Degradación</label>
+          <item id="2012539">
+            <code>fire</code>
+            <label xml:lang="en">Fires</label>
+            <label xml:lang="fr">Feux</label>
+            <label xml:lang="pt">Incêndios</label>
+            <label xml:lang="es">Incendios</label>
+          </item>
+          <item id="2012540">
+            <code>logging</code>
+            <label xml:lang="en">Logging</label>
+            <label xml:lang="fr">Abbattage</label>
+            <label xml:lang="pt">Desmatamento</label>
+            <label xml:lang="es">Tala</label>
+          </item>
+          <item id="2012541">
+            <code>pests</code>
+            <label xml:lang="en">Pests</label>
+            <label xml:lang="fr">Peste</label>
+            <label xml:lang="pt">Plaga</label>
+            <label xml:lang="es">Plaga</label>
+          </item>
+          <item id="2012542">
+            <code>cattle</code>
+            <label xml:lang="en">Cattle raising</label>
+            <label xml:lang="fr">Élevage de bétail</label>
+            <label xml:lang="pt">Ganadería</label>
+            <label xml:lang="es">Ganadería</label>
+          </item>
+          <item id="2012543">
+            <code>agriculture</code>
+            <label xml:lang="en">Agriculture</label>
+            <label xml:lang="fr">Agriculture</label>
+            <label xml:lang="pt">Agricultura</label>
+            <label xml:lang="es">Agricultura</label>
+          </item>
+          <item id="2012544">
+            <code>paths</code>
+            <label xml:lang="en">Roads</label>
+            <label xml:lang="fr">Routes</label>
+            <label xml:lang="pt">Caminhos</label>
+            <label xml:lang="es">Caminos</label>
+          </item>
+          <item id="2012545">
+            <code>settlements</code>
+            <label xml:lang="en">Settlements</label>
+            <label xml:lang="fr">Expansion urbaine</label>
+            <label xml:lang="pt">Asentamientos</label>
+            <label xml:lang="es">Asentamientos</label>
+          </item>
+          <item id="2012546">
+            <code>climate</code>
+            <label xml:lang="en">Cyclone / Flood / Weather Events</label>
+            <label xml:lang="fr">Cyclone / Inondation / Événements météorologiques</label>
+            <label xml:lang="pt">Ciclone / Inundação / Eventos Meteorológicos</label>
+            <label xml:lang="es">Ciclón / Inundación / Eventos meteorológicos</label>
+          </item>
+        </item>
+        <item id="2012547">
+          <code>reforestation</code>
+          <label xml:lang="en">Recovery/Reforestation</label>
+          <label xml:lang="fr">Récupération/Reboisement</label>
+          <label xml:lang="pt">Recuperação/Reflorestamento</label>
+          <label xml:lang="es">Recuperación de la Degradación</label>
+          <item id="2012548">
+            <code>natural</code>
+            <label xml:lang="en">Natural</label>
+            <label xml:lang="fr">Naturel</label>
+            <label xml:lang="pt">Natural</label>
+            <label xml:lang="es">Natural</label>
+          </item>
+          <item id="2012549">
+            <code>antropogenic</code>
+            <label xml:lang="en">Anthropogenic</label>
+            <label xml:lang="fr">Anthropique</label>
+            <label xml:lang="pt">Antropogénica</label>
+            <label xml:lang="es">Antropogénica</label>
+            <description xml:lang="es">Incentivos INAB, Prácticas de Conservación en Áreas Protegidas, Proyectos REDD+</description>
+          </item>
         </item>
       </items>
     </list>
@@ -2723,7 +2743,7 @@ Estos valores provienen del archivo CSV con la malla de parcelas (diseño de mue
       </text>
       <code id="4614" name="round" required="true" ui:tab="tab_10007" collect:measurement="true" key="true" list="assessment_phases">
         <label type="instance" xml:lang="en">Plot - Assessment phase</label>
-        <label type="instance" xml:lang="fr">Placette - Phase d’évaluation </label>
+        <label type="instance" xml:lang="fr">Placette - Phase d’évaluation</label>
         <label type="instance" xml:lang="es">Parcela - Ronda de evaluación</label>
         <label type="instance" xml:lang="pt">Parcela- Fase de avaliação</label>
         <description xml:lang="en">Combined with the plot ID generates the Unique Identifier of the plot. The value of this attribute comes from the CSV with the plot grids (sampling design).
@@ -2737,7 +2757,7 @@ Utilizar el valor 1 "Primera evaluación" para la primera vez que se evalúa la 
       </code>
       <coordinate id="3" name="location" ui:tab="tab_10007">
         <label type="instance" xml:lang="en">Plot - Central point coordinates</label>
-        <label type="instance" xml:lang="fr">Placette - Coordonnées du point central </label>
+        <label type="instance" xml:lang="fr">Placette - Coordonnées du point central</label>
         <label type="instance" xml:lang="es">Parcela - Coordenadas punto central</label>
         <label type="instance" xml:lang="pt">Parcela - Coordenadas do ponto central</label>
         <description xml:lang="en">Location of the center point of the plot. This value comes from the CSV with the sampling design. DO NOT REMOVE!
@@ -2764,42 +2784,42 @@ NE PAS ENLEVER!</description>
 Este nome vem da janela principal do Collect Earth onde o usuário deve preencher um nome quando o programa iniciar.
 NÃO REMOVA!</description>
       </text>
-      <number id="1999990" name="settlement_percentage" relevant="false()" ui:hide="true" calculated="true" type="integer">
+      <number id="1999990" name="settlement_percentage" ui:hide="true" calculated="true" type="integer">
         <label type="instance" xml:lang="en">Land cover - Percentage of Settlement</label>
         <label type="reporting" xml:lang="en">Land cover - Percentage of Settlement</label>
         <label type="instance" xml:lang="fr">Couverture terrestre - Pourcentage Etablissements</label>
         <label type="instance" xml:lang="es">Cobertura de la parcela - UT Asentamiento</label>
         <default expr="land_use[lu='S']/percentage" />
       </number>
-      <number id="1999991" name="cropland_percentage" relevant="false()" ui:hide="true" calculated="true" type="integer">
+      <number id="1999991" name="cropland_percentage" ui:hide="true" calculated="true" type="integer">
         <label type="instance" xml:lang="en">Land cover - Percentage of Cropland</label>
         <label type="reporting" xml:lang="en">Land cover - Percentage of Cropland</label>
-        <label type="instance" xml:lang="fr">Couverture terrestre - Pourcentage Terres cultivées </label>
+        <label type="instance" xml:lang="fr">Couverture terrestre - Pourcentage Terres cultivées</label>
         <label type="instance" xml:lang="es">Cobertura de la parcela - UT Cultivo</label>
         <default expr="land_use[lu='C']/percentage" />
       </number>
-      <number id="1999992" name="forest_percentage" relevant="false()" ui:hide="true" calculated="true" type="integer">
+      <number id="1999992" name="forest_percentage" ui:hide="true" calculated="true" type="integer">
         <label type="instance" xml:lang="en">Land cover - Percentage of Forest</label>
         <label type="reporting" xml:lang="en">Land cover - Percentage of Forest</label>
         <label type="instance" xml:lang="fr">Couverture terrestre - Pourcentage Forets</label>
         <label type="instance" xml:lang="es">Cobertura de la parcela - UT Bosque</label>
         <default expr="land_use[lu='F']/percentage" />
       </number>
-      <number id="1999993" name="grassland_percentage" relevant="false()" ui:hide="true" calculated="true" type="integer">
+      <number id="1999993" name="grassland_percentage" ui:hide="true" calculated="true" type="integer">
         <label type="instance" xml:lang="en">Land cover - Percentage of Grassland</label>
         <label type="reporting" xml:lang="en">Land cover - Percentage of Grassland</label>
-        <label type="instance" xml:lang="fr">Couverture terrestre - Pourcentage Prairies </label>
+        <label type="instance" xml:lang="fr">Couverture terrestre - Pourcentage Prairies</label>
         <label type="instance" xml:lang="es">Cobertura de la parcela - UT Pastizal</label>
         <default expr="land_use[lu='G']/percentage" />
       </number>
-      <number id="1999994" name="wetland_percentage" relevant="false()" ui:hide="true" calculated="true" type="integer">
+      <number id="1999994" name="wetland_percentage" ui:hide="true" calculated="true" type="integer">
         <label type="instance" xml:lang="en">Land cover - Percentage of Wetland</label>
         <label type="reporting" xml:lang="en">Land cover - Percentage of Wetland</label>
         <label type="instance" xml:lang="fr">Couverture terrestre - Pourcentage Terres Humides</label>
         <label type="instance" xml:lang="es">Cobertura de la parcela - UT Humedal</label>
         <default expr="land_use[lu='W']/percentage" />
       </number>
-      <number id="1999995" name="otherland_percentage" relevant="false()" ui:hide="true" calculated="true" type="integer">
+      <number id="1999995" name="otherland_percentage" ui:hide="true" calculated="true" type="integer">
         <label type="instance" xml:lang="en">Land cover - Percentage of Otherland</label>
         <label type="reporting" xml:lang="en">Land cover - Percentage of Otherland</label>
         <label type="instance" xml:lang="fr">Couverture terrestre - Pourcentage Autres terres</label>
@@ -2812,7 +2832,7 @@ NÃO REMOVA!</description>
         <label type="reporting" xml:lang="en">LU - Land Use 2023</label>
         <label type="reporting" xml:lang="fr">UT - Land Use 2023</label>
         <label type="reporting" xml:lang="pt">UT - Uso da terra 2023</label>
-        <label type="reporting" xml:lang="es">UT - Uso de la tierra 2023</label>                
+        <label type="reporting" xml:lang="es">UT - Uso de la tierra 2023</label>
         <label type="instance" xml:lang="es">Uso de la tierra 2023</label>
         <label type="instance" xml:lang="pt">Uso da terra 2023</label>
         <description xml:lang="en">Calculated automatically by Collect using the percentages of the different Land Uses in the plot (in case of multiple LU).
@@ -2823,12 +2843,12 @@ Verifique o "Calculate Value Expressions" para a lógica do cálculo.</descripti
 Vérifiez les "Calculate Value Expressions" pour la logique du calcul.</description>
         <description xml:lang="es">Calculado automáticamente por Collect utilizando los porcentajes de los diferentes Usos del Suelo en la parcela (en caso de múltiples LU).
 Verifique "Calculate Value Expressions" para conocer la lógica del cálculo.</description>
-        <default value="S" if="(land_cover[element='infrastucture']/percentage+land_cover[element='housing']/percentage) &gt;=20" />
-        <default value="S" if="settlement_percentage&gt;=20" />
-        <default value="C" if="cropland_percentage&gt;=20" />
-        <default value="F" if="forest_percentage&gt;=10" />
-        <default value="G" if="grassland_percentage&gt;=20" />
-        <default value="W" if="wetland_percentage&gt;=20" />
+        <default value="S" if="(land_cover[element='infrastucture']/percentage + land_cover[element='housing']/percentage + land_cover[element='roads']/percentage)  &gt;= 20" />
+        <default value="S" if="settlement_percentage &gt;= cropland_percentage and settlement_percentage &gt;= forest_percentage and settlement_percentage &gt;= grassland_percentage and settlement_percentage   &gt;= wetland_percentage and settlement_percentage &gt;= otherland_percentage&#10;" />
+        <default value="C" if="cropland_percentage &gt;= settlement_percentage and cropland_percentage &gt;= forest_percentage and cropland_percentage  &gt;= grassland_percentage and cropland_percentage  &gt;= wetland_percentage and cropland_percentage  &gt;= otherland_percentage&#10;" />
+        <default value="F" if="forest_percentage &gt;= settlement_percentage and forest_percentage &gt;= cropland_percentage and forest_percentage  &gt;= grassland_percentage and forest_percentage  &gt;= wetland_percentage and forest_percentage  &gt;= otherland_percentage&#10;" />
+        <default value="G" if="grassland_percentage &gt;= cropland_percentage and grassland_percentage &gt;= forest_percentage and grassland_percentage &gt;= settlement_percentage and grassland_percentage &gt;= wetland_percentage and grassland_percentage &gt;= otherland_percentage&#10;" />
+        <default value="W" if="wetland_percentage &gt;= cropland_percentage and wetland_percentage &gt;= forest_percentage and wetland_percentage &gt;= settlement_percentage and wetland_percentage &gt;= grassland_percentage and wetland_percentage &gt;= otherland_percentage&#10;" />
         <default value="O" />
       </code>
       <code id="6" name="land_use_category_alias" ui:hide="true" collect:includeInDataExport="false" calculated="true" list="land_use_conversions">
@@ -2838,12 +2858,12 @@ Verifique "Calculate Value Expressions" para conocer la lógica del cálculo.</d
         <label type="instance" xml:lang="pt">Auxiliar - Cópia do uso da terra</label>
         <default expr="land_use_category" />
       </code>
-      <code id="8" name="land_use_subcategory" relevant="land_use_category!='noData'" required="true" ui:hideWhenNotRelevant="true" list="land_use_conversions" parent="land_use_category_alias">
+      <code id="8" name="land_use_subcategory" required="true" ui:layoutType="radio" list="land_use_conversions" parent="land_use_category_alias">
         <label type="instance" xml:lang="en">Land Use Change (2000-2023)</label>
         <label type="reporting" xml:lang="en">LU - Land Use Change (2000-2023)</label>
         <label type="reporting" xml:lang="es">UT - Cambio de Uso de la Tierra (2000-2023)</label>
         <label type="reporting" xml:lang="fr">UT - Changement d'Affectation des terres (2000-2023)</label>
-        <label type="reporting" xml:lang="pt">UT - Mudança de uso da terra (2000-2023)</label>                
+        <label type="reporting" xml:lang="pt">UT - Mudança de uso da terra (2000-2023)</label>
         <label type="instance" xml:lang="fr">Changement d'Affectation des terres (2000-2023)</label>
         <label type="instance" xml:lang="es">Cambio de Uso de la Tierra (2000-2023)</label>
         <label type="instance" xml:lang="pt">Mudança de uso da terra (2000-2023)</label>
@@ -2854,12 +2874,11 @@ Verifique "Calculate Value Expressions" para conocer la lógica del cálculo.</d
       </code>
       <boolean id="20824" name="land_use_category_has_changed" ui:hide="true" ui:tab="plot_tab" calculated="true">
         <label type="instance" xml:lang="en">Land Use Category Has Changed</label>
-        <label type="instance" xml:lang="fr">Catégorie d'utilisation des terres a changé </label>
+        <label type="instance" xml:lang="fr">Catégorie d'utilisation des terres a changé</label>
         <label type="reporting" xml:lang="en">LU - Plot has changed LU Type?</label>
         <label type="reporting" xml:lang="fr">UT - Catégorie d'utilisation des terres a changé</label>
         <label type="reporting" xml:lang="es">UT - Ha cambiado la categoría de uso de la tierra</label>
-        <label type="reporting" xml:lang="pt">UT - A categoria de uso da terra mudou</label>                
-                
+        <label type="reporting" xml:lang="pt">UT - A categoria de uso da terra mudou</label>
         <label type="instance" xml:lang="es">Ha cambiado la categoría de uso de la tierra</label>
         <label type="instance" xml:lang="pt">A categoria de uso da terra mudou</label>
         <description xml:lang="en">This is a calculated field that helps us to keep truck if the LU category has changed or not, aggregating all conversion classes into change or no change.</description>
@@ -2868,7 +2887,7 @@ Verifique "Calculate Value Expressions" para conocer la lógica del cálculo.</d
         <description xml:lang="es">Este es un campo calculado que nos ayuda a controlar si la categoría de LU ha cambiado o no, agregando todas las clases de conversión en cambio o sin cambio.</description>
         <default expr="substring(land_use_subcategory,1,1)!=substring(land_use_subcategory,2,1)" />
       </boolean>
-      <code id="44410" name="land_use_subcategory_year_of_change" relevant="land_use_category!='noData' and land_use_category_has_changed" required="true" ui:hideWhenNotRelevant="true" ui:layoutType="dropdown" list="years">
+      <code id="44410" name="land_use_subcategory_year_of_change" relevant="land_use_category_has_changed" required="true" ui:hideWhenNotRelevant="true" ui:layoutType="dropdown" list="years">
         <label type="instance" xml:lang="en">Land Use Change - Year of change</label>
         <label type="instance" xml:lang="fr">Changement d'affectation des terres - Année du changement</label>
         <label type="reporting" xml:lang="en">LU - Land Use Change YEAR</label>
@@ -2878,7 +2897,6 @@ Verifique "Calculate Value Expressions" para conocer la lógica del cálculo.</d
         <description xml:lang="fr">En quelle année pouvez-vous apprécier pour la première fois le changement d'utilisation des terres ?</description>
         <description xml:lang="pt">¿En qué año se puede apreciar por primera vez el cambio de Uso de la Tierra?</description>
         <description xml:lang="es">¿En qué año se puede apreciar por primera vez el cambio de Uso de Suelo?</description>
-        <compare flag="error" lte="2022" gt="1994" />
       </code>
       <code id="10" name="land_use_subdivision" relevant="boolean(land_use_category)" required="true" list="land_uses" parent="land_use_category">
         <label type="instance" xml:lang="en">Land Use Subdivision 2023</label>
@@ -2887,7 +2905,7 @@ Verifique "Calculate Value Expressions" para conocer la lógica del cálculo.</d
         <label type="reporting" xml:lang="en">LU - Land Use Subdivision 2023</label>
         <label type="reporting" xml:lang="fr">UT - Subdivision de l'Utilisation des terres 2023</label>
         <label type="reporting" xml:lang="es">UT - Subdivisión de UT en 2023</label>
-        <label type="reporting" xml:lang="pt">UT - Subdivisão de Uso da Terra 2023</label>                        
+        <label type="reporting" xml:lang="pt">UT - Subdivisão de Uso da Terra 2023</label>
         <label type="instance" xml:lang="es">Subdivisión de UT en 2023</label>
         <description xml:lang="en">Country specific Land Use</description>
       </code>
@@ -2897,7 +2915,7 @@ Verifique "Calculate Value Expressions" para conocer la lógica del cálculo.</d
         <label type="reporting" xml:lang="en">LU - Land Use Subdivision changed</label>
         <label type="reporting" xml:lang="fr">UT - Subdivision de l'Utilisation des terres a changé entre 2000 et aujourd'hui</label>
         <label type="reporting" xml:lang="es">UT - Subdivisión del uso de la tierra cambió entre 2000 y la actualidad</label>
-        <label type="reporting" xml:lang="pt">UT - Subdivisão do uso da terra mudou entre 2000 e o presente</label>                        
+        <label type="reporting" xml:lang="pt">UT - Subdivisão do uso da terra mudou entre 2000 e o presente</label>
         <label type="instance" xml:lang="es">La subdivisión del uso de la tierra cambió entre 2000 y la actualidad</label>
         <label type="instance" xml:lang="pt">A subdivisão do uso da terra mudou entre 2000 e o presente</label>
         <description xml:lang="en">The plot has changed at subdivision level but not its use category, for example, a forest plothas changed from Native Forest to Forest Plantation (no change in Land Use but change on sudivision, indicator of degradation)</description>
@@ -2910,7 +2928,7 @@ Verifique "Calculate Value Expressions" para conocer la lógica del cálculo.</d
         <label type="reporting" xml:lang="en">LU - Land Use / Land Use Change - Confidence</label>
         <label type="reporting" xml:lang="fr">UT - Confiance - Utilisation des terres/ Changement d'Affection des terres</label>
         <label type="reporting" xml:lang="es">UT - Confianza - Uso de la tierra/Cambio de uso de la tierra</label>
-        <label type="reporting" xml:lang="pt">UT - Confiança - Uso do Solo / Mudança no Uso do Solo</label>                        
+        <label type="reporting" xml:lang="pt">UT - Confiança - Uso do Solo / Mudança no Uso do Solo</label>
         <label type="instance" xml:lang="fr">Confiance - Utilisation des terres/ Changement d'Affection des terres</label>
         <label type="instance" xml:lang="pt">Confiança - Uso do Solo / Mudança no Uso do Solo</label>
         <label type="instance" xml:lang="es">Confianza - Uso de la tierra/Cambio de uso de la tierra</label>
@@ -2925,7 +2943,7 @@ Verifique "Calculate Value Expressions" para conocer la lógica del cálculo.</d
         <label type="reporting" xml:lang="en">LU - Land Use 2000</label>
         <label type="reporting" xml:lang="fr">UT - Utilisation des terres 2000</label>
         <label type="reporting" xml:lang="es">UT - Uso de la tierra 2000</label>
-        <label type="reporting" xml:lang="pt">UT - Uso da terra 2000</label>                        
+        <label type="reporting" xml:lang="pt">UT - Uso da terra 2000</label>
         <label type="instance" xml:lang="pt">Uso da terra 2000 (calculado a partir de dados do intérprete)</label>
         <label type="instance" xml:lang="es">Uso de la tierra 2000 (calculado a partir de datos del intérprete)</label>
         <default expr="substring(land_use_subcategory,1,1)" />
@@ -2944,7 +2962,7 @@ Verifique "Calculate Value Expressions" para conocer la lógica del cálculo.</d
           <label type="reporting" xml:lang="en">Land cover - Element</label>
           <label type="reporting" xml:lang="es">Cobertura del suelo - Elemento</label>
           <label type="reporting" xml:lang="fr">Couverture du sol - éléments</label>
-          <label type="reporting" xml:lang="pt">Cobertura da terra - Elemento</label>                    
+          <label type="reporting" xml:lang="pt">Cobertura da terra - Elemento</label>
           <label type="instance" xml:lang="fr">Eléments couverture</label>
           <label type="instance" xml:lang="es">Elemento</label>
           <label type="instance" xml:lang="pt">Elemento</label>
@@ -2954,16 +2972,14 @@ Verifique "Calculate Value Expressions" para conocer la lógica del cálculo.</d
           <label type="reporting" xml:lang="en">Land cover - Coverage</label>
           <label type="reporting" xml:lang="fr">Couverture du sol - Couverture</label>
           <label type="reporting" xml:lang="es">Cobertura del suelo - Cobertura</label>
-          <label type="reporting" xml:lang="pt">Cobertura da terra - Cobertura</label>                              
+          <label type="reporting" xml:lang="pt">Cobertura da terra - Cobertura</label>
           <label type="instance" xml:lang="fr">Couverture</label>
           <label type="instance" xml:lang="es">Cobertura</label>
           <label type="instance" xml:lang="pt">Cobertura</label>
           <description xml:lang="en">Number of points that fall within a Land Cover element</description>
           <default value="na" />
-          <check flag="error" expr="sum(parent()/land_cover/percentage)>90">
-            <message  xml:lang="es">La suma de los puntos de cobertura debe ser el 100% de la parcela</message>
-            <message  xml:lang="es">A soma dos pontos de cobertura deve ser 100% da parcela</message>
-            <message  xml:lang="es">La suma de los puntos de cobertura debe ser 100%</message>
+          <check flag="error" expr="sum(parent()/land_cover/percentage)&gt;=80">
+            <message xml:lang="es">La suma de los puntos de cobertura debe ser 100%</message>
             <message xml:lang="fr">La somme des points de contrôle doit être au moins 45-49</message>
           </check>
         </code>
@@ -2971,8 +2987,8 @@ Verifique "Calculate Value Expressions" para conocer la lógica del cálculo.</d
           <label type="instance" xml:lang="en">%</label>
           <label type="reporting" xml:lang="en">Land cover - Percentage</label>
           <label type="reporting" xml:lang="fr">Couverture du sol - Pourcentage</label>
-          <label type="reporting" xml:lang="es">Cobertura del suelo - Porcentaje</label>                    
-          <label type="reporting" xml:lang="pt">Cobertura da terra - Percentagem</label>          
+          <label type="reporting" xml:lang="es">Cobertura del suelo - Porcentaje</label>
+          <label type="reporting" xml:lang="pt">Cobertura da terra - Percentagem</label>
           <label type="instance" xml:lang="es">%</label>
           <label type="instance" xml:lang="fr">%</label>
           <label type="instance" xml:lang="pt">%</label>
@@ -3010,9 +3026,9 @@ Si no hay imágenes VHR en Google Earth o Bing Maps, marque la opción 'No hay i
         <label type="reporting" xml:lang="en">LU - Year of the Subdivision change</label>
         <label type="reporting" xml:lang="fr">UT - Année du changement de subdivision</label>
         <label type="reporting" xml:lang="es">UT - Año del cambio de Subdivisión</label>
-        <label type="reporting" xml:lang="pt">UT - Ano da mudança de Loteamento</label>                        
+        <label type="reporting" xml:lang="pt">UT - Ano da mudança de Loteamento</label>
         <label type="instance" xml:lang="es">Año del cambio de Subdivisión</label>
-        <compare flag="error" lte="2022" gte="1980" />
+        <compare flag="error" lte="2023" gte="1980" />
       </code>
       <code id="1065" name="land_use_initial_subdivision" relevant="land_use_subdivision_change=true() or  land_use_category_has_changed" required="true" ui:tab="plot_tab" ui:layoutType="dropdown" list="land_uses" parent="calculated_initial_land_use">
         <label type="instance" xml:lang="en">Previous Land Use Subdivision</label>
@@ -3020,9 +3036,9 @@ Si no hay imágenes VHR en Google Earth o Bing Maps, marque la opción 'No hay i
         <label type="reporting" xml:lang="en">LU - Previous Land Use Subdivision</label>
         <label type="reporting" xml:lang="es">UT - Subcategoría de uso de suelo anterior</label>
         <label type="reporting" xml:lang="fr">UT - Subdivision des terres précédente</label>
-        <label type="reporting" xml:lang="pt">UT - Subcategoria de uso da terra anterior</label>                        
+        <label type="reporting" xml:lang="pt">UT - Subcategoria de uso da terra anterior</label>
         <label type="instance" xml:lang="es">Subcategoría de uso de suelo anterior</label>
-        <label type="instance" xml:lang="pt">Subcategoria de uso da terra anterior</label>        
+        <label type="instance" xml:lang="pt">Subcategoria de uso da terra anterior</label>
         <check flag="error" if="land_use_subdivision_change" expr="land_use_subdivision != land_use_initial_subdivision">
           <message>There is no change recorded, same subdivision as in the 2019 Land Use Subdivision</message>
           <message xml:lang="fr">Il n'y a pas de changement enregistré, même subdivision que dans l'Utilisation du sol de 2019</message>
@@ -3040,7 +3056,7 @@ Si no hay imágenes VHR en Google Earth o Bing Maps, marque la opción 'No hay i
         <label type="reporting" xml:lang="en">LU Change - More than one LU change?</label>
         <label type="reporting" xml:lang="es">UT Cambio de Uso - Más de un cambio?</label>
         <label type="reporting" xml:lang="pt">UT Mudança de Uso - Mais de uma mudança</label>
-        <label type="reporting" xml:lang="fr">UT Changement d'utilisation - Plus d'un changement</label>                        
+        <label type="reporting" xml:lang="fr">UT Changement d'utilisation - Plus d'un changement</label>
         <label type="instance" xml:lang="pt">Houve um uso anterior da terra?</label>
         <description xml:lang="en">Has the land use change more than once since 2000?
 For instance this might happen if there is a transition from Forest in 2000 to Grassland in 2005 that becomes settlement in 2010.</description>
@@ -3054,17 +3070,17 @@ Por exemplo, isso pode acontecer se houver uma transição de floresta em 2000 p
       <code id="20117" name="second_lu_conversion" relevant="second_lu_change" required="true" ui:hideWhenNotRelevant="true" ui:tab="plot_tab" list="land_uses">
         <label type="instance" xml:lang="es">Conversión UT anterior al último cambio</label>
         <label type="instance" xml:lang="en">Oldest Land Use</label>
-        <label type="instance" xml:lang="fr">Utilisation des terres la plus ancienne </label>
-        <label type="reporting" xml:lang="en">LU Change - Oldest LU </label>
+        <label type="instance" xml:lang="fr">Utilisation des terres la plus ancienne</label>
+        <label type="reporting" xml:lang="en">LU Change - Oldest LU</label>
         <label type="reporting" xml:lang="es">UT Cambio de Uso - UT Mas antiguo</label>
         <label type="reporting" xml:lang="fr">UT Changement d'utilisation - UT le plus ancien</label>
-        <label type="reporting" xml:lang="pt">UT Mudança de uso - UT mais antigo</label>                        
+        <label type="reporting" xml:lang="pt">UT Mudança de uso - UT mais antigo</label>
         <label type="instance" xml:lang="pt">Uso de terra mais antigo</label>
       </code>
       <code id="20118" name="second_lu_conversion_year" relevant="second_lu_change" required="true" ui:hideWhenNotRelevant="true" ui:tab="plot_tab" ui:layoutType="dropdown" list="years">
         <label type="instance" xml:lang="es">Año de conversion anterior al último cambio</label>
         <label type="instance" xml:lang="en">Year of the conversion from the oldest land use</label>
-        <label type="instance" xml:lang="fr">Année du changement d'AT la plus ancienne </label>
+        <label type="instance" xml:lang="fr">Année du changement d'AT la plus ancienne</label>
         <label type="reporting" xml:lang="en">LU Change - Year of change from oldest to previous LU</label>
         <label type="reporting" xml:lang="es">UT Cambio de Uso - Año del cambio del uso anterior al mas antiguo</label>
         <label type="reporting" xml:lang="fr">UT Changement d'utilisation - Année de changement de l'utilisation précédente à la plus ancienne</label>
@@ -3095,13 +3111,13 @@ Por exemplo, isso pode acontecer se houver uma transição de floresta em 2000 p
         <label type="reporting" xml:lang="en">LU Change - Oldest Land Use Subdivision</label>
         <label type="reporting" xml:lang="es">UT Cambio de Uso - Subdivision UT inicial</label>
         <label type="reporting" xml:lang="fr">UT Changement d'utilisation - Subdivision d'UT la plus ancienne</label>
-        <label type="reporting" xml:lang="pt">UT Cambio de Uso - Subdivisão de uso da terra mais antiga</label>                        
+        <label type="reporting" xml:lang="pt">UT Cambio de Uso - Subdivisão de uso da terra mais antiga</label>
         <label type="instance" xml:lang="pt">Subdivisão de uso da terra mais antiga</label>
         <check flag="error" expr="$this != land_use_initial_subdivision">
           <message>The oldest land use subdivision must be different than the first change</message>
         </check>
       </code>
-      <boolean id="31" name="actively_saved"  ui:tab="tab_2012574">
+      <boolean id="31" name="actively_saved" ui:tab="tab_2012574">
         <label type="instance" xml:lang="en">Plot - Actively saved by user</label>
         <label type="instance" xml:lang="fr">Placette - activement enregistrée par l'utilisateur</label>
         <label type="instance" xml:lang="pt">Parcela - salva ativamente pelo usuário</label>
@@ -3110,7 +3126,7 @@ Por exemplo, isso pode acontecer se houver uma transição de floresta em 2000 p
 
 DO NOT REMOVE. Internal attribute used by the CE Survey.</description>
       </boolean>
-      <date id="32" name="actively_saved_on" relevant="false()"  ui:tab="tab_2012574">
+      <date id="32" name="actively_saved_on" relevant="false()" ui:tab="tab_2012574">
         <label type="instance" xml:lang="en">Plot - Date of last saved</label>
         <label type="instance" xml:lang="fr">Placette - dernier enregistrement le</label>
         <label type="instance" xml:lang="es">Parcela - fecha de la última vez que se guardó</label>
@@ -3119,7 +3135,7 @@ DO NOT REMOVE. Internal attribute used by the CE Survey.</description>
 
 DO NOT REMOVE. Internal attribute used by the CE Survey.</description>
       </date>
-      <text id="33" name="plot_file" relevant="false()" type="short"  ui:tab="tab_2012574">
+      <text id="33" name="plot_file" relevant="false()" ui:tab="tab_2012574" type="short">
         <label type="instance" xml:lang="en">Plot - CSV file that contains the plot</label>
         <label type="instance" xml:lang="fr">Placette - Fichier CSV qui contient la placette</label>
         <label type="instance" xml:lang="pt">Parcela - arquivo CSV que contém a parcela</label>
@@ -3198,7 +3214,7 @@ This field is NOT necessary for the CE survey to work but we recommend you keep 
         <label type="reporting" xml:lang="en">Imagery - Year of latest image</label>
         <label type="reporting" xml:lang="es">Imágenes - Año de la última imagen</label>
         <label type="reporting" xml:lang="fr">Imagerie - Année de la dernière image</label>
-        <label type="reporting" xml:lang="pt">Imagens - Ano da última imagem</label>                        
+        <label type="reporting" xml:lang="pt">Imagens - Ano da última imagem</label>
         <label type="instance" xml:lang="fr">Année de la dernière image de Google Earth</label>
         <label type="instance" xml:lang="es">Año de la imagen mas reciente de Google Earth</label>
         <label type="instance" xml:lang="pt">Ano da última imagem do Google Earth</label>
@@ -3206,53 +3222,6 @@ This field is NOT necessary for the CE survey to work but we recommend you keep 
         <description xml:lang="es">ATENCIÓN: Si la última imagen de Google Earth no es lo suficientemente reciente (2020-2023) utilice las imágenes en GEE y Planet para la evaluación actual del uso de la tierra</description>
         <description xml:lang="pt">ATENÇÃO: Se a imagem mais recente do Google Earth não for recente o suficiente (2020-2023), use as imagens em GEE e Planet para avaliação atual do uso da terra</description>
         <description xml:lang="en">ATTENTION: If the latest Google Earth image is not recent enough (2020-2023) please use the images in GEE and Planet for current land use assessment</description>
-      </code>
-      <code id="50423" name="primary_disturbance" relevant="land_use_category='F' or land_use_category='G'" required="true" ui:hideWhenNotRelevant="true" ui:tab="tab_1012" list="disturbance_types">
-        <label type="instance" xml:lang="en">Primary Disturbance</label>
-        <label type="reporting" xml:lang="en">Disturbance - Primary Disturbance</label>
-        <label type="instance" xml:lang="fr">Perturbation primaire</label>
-        <label type="instance" xml:lang="pt">Perturbação principal</label>
-        <label type="instance" xml:lang="es">Perturbación principal</label>
-      </code>
-      <text id="2006581" name="specify_disturbance" relevant="primary_disturbance ='other_human_impact'" required="true" ui:hideWhenNotRelevant="true" ui:tab="tab_1012" type="short">
-        <label type="instance" xml:lang="en">Specify Disturbance</label>
-        <label type="instance" xml:lang="fr">Spécifiez la perturbation</label>
-        <label type="instance" xml:lang="pt">Especificar perturbação</label>
-        <label type="instance" xml:lang="es">Especificar perturbación</label>
-      </text>
-      <code id="2006429" name="primary_disturbance_year" relevant="primary_disturbance='logging'  or &#10;primary_disturbance='crops'  or &#10;primary_disturbance='settlement'" required="true" ui:tab="tab_1012" ui:layoutType="radio" list="years">
-        <label type="instance" xml:lang="en">Primary Disturbance Year</label>
-        <label type="instance" xml:lang="fr">Année de début de la perturbation primaire</label>
-        <label type="instance" xml:lang="es">Año de la perturbación principal</label>
-        <label type="instance" xml:lang="pt">Ano de Perturbação Principal</label>
-        <description xml:lang="fr">Veuillez spécifier ici l'année dans laquelle la perturbation est apparue (e.g. si perturbation = exploitation forestière, l'année du début de cette activité humaine au sein de la placette).</description>
-        <description xml:lang="es">Especifique aquí el año en que apareció la perturbación (por ejemplo, si perturbación = tala, el año del comienzo de esta actividad humana dentro de la parcela).</description>
-        <description xml:lang="pt">Por favor, especifique aqui o ano em que ocorreu a perturbação (por exemplo, se perturbação = extração de madeira, o ano do início desta atividade humana dentro da parcela).</description>
-        <description xml:lang="en">Please specify here the year in which the disturbance appeared (e.g. if disturbance = logging, the year of the beginning of this human activity within the plot).v</description>
-      </code>
-      <code id="2001338" name="previous_tree_cover" relevant="primary_disturbance != 'none'" required="true" ui:hideWhenNotRelevant="true" ui:tab="tab_1012" ui:layoutType="dropdown" list="plot_coverage">
-        <label type="instance" xml:lang="fr">Couverture des arbres avant la perturbation</label>
-        <label type="instance" xml:lang="en">Tree cover before disturbance</label>
-        <label type="instance" xml:lang="es">Cobertura de arboles anterior a la perturbación</label>
-        <label type="instance" xml:lang="pt">Cobertura de árvores antes da perturbação</label>
-        <description xml:lang="fr">Faire attention a ne pas considéré la saisonnalité de la végétation (une image en saison pluvieuse peut apparaitre comme une augmentation de la couverture des canopées). On veut tenir compte ici uniquement de l'impact de la dégradation des forets sur le couvert arboré</description>
-        <description xml:lang="en">Be careful not to consider the seasonality of the vegetation (a rainy season image may appear as an increase in canopy cover). We want to take into account here only the impact of forest degradation on the tree cover</description>
-        <description xml:lang="pt">Tenha cuidado para não considerar a sazonalidade da vegetação (uma imagem da estação chuvosa pode aparecer como um aumento na cobertura do dossel). Queremos levar em consideração aqui apenas o impacto da degradação florestal na cobertura arbórea</description>
-        <description xml:lang="es">Tenga cuidado de no considerar la estacionalidad de la vegetación (una imagen de temporada de lluvias puede aparecer como un aumento en la cobertura del dosel). Queremos tener en cuenta aquí solo el impacto de la degradación forestal en la cubierta arbórea.</description>
-      </code>
-      <code id="53386" name="secondary_disturbance" relevant="idm:not-blank(primary_disturbance) and primary_disturbance!='none'" ui:tab="tab_1012" ui:layoutType="dropdown" list="disturbance_types">
-        <label type="instance" xml:lang="en">Secondary Disturbance</label>
-        <label type="reporting" xml:lang="en">Disturbance - Secondary Disturbance</label>
-        <label type="instance" xml:lang="fr">Perturbation secondaire</label>
-        <label type="instance" xml:lang="es">Perturbación secundaria</label>
-        <label type="instance" xml:lang="pt">Perturbação secundária</label>
-      </code>
-      <code id="53832" name="tertiary_disturbance" relevant="secondary_disturbance" ui:tab="tab_1012" ui:layoutType="dropdown" list="disturbance_types">
-        <label type="instance" xml:lang="en">Tertiary Disturbance</label>
-        <label type="reporting" xml:lang="en">Disturbance - Tertiary Disturbance</label>
-        <label type="instance" xml:lang="fr">Perturbation tertiaire</label>
-        <label type="instance" xml:lang="pt">Perturbação terciário</label>
-        <label type="instance" xml:lang="es">Perturbación terciaria</label>
       </code>
       <code id="61480" name="climate" ui:tab="tab_10007" collectearth:fromcsv="true" list="climate_zones">
         <label type="instance" xml:lang="en">IPCC - Climate</label>
@@ -3340,10 +3309,10 @@ GEE Script code :
 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid</description>
       </code>
       <text id="61484" name="country" required="true" ui:tab="tab_10007" collectearth:fromcsv="true" type="short">
-        <label type="instance" xml:lang="en">GAUL - Country</label>
-        <label type="instance" xml:lang="fr">GAUL - Pays</label>
-        <label type="instance" xml:lang="es">GAUL - País</label>
-        <label type="instance" xml:lang="pt">GAUL - Pais</label>
+        <label type="instance" xml:lang="en">GAUL - Adm. Level 0 (Country)</label>
+        <label type="instance" xml:lang="fr">GAUL - Adm. Level 0 (Pays)</label>
+        <label type="instance" xml:lang="es">GAUL - Adm. Level 0 (Pais)</label>
+        <label type="instance" xml:lang="pt">GAUL - Adm. Level 0 (Pais)</label>
         <description xml:lang="en">Country where the plot is located. Usually obtained from FAOs Global Administrative Units Layer (GAUL) 2014.
 
 Keep this attribute if you want to disaggregate the data by country. This attribute is NOT necessary for the Collect Earth survey to work (in case it is not needed in your survey and you do not want to add it to the CSV files)
@@ -3357,10 +3326,10 @@ Collect Earth grid generator tool : https://collectearth.users.earthengine.app/v
 The GAUL data might be inadequate if the Administrative Units of the country have changed. We recommend you to use your official country/province/district boundaries.</description>
       </text>
       <text id="61387" name="province" required="true" ui:tab="tab_10007" collectearth:fromcsv="true" type="short">
-        <label type="instance" xml:lang="en">GAUL - Province</label>
-        <label type="instance" xml:lang="fr">GAUL - Province</label>
-        <label type="instance" xml:lang="es">GAUL - Provincia/Región</label>
-        <label type="instance" xml:lang="pt">GAUL - Província</label>
+        <label type="instance" xml:lang="en">GAUL - Adm. Level 1 ( Province/Region)</label>
+        <label type="instance" xml:lang="fr">GAUL - Adm. Level 1 ( Province/Region )</label>
+        <label type="instance" xml:lang="es">GAUL - Adm. Level 1 ( Province/Region)</label>
+        <label type="instance" xml:lang="pt">GAUL - Adm. Level 1 ( Província/Region)</label>
         <description xml:lang="en">Province where the plot is located. Usually obtained from FAOs Global Administrative Units Layer (GAUL) 2014.
 
 Keep this attribute if you want to disaggregate the data by province. This attribute is NOT necessary for the Collect Earth survey to work (in case it is not needed in your survey and you do not want to add it to the CSV files)
@@ -3374,10 +3343,10 @@ Collect Earth grid generator tool : https://collectearth.users.earthengine.app/v
 The GAUL data might be inadequate if the Administrative Units of the country have changed. We recommend you to use your official country/province/district boundaries.</description>
       </text>
       <text id="61483" name="district" required="true" ui:tab="tab_10007" collectearth:fromcsv="true" type="short">
-        <label type="instance" xml:lang="en">GAUL - District</label>
-        <label type="instance" xml:lang="fr">GAUL - Commnune</label>
-        <label type="instance" xml:lang="es">GAUL - Distrito/Municipio/Comuna</label>
-        <label type="instance" xml:lang="pt">GAUL - Distrito</label>
+        <label type="instance" xml:lang="en">GAUL - Adm. Level 2 (District/Commune)</label>
+        <label type="instance" xml:lang="fr">GAUL - Adm. Level 2 (District/Commune)</label>
+        <label type="instance" xml:lang="es">GAUL - Adm. Level 2 (Distrito/Municipio/Comuna)</label>
+        <label type="instance" xml:lang="pt">GAUL - Adm. Level 2 (Distrito/Comuna)</label>
         <description xml:lang="en">District where the plot is located. Usually obtained from FAOs Global Administrative Units Layer (GAUL) 2014.
 
 Keep this attribute if you want to disaggregate the data by district. This attribute is NOT necessary for the Collect Earth survey to work (in case it is not needed in your survey and you do not want to add it to the CSV files)
@@ -3392,7 +3361,7 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
       </text>
       <number id="63345" name="lc_points_summed" relevant='vhri_source != "no_vhr"' collect:includeInDataExport="false" ui:tab="tab_1015" calculated="true" type="integer">
         <label type="instance" xml:lang="en">% of land cover assessed</label>
-        <label type="instance" xml:lang="fr">% d'occupation du sol évalué </label>
+        <label type="instance" xml:lang="fr">% d'occupation du sol évalué</label>
         <label type="instance" xml:lang="es">% de cobertura evaluada</label>
         <label type="instance" xml:lang="pt">% de cobertura de terra avaliada</label>
         <default expr="sum(land_cover/percentage)" />
@@ -3425,69 +3394,65 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         </code>
         <code id="63368" name="coverage" ui:layoutType="dropdown" list="plot_coverage">
           <label type="instance" xml:lang="en">Control points</label>
-          <label type="instance" xml:lang="fr">Points de contrôle </label>
+          <label type="instance" xml:lang="fr">Points de contrôle</label>
           <label type="reporting" xml:lang="en">LU within plot - Control points</label>
           <label type="reporting" xml:lang="fr">UT dans la parcelle - Points de contrôle</label>
           <label type="reporting" xml:lang="es">UT dentro de la parcela - Puntos de control</label>
-          <label type="reporting" xml:lang="pt">UT dentro parcela - Pontos de controle</label>                    
+          <label type="reporting" xml:lang="pt">UT dentro parcela - Pontos de controle</label>
           <label type="instance" xml:lang="es">Puntos de control</label>
-          <label type="instance" xml:lang="pt">Points de contrôle </label>
+          <label type="instance" xml:lang="pt">Points de contrôle</label>
           <description xml:lang="en">Count the number of points within the plot that fall on each land cover.</description>
           <description xml:lang="es">Cuente el número de puntos dentro de la parcela que caen en cada cobertura terrestre.</description>
           <description xml:lang="pt">Conte o número de pontos dentro da parcela que caem em cada cobertura de terra.</description>
           <description xml:lang="fr">Comptez le nombre de points dans la parcelle qui tombent sur chaque couverture terrestre.</description>
           <default value="na" />
           <check flag="error" if="parent()/vhri_source!='no_vhr' and coverage!='na' and lu='S'" expr="(&#10;  parent()/land_cover[element='bareSoil']/percentage +   parent()/land_cover[element='infrastucture']/percentage +   parent()/land_cover[element='housing']/percentage +   parent()/land_cover[element='tof']/percentage +   parent()/land_cover[element='grass']/percentage&#10; ) &gt; 0">
-            <message xml:lang="fr">Vous devez spécifier l'occupation du sol de la zone d'habitat</message>
-            <message xml:lang="en">You must specify the land coverage of the settlement area</message>
-            <message xml:lang="es">Debe especificar la cobertura terrestre del área de asentamiento</message>
             <message xml:lang="fr">Vous devez spécifier la couverture terrestre de la zone de règlement</message>
+            <message>You must specify the land coverage of the settlement area</message>
+            <message xml:lang="es">Debe especificar la cobertura terrestre del área de asentamiento</message>
           </check>
           <check flag="error" if="parent()/vhri_source!='no_vhr' and lu = 'F'  and coverage!='na'" expr="percentage &gt;= &#10;parent()/land_cover[element='trees']/percentage">
             <message xml:lang="fr">Le couvert forestier doit être au moins aussi grand que le couvert arboré</message>
             <message xml:lang="pt">A cobertura florestal deve ser pelo menos igual à cobertura arbórea</message>
             <message xml:lang="es">La cubierta forestal debe ser al menos tanto como la cubierta arbórea</message>
-            <message xml:lang="en">The forest cover must be at least as much as the tree cover</message>                                    
+            <message>The forest cover must be at least as much as the tree cover</message>
           </check>
           <check flag="error" if="parent()/vhri_source!='no_vhr' and lu='C'  and coverage!='na'" expr="percentage &gt;= &#10;parent()/land_cover[element='crops']/percentage">
             <message xml:lang="fr">La couverture des terres cultivées doit être au moins égale à la couverture des cultures</message>
-            <message xml:lang="en">You must specify the land cover of the cultivation area</message>
+            <message>You must specify the land cover of the cultivation area</message>
             <message xml:lang="es">La cobertura de tierras de cultivo debe ser al menos igual a la cobertura de cultivos</message>
             <message xml:lang="pt">A cobertura de terras agrícolas deve ser pelo menos tanto quanto a cobertura de culturas</message>
           </check>
           <check flag="error" if="parent()/vhri_source!='no_vhr' and coverage!='na' and lu='C'" expr="parent()/land_cover[element='crops']/percentage  &gt; 0">
             <message xml:lang="fr">Vous devez spécifier l'occupation du sol de la zone de culture</message>
-            <message xml:lang="en">Vous devez spécifier l'occupation du sol de la zone de culture</message>
+            <message>Vous devez spécifier l'occupation du sol de la zone de culture</message>
             <message xml:lang="es">Debe especificar la cobertura del suelo del área de cultivo</message>
             <message xml:lang="pt">Você deve especificar a cobertura da terra da área de cultivo</message>
           </check>
           <check flag="error" if="parent()/vhri_source!='no_vhr' and lu='G' and (parent()/land_cover[element='grass']/percentage  + parent()/land_cover[element='shrubs']/percentage) =0" expr="percentage!= 'na'">
             <message xml:lang="fr">S'il y a des prairies comme utilisation des terres, vous devez spécifier la couverture d'herbe ou d'arbustes dans la première onglet</message>
-            <message xml:lang="en">If there is grassland as land use, you must specify grass or shrub cover in the first tab</message>
+            <message>If there is grassland as land use, you must specify grass or shrub cover in the first tab</message>
             <message xml:lang="es">Si hay pastizal como uso del suelo, debe especificar la cobertura de pasto o arbustos en la primera pestaña</message>
             <message xml:lang="pt">Se houver pastagem como uso da terra, você deve especificar grama ou cobertura arbustiva na primeira guia</message>
-            
           </check>
           <check flag="error" expr="sum(parent()/land_use/percentage)&gt;=90">
             <message xml:lang="fr">La couverture minimale des UT doit etre au moins de 45 points de controle</message>
             <message xml:lang="es">La cobertura mínima de UT debe ser de al menos 45 puntos de control</message>
-            <message xml:lang="en">Minimum LU coverage must be at least 45 control points</message>
+            <message>Minimum LU coverage must be at least 45 control points</message>
             <message xml:lang="pt">A cobertura mínima de UT deve ser de pelo menos 45 pontos de controle</message>
           </check>
-          <check flag="error" if="parent()/plot_distribution= 'single'" expr="coverage&gt;= '90'">
+          <check flag="error" if="parent()/plot_distribution= 'single'" expr="coverage= '90' or coverage = 'na'">
             <message xml:lang="fr">Si la parcelle est homogène, la couverture doit être &gt; 90 %</message>
-            <message xml:lang="en">If the plot is homogeneous, the coverage should be &gt; 90%</message>
+            <message>If the plot is homogeneous, the coverage should be 45-49 in only one LU</message>
             <message xml:lang="es">Si la parcela es homogénea, la cobertura debe ser &gt; 90%</message>
             <message xml:lang="pt">Se a parcela for homogêneo, a cobertura deve ser &gt; 90%</message>
-           
           </check>
           <check flag="error" if="parent()/plot_distribution= 'multiple'" expr="coverage!='90'">
             <message xml:lang="fr">Si la parcelle est distinct, la couverture doit être &lt; 90 %</message>
             <message xml:lang="pt">Se a parcela for de uso múltiplo, a cobertura deve ser &lt; 90%</message>
             <message xml:lang="es">Si la parcela es de uso multiple, la cobertura debe ser &lt; 90%</message>
-            <message xml:lang="en">If the plot is for multiple use, the coverage must be &lt; 90%</message>
+            <message>If the plot is for multiple use, the coverage must be different than 45-49 points</message>
           </check>
-
         </code>
         <number id="63370" name="percentage" calculated="true" type="integer">
           <label type="instance" xml:lang="en">%</label>
@@ -3518,16 +3483,6 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <label type="instance" xml:lang="pt">% de uso da terra avaliado</label>
         <default expr="sum(land_use/percentage)" />
       </number>
-      <boolean id="63388" name="floodplain_crops" relevant="land_use_category = 'C'" required="true" ui:hideWhenNotRelevant="true" ui:tab="plot_tab">
-        <label type="instance" xml:lang="en">Floodplain crops</label>
-        <label type="instance" xml:lang="fr">Cultures des plaines inondables</label>
-        <label type="reporting" xml:lang="en">Agriculture - Floodplain crops</label>
-      </boolean>
-      <code id="63406" name="grassland_mgmt" relevant="land_use_category = 'G'" required="true" ui:hideWhenNotRelevant="true" ui:tab="plot_tab" ui:layoutType="dropdown" list="grassland_management">
-        <label type="instance" xml:lang="en">Grassland Management</label>
-        <label type="instance" xml:lang="fr">Gestion des prairies</label>
-        <label type="reporting" xml:lang="en">Grassland - Grassland Management</label>
-      </code>
       <text id="1000155" name="comments" ui:tab="tab_1000154" type="memo">
         <label type="instance" xml:lang="en">Comments</label>
         <label type="instance" xml:lang="fr">Commentaires</label>
@@ -3556,7 +3511,6 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <label type="instance" xml:lang="en">IPCC Land Use Category - previous</label>
         <label type="instance" xml:lang="es">IPCC Categoría Uso de la Tierra - Previa</label>
         <label type="instance" xml:lang="pt">IPCC Categoria de Uso da Terra - Anterior</label>
-        
         <label type="instance" xml:lang="fr">GIEC Catégorie d'utilisation des terres - précédent</label>
         <default expr="substring( land_use_subcategory, 1, 1)" />
       </code>
@@ -3568,10 +3522,73 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="substring( second_lu_conversion, 1,1)" if="second_lu_change = true() " />
         <default expr="substring( land_use_subcategory, 1,1)" if="idm:blank(second_lu_change) or second_lu_change = true() " />
       </code>
-      <text id="2012052" name="ipcc_2000_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <code id="2012502" name="deforestation_driver" relevant="calculated_initial_land_use = 'F' and land_use_category != 'F'" required="true" ui:tab="tab_2012497" list="drivers">
+        <label type="instance" xml:lang="es">Agente de deforestación</label>
+        <label type="instance" xml:lang="en">Deforestation driver</label>
+        <label type="instance" xml:lang="fr">Moteur de déforestation</label>
+        <label type="instance" xml:lang="pt">Agente de desmatamento</label>
+      </code>
+      <code id="2012516" name="forest_dynamics" relevant="land_use_category = 'F'" required="true" ui:tab="tab_2012497" ui:layoutType="radio" list="forest_dynamics">
+        <label type="instance" xml:lang="es">Dinámica en permanencia de Tierra Forestal</label>
+        <label type="instance" xml:lang="en">Forest Dynamics</label>
+        <label type="instance" xml:lang="fr">Dynamique des terres forestières</label>
+        <label type="instance" xml:lang="pt">Dinâmica do Solo Florestal</label>
+      </code>
+      <code id="2012517" name="forest_dynamics_type" relevant="land_use_category = 'F'" required="true" ui:tab="tab_2012497" ui:layoutType="radio" list="forest_dynamics" parent="forest_dynamics">
+        <label type="instance" xml:lang="es">Tipo de dinámica de cambio</label>
+        <label type="instance" xml:lang="en">Type of change dynamics</label>
+        <label type="instance" xml:lang="fr">Type de dynamique de changement</label>
+        <label type="instance" xml:lang="pt">Tipo de dinâmica de mudança</label>
+      </code>
+      <code id="2012518" name="previous_tree_cover" relevant='forest_dynamics != "none" and vhri_source != "no_vhr"' required="true" ui:tab="tab_2012497" ui:layoutType="dropdown" list="plot_coverage">
+        <label type="instance" xml:lang="fr">Couverture des arbres avant la perturbation</label>
+        <label type="instance" xml:lang="en">Tree cover before disturbance</label>
+        <label type="instance" xml:lang="es">Cobertura de arboles anterior a la dinamica</label>
+        <label type="instance" xml:lang="pt">Cobertura de árvores antes da perturbação</label>
+        <description xml:lang="fr">Faire attention a ne pas considéré la saisonnalité de la végétation (une image en saison pluvieuse peut apparaitre comme une augmentation de la couverture des canopées). On veut tenir compte ici uniquement de l'impact de la dégradation des forets sur le couvert arboré</description>
+        <description xml:lang="en">Be careful not to consider the seasonality of the vegetation (a rainy season image may appear as an increase in canopy cover). We want to take into account here only the impact of forest degradation on the tree cover</description>
+        <description xml:lang="pt">Tenha cuidado para não considerar a sazonalidade da vegetação (uma imagem da estação chuvosa pode aparecer como um aumento na cobertura do dossel). Queremos levar em consideração aqui apenas o impacto da degradação florestal na cobertura arbórea</description>
+        <description xml:lang="es">Tenga cuidado de no considerar la estacionalidad de la vegetación (una imagen de temporada de lluvias puede aparecer como un aumento en la cobertura del dosel). Queremos tener en cuenta aquí solo el impacto de la degradación forestal en la cubierta arbórea.</description>
+        <check flag="error" if="forest_dynamics= 'degradation'" expr="percentage_previous_tree_cover &gt;= land_cover[ element='trees' ]/percentage">
+          <message xml:lang="es">Si hubo degradación debería de haber perdida de cobertura forestal</message>
+        </check>
+        <check flag="error" if="forest_dynamics = 'reforestation'" expr="percentage_previous_tree_cover &lt;= land_cover[ element='trees' ]/percentage">
+          <message xml:lang="es">Si hubo reforestación debería haber aumentado la cobertura forestal</message>
+        </check>
+      </code>
+      <number id="2012550" name="percentage_previous_tree_cover" relevant="false()" ui:hide="true" collect:includeInDataExport="false" ui:tab="tab_2012497" calculated="true" type="integer">
+        <label type="instance" xml:lang="en">% previos tree cover</label>
+        <label type="reporting" xml:lang="en">Land cover - Percentage</label>
+        <label type="reporting" xml:lang="fr">Couverture du sol - Pourcentage</label>
+        <label type="reporting" xml:lang="es">Cobertura del suelo - Porcentaje</label>
+        <label type="reporting" xml:lang="pt">Cobertura da terra - Percentagem</label>
+        <label type="instance" xml:lang="es">%</label>
+        <label type="instance" xml:lang="fr">%</label>
+        <label type="instance" xml:lang="pt">%</label>
+        <default value="0" if="idm:blank(previous_tree_cover) or previous_tree_cover='na'" />
+        <default expr="previous_tree_cover" />
+      </number>
+      <code id="2012519" name="degradation_year" relevant='forest_dynamics = "degradation"' required="true" ui:tab="tab_2012497" ui:layoutType="dropdown" list="years">
+        <label type="instance" xml:lang="es">Año de la degradación</label>
+        <label type="instance" xml:lang="en">Year of degradation</label>
+        <label type="instance" xml:lang="fr">Année de dégradation</label>
+        <label type="instance" xml:lang="pt">Ano de degradação</label>
+      </code>
+      <code id="2012520" name="increase_year" relevant='forest_dynamics = "reforestation"' required="true" ui:tab="tab_2012497" ui:layoutType="dropdown" list="years">
+        <label type="instance" xml:lang="es">Año de la recuperación de la degradación</label>
+        <label type="instance" xml:lang="en">Year of recovery</label>
+        <label type="instance" xml:lang="fr">Année de reprise</label>
+        <label type="instance" xml:lang="pt">Ano de recuperação</label>
+      </code>
+      <code id="2012551" name="ipcc_current_subdivision" ui:hide="true" list="land_uses" parent="ipcc_current_category">
+        <label type="instance" xml:lang="en">IPCC Land Use Subdivision - current</label>
+        <label type="instance" xml:lang="es">IPCC Subdivisión Uso de la Tierra - actual</label>
+        <label type="instance" xml:lang="fr">GIEC Subdivision d'utilisation des terres - actuelle</label>
+        <default expr="land_use_subdivision" />
+      </code>
+      <text id="2012552" name="ipcc_2000_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2000 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2000 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2000 Conversão do Uso da Terra</label>
         <label type="instance" xml:lang="fr">GIEC 2000 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2000 and land_use_subcategory_year_of_change  &gt;=1980" />
@@ -3581,17 +3598,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1980" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1980" />
       </text>
-      <code id="2012053" name="ipcc_2000_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012553" name="ipcc_2000_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2000 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2000 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2000 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2000 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2000_subcategory, 2, 1)" />
       </code>
-      <code id="2012054" name="ipcc_2000_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2000_category">
+      <code id="2012554" name="ipcc_2000_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2000_category">
         <label type="instance" xml:lang="en">IPCC 2000 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2000 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2000 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2000 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2000" />
@@ -3605,10 +3620,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2000" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2000" />
       </code>
-      <text id="2012055" name="ipcc_2001_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012555" name="ipcc_2001_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2001 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2001 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2001 Conversão do Uso da Terra</label>
         <label type="instance" xml:lang="fr">GIEC 2001 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2001 and land_use_subcategory_year_of_change  &gt;=1981" />
@@ -3618,17 +3632,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1981" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1981" />
       </text>
-      <code id="2012056" name="ipcc_2001_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012556" name="ipcc_2001_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2001 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2001 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2001 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2001 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2001_subcategory, 2, 1)" />
       </code>
-      <code id="2012057" name="ipcc_2001_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2001_category">
+      <code id="2012557" name="ipcc_2001_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2001_category">
         <label type="instance" xml:lang="en">IPCC 2001 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2001 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2001 Subdivisión de Uso de la Tierra</label>
         <label type="instance" xml:lang="fr">GIEC 2001 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2001" />
@@ -3642,10 +3654,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2001" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2001" />
       </code>
-      <text id="2012058" name="ipcc_2002_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012558" name="ipcc_2002_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2002 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2002 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2002 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2002 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2002 and land_use_subcategory_year_of_change  &gt;=1982" />
@@ -3655,17 +3666,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1982" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1982" />
       </text>
-      <code id="2012059" name="ipcc_2002_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012559" name="ipcc_2002_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2002 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2002 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2002 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2002 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2002_subcategory, 2, 1)" />
       </code>
-      <code id="2012060" name="ipcc_2002_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2002_category">
+      <code id="2012560" name="ipcc_2002_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2002_category">
         <label type="instance" xml:lang="en">IPCC 2002 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2002 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2002 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2002 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2002" />
@@ -3679,10 +3688,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2002" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2002" />
       </code>
-      <text id="2012061" name="ipcc_2003_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012561" name="ipcc_2003_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2003 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2003 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2003 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2003 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2003 and land_use_subcategory_year_of_change  &gt;=1983" />
@@ -3692,17 +3700,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1983" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1983" />
       </text>
-      <code id="2012062" name="ipcc_2003_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012562" name="ipcc_2003_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2003 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2003 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2003 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2003 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2003_subcategory, 2, 1)" />
       </code>
-      <code id="2012063" name="ipcc_2003_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2003_category">
+      <code id="2012563" name="ipcc_2003_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2003_category">
         <label type="instance" xml:lang="en">IPCC 2003 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2003 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2003 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2003 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2003" />
@@ -3716,10 +3722,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2003" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2003" />
       </code>
-      <text id="2012064" name="ipcc_2004_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012564" name="ipcc_2004_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2004 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2004 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2004 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2004 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2004 and land_use_subcategory_year_of_change  &gt;=1984" />
@@ -3729,17 +3734,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1984" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1984" />
       </text>
-      <code id="2012065" name="ipcc_2004_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012565" name="ipcc_2004_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2004 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2004 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2004 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2004 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2004_subcategory, 2, 1)" />
       </code>
-      <code id="2012066" name="ipcc_2004_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2004_category">
+      <code id="2012566" name="ipcc_2004_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2004_category">
         <label type="instance" xml:lang="en">IPCC 2004 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2004 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2004 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2004 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2004" />
@@ -3753,10 +3756,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2004" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2004" />
       </code>
-      <text id="2012067" name="ipcc_2005_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012567" name="ipcc_2005_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2005 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2005 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2005 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2005 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2005 and land_use_subcategory_year_of_change  &gt;=1985" />
@@ -3766,17 +3768,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1985" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1985" />
       </text>
-      <code id="2012068" name="ipcc_2005_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012568" name="ipcc_2005_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2005 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2005 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2005 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2005 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2005_subcategory, 2, 1)" />
       </code>
-      <code id="2012069" name="ipcc_2005_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2005_category">
+      <code id="2012569" name="ipcc_2005_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2005_category">
         <label type="instance" xml:lang="en">IPCC 2005 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2005 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2005 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2005 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2005" />
@@ -3790,10 +3790,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2005" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2005" />
       </code>
-      <text id="2012070" name="ipcc_2006_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012570" name="ipcc_2006_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2006 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2006 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2006 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2006 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2006 and land_use_subcategory_year_of_change  &gt;=1986" />
@@ -3803,17 +3802,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1986" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1986" />
       </text>
-      <code id="2012071" name="ipcc_2006_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012571" name="ipcc_2006_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2006 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2006 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2006 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2006 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2006_subcategory, 2, 1)" />
       </code>
-      <code id="2012072" name="ipcc_2006_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2006_category">
+      <code id="2012572" name="ipcc_2006_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2006_category">
         <label type="instance" xml:lang="en">IPCC 2006 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2006 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2006 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2006 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2006" />
@@ -3827,10 +3824,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2006" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2006" />
       </code>
-      <text id="2012073" name="ipcc_2007_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012573" name="ipcc_2007_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2007 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2007 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2007 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2007 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2007 and land_use_subcategory_year_of_change  &gt;=1987" />
@@ -3840,17 +3836,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1987" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1987" />
       </text>
-      <code id="2012074" name="ipcc_2007_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012574" name="ipcc_2007_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2007 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2007 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2007 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2007 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2007_subcategory, 2, 1)" />
       </code>
-      <code id="2012075" name="ipcc_2007_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2007_category">
+      <code id="2012575" name="ipcc_2007_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2007_category">
         <label type="instance" xml:lang="en">IPCC 2007 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2007 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2007 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2007 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2007" />
@@ -3864,10 +3858,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2007" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2007" />
       </code>
-      <text id="2012076" name="ipcc_2008_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012576" name="ipcc_2008_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2008 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2008 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2008 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2008 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2008 and land_use_subcategory_year_of_change  &gt;=1988" />
@@ -3877,17 +3870,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1988" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1988" />
       </text>
-      <code id="2012077" name="ipcc_2008_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012577" name="ipcc_2008_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2008 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2008 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2008 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2008 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2008_subcategory, 2, 1)" />
       </code>
-      <code id="2012078" name="ipcc_2008_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2008_category">
+      <code id="2012578" name="ipcc_2008_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2008_category">
         <label type="instance" xml:lang="en">IPCC 2008 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2008 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2008 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2008 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2008" />
@@ -3901,10 +3892,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2008" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2008" />
       </code>
-      <text id="2012079" name="ipcc_2009_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012579" name="ipcc_2009_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2009 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2009 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2009 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2009 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2009 and land_use_subcategory_year_of_change  &gt;=1989" />
@@ -3914,17 +3904,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1989" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1989" />
       </text>
-      <code id="2012080" name="ipcc_2009_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012580" name="ipcc_2009_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2009 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2009 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2009 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2009 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2009_subcategory, 2, 1)" />
       </code>
-      <code id="2012081" name="ipcc_2009_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2009_category">
+      <code id="2012581" name="ipcc_2009_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2009_category">
         <label type="instance" xml:lang="en">IPCC 2009 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2009 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2009 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2009 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2009" />
@@ -3938,10 +3926,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2009" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2009" />
       </code>
-      <text id="2012082" name="ipcc_2010_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012582" name="ipcc_2010_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2010 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2010 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2010 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2010 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2010 and land_use_subcategory_year_of_change  &gt;=1990" />
@@ -3951,17 +3938,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1990" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1990" />
       </text>
-      <code id="2012083" name="ipcc_2010_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012583" name="ipcc_2010_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2010 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2010 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2010 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2010 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2010_subcategory, 2, 1)" />
       </code>
-      <code id="2012084" name="ipcc_2010_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2010_category">
+      <code id="2012584" name="ipcc_2010_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2010_category">
         <label type="instance" xml:lang="en">IPCC 2010 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2010 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2010 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2010 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2010" />
@@ -3975,10 +3960,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2010" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2010" />
       </code>
-      <text id="2012085" name="ipcc_2011_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012585" name="ipcc_2011_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2011 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2011 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2011 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2011 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2011 and land_use_subcategory_year_of_change  &gt;=1991" />
@@ -3988,17 +3972,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1991" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1991" />
       </text>
-      <code id="2012086" name="ipcc_2011_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012586" name="ipcc_2011_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2011 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2011 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2011 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2011 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2011_subcategory, 2, 1)" />
       </code>
-      <code id="2012087" name="ipcc_2011_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2011_category">
+      <code id="2012587" name="ipcc_2011_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2011_category">
         <label type="instance" xml:lang="en">IPCC 2011 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2011 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2011 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2011 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2011" />
@@ -4012,10 +3994,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2011" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2011" />
       </code>
-      <text id="2012088" name="ipcc_2012_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012588" name="ipcc_2012_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2012 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2012 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2012 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2012 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2012 and land_use_subcategory_year_of_change  &gt;=1992" />
@@ -4025,17 +4006,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1992" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1992" />
       </text>
-      <code id="2012089" name="ipcc_2012_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012589" name="ipcc_2012_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2012 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2012 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2012 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2012 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2012_subcategory, 2, 1)" />
       </code>
-      <code id="2012090" name="ipcc_2012_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2012_category">
+      <code id="2012590" name="ipcc_2012_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2012_category">
         <label type="instance" xml:lang="en">IPCC 2012 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2012 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2012 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2012 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2012" />
@@ -4049,10 +4028,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2012" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2012" />
       </code>
-      <text id="2012091" name="ipcc_2013_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012591" name="ipcc_2013_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2013 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2013 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2013 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2013 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2013 and land_use_subcategory_year_of_change  &gt;=1993" />
@@ -4062,17 +4040,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1993" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1993" />
       </text>
-      <code id="2012092" name="ipcc_2013_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012592" name="ipcc_2013_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2013 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2013 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2013 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2013 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2013_subcategory, 2, 1)" />
       </code>
-      <code id="2012093" name="ipcc_2013_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2013_category">
+      <code id="2012593" name="ipcc_2013_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2013_category">
         <label type="instance" xml:lang="en">IPCC 2013 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2013 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2013 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2013 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2013" />
@@ -4086,10 +4062,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2013" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2013" />
       </code>
-      <text id="2012094" name="ipcc_2014_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012594" name="ipcc_2014_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2014 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2014 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2014 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2014 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2014 and land_use_subcategory_year_of_change  &gt;=1994" />
@@ -4099,17 +4074,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1994" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1994" />
       </text>
-      <code id="2012095" name="ipcc_2014_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012595" name="ipcc_2014_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2014 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2014 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2014 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2014 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2014_subcategory, 2, 1)" />
       </code>
-      <code id="2012096" name="ipcc_2014_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2014_category">
+      <code id="2012596" name="ipcc_2014_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2014_category">
         <label type="instance" xml:lang="en">IPCC 2014 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2014 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2014 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2014 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2014" />
@@ -4123,10 +4096,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2014" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2014" />
       </code>
-      <text id="2012097" name="ipcc_2015_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012597" name="ipcc_2015_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2015 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2015 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2015 Conversão do Uso da Terra</label>
         <label type="instance" xml:lang="fr">GIEC 2015 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2015 and land_use_subcategory_year_of_change  &gt;=1995" />
@@ -4136,17 +4108,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1995" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1995" />
       </text>
-      <code id="2012098" name="ipcc_2015_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012598" name="ipcc_2015_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2015 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2015 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2015 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2015 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2015_subcategory, 2, 1)" />
       </code>
-      <code id="2012099" name="ipcc_2015_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2015_category">
+      <code id="2012599" name="ipcc_2015_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2015_category">
         <label type="instance" xml:lang="en">IPCC 2015 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2015 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2016 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2015 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2015" />
@@ -4160,10 +4130,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2015" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2015" />
       </code>
-      <text id="2012100" name="ipcc_2016_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012600" name="ipcc_2016_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2016 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2016 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2016 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2016 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2016 and land_use_subcategory_year_of_change  &gt;=1996" />
@@ -4173,17 +4142,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1996" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1996" />
       </text>
-      <code id="2012101" name="ipcc_2016_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012601" name="ipcc_2016_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2016 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2016 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2016 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2016 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2016_subcategory, 2, 1)" />
       </code>
-      <code id="2012102" name="ipcc_2016_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2016_category">
+      <code id="2012602" name="ipcc_2016_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2016_category">
         <label type="instance" xml:lang="en">IPCC 2016 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2016 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2016 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2016 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2016" />
@@ -4197,10 +4164,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2016" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2016" />
       </code>
-      <text id="2012103" name="ipcc_2017_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012603" name="ipcc_2017_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2017 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2017 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2017 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2017 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2017 and land_use_subcategory_year_of_change  &gt;=1997" />
@@ -4210,17 +4176,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1997" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1997" />
       </text>
-      <code id="2012104" name="ipcc_2017_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012604" name="ipcc_2017_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2017 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2017 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2017 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2017 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2017_subcategory, 2, 1)" />
       </code>
-      <code id="2012105" name="ipcc_2017_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2017_category">
+      <code id="2012605" name="ipcc_2017_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2017_category">
         <label type="instance" xml:lang="en">IPCC 2017 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2017 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2017 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2017 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2017" />
@@ -4234,10 +4198,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2017" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2017" />
       </code>
-      <text id="2012106" name="ipcc_2018_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012606" name="ipcc_2018_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2018 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2018 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2018 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2018 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2018 and land_use_subcategory_year_of_change  &gt;=1998" />
@@ -4247,17 +4210,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1998" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1998" />
       </text>
-      <code id="2012107" name="ipcc_2018_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012607" name="ipcc_2018_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2018 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2018 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2018 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2018 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2018_subcategory, 2, 1)" />
       </code>
-      <code id="2012108" name="ipcc_2018_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2018_category">
+      <code id="2012608" name="ipcc_2018_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2018_category">
         <label type="instance" xml:lang="en">IPCC 2018 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2018 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2018 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2018 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2018" />
@@ -4271,10 +4232,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2018" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2018" />
       </code>
-      <text id="2012109" name="ipcc_2019_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012609" name="ipcc_2019_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2019 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2019 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2019 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2019 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2019 and land_use_subcategory_year_of_change  &gt;=1999" />
@@ -4284,17 +4244,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 1999" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 1999" />
       </text>
-      <code id="2012110" name="ipcc_2019_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012610" name="ipcc_2019_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2019 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2019 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2019 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2019 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2019_subcategory, 2, 1)" />
       </code>
-      <code id="2012111" name="ipcc_2019_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2019_category">
+      <code id="2012611" name="ipcc_2019_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2019_category">
         <label type="instance" xml:lang="en">IPCC 2019 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2019 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2019 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2019 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2019" />
@@ -4308,9 +4266,8 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2019" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2019" />
       </code>
-      <text id="2012112" name="ipcc_2020_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012612" name="ipcc_2020_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2020 Land Use Conversion</label>
-        <label type="instance" xml:lang="pt">IPCC 2020 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="es">IPCC 2020 Conversión de Uso de la Tierra</label>
         <label type="instance" xml:lang="fr">GIEC 2020 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
@@ -4321,17 +4278,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 2000" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 2000" />
       </text>
-      <code id="2012113" name="ipcc_2020_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012613" name="ipcc_2020_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2020 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2020 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2020 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2020 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2020_subcategory, 2, 1)" />
       </code>
-      <code id="2012114" name="ipcc_2020_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2020_category">
+      <code id="2012614" name="ipcc_2020_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2020_category">
         <label type="instance" xml:lang="en">IPCC 2020 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2020 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2020 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2020 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2020" />
@@ -4345,10 +4300,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2020" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2020" />
       </code>
-      <text id="2012115" name="ipcc_2021_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012615" name="ipcc_2021_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2021 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2021 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2021 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2021 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2021 and land_use_subcategory_year_of_change  &gt;=2001" />
@@ -4358,17 +4312,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 2001" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 2001" />
       </text>
-      <code id="2012116" name="ipcc_2021_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012616" name="ipcc_2021_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2021 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2021 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2021 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2021 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2021_subcategory, 2, 1)" />
       </code>
-      <code id="2012117" name="ipcc_2021_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2021_category">
+      <code id="2012617" name="ipcc_2021_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2021_category">
         <label type="instance" xml:lang="en">IPCC 2021 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2021 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2021 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2021 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2021" />
@@ -4382,10 +4334,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2021" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2021" />
       </code>
-      <text id="2012118" name="ipcc_2022_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012618" name="ipcc_2022_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2022 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2022 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2022 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2022 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2022 and land_use_subcategory_year_of_change  &gt;=2002" />
@@ -4395,17 +4346,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 2002" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 2002" />
       </text>
-      <code id="2012119" name="ipcc_2022_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012619" name="ipcc_2022_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2022 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2022 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2022 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2022 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2022_subcategory, 2, 1)" />
       </code>
-      <code id="2012120" name="ipcc_2022_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2022_category">
+      <code id="2012620" name="ipcc_2022_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2022_category">
         <label type="instance" xml:lang="en">IPCC 2022 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2022 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2022 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2022 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2022" />
@@ -4419,10 +4368,9 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2022" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2022" />
       </code>
-      <text id="2012121" name="ipcc_2023_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+      <text id="2012621" name="ipcc_2023_subcategory" ui:hide="true" calculated="true" type="short">
         <label type="instance" xml:lang="en">IPCC 2023 Land Use Conversion</label>
         <label type="instance" xml:lang="es">IPCC 2023 Conversión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2023 Conversão do Uso da Terra</label>        
         <label type="instance" xml:lang="fr">GIEC 2023 Conversion de l'utilisation des terres</label>
         <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
         <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2023 and land_use_subcategory_year_of_change  &gt;=2003" />
@@ -4432,17 +4380,15 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 2003" />
         <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 2003" />
       </text>
-      <code id="2012122" name="ipcc_2023_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+      <code id="2012622" name="ipcc_2023_category" ui:hide="true" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2023 Land Use Category</label>
         <label type="instance" xml:lang="es">IPCC 2023 Categoría Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2023 Categoria de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2023 Catégorie d'utilisation des terres </label>
         <default expr="substring(ipcc_2023_subcategory, 2, 1)" />
       </code>
-      <code id="2012123" name="ipcc_2023_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2023_category">
+      <code id="2012623" name="ipcc_2023_subdivision" ui:hide="true" calculated="true" list="land_uses" parent="ipcc_2023_category">
         <label type="instance" xml:lang="en">IPCC 2023 Land Use Subdivision</label>
         <label type="instance" xml:lang="es">IPCC 2023 Subdivisión de Uso de la Tierra</label>
-        <label type="instance" xml:lang="pt">IPCC 2023 Subdivisión de uso da terra</label>
         <label type="instance" xml:lang="fr">GIEC 2023 Subdivision d'utilisation des terres</label>
         <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
         <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2023" />
