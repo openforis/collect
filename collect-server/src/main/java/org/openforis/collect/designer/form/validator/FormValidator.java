@@ -107,18 +107,19 @@ public abstract class FormValidator extends BaseValidator {
 
 	protected boolean validateExpression(ValidationContext ctx, ExpressionType type, String field, 
 			NodeDefinition contextNodeDef, NodeDefinition thisNodeDef, String epression) {
-		if ( StringUtils.isNotBlank(epression) ) {
-			ExpressionValidator expressionValidator = getExpressionValidator(ctx);
-			ExpressionValidationResult result = expressionValidator.validateExpression(type, contextNodeDef, thisNodeDef, epression);
-			if ( result.isError() ) {
-				addInvalidMessage(ctx, field, generateErrorMessageLabel(result, INVALID_EXPRESSION_MESSAGE_KEY));
-				return false;
-			}
-			ExpressionValidationResult circularReferenceValidationResult = expressionValidator.validateCircularReferenceAbsence(contextNodeDef, thisNodeDef, epression);
-			if (circularReferenceValidationResult.isError()) {
-				addInvalidMessage(ctx, field, generateErrorMessageLabel(circularReferenceValidationResult, CIRCULAR_REFERENCE_IN_EXPRESSION_MESSAGE_KEY));
-				return false;
-			}
+		if ( StringUtils.isBlank(epression) ) {
+			return true;
+		}
+		ExpressionValidator expressionValidator = getExpressionValidator(ctx);
+		ExpressionValidationResult result = expressionValidator.validateExpression(type, contextNodeDef, thisNodeDef, epression);
+		if ( result.isError() ) {
+			addInvalidMessage(ctx, field, generateErrorMessageLabel(result, INVALID_EXPRESSION_MESSAGE_KEY));
+			return false;
+		}
+		ExpressionValidationResult circularReferenceValidationResult = expressionValidator.validateCircularReferenceAbsence(contextNodeDef, thisNodeDef, epression);
+		if (circularReferenceValidationResult.isError()) {
+			addInvalidMessage(ctx, field, generateErrorMessageLabel(circularReferenceValidationResult, CIRCULAR_REFERENCE_IN_EXPRESSION_MESSAGE_KEY));
+			return false;
 		}
 		return true;
 	}

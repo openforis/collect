@@ -22,6 +22,7 @@ public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition
 	*/
 	private Integer maxSize;
 	private String fileType;
+	private String fileNameExpression;
 	
 	FileAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
@@ -34,6 +35,7 @@ public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition
 		dest.removeAllExtensions();
 		CollectAnnotations annotations = ((CollectSurvey) dest.getSurvey()).getAnnotations();
 		annotations.setFileType(dest, FileType.valueOf(fileType));
+		annotations.setFileNameExpression(dest, fileNameExpression);
 	}
 	
 	@Override
@@ -42,6 +44,7 @@ public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition
 		maxSize = convertToMB(source.getMaxSize());
 		CollectAnnotations annotations = ((CollectSurvey) source.getSurvey()).getAnnotations();
 		fileType = annotations.getFileType(source).name();
+		fileNameExpression = annotations.getFileNameExpression(source);
 	}
 
 	private static Integer convertToMB(Integer bytes) {
@@ -77,6 +80,14 @@ public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition
 	
 	public void setFileType(String fileType) {
 		this.fileType = fileType;
+	}
+	
+	public String getFileNameExpression() {
+		return fileNameExpression;
+	}
+	
+	public void setFileNameExpression(String fileNameExpression) {
+		this.fileNameExpression = fileNameExpression;
 	}
 
 }

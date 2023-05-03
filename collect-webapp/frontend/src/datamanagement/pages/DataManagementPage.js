@@ -306,11 +306,11 @@ class DataManagementPage extends React.Component {
               </DropdownToggle>
               <DropdownMenu>
                 <DropdownItem onClick={this.handleExportToCsvButtonClick}>
-                  <i class="fa fa-file-excel"></i>
+                  <i className="fa fa-file-excel"></i>
                   {L.l('dataManagement.export.toCsv')}
                 </DropdownItem>
                 <DropdownItem onClick={this.handleBackupButtonClick}>
-                  <i class="fa fa-file-code"></i>
+                  <i className="fa fa-file-code"></i>
                   {L.l('dataManagement.export.toCollectFormat')}
                 </DropdownItem>
               </DropdownMenu>
@@ -331,7 +331,7 @@ class DataManagementPage extends React.Component {
                     <i className="fa fa-file-excel" aria-hidden="true"></i> {L.l('dataManagement.import.fromCsv')}
                   </DropdownItem>
                   <DropdownItem onClick={this.handleBackupImportButtonClick}>
-                    <i class="fa fa-file-code"></i>
+                    <i className="fa fa-file-code"></i>
                     {L.l('dataManagement.import.fromCollectFormat')}
                   </DropdownItem>
                 </DropdownMenu>
