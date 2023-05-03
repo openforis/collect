@@ -50,6 +50,7 @@ public class CollectAnnotations {
 		PHASE_TO_APPLY_DEFAULT_VALUE(new QName(COLLECT_NAMESPACE_URI, "phaseToApplyDefaultValue"), Step.ENTRY),
 		EDITABLE(new QName(COLLECT_NAMESPACE_URI, "editable"), true),
 		FILE_TYPE(new QName(COLLECT_NAMESPACE_URI, "fileType"), FileType.IMAGE),
+		FILE_NAME_EXPRESSION(new QName(COLLECT_NAMESPACE_URI, "fileNameExpression"), null),
 		MEASUREMENT(new QName(COLLECT_NAMESPACE_URI, "measurement"), false),
 		TEXT_INPUT(new QName(COLLECT_NAMESPACE_URI, "textInput"), TextInput.KEYBOARD),
 		TARGET(new QName(COLLECT_NAMESPACE_URI, "target"), SurveyTarget.COLLECT_DESKTOP),
@@ -455,6 +456,14 @@ public class CollectAnnotations {
 
 	public void setGeometry(TextAttributeDefinition def, boolean geometry) {
 		setAnnotationValue(def, Annotation.GEOMETRY, geometry);
+	}
+	
+	public String getFileNameExpression(FileAttributeDefinition def) {
+		return def.getAnnotation(Annotation.FILE_NAME_EXPRESSION.qName);
+	}
+
+	public void setFileNameExpression(FileAttributeDefinition def, String fileNameExpression) {
+		setAnnotationValue(def, Annotation.FILE_NAME_EXPRESSION, fileNameExpression);
 	}
 
 	public boolean isShowInMapBalloon(AttributeDefinition def) {
