@@ -8,8 +8,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.SessionRecordFileManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -55,9 +57,10 @@ public class RecordFileController extends BasicController implements Serializabl
 			@PathVariable("recordStep") Step recordStep, @RequestParam("nodePath") String nodePath) throws IOException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
 		CollectRecord record = recordProvider.provide(survey, recordId == 0 ? null : recordId, recordStep);
-		FileAttribute node = record.getNodeByPath(nodePath);
-		File file = getFile(node);
-		Controllers.writeFileToResponse(response, file);
+		FileAttribute fileAttribute = record.getNodeByPath(nodePath);
+		File file = getFile(fileAttribute);
+		String outputFileName = determineOutputFileName(survey, fileAttribute, file);
+		Controllers.writeFileToResponse(response, file, outputFileName);
 	}
 
 	@RequestMapping(value = "/survey/{surveyId}/data/records/{recordId}/{recordStep}/file-thumbnail", method = RequestMethod.GET)
@@ -90,4 +93,24 @@ public class RecordFileController extends BasicController implements Serializabl
 		return file;
 	}
 
+	
+	private String determineOutputFileName(CollectSurvey survey, FileAttribute node, File file) {
+		String originalFileName = file.getName();
+		CollectAnnotations annotations = survey.getAnnotations();
+		String fileNameExpression = annotations.getFileNameExpression(node.getDefinition());
+
+		if (StringUtils.isBlank(fileNameExpression)) {
+			return originalFileName;
+		}
+		try {
+			String fileName = (String) survey.getContext().getExpressionEvaluator().evaluateValue(node.getParent(), node, fileNameExpression);
+			String extension = FilenameUtils.getExtension(originalFileName);
+			if (StringUtils.isBlank(extension)) {
+				return fileName;
+			}
+			return fileName + "." + extension;
+		} catch (Exception e) {
+			return originalFileName;
+		}
+	}
 }
