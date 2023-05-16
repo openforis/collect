@@ -274,8 +274,8 @@ public class SpeciesImportTask extends ReferenceDataImportTask<ParsingError> {
 			throw new ParsingException(error);
 		}
 		Taxon taxonFamily = createTaxonFamily(line);
-		String normalizedScientificName = line.getRank() == GENUS ? line.getCanonicalScientificName()
-				: StringUtils.join(genus, " ", SpeciesCSVReader.SpeciesCSVLineParser.GENUS_SUFFIX);
+		String normalizedScientificName = StringUtils.join(genus, " ",
+				SpeciesCSVReader.SpeciesCSVLineParser.GENUS_SUFFIX);
 		return createTaxon(line, GENUS, taxonFamily, normalizedScientificName);
 	}
 
