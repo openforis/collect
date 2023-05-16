@@ -146,7 +146,8 @@ public class SpeciesCSVReader extends CSVReferenceDataImportReader<SpeciesLine> 
 				Matcher matcher = ONLY_GENUS_PATTERN.matcher(rawScientificName);
 				if (matcher.matches()) {
 					String genus = matcher.group(1);
-					return new ScientificNameParseResult(genus, null, genus + " " + GENUS_SUFFIX, TaxonRank.GENUS);
+					String suffix = matcher.groupCount() > 2 ? " " + matcher.group(3) + ".": "";
+					return new ScientificNameParseResult(genus, null, genus + suffix, TaxonRank.GENUS);
 				}
 			}
 			//species rank and above
