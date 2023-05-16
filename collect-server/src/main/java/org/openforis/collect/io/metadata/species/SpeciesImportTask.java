@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openforis.collect.io.exception.ParsingException;
@@ -273,7 +274,9 @@ public class SpeciesImportTask extends ReferenceDataImportTask<ParsingError> {
 			throw new ParsingException(error);
 		}
 		Taxon taxonFamily = createTaxonFamily(line);
-		return createTaxon(line, GENUS, taxonFamily, line.getCanonicalScientificName());
+		String normalizedScientificName = line.getRank() == GENUS ? line.getCanonicalScientificName()
+				: StringUtils.join(genus, " ", SpeciesCSVReader.SpeciesCSVLineParser.GENUS_SUFFIX);
+		return createTaxon(line, GENUS, taxonFamily, normalizedScientificName);
 	}
 
 	protected Taxon createTaxonSpecies(SpeciesLine line) throws ParsingException {
