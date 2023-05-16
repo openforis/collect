@@ -45,8 +45,8 @@ public class SchemaSummaryCSVExportJob extends Job {
 			@Override
 			protected void execute() throws Throwable {
 				try (
-						FileOutputStream out = new FileOutputStream(outputFile); 
-						final FlatDataWriter csvWriter = new ExcelFlatValuesWriter(out)) {
+					FileOutputStream out = new FileOutputStream(outputFile); 
+					final FlatDataWriter csvWriter = new ExcelFlatValuesWriter(out)) {
 					writeHeaders(csvWriter);
 					
 					Schema schema = survey.getSchema();

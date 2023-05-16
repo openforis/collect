@@ -3,19 +3,31 @@
  */
 package org.openforis.collect.designer.viewmodel.referencedata;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.net.URLConnection;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PopUpUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.viewmodel.BaseVM;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
+import org.openforis.commons.io.excel.ExcelFlatValuesWriter;
+import org.openforis.commons.io.flat.FlatDataWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Window;
 
@@ -24,7 +36,9 @@ import org.zkoss.zul.Window;
  *
  */
 public class ReferenceDataImportErrorsPopUpVM extends BaseVM {
-
+	
+	private static final Logger logger = LoggerFactory.getLogger(ReferenceDataImportErrorsPopUpVM.class);
+	
 	private static final String ERRORS_PARAM = "errors";
 	private static final String TITLE_PARAM = "title";
 	private static final String MESSAGE_KEY_DUPLICATE_VALUE = "survey.reference_data.import_error.type.duplicate_value.message";
@@ -44,6 +58,28 @@ public class ReferenceDataImportErrorsPopUpVM extends BaseVM {
 			@ExecutionArgParam(TITLE_PARAM) String title) {
 		this.errors = errors;
 		this.title = title;
+	}
+	
+	@Command
+	public void exportErrorsToExcel() {
+		try {
+			File outputFile = File.createTempFile("collect_reference_data_import_errors", ".xlsx");
+			FileOutputStream out = new FileOutputStream(outputFile); 
+			final FlatDataWriter csvWriter = new ExcelFlatValuesWriter(out);
+			csvWriter.writeHeaders(Arrays.asList("row", "columns", "type", "message"));
+			for (ParsingError error : this.errors) {
+				csvWriter.writeNext(Arrays.asList(String.valueOf(error.getRow()), error.getColumnsString(),
+						getErrorTypeLabel(error), getErrorMessageLabel(error)));
+			}
+			csvWriter.close();
+			String fileName = "data_import_errors.xlsx";
+			String contentType = URLConnection.guessContentTypeFromName(fileName);
+			FileInputStream is = new FileInputStream(outputFile);
+			Filedownload.save(is, contentType, fileName);
+		} catch (Exception e) {
+			logger.error("Error exporting list of errors", e);
+			MessageUtil.showError("survey.schema.export_summary.error", e.getMessage());
+		}
 	}
 
 	public List<ParsingError> getErrors() {

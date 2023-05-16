@@ -1,39 +1,44 @@
 <zk>
-  <window id="referenceDataImportErrorPopUp"
-  	title="@load(vm.title)"
-    border="normal" 
-    position="center"
-    height="80%"
-    apply="org.zkoss.bind.BindComposer"
-    viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.referencedata.ReferenceDataImportErrorsPopUpVM')"
-    closable="true"
-    onClose="@global-command('closeReferenceDataImportErrorPopUp')"
-    >
-    
-    <vbox align="center" vflex="true">
-      <listbox id="listbox" 
-        width="710px" vflex="true"
-        model="@load(vm.errors)">
-        <listhead>
-          <listheader label="${labels.survey.reference_data.import_error.row}" width="70px" 
-            sort="auto(row)" />
-          <listheader label="${labels.survey.reference_data.import_error.columns}" width="100px" 
-            sort="auto(columnsString)" />
-          <listheader label="${labels.survey.reference_data.import_error.type.$}" width="200px" 
-            sort="auto(errorType)" />
-          <listheader label="${labels.survey.reference_data.import_error.message}" 
-            sort="auto(message)" />
-        </listhead>
-        <template name="model">
-          <listitem>
-            <listcell label="@load(each.row)" />
-            <listcell label="@load(each.columnsString)" />
-            <listcell label="@load(vm.getErrorTypeLabel(each))" />
-            <listcell label="@load(vm.getErrorMessageLabel(each))" />
-          </listitem>
-        </template>
-      </listbox>
-  
-    </vbox>
-  </window>
+	<window id="referenceDataImportErrorPopUp" title="@load(vm.title)"
+		border="normal" position="center" height="80%"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.referencedata.ReferenceDataImportErrorsPopUpVM')"
+		closable="true"
+		onClose="@global-command('closeReferenceDataImportErrorPopUp')">
+
+		<vbox align="center" vflex="true">
+			<listbox id="listbox" width="710px" vflex="true"
+				model="@load(vm.errors)">
+				<listhead>
+					<listheader
+						label="${labels.survey.reference_data.import_error.row}"
+						width="70px" sort="auto(row)" />
+					<listheader
+						label="${labels.survey.reference_data.import_error.columns}"
+						width="100px" sort="auto(columnsString)" />
+					<listheader
+						label="${labels.survey.reference_data.import_error.type.$}"
+						width="200px" sort="auto(errorType)" />
+					<listheader
+						label="${labels.survey.reference_data.import_error.message}"
+						sort="auto(message)" />
+				</listhead>
+				<template name="model">
+					<listitem>
+						<listcell label="@load(each.row)" />
+						<listcell label="@load(each.columnsString)" />
+						<listcell
+							label="@load(vm.getErrorTypeLabel(each))" />
+						<listcell
+							label="@load(vm.getErrorMessageLabel(each))" />
+					</listitem>
+				</template>
+			</listbox>
+
+			<button id="exportBtn"
+				label="${labels.global.export_to_excel}"
+				image="/assets/images/excel-small.png"
+				onClick="@command('exportErrorsToExcel')" />
+		</vbox>
+	</window>
 </zk>

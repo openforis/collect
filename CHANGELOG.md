@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.85] - 2023-05-16
+### Added
+- Taxonomy import: export errors list to Excel;
+
 ## [4.0.84] - 2023-05-04
 ### Fixed
 - Survey export: fixed error exporting survey to Collect Mobile;

@@ -41,6 +41,17 @@ button.icon {
 	white-space: nowrap;
 }
 
+.ellipsed {
+	display: block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.full-width {
+	width: 100%;
+}
+
 .z-west-header, .z-center-header, .z-east-header, .z-north-header, .z-south-header {
 	background: #f6f6f6;
 	height: 37px;

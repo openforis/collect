@@ -25,11 +25,11 @@
 		    onClick="@command('downloadExample')" />
 		</box>
 		
-		<hbox hflex="1" pack="center">
-			<label value="${labels.global.file_to_import}:" multiline="false" />
+		<hbox hflex="1" pack="center" spacing="20px">
+			<label value="${labels.global.file_to_import}:" multiline="false" zclass="z-label nowrap" />
 			<hbox hflex="1">
-		        <label visible="@load(not empty vm.uploadedFileName)" value="@load(vm.uploadedFileName)" />
-		        <label visible="@load(empty vm.uploadedFileName)" value="${labels.global.file_not_selected}" />
+		        <label hflex="1" visible="@load(not empty vm.uploadedFileName)" value="@load(vm.uploadedFileName)" zclass="z-label ellipsed full-width" />
+		        <label hflex="1" visible="@load(empty vm.uploadedFileName)" value="${labels.global.file_not_selected}" />
 			</hbox>
 	      	<button id="selectFileBtn" label="${labels.global.select_file_to_upload}"
 	        	upload="true,maxsize=-1" onUpload="@command('fileUploaded')" />
