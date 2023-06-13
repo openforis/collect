@@ -4,6 +4,7 @@ package org.openforis.collect.model;
 import static org.openforis.collect.model.CollectRecord.APPROVED_MISSING_POSITION;
 import static org.openforis.collect.model.CollectRecord.CONFIRMED_ERROR_POSITION;
 import static org.openforis.idm.model.NodePointers.nodesToPointers;
+import static org.openforis.idm.model.NodePointers.pointersToDescendantPointers;
 import static org.openforis.idm.model.NodePointers.pointersToNodes;
 
 import java.util.ArrayList;
@@ -454,7 +455,7 @@ public class RecordUpdater {
 			
 			ValidationResultFlag minCountResult, maxCountResult;
 			
-			if ( entity.isRelevant(childDef) ) {
+			if ( entity.isRelevant() && entity.isRelevant(childDef) ) {
 				minCountResult = validator.validateMinCount(entity, childDef);
 				maxCountResult = validator.validateMaxCount(entity, childDef);
 			} else {
@@ -596,6 +597,7 @@ public class RecordUpdater {
 		pointersToValidateCardinalityFor.addAll(updatedMinCountPointers);
 		pointersToValidateCardinalityFor.addAll(updatedMaxCountPointers);
 		pointersToValidateCardinalityFor.addAll(updatedRelevancePointers);
+		pointersToValidateCardinalityFor.addAll(pointersToDescendantPointers(updatedRelevancePointers));
 		pointersToValidateCardinalityFor.addAll(dependentCodeAttributesPointers);
 		// validate cardinality on ancestor node pointers because we are considering empty nodes as missing nodes
 		pointersToValidateCardinalityFor.addAll(ancestorsAndSelfPointers);

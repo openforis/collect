@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
+
 public class NodePointers {
 
 	public static Set<Node<?>> pointersToNodes(Collection<NodePointer> pointers) {
@@ -29,6 +32,22 @@ public class NodePointers {
 			}
 		}
 		return false;
+	}
+	
+	public static Set<NodePointer> pointersToDescendantPointers(Collection<NodePointer> pointers) {
+		final Set<NodePointer> result = new HashSet<NodePointer>();
+		for (NodePointer pointer : pointers) {
+			if (pointer.getChildDefinition() instanceof EntityDefinition) {
+				for (Node<?> node: pointer.getNodes()) {
+					((Entity) node).traverseDescendants(new NodeVisitor() {
+						public void visit(Node<? extends NodeDefinition> descendant, int idx) {
+							result.add(new NodePointer(descendant));
+						}
+					});
+				}
+			}
+		}
+		return result;
 	}
 
 }
