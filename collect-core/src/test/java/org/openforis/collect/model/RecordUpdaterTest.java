@@ -1089,4 +1089,41 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		assertEquals(new Code("C"), landUseCategoryAlias.getValue());
 	}
 	
+	@Test
+	public void testAttributesValidWhenParentBecomesNotRelevant() {
+		record(
+			rootEntityDef(
+				attributeDef("single_entity_relevant"),
+				entityDef("single_entity",
+					attributeDef("child_attribute").validate("$this != 'wrong'").required()
+				)
+				.relevant("single_entity_relevant = 'yes'")
+			),
+			entity("single_entity", attribute("child_attribute"))
+		);
+		Entity singleEntity = entityByPath("/root/single_entity");
+		Attribute<?, ?> childAttribute = attributeByPath("/root/single_entity/child_attribute");
+
+		updateAttribute("/root/single_entity_relevant", "yes");
+		assertTrue(singleEntity.isRelevant());
+		assertTrue(childAttribute.isRelevant());
+		assertEquals(ValidationResultFlag.ERROR, singleEntity.getMinCountValidationResult("child_attribute"));
+
+		updateAttribute("/root/single_entity_relevant", "no");
+		assertFalse(singleEntity.isRelevant());
+		assertEquals(ValidationResultFlag.OK, singleEntity.getMinCountValidationResult("child_attribute"));
+
+		// attribute not relevant with wrong value => valid
+		updateAttribute("/root/single_entity/child_attribute", "wrong");
+		assertTrue(childAttribute.getValidationResults() == null || childAttribute.getValidationResults().isEmpty());
+
+		// attribute relevant with wrong value => not valid
+		updateAttribute("/root/single_entity_relevant", "yes");
+		assertTrue(childAttribute.isRelevant());
+		assertTrue(childAttribute.getValidationResults().hasErrors());
+
+		// attribute not relevant with wrong value => valid
+		updateAttribute("/root/single_entity_relevant", "no");
+		assertTrue(childAttribute.getValidationResults() == null || childAttribute.getValidationResults().isEmpty());
+	}
 }

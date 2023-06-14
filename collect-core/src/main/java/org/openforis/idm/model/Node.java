@@ -135,6 +135,10 @@ public abstract class Node<D extends NodeDefinition> implements Serializable, De
 		return parent == null ? true : parent.isRelevant(getDefinition());
 	}
 	
+	public boolean isRelevantInsideAncestors() {
+		return parent == null ?  true : parent.isRelevantInsideAncestors() && parent.isRelevant(getDefinition());
+	}
+	
 	public boolean isRequired() {
 		return parent == null ? true : parent.isRequired(getDefinition());
 	}

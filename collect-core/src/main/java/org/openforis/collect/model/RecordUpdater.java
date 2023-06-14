@@ -4,6 +4,7 @@ package org.openforis.collect.model;
 import static org.openforis.collect.model.CollectRecord.APPROVED_MISSING_POSITION;
 import static org.openforis.collect.model.CollectRecord.CONFIRMED_ERROR_POSITION;
 import static org.openforis.idm.model.NodePointers.nodesToPointers;
+import static org.openforis.idm.model.NodePointers.pointersToDescendantPointers;
 import static org.openforis.idm.model.NodePointers.pointersToNodes;
 
 import java.util.ArrayList;
@@ -404,7 +405,7 @@ public class RecordUpdater {
 		Validator validator = record.getSurveyContext().getValidator();
 		
 		for (Attribute<?, ?> a : attributes) {
-			ValidationResults validationResultsNew = a.isRelevant() ? validator.validate(a) : new ValidationResults();
+			ValidationResults validationResultsNew = a.isRelevantInsideAncestors() ? validator.validate(a) : new ValidationResults();
 			ValidationResults validationResultsOld = a.getValidationResults();
 			if (validationResultsOld == null && !validationResultsNew.isEmpty()
 					|| validationResultsOld != null && !validationResultsNew.equals(validationResultsOld)) {
@@ -454,7 +455,7 @@ public class RecordUpdater {
 			
 			ValidationResultFlag minCountResult, maxCountResult;
 			
-			if ( entity.isRelevant(childDef) ) {
+			if ( entity.isRelevant() && entity.isRelevant(childDef) ) {
 				minCountResult = validator.validateMinCount(entity, childDef);
 				maxCountResult = validator.validateMaxCount(entity, childDef);
 			} else {
@@ -591,11 +592,14 @@ public class RecordUpdater {
 		//determine dependent attributes (hierarchical code attributes with parent/child relation)
 		Set<NodePointer> dependentCodeAttributesPointers = determineDependentCodeAttributes(updatedAttributePointersAndSelf);
 		
+		Set<NodePointer> updatedRelevanceDescendantPointers = pointersToDescendantPointers(updatedRelevancePointers);
+
 		Set<NodePointer> pointersToValidateCardinalityFor = new HashSet<NodePointer>();
 		pointersToValidateCardinalityFor.addAll(updatedAttributePointers);
 		pointersToValidateCardinalityFor.addAll(updatedMinCountPointers);
 		pointersToValidateCardinalityFor.addAll(updatedMaxCountPointers);
 		pointersToValidateCardinalityFor.addAll(updatedRelevancePointers);
+		pointersToValidateCardinalityFor.addAll(updatedRelevanceDescendantPointers);
 		pointersToValidateCardinalityFor.addAll(dependentCodeAttributesPointers);
 		// validate cardinality on ancestor node pointers because we are considering empty nodes as missing nodes
 		pointersToValidateCardinalityFor.addAll(ancestorsAndSelfPointers);
@@ -610,6 +614,7 @@ public class RecordUpdater {
 		nodesToCheckValidationFor.addAll(updatedAttributes);
 		nodesToCheckValidationFor.addAll(validationDependenciesToSelf);
 		nodesToCheckValidationFor.addAll(pointersToNodes(updatedRelevancePointers));
+		nodesToCheckValidationFor.addAll(pointersToNodes(updatedRelevanceDescendantPointers));
 		nodesToCheckValidationFor.addAll(pointersToNodes(updatedCardinalityPointers));
 		
 		Set<Attribute<?, ?>> attributesToRevalidate = filterAttributes(nodesToCheckValidationFor);
