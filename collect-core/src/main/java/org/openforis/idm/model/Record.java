@@ -130,13 +130,10 @@ public class Record implements DeepComparable {
 		List<Node<?>> nodes = findNodesByPath(path);
 		if ( nodes.size() == 0 ) {
 			return null;
-		} else if ( nodes.size() == 1 ) {
+		} else {
 			@SuppressWarnings("unchecked")
 			N n = (N) nodes.get(0);
 			return n;
-		} else {
-			throw new IllegalArgumentException(
-					"Multiple nodes found for path: " + path);
 		}
 	}
 

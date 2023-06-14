@@ -581,16 +581,14 @@ public class CollectRecord extends Record {
 	
 	private List<String> extractValues(List<AttributeDefinition> attrDefs) {
 		List<String> values = new ArrayList<String>();
-		for (AttributeDefinition keyDefn : attrDefs) {
-			Attribute<?, ?> keyNode = this.findNodeByPath(keyDefn.getPath());
-			if ( keyNode == null || keyNode.isEmpty() ) {
+		for (AttributeDefinition attrDef : attrDefs) {
+			Attribute<?, ?> node = this.findNodeByPath(attrDef.getPath());
+			if ( node == null || node.isEmpty() ) {
 				//TODO throw error in this case?
 				values.add(null);
 			} else {
-				if (! keyNode.isEmpty()) {
-					String keyValue = keyNode.extractTextValue();
-					values.add(keyValue);
-				}
+				String value = node.extractTextValue();
+				values.add(value);
 			}
 		}
 		return values;
