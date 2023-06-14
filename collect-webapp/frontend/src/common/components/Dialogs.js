@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { render, unmountComponentAtNode, findDOMNode } from 'react-dom'
+import { findDOMNode } from 'react-dom'
+import { createRoot } from 'react-dom/client'
 
 import Button from '@mui/material/Button'
 import DialogContent from '@mui/material/DialogContent'
@@ -33,7 +34,7 @@ class BaseDialog extends Component {
   }
 
   handleEntered() {
-    const focusBtn = this.okButton ? this.okButton : this.cancelButton
+    const focusBtn = this.okButton || this.cancelButton
     if (focusBtn) findDOMNode(focusBtn).focus()
   }
 
@@ -54,7 +55,7 @@ class BaseDialog extends Component {
   }
 
   close() {
-    Dialogs._removeTargetDiv(this.targetDivId)
+    Dialogs.close(this)
   }
 }
 
@@ -161,31 +162,40 @@ class ConfirmDialogConfiguration {
 
 export default class Dialogs {
   static confirm(title, message, onOk, onCancel, configuration) {
-    render(
+    const root = createRoot(Dialogs._createTargetDiv(CONFIRM_TARGET_DIV_ID))
+    root.render(
       <ConfirmDialog
+        root={root}
         targetDivId={CONFIRM_TARGET_DIV_ID}
         title={title}
         message={message}
         onOk={onOk}
         onCancel={onCancel}
         configuration={Object.assign({}, new ConfirmDialogConfiguration(), configuration)}
-      />,
-      Dialogs._createTargetDiv(CONFIRM_TARGET_DIV_ID)
+      />
     )
   }
 
   static alert(title, message, onOk = null) {
-    render(
-      <AlertDialog targetDivId={ALERT_TARGET_DIV_ID} title={title} message={message} onOk={onOk} />,
-      Dialogs._createTargetDiv(ALERT_TARGET_DIV_ID)
+    const root = createRoot(Dialogs._createTargetDiv(ALERT_TARGET_DIV_ID))
+    root.render(
+      <AlertDialog root={root} targetDivId={ALERT_TARGET_DIV_ID} title={title} message={message} onOk={onOk} />
     )
   }
 
   static showLoadingDialog(allowCancel = false, onCancel = null, title = L.l('global.loading')) {
-    return render(
-      <LoadingDialog targetDivId={LOADING_TARGET_DIV_ID} title={title} allowCancel={allowCancel} onCancel={onCancel} />,
-      Dialogs._createTargetDiv(LOADING_TARGET_DIV_ID)
+    const root = createRoot(Dialogs._createTargetDiv(LOADING_TARGET_DIV_ID))
+    const dialog = (
+      <LoadingDialog
+        root={root}
+        targetDivId={LOADING_TARGET_DIV_ID}
+        title={title}
+        allowCancel={allowCancel}
+        onCancel={onCancel}
+      />
     )
+    root.render(dialog)
+    return dialog
   }
 
   static _createTargetDiv(targetDivId) {
@@ -195,9 +205,10 @@ export default class Dialogs {
     return targetDiv
   }
 
-  static _removeTargetDiv(targetDivId) {
+  static close(dialog) {
+    const { root, targetDivId } = dialog.props
     const target = document.getElementById(targetDivId)
-    unmountComponentAtNode(target)
     target.parentNode.removeChild(target)
+    root.unmount()
   }
 }

@@ -72,7 +72,7 @@ export const publishSurvey = (survey, ignoreWarnings = false, onComplete = null)
             .catch(() => {
                 Dialogs.alert(L.l('survey.publish.error.title'), L.l('common.systemError.message'))
             })
-            .finally(() => loadingDialog.close())
+            .finally(() => Dialogs.close(loadingDialog))
     }
 
 export const unpublishSurvey = survey =>
