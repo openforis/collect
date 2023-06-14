@@ -405,7 +405,7 @@ public class RecordUpdater {
 		Validator validator = record.getSurveyContext().getValidator();
 		
 		for (Attribute<?, ?> a : attributes) {
-			ValidationResults validationResultsNew = a.isRelevant() ? validator.validate(a) : new ValidationResults();
+			ValidationResults validationResultsNew = a.isRelevantInsideAncestors() ? validator.validate(a) : new ValidationResults();
 			ValidationResults validationResultsOld = a.getValidationResults();
 			if (validationResultsOld == null && !validationResultsNew.isEmpty()
 					|| validationResultsOld != null && !validationResultsNew.equals(validationResultsOld)) {
@@ -592,12 +592,14 @@ public class RecordUpdater {
 		//determine dependent attributes (hierarchical code attributes with parent/child relation)
 		Set<NodePointer> dependentCodeAttributesPointers = determineDependentCodeAttributes(updatedAttributePointersAndSelf);
 		
+		Set<NodePointer> updatedRelevanceDescendantPointers = pointersToDescendantPointers(updatedRelevancePointers);
+
 		Set<NodePointer> pointersToValidateCardinalityFor = new HashSet<NodePointer>();
 		pointersToValidateCardinalityFor.addAll(updatedAttributePointers);
 		pointersToValidateCardinalityFor.addAll(updatedMinCountPointers);
 		pointersToValidateCardinalityFor.addAll(updatedMaxCountPointers);
 		pointersToValidateCardinalityFor.addAll(updatedRelevancePointers);
-		pointersToValidateCardinalityFor.addAll(pointersToDescendantPointers(updatedRelevancePointers));
+		pointersToValidateCardinalityFor.addAll(updatedRelevanceDescendantPointers);
 		pointersToValidateCardinalityFor.addAll(dependentCodeAttributesPointers);
 		// validate cardinality on ancestor node pointers because we are considering empty nodes as missing nodes
 		pointersToValidateCardinalityFor.addAll(ancestorsAndSelfPointers);
@@ -612,6 +614,7 @@ public class RecordUpdater {
 		nodesToCheckValidationFor.addAll(updatedAttributes);
 		nodesToCheckValidationFor.addAll(validationDependenciesToSelf);
 		nodesToCheckValidationFor.addAll(pointersToNodes(updatedRelevancePointers));
+		nodesToCheckValidationFor.addAll(pointersToNodes(updatedRelevanceDescendantPointers));
 		nodesToCheckValidationFor.addAll(pointersToNodes(updatedCardinalityPointers));
 		
 		Set<Attribute<?, ?>> attributesToRevalidate = filterAttributes(nodesToCheckValidationFor);

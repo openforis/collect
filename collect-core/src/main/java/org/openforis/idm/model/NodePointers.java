@@ -36,14 +36,17 @@ public class NodePointers {
 	
 	public static Set<NodePointer> pointersToDescendantPointers(Collection<NodePointer> pointers) {
 		final Set<NodePointer> result = new HashSet<NodePointer>();
+
+		NodeVisitor nodePointerCreatorVisitor = new NodeVisitor() {
+			public void visit(Node<? extends NodeDefinition> descendant, int idx) {
+				result.add(new NodePointer(descendant));
+			}
+		};
+
 		for (NodePointer pointer : pointers) {
 			if (pointer.getChildDefinition() instanceof EntityDefinition) {
 				for (Node<?> node: pointer.getNodes()) {
-					((Entity) node).traverseDescendants(new NodeVisitor() {
-						public void visit(Node<? extends NodeDefinition> descendant, int idx) {
-							result.add(new NodePointer(descendant));
-						}
-					});
+					((Entity) node).traverseDescendants(nodePointerCreatorVisitor);
 				}
 			}
 		}
