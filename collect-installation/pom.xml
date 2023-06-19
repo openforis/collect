@@ -22,9 +22,9 @@
 		<!-- install builder application version id (used by auto updater): it 
 			must be a progressive number -->
 		<installer-version-id>${buildNumber}</installer-version-id>
-		<installer.jre.version.major>1.8</installer.jre.version.major>
-		<installer.jre.version>1.8.0</installer.jre.version>
-		<installer.jre.version.full>1.8.0_272</installer.jre.version.full>
+		<installer.jre.version.major>20.0</installer.jre.version.major>
+		<installer.jre.version>20.0.1</installer.jre.version>
+		<installer.jre.version.full>20.0.1+9</installer.jre.version.full>
 	</properties>
 
 	<profiles>

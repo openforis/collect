@@ -1,6 +1,6 @@
 <component>
     <name>java</name>
-    <description>Java Runtime Environment - OpenJDK 8 with OpenJ9 JVM</description>
+    <description>Java Runtime Environment - Eclipse Temurin JRE 20</description>
     <canBeEdited>0</canBeEdited>
     <selected>1</selected>
     <show>0</show>
@@ -126,9 +126,9 @@
     <readyToInstallActionList>
 	<if>
 	    <actionList>
-		<setInstallerVariable name="java_version_major" value="1.8" />
-		<setInstallerVariable name="java_version" value="1.8.0" />
-		<setInstallerVariable name="java_version_full" value="1.8.0_232" />
+		<setInstallerVariable name="java_version_major" value="20.0" />
+		<setInstallerVariable name="java_version" value="20.0.1" />
+		<setInstallerVariable name="java_version_full" value="20.0.1+9" />
 		<setInstallerVariable name="java_version_vendor" value="Sun" />
 		<setInstallerVariable name="java_bitness" value="64" />
 		<!-- determine Java binary name - javaw.exe on Windows, java otherwise -->

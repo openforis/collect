@@ -57,16 +57,18 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 
 	private void printClasspath() {
 		ClassLoader cl = ClassLoader.getSystemClassLoader();
-        URL[] urls = ((URLClassLoader)cl).getURLs();
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < urls.length; i++) {
-			URL url = urls[i];
-        	sb.append(url.getFile());
-        	if (i < urls.length - 1) {
-        		sb.append(';');
-        	}
+		if (cl instanceof URLClassLoader) {
+			URL[] urls = ((URLClassLoader) cl).getURLs();
+	        for (int i = 0; i < urls.length; i++) {
+				URL url = urls[i];
+	        	sb.append(url.getFile());
+	        	if (i < urls.length - 1) {
+	        		sb.append(';');
+	        	}
+			}
+	    	LOG.info("Classpath: " + sb.toString());
 		}
-    	LOG.info("Classpath: " + sb.toString());
 	}
 	
 	@Override
