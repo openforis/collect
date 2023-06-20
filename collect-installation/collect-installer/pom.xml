@@ -180,7 +180,7 @@
 						<artifactId>iterator-maven-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>download-jre-autoupdater</id>
+								<id>download-autoupdater</id>
 								<phase>process-sources</phase>
 								<goals>
 									<goal>iterator</goal>

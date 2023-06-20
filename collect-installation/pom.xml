@@ -72,17 +72,6 @@
 					<configuration>
 						<itemsWithProperties>
 							<itemWithProperty>
-								<name>linux</name>
-								<properties>
-									<jre.classifier>linux</jre.classifier>
-									<installer.skip>false</installer.skip>
-									<installer.classifier>linux</installer.classifier>
-									<installer.artifact.type>run</installer.artifact.type>
-									<installer.autoupdater.extension>run</installer.autoupdater.extension>
-									<installer.extension>run</installer.extension>
-								</properties>
-							</itemWithProperty>
-							<itemWithProperty>
 								<name>linux-x64</name>
 								<properties>
 									<jre.classifier>linux-x64</jre.classifier>
@@ -105,22 +94,11 @@
 								</properties>
 							</itemWithProperty>
 							<itemWithProperty>
-								<name>windows</name>
-								<properties>
-									<jre.classifier>windows-i386</jre.classifier>
-									<installer.skip>false</installer.skip>
-									<installer.classifier>windows</installer.classifier>
-									<installer.artifact.type>exe</installer.artifact.type>
-									<installer.autoupdater.extension>exe</installer.autoupdater.extension>
-									<installer.extension>exe</installer.extension>
-								</properties>
-							</itemWithProperty>
-							<itemWithProperty>
 								<name>windows-x64</name>
 								<properties>
 									<jre.classifier>windows-x64</jre.classifier>
-									<installer.skip>true</installer.skip>
-									<installer.classifier>windows</installer.classifier>
+									<installer.skip>false</installer.skip>
+									<installer.classifier>windows-x64</installer.classifier>
 									<installer.artifact.type>exe</installer.artifact.type>
 									<installer.autoupdater.extension>exe</installer.autoupdater.extension>
 									<installer.extension>exe</installer.extension>
