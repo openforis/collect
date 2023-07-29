@@ -6,6 +6,11 @@ export class CoordinateAttributeDefinition extends AttributeDefinition {
   showSrsField
   includeAltitudeField
   includeAccuracyField
+  mandatoryFieldNames = [
+    CoordinateAttributeDefinition.Fields.X,
+    CoordinateAttributeDefinition.Fields.Y,
+    CoordinateAttributeDefinition.Fields.SRS,
+  ]
 
   static FieldsOrder = {
     SRS_X_Y: 'SRS_X_Y',

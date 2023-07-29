@@ -1,6 +1,8 @@
 import { AttributeDefinition } from './AttributeDefinition'
 
 export class TaxonAttributeDefinition extends AttributeDefinition {
+  mandatoryFieldNames = [TaxonAttributeDefinition.Fields.CODE]
+
   static QueryFields = {
     CODE: 'CODE',
     SCIENTIFIC_NAME: 'SCIENTIFIC_NAME',
