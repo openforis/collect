@@ -5,7 +5,9 @@ package org.openforis.collect.io.metadata.codelist;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
@@ -26,6 +28,10 @@ public class CodeListBatchImportJob extends Job {
 
 	private static final String ZIP = "zip";
 	private static final String CSV = "csv";
+	private static final String XLS = "xls";
+	private static final String XLSX = "xlsx";
+	private static final String MACOSX_HIDDEN_ENTRY_PREFIX = "__MACOSX/";
+	private static final List<String> VALID_EXTENSIONS = Arrays.<String>asList(CSV, XLS, XLSX);
 	
 	//input
 	private CodeListManager codeListManager;
@@ -47,7 +53,7 @@ public class CodeListBatchImportJob extends Job {
 	@Override
 	protected void validateInput() throws Throwable {
 		super.validateInput();
-		if (!validateExtension(file.getName(), ZIP)) {
+		if (!hasExtension(file.getName(), ZIP)) {
 			throw new IllegalArgumentException("survey.code_list.import_data.error.invalid_extension");
 		}
 		ZipFile zipFile = null;
@@ -60,7 +66,9 @@ public class CodeListBatchImportJob extends Job {
 				while (entries.hasMoreElements()) {
 					ZipArchiveEntry entry = (ZipArchiveEntry) entries.nextElement();
 					String entryName = entry.getName();
-					if (!validateExtension(entryName, CSV)) {
+					if (canSkipEntry(entryName)) {
+						// ignore it
+					} else if (!hasValidCodeListExtension(entryName)) {
 						throw new IllegalArgumentException("survey.code_list.import_data.error.invalid_extension");
 					} else if (!FilenameUtils.getBaseName(entryName).matches(Survey.INTERNAL_NAME_REGEX) ) {
 						throw new IllegalArgumentException("survey.code_list.import_data.error.invalid_filename");
@@ -72,8 +80,21 @@ public class CodeListBatchImportJob extends Job {
 		}
 	}
 
-	private boolean validateExtension(String fileName, String expectedExtension) {
-		return expectedExtension.equals(FilenameUtils.getExtension(fileName));
+	private boolean canSkipEntry(String entryName) {
+		return entryName.startsWith(MACOSX_HIDDEN_ENTRY_PREFIX);
+	}
+
+	private boolean hasExtension(String fileName, String expectedExtension) {
+		return expectedExtension.equalsIgnoreCase(FilenameUtils.getExtension(fileName));
+	}
+	
+	private boolean hasValidCodeListExtension(String fileName) {
+		for (String validExtension : VALID_EXTENSIONS) {
+			if (hasExtension(fileName, validExtension)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -82,7 +103,7 @@ public class CodeListBatchImportJob extends Job {
 		while (entries.hasMoreElements()) {
 			ZipArchiveEntry entry = (ZipArchiveEntry) entries.nextElement();
 			String entryName = entry.getName();
-			if (CSV.equalsIgnoreCase(FilenameUtils.getExtension(entryName))) {
+			if (!canSkipEntry(entryName) && hasValidCodeListExtension(entryName)) {
 				addCodeListImportTask(FilenameUtils.getBaseName(entryName));
 			}
 		}
