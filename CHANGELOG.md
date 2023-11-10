@@ -4,9 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.0.88] - 2023-11-09
+## [4.0.89] - 2023-11-10
 ### Fixed
 - Code lists batch import: allow importing zip files generated with MacOS;
+
+## [4.0.88] - 2023-11-09
 ### Added
 - Code lists batch import: allow importing zip files containing Excel files;
 

@@ -41,13 +41,11 @@ public class CodeListBatchImportJob extends Job {
 	
 	//transient
 	private ZipFile zipFile;
-	private Enumeration<ZipArchiveEntry> zipEntries;
 
 	@Override
 	protected void createInternalVariables() throws Throwable {
 		super.createInternalVariables();
 		zipFile = new ZipFile(file);
-		zipEntries = zipFile.getEntries();
 	}
 	
 	@Override
@@ -104,7 +102,7 @@ public class CodeListBatchImportJob extends Job {
 			ZipArchiveEntry entry = (ZipArchiveEntry) entries.nextElement();
 			String entryName = entry.getName();
 			if (!canSkipEntry(entryName) && hasValidCodeListExtension(entryName)) {
-				addCodeListImportTask(FilenameUtils.getBaseName(entryName));
+				addCodeListImportTask(entryName);
 			}
 		}
 	}
@@ -112,22 +110,25 @@ public class CodeListBatchImportJob extends Job {
 	@Override
 	protected void initializeTask(Worker task) {
 		try {
-			ZipArchiveEntry entry = zipEntries.nextElement();
-			InputStream is = zipFile.getInputStream(entry);
-			((CodeListImportTask) task).setInputStream(is);
-			((CodeListImportTask) task).setEntryName(entry.getName());
+			CodeListImportTask importTask = (CodeListImportTask) task;
+			String entryName = importTask.getEntryName();
+			ZipArchiveEntry zipEntry = zipFile.getEntry(entryName);
+			InputStream is = zipFile.getInputStream(zipEntry);
+			importTask.setInputStream(is);
 			super.initializeTask(task);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
-	private void addCodeListImportTask(String codeListName) {
+	private void addCodeListImportTask(String entryName) {
+		String codeListName = FilenameUtils.getBaseName(entryName);
 		CodeList codeList = getOrCreateCodeList(codeListName);
 		CodeListImportTask task = new CodeListImportTask();
 		task.setCodeListManager(codeListManager);
 		task.setCodeList(codeList);
 		task.setOverwriteData(overwriteData);
+		task.setEntryName(entryName);
 		addTask(task);
 	}
 
