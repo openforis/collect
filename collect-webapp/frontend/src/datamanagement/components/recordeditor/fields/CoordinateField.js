@@ -1,9 +1,16 @@
+import './CoordinateField.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
-import { MenuItem, Select, TextField as MuiTextField } from '@mui/material'
+import { MenuItem, Select, TextField as MuiTextField, IconButton } from '@mui/material'
+import { MyLocation } from '@mui/icons-material'
+
 import { CoordinateAttributeDefinition } from 'model/Survey'
 
+import Dialogs from 'common/components/Dialogs'
 import InputNumber from 'common/components/InputNumber'
+
+import BrowserUtils from 'utils/BrowserUtils'
 import L from 'utils/Labels'
 import Objects from 'utils/Objects'
 
@@ -12,17 +19,37 @@ import CompositeAttributeFormItem from './CompositeAttributeFormItem'
 import { COORDINATE_FIELD_WIDTH_PX } from './FieldsSizes'
 import DirtyFieldSpinner from './DirtyFieldSpinner'
 
+const latLonSrsId = 'EPSG:4326'
+
 class CoordinateField extends AbstractField {
   constructor() {
     super()
+    this.onChangeFields = this.onChangeFields.bind(this)
     this.onChangeSrs = this.onChangeSrs.bind(this)
+    this.onSetCurrentLocationClick = this.onSetCurrentLocationClick.bind(this)
+  }
+
+  getSpatialReferenceSystems() {
+    return this.props.survey.spatialReferenceSystems
+  }
+
+  getLatLonSrs() {
+    return this.getSpatialReferenceSystems().find((srs) => srs.id === latLonSrsId)
+  }
+
+  isGeoLocationSupported() {
+    return BrowserUtils.isGeoLocationSupported && !!this.getLatLonSrs()
   }
 
   onChangeField({ field, fieldValue }) {
+    this.onChangeFields({ [field]: fieldValue })
+  }
+
+  onChangeFields(fieldValuePairs) {
     const { value: valueState } = this.state
     const { fieldDef } = this.props
     const { showSrsField } = fieldDef.attributeDefinition
-    const value = { ...valueState, [field]: fieldValue }
+    const value = { ...valueState, ...fieldValuePairs }
     const { x = null, y = null, srs = null } = value
 
     const srss = this.getSpatialReferenceSystems()
@@ -42,8 +69,24 @@ class CoordinateField extends AbstractField {
     this.onChangeField({ field: 'srs', fieldValue: event.target.value })
   }
 
-  getSpatialReferenceSystems() {
-    return this.props.parentEntity.definition.survey.spatialReferenceSystems
+  onSetCurrentLocationClick() {
+    BrowserUtils.getCurrentPosition()
+      .then(({ latitude, longitude }) => {
+        Dialogs.confirm(
+          L.l('global.confirm'),
+          L.l('dataManagement.dataEntry.attribute.coordinate.confirm_overwrite_coordinate_with_current_location'),
+          () => {
+            const valueUpdated = { x: longitude, y: latitude, srs: latLonSrsId }
+            this.onChangeFields(valueUpdated)
+          }
+        )
+      })
+      .catch((error) => {
+        Dialogs.alert(
+          L.l('global.error'),
+          L.l('dataManagement.dataEntry.attribute.coordinate.error_getting_current_location', [error.message])
+        )
+      })
   }
 
   render() {
@@ -113,21 +156,29 @@ class CoordinateField extends AbstractField {
 
     return (
       <>
-        <div style={{ flexDirection: inTable ? 'row' : 'column' }} className="form-item-composite-wrapper">
-          {inTable
-            ? inputFields
-            : availableFieldNames.map((field, index) => getFormItem({ field, inputField: inputFields[index] }))}
+        <div className="coordinate-field-wrapper">
+          <div style={{ flexDirection: inTable ? 'row' : 'column' }} className="form-item-composite-wrapper">
+            {inTable
+              ? inputFields
+              : availableFieldNames.map((field, index) => getFormItem({ field, inputField: inputFields[index] }))}
+          </div>
+          {this.isGeoLocationSupported() && (
+            <IconButton onClick={this.onSetCurrentLocationClick}>
+              <MyLocation />
+            </IconButton>
+          )}
+          {dirty && <DirtyFieldSpinner />}
         </div>
-        {dirty && <DirtyFieldSpinner />}
       </>
     )
   }
 }
 
 const mapStateToProps = (state) => {
-  const { session } = state
-  const { loggedUser: user } = session
-  return { user }
+  const { activeSurvey, session } = state
+  const { survey } = activeSurvey ?? {}
+  const { loggedUser: user } = session ?? {}
+  return { survey, user }
 }
 
 export default connect(mapStateToProps)(CoordinateField)
