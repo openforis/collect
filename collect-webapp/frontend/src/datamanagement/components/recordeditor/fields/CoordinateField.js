@@ -123,6 +123,7 @@ class CoordinateField extends AbstractField {
     const { attributeDefinition } = fieldDef
     const { availableFieldNames } = attributeDefinition
     const readOnly = !user.canEditRecordAttribute({ record, attributeDefinition })
+    const currentLocationButtonVisible = !readOnly && this.isGeoLocationSupported()
 
     const numericField = ({ field }) => (
       <InputNumber
@@ -188,7 +189,7 @@ class CoordinateField extends AbstractField {
               ? inputFields
               : availableFieldNames.map((field, index) => getFormItem({ field, inputField: inputFields[index] }))}
           </div>
-          {this.isGeoLocationSupported() && (
+          {!inTable && currentLocationButtonVisible && (
             <IconButton onClick={this.onSetCurrentLocationClick}>
               <MyLocation />
             </IconButton>
