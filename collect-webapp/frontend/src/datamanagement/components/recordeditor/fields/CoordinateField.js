@@ -28,6 +28,8 @@ class CoordinateField extends AbstractField {
     this.onChangeFields = this.onChangeFields.bind(this)
     this.onChangeSrs = this.onChangeSrs.bind(this)
     this.onSetCurrentLocationClick = this.onSetCurrentLocationClick.bind(this)
+    this.onSetCurrentLocationConfirm = this.onSetCurrentLocationConfirm.bind(this)
+    this.onErrorGettingCurrentLocation = this.onErrorGettingCurrentLocation.bind(this)
   }
 
   getSpatialReferenceSystems() {
@@ -103,7 +105,8 @@ class CoordinateField extends AbstractField {
   }
 
   onSetCurrentLocationClick() {
-    const { x, y } = this.state
+    const { value } = this.state
+    const { x, y } = value ?? {}
     if (!!x || !!y) {
       Dialogs.confirm(
         L.l('global.confirm'),
@@ -124,6 +127,12 @@ class CoordinateField extends AbstractField {
     const { availableFieldNames } = attributeDefinition
     const readOnly = !user.canEditRecordAttribute({ record, attributeDefinition })
     const currentLocationButtonVisible = !readOnly && this.isGeoLocationSupported()
+
+    const currentLocationButton = currentLocationButtonVisible && (
+      <IconButton onClick={this.onSetCurrentLocationClick}>
+        <MyLocation />
+      </IconButton>
+    )
 
     const numericField = ({ field }) => (
       <InputNumber
@@ -185,15 +194,16 @@ class CoordinateField extends AbstractField {
       <>
         <div className="coordinate-field-wrapper">
           <div style={{ flexDirection: inTable ? 'row' : 'column' }} className="form-item-composite-wrapper">
-            {inTable
-              ? inputFields
-              : availableFieldNames.map((field, index) => getFormItem({ field, inputField: inputFields[index] }))}
+            {inTable ? (
+              <>
+                {inputFields}
+                {currentLocationButton}
+              </>
+            ) : (
+              availableFieldNames.map((field, index) => getFormItem({ field, inputField: inputFields[index] }))
+            )}
           </div>
-          {!inTable && currentLocationButtonVisible && (
-            <IconButton onClick={this.onSetCurrentLocationClick}>
-              <MyLocation />
-            </IconButton>
-          )}
+          {!inTable && currentLocationButton}
           {dirty && <DirtyFieldSpinner />}
         </div>
       </>

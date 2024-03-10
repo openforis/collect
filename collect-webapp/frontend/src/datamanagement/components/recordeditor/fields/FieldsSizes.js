@@ -7,6 +7,7 @@ import {
 
 export const COORDINATE_FIELD_WIDTH = 150
 export const COORDINATE_FIELD_WIDTH_PX = `${COORDINATE_FIELD_WIDTH}px`
+export const COORDINATE_GET_CURRENT_LOCATION_BUTTON_WIDTH = 40
 
 export const TaxonFieldWidths = {
   [TaxonAttributeDefinition.Fields.FAMILY_CODE]: 150,
@@ -27,7 +28,10 @@ const WIDTH_CALCULATORS_BY_ATTRIBUTE_TYPE = {
     const { attributeDefinition } = fieldDef
     const { availableFieldNames } = attributeDefinition
 
-    return inTable ? availableFieldNames.length * COORDINATE_FIELD_WIDTH : COORDINATE_FIELD_WIDTH
+    return (
+      (inTable ? availableFieldNames.length * COORDINATE_FIELD_WIDTH : COORDINATE_FIELD_WIDTH) +
+      COORDINATE_GET_CURRENT_LOCATION_BUTTON_WIDTH
+    )
   },
   [AttributeDefinition.Types.DATE]: () => 180,
   [AttributeDefinition.Types.FILE]: ({ inTable }) => (inTable ? 200 : 400),
