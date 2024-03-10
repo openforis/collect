@@ -18,6 +18,7 @@ import AbstractField from './AbstractField'
 import CompositeAttributeFormItem from './CompositeAttributeFormItem'
 import { COORDINATE_FIELD_WIDTH_PX } from './FieldsSizes'
 import DirtyFieldSpinner from './DirtyFieldSpinner'
+import ServiceFactory from 'services/ServiceFactory'
 
 const latLonSrsId = 'EPSG:4326'
 
@@ -30,15 +31,21 @@ class CoordinateField extends AbstractField {
   }
 
   getSpatialReferenceSystems() {
-    return this.props.survey.spatialReferenceSystems
+    return this.props.parentEntity.survey.spatialReferenceSystems
   }
 
   getLatLonSrs() {
     return this.getSpatialReferenceSystems().find((srs) => srs.id === latLonSrsId)
   }
 
+  getCurrentSrsIdOrDefault() {
+    const { value } = this.state
+    const { srs } = value ?? {}
+    return srs ?? this.getSpatialReferenceSystems()[0]?.id
+  }
+
   isGeoLocationSupported() {
-    return BrowserUtils.isGeoLocationSupported && !!this.getLatLonSrs()
+    return BrowserUtils.isGeoLocationSupported
   }
 
   onChangeField({ field, fieldValue }) {
@@ -69,24 +76,43 @@ class CoordinateField extends AbstractField {
     this.onChangeField({ field: 'srs', fieldValue: event.target.value })
   }
 
+  async onSetCurrentLocationConfirm() {
+    try {
+      const { latitude, longitude } = await BrowserUtils.getCurrentPosition()
+      const currentSrsId = this.getCurrentSrsIdOrDefault()
+      const currentLocationCoordinate = { x: longitude, y: latitude, srs: latLonSrsId }
+      if (currentSrsId === latLonSrsId) {
+        this.onChangeFields(currentLocationCoordinate)
+      } else {
+        const convertedCoordinate = await ServiceFactory.geoService.convertCoordinate(
+          currentLocationCoordinate,
+          currentSrsId
+        )
+        this.onChangeFields(convertedCoordinate)
+      }
+    } catch (error) {
+      this.onErrorGettingCurrentLocation(error)
+    }
+  }
+
+  onErrorGettingCurrentLocation(error) {
+    Dialogs.alert(
+      L.l('global.error'),
+      L.l('dataManagement.dataEntry.attribute.coordinate.error_getting_current_location', [error.message])
+    )
+  }
+
   onSetCurrentLocationClick() {
-    BrowserUtils.getCurrentPosition()
-      .then(({ latitude, longitude }) => {
-        Dialogs.confirm(
-          L.l('global.confirm'),
-          L.l('dataManagement.dataEntry.attribute.coordinate.confirm_overwrite_coordinate_with_current_location'),
-          () => {
-            const valueUpdated = { x: longitude, y: latitude, srs: latLonSrsId }
-            this.onChangeFields(valueUpdated)
-          }
-        )
-      })
-      .catch((error) => {
-        Dialogs.alert(
-          L.l('global.error'),
-          L.l('dataManagement.dataEntry.attribute.coordinate.error_getting_current_location', [error.message])
-        )
-      })
+    const { x, y } = this.state
+    if (!!x || !!y) {
+      Dialogs.confirm(
+        L.l('global.confirm'),
+        L.l('dataManagement.dataEntry.attribute.coordinate.confirm_overwrite_coordinate_with_current_location'),
+        this.onSetCurrentLocationConfirm
+      )
+    } else {
+      this.onSetCurrentLocationConfirm()
+    }
   }
 
   render() {
@@ -175,10 +201,9 @@ class CoordinateField extends AbstractField {
 }
 
 const mapStateToProps = (state) => {
-  const { activeSurvey, session } = state
-  const { survey } = activeSurvey ?? {}
+  const { session } = state
   const { loggedUser: user } = session ?? {}
-  return { survey, user }
+  return { user }
 }
 
 export default connect(mapStateToProps)(CoordinateField)
