@@ -52,6 +52,19 @@ public class GeoDataController {
 	private RecordManager recordManager;
 	@Autowired
 	private CollectJobManager jobManager;
+	@Autowired
+	private CoordinateOperations coordinateOperations;
+
+	
+	@RequestMapping(value = "geo/coordinate/convert.json", method=GET)
+	public @ResponseBody Coordinate convertCoordinateTo(
+			@RequestParam double x, 
+			@RequestParam double y, 
+			@RequestParam String srs,
+			@RequestParam String srsIdTo) {
+		Coordinate coordinate = new Coordinate(x, y, srs);
+		return coordinateOperations.convertTo(coordinate, srsIdTo);
+	}
 	
 	@RequestMapping(value = "survey/{surveyId}/data/coordinatevalues.json", method=GET)
 	public @ResponseBody List<CoordinateAttributePoint> loadCoordinateValues(

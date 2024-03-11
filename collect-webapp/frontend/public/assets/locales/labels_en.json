@@ -320,7 +320,9 @@
           "y": "Y",
           "srs": "SRS",
           "altitude": "Altitude",
-          "accuracy": "Accuracy"
+          "accuracy": "Accuracy",
+          "confirm_overwrite_coordinate_with_current_location": "Overwrite existing value with current location?",
+          "error_getting_current_location": "Error getting current location:\n {0}"
         },
         "date": {
           "incompleteDate": "Incomplete date"
