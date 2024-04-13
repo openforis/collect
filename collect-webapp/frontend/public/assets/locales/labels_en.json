@@ -205,7 +205,8 @@
         "includeCreatedByUserColumn": "Include 'created by user' column*",
         "includeEnumeratedEntities": "Include enumerated multiple entities as additional columns",
         "includeGroupingLabels": "Prepend grouping (single entity) name to column name",
-        "includeImages": "Include images"
+        "includeImages": "Include images",
+        "alwaysEvaluateCalculatedAttributes": "Always evaluate calculated attributes, even when they are not relevant (e.g. Collect Earth surveys)"
       },
       "exportDialog": {
         "title": "Exporting data",

@@ -31,6 +31,7 @@ const additionalOptions = [
   'includeCreatedByUserColumn',
   'includeGroupingLabels',
   'includeImages',
+  'alwaysEvaluateCalculatedAttributes',
 ]
 
 const onlyExcelAdditionalOptions = ['includeImages']
@@ -60,6 +61,7 @@ const defaultState = {
   languageCode: '',
   includeGroupingLabels: true,
   includeImages: false,
+  alwaysEvaluateCalculatedAttributes: false,
 }
 
 class CsvDataExportPage extends Component {

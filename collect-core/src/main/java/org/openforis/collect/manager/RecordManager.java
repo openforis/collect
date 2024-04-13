@@ -351,8 +351,12 @@ public class RecordManager {
 	public CollectRecord load(CollectSurvey survey, int recordId, Step step) {
 		return load(survey, recordId, step, true);
 	}
-	
+
 	public CollectRecord load(CollectSurvey survey, int recordId, Step step, boolean validate) {
+		return load(survey, recordId, step, validate, false);
+	}
+
+	public CollectRecord load(CollectSurvey survey, int recordId, Step step, boolean validate, boolean alwaysEvaluateCalculatedAttributes) {
 		if (survey == null) {
 			int surveyId = recordDao.loadSurveyId(recordId);
 			survey = surveyManager.getOrLoadSurveyById(surveyId);
@@ -365,6 +369,7 @@ public class RecordManager {
 		recordConverter.convertToLatestVersion(r);
 		RecordUpdater updater = new RecordUpdater();
 		updater.setValidateAfterUpdate(validate);
+		updater.setAlwaysEvaluateCalculatedAttributes(alwaysEvaluateCalculatedAttributes);
 		updater.initializeRecord(r);
 		return r;
 	}
