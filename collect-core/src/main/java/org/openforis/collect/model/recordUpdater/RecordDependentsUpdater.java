@@ -206,7 +206,7 @@ public class RecordDependentsUpdater {
 		}
 		Value previousValue = attr.getValue();
 		Value newValue;
-		if (relevant) {
+		if (relevant || configuration.isAlwaysEvaluateCalculatedAttributes()) {
 			if (def.isCalculated() && !annotations.isCalculatedOnlyOneTime(def) || attr.isEmpty()) {
 				// calculate value or default value
 				newValue = recalculateValue(attr);

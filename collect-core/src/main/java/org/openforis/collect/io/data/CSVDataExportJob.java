@@ -149,7 +149,8 @@ public class CSVDataExportJob extends SurveyLockingJob {
 			List<CollectRecordSummary> summaries = recordManager.loadSummaries(recordFilter);
 			for (CollectRecordSummary s : summaries) {
 				if ( isRunning() ) {
-					CollectRecord record = recordManager.load(survey, s.getId(), recordFilter.getStepGreaterOrEqual(), false);
+					CollectRecord record = recordManager.load(survey, s.getId(), recordFilter.getStepGreaterOrEqual(), 
+							false, parameters.isAlwaysEvaluateCalculatedAttributes());
 					modelWriter.printData(record);
 					incrementProcessedItems();
 				} else {
