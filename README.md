@@ -22,7 +22,7 @@ Developed under the [Open Foris Initiative](https://www.openforis.org)
 ## Where to download the installer?
 
 If you are not interested in the code but rather on the Collect features you might want to run it right away!
-Go to our [website](https://www.openforis.org/tools/collect.html) and download the installer directly there. There are versions for Windows, Mac OS X and Linux 32-bit and 64-bit. 
+Go to our [website](https://openforis.org/solutions/collect/) and download the installer directly there. There are versions for Windows, Mac OS X and Linux 32-bit and 64-bit. 
 
 
 ## Install and run Collect as a Docker container
@@ -31,7 +31,7 @@ Go to our [website](https://www.openforis.org/tools/collect.html) and download t
 
 - [download and install Docker](https://www.docker.com/). Docker is an open platform for developing, shipping, and running applications.
 
-- Create a docker network that the collect application can use to communicate with the database we will create in the next step:
+- Create a docker network that the Collect application can use to communicate with the database we will create in the next step:
 
 ```console
 $ docker network create collect
