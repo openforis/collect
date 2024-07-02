@@ -123,19 +123,21 @@ public class CEComponentHTMLFormatter {
 
 	private XMLBuilder createBuilder(CEAncillaryFields comp, XMLBuilder parentBuilder) throws Exception {
 		XMLBuilder informationFieldsBuilder =  parentBuilder.e("div").attr("class", "ancillary-data" ); //$NON-NLS-1$
-		//informationFieldsBuilder.e("span").t( comp.getLabelOrName() ); //$NON-NLS-1$
-		//informationFieldsBuilder.e("br");
+
 		boolean firstChild = true;
 		for (CEComponent child : comp.getChildren()) {
 			if (child instanceof CEField) {
-				informationFieldsBuilder.e("span" ).t( (firstChild?" ":", ") + child.getLabelOrName() + ": $["+  CollectEarthBalloonGenerator.EXTRA_HIDDEN_PREFIX + child.getName()+ "]" );
+				if( !firstChild ){ // Do not add a break line before the first element
+                    informationFieldsBuilder.e("br").up(); //$NON-NLS-1$
+                }
+				informationFieldsBuilder.e("span" ).t( child.getLabelOrName() + ": $["+  CollectEarthBalloonGenerator.EXTRA_HIDDEN_PREFIX + child.getName()+ "]" ).up();
 				firstChild = false;
 			} else {
 				throw new IllegalArgumentException("Only attribute fields supported inside single entity"); //$NON-NLS-1$
 			}
 		}
 
-		return informationFieldsBuilder;
+		return informationFieldsBuilder.up(); // Close the div;
 	}
 
 	private XMLBuilder createBuilder(CEField comp, boolean includeLabel, XMLBuilder parentBuilder) throws Exception {
