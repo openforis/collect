@@ -1010,6 +1010,7 @@ public class RecordController extends BasicController implements Serializable {
 			recordFilter.setStepGreaterOrEqual(stepGreaterOrEqual);
 			recordFilter.setKeyValues(keyAttributeValues);
 			recordFilter.setSummaryValues(summaryAttributeValues);
+			recordFilter.setFilterExpression(filterExpression);
 			result.setRecordFilter(recordFilter);
 			try {
 				PropertyUtils.copyProperties(result, this);

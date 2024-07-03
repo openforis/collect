@@ -102,6 +102,7 @@ class CsvDataExportPage extends Component {
       exportOnlyOwnedRecords,
       headingSource,
       languageCode,
+      filterExpression,
     } = this.state
 
     const surveyId = survey.id
@@ -272,7 +273,7 @@ class CsvDataExportPage extends Component {
                 <FormGroup check>
                   {Object.values(outputFormats).map((of) => (
                     <>
-                      <Label check>
+                      <Label key={of} check>
                         <Input
                           type="radio"
                           value={of}
@@ -313,7 +314,7 @@ class CsvDataExportPage extends Component {
                 <FormGroup check>
                   {Object.values(exportModes).map((mode) => (
                     <>
-                      <Label check>
+                      <Label key={mode} check>
                         <Input
                           type="radio"
                           value={mode}
@@ -382,14 +383,14 @@ class CsvDataExportPage extends Component {
                     </FormGroup>
                     {keyAttributeFormGroups}
                     {summaryFormGroups}
-                    <FormGroup check row>
-                      <Label check>
+                    <FormGroup row>
+                      <Label md={4}>{L.l('dataManagement.export.filterExpression')}</Label>
+                      <Col md={8}>
                         <Input
                           onChange={(e) => this.setState({ filterExpression: e.target.value })}
                           value={filterExpression}
                         />
-                        {L.l('dataManagement.export.filterExpression')}
-                      </Label>
+                      </Col>
                     </FormGroup>
                   </div>
                 </AccordionDetails>
