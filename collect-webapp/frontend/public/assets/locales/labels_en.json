@@ -214,7 +214,7 @@
       },
       "exportToCollectFormat": "Export to Collect Format",
       "filter": "Filter",
-      "filterCondition": "Filter condition",
+      "filterExpression": "Filter expression",
       "mode": {
         "label": "Export mode",
         "allEntities": "All entities",

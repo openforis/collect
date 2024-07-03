@@ -998,6 +998,7 @@ public class RecordController extends BasicController implements Serializable {
 		private boolean exportOnlyOwnedRecords = false;
 		private Date modifiedSince;
 		private Date modifiedUntil;
+		private String filterExpression;
 		private List<String> keyAttributeValues = new ArrayList<String>();
 		private List<String> summaryAttributeValues = new ArrayList<String>();
 
@@ -1072,6 +1073,14 @@ public class RecordController extends BasicController implements Serializable {
 
 		public void setModifiedUntil(Date modifiedUntil) {
 			this.modifiedUntil = modifiedUntil;
+		}
+		
+		public String getFilterExpression() {
+			return filterExpression;
+		}
+		
+		public void setFilterExpression(String filterExpression) {
+			this.filterExpression = filterExpression;
 		}
 
 		public List<String> getKeyAttributeValues() {

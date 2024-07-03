@@ -61,11 +61,8 @@ const defaultState = {
   languageCode: '',
   includeGroupingLabels: true,
   includeImages: false,
-<<<<<<< Updated upstream
   alwaysEvaluateCalculatedAttributes: false,
-=======
-  filterCondition: '',
->>>>>>> Stashed changes
+  filterExpression: '',
 }
 
 class CsvDataExportPage extends Component {
@@ -129,7 +126,7 @@ class CsvDataExportPage extends Component {
       alwaysGenerateZipFile: true,
       keyAttributeValues,
       summaryAttributeValues,
-      filterCondition,
+      filterExpression,
     }
 
     additionalOptions.forEach((o) => {
@@ -205,7 +202,7 @@ class CsvDataExportPage extends Component {
       modifiedUntil,
       headingSource,
       languageCode,
-      filterCondition,
+      filterExpression,
     } = this.state
 
     const additionalOptionsFormGroups = additionalOptions
@@ -388,10 +385,10 @@ class CsvDataExportPage extends Component {
                     <FormGroup check row>
                       <Label check>
                         <Input
-                          onChange={(e) => this.setState({ filterCondition: e.target.value })}
-                          value={filterCondition}
+                          onChange={(e) => this.setState({ filterExpression: e.target.value })}
+                          value={filterExpression}
                         />
-                        {L.l('dataManagement.export.filterCondition')}
+                        {L.l('dataManagement.export.filterExpression')}
                       </Label>
                     </FormGroup>
                   </div>
