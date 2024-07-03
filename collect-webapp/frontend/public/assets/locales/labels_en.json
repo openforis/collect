@@ -214,10 +214,11 @@
       },
       "exportToCollectFormat": "Export to Collect Format",
       "filter": "Filter",
+      "filterCondition": "Filter condition",
       "mode": {
         "label": "Export mode",
         "allEntities": "All entities",
-        "onlySelectedEntities": "Only selected entities"
+        "selectedEntities": "Only selected entities"
       },
       "modifiedSince": "Modified since",
       "modifiedUntil": "until",

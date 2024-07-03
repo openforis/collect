@@ -61,7 +61,11 @@ const defaultState = {
   languageCode: '',
   includeGroupingLabels: true,
   includeImages: false,
+<<<<<<< Updated upstream
   alwaysEvaluateCalculatedAttributes: false,
+=======
+  filterCondition: '',
+>>>>>>> Stashed changes
 }
 
 class CsvDataExportPage extends Component {
@@ -125,6 +129,7 @@ class CsvDataExportPage extends Component {
       alwaysGenerateZipFile: true,
       keyAttributeValues,
       summaryAttributeValues,
+      filterCondition,
     }
 
     additionalOptions.forEach((o) => {
@@ -200,6 +205,7 @@ class CsvDataExportPage extends Component {
       modifiedUntil,
       headingSource,
       languageCode,
+      filterCondition,
     } = this.state
 
     const additionalOptionsFormGroups = additionalOptions
@@ -267,27 +273,21 @@ class CsvDataExportPage extends Component {
               </Label>
               <Col md={10}>
                 <FormGroup check>
-                  <Label check>
-                    <Input
-                      type="radio"
-                      value={outputFormats.CSV}
-                      name="outputFormat"
-                      checked={outputFormat === outputFormats.CSV}
-                      onChange={this.handleOutputFormatChange}
-                    />
-                    {L.l('dataManagement.export.outputFormat.csv')}
-                  </Label>
-                  <span style={{ display: 'inline-block', width: '40px' }}></span>
-                  <Label check>
-                    <Input
-                      type="radio"
-                      value={outputFormats.XLSX}
-                      name="outputFormat"
-                      checked={outputFormat === outputFormats.XLSX}
-                      onChange={this.handleOutputFormatChange}
-                    />
-                    {L.l('dataManagement.export.outputFormat.xlsx')}
-                  </Label>
+                  {Object.values(outputFormats).map((of) => (
+                    <>
+                      <Label check>
+                        <Input
+                          type="radio"
+                          value={of}
+                          name="outputFormat"
+                          checked={outputFormat === of}
+                          onChange={this.handleOutputFormatChange}
+                        />
+                        {L.l(`dataManagement.export.outputFormat.${of.toLocaleLowerCase()}`)}
+                      </Label>
+                      <span style={{ display: 'inline-block', width: '40px' }}></span>
+                    </>
+                  ))}
                 </FormGroup>
               </Col>
             </FormGroup>
@@ -314,27 +314,21 @@ class CsvDataExportPage extends Component {
               </Label>
               <Col md={10}>
                 <FormGroup check>
-                  <Label check>
-                    <Input
-                      type="radio"
-                      value={exportModes.allEntities}
-                      name="exportMode"
-                      checked={exportMode === exportModes.allEntities}
-                      onChange={(event) => this.setState({ ...this.state, exportMode: event.target.value })}
-                    />
-                    {L.l('dataManagement.export.mode.allEntities')}
-                  </Label>
-                  <span style={{ display: 'inline-block', width: '40px' }}></span>
-                  <Label check>
-                    <Input
-                      type="radio"
-                      value={exportModes.selectedEntity}
-                      name="exportMode"
-                      checked={exportMode === exportModes.selectedEntity}
-                      onChange={(event) => this.setState({ ...this.state, exportMode: event.target.value })}
-                    />
-                    {L.l('dataManagement.export.mode.onlySelectedEntities')}
-                  </Label>
+                  {Object.values(exportModes).map((mode) => (
+                    <>
+                      <Label check>
+                        <Input
+                          type="radio"
+                          value={mode}
+                          name="exportMode"
+                          checked={exportMode === mode}
+                          onChange={(e) => this.setState({ ...this.state, exportMode: e.target.value })}
+                        />
+                        {L.l(`dataManagement.export.mode.${mode}`)}
+                      </Label>
+                      <span style={{ display: 'inline-block', width: '40px' }}></span>
+                    </>
+                  ))}
                 </FormGroup>
               </Col>
             </FormGroup>
@@ -357,9 +351,9 @@ class CsvDataExportPage extends Component {
                       <Label check>
                         <Input
                           type="checkbox"
-                          onChange={(event) => this.setState({ exportOnlyOwnedRecords: event.target.checked })}
+                          onChange={(e) => this.setState({ exportOnlyOwnedRecords: e.target.checked })}
                           checked={exportOnlyOwnedRecords}
-                        />{' '}
+                        />
                         {L.l('dataManagement.export.onlyOwnedRecords')}
                       </Label>
                     </FormGroup>
@@ -391,6 +385,15 @@ class CsvDataExportPage extends Component {
                     </FormGroup>
                     {keyAttributeFormGroups}
                     {summaryFormGroups}
+                    <FormGroup check row>
+                      <Label check>
+                        <Input
+                          onChange={(e) => this.setState({ filterCondition: e.target.value })}
+                          value={filterCondition}
+                        />
+                        {L.l('dataManagement.export.filterCondition')}
+                      </Label>
+                    </FormGroup>
                   </div>
                 </AccordionDetails>
               </Accordion>
