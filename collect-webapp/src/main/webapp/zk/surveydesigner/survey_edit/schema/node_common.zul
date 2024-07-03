@@ -106,7 +106,7 @@
   			<column />
   		</columns>
   		<rows>
-  			<row visible="@load(not vm.rootEntity)">
+  			<row visible="@load(not vm.rootEntity and (not fx.fromCollectEarthCSV or fx.relevanceType != 'ALWAYS_RELEVANT'))">
   				<label value="${vm.collectEarthSurvey ? labels.survey.schema.node.visible : labels.survey.schema.node.relevant}:" />
   				<vlayout>
 	  				<radiogroup selectedItem="@bind(fx.relevanceType)"
