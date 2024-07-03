@@ -270,7 +270,7 @@
 		  				<radiogroup selectedItem="@bind(fx.requirenessType)"
 								onCheck="@command('applyChanges')">
 							<radio
-								label="${labels.survey.schema.node.always_required.$}"
+								label="${vm.collectEarthSurvey ? labels.survey.schema.node.required_if_visible : labels.survey.schema.node.always_required.$}"						
 								value="ALWAYS_REQUIRED"
 								disabled="@load(fx.key and fx.requirenessType eq 'ALWAYS_REQUIRED')" />
 							<radio 
