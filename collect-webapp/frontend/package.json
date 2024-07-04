@@ -4,7 +4,7 @@
   "private": true,
   "homepage": ".",
   "devDependencies": {
-    "gulp": "^4.0.2",
+    "gulp": "^5.0.0",
     "gulp-concat": "^2.6.1",
     "gulp-sass": "^5.1.0",
     "react-scripts": "^5.0.1",
