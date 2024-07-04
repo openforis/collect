@@ -312,17 +312,17 @@ class CsvDataExportPage extends Component {
               </Label>
               <Col md={10}>
                 <FormGroup check>
-                  {Object.values(exportModes).map((mode) => (
+                  {Object.entries(exportModes).map(([modeKey, modeValue]) => (
                     <>
-                      <Label key={mode} check>
+                      <Label key={modeKey} check>
                         <Input
                           type="radio"
-                          value={mode}
+                          value={modeValue}
                           name="exportMode"
-                          checked={exportMode === mode}
+                          checked={exportMode === modeValue}
                           onChange={(e) => this.setState({ ...this.state, exportMode: e.target.value })}
                         />
-                        {L.l(`dataManagement.export.mode.${mode}`)}
+                        {L.l(`dataManagement.export.mode.${modeKey}`)}
                       </Label>
                       <span style={{ display: 'inline-block', width: '40px' }}></span>
                     </>
