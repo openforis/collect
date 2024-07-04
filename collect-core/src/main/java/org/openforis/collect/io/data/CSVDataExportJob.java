@@ -18,6 +18,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.concurrency.SurveyLockingJob;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.data.csv.CSVDataExportParametersBase.OutputFormat;
@@ -36,6 +37,7 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.model.expression.ExpressionEvaluator;
 import org.openforis.idm.model.expression.InvalidExpressionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -127,6 +129,16 @@ public class CSVDataExportJob extends SurveyLockingJob {
 			}
 		}
 		
+		private boolean isFilterExpressionVerified(CollectRecord record, String expression) {
+			if (StringUtils.isBlank(expression)) return true;
+			ExpressionEvaluator expressionEvaluator = record.getSurvey().getContext().getExpressionEvaluator();
+			try {
+				return expressionEvaluator.evaluateBoolean(record.getRootEntity(), null, expression);
+			} catch (Exception e) {
+				return false;
+			}
+		}
+		
 		private void exportData(OutputStream outputStream, int entityDefId) throws InvalidExpressionException, IOException, RecordPersistenceException {
 			RecordFilter recordFilter = parameters.getRecordFilter();
 			CSVDataExportColumnProviderGenerator csvDataExportColumnProviderGenerator = new CSVDataExportColumnProviderGenerator(recordFilter.getSurvey(), parameters);
@@ -151,8 +163,10 @@ public class CSVDataExportJob extends SurveyLockingJob {
 				if ( isRunning() ) {
 					CollectRecord record = recordManager.load(survey, s.getId(), recordFilter.getStepGreaterOrEqual(), 
 							false, parameters.isAlwaysEvaluateCalculatedAttributes());
-					modelWriter.printData(record);
-					incrementProcessedItems();
+					if (isFilterExpressionVerified(record, recordFilter.getFilterExpression())) {
+						modelWriter.printData(record);
+						incrementProcessedItems();
+					}
 				} else {
 					break;
 				}

@@ -62,6 +62,7 @@ const defaultState = {
   includeGroupingLabels: true,
   includeImages: false,
   alwaysEvaluateCalculatedAttributes: false,
+  filterExpression: '',
 }
 
 class CsvDataExportPage extends Component {
@@ -101,6 +102,7 @@ class CsvDataExportPage extends Component {
       exportOnlyOwnedRecords,
       headingSource,
       languageCode,
+      filterExpression,
     } = this.state
 
     const surveyId = survey.id
@@ -125,6 +127,7 @@ class CsvDataExportPage extends Component {
       alwaysGenerateZipFile: true,
       keyAttributeValues,
       summaryAttributeValues,
+      filterExpression,
     }
 
     additionalOptions.forEach((o) => {
@@ -200,6 +203,7 @@ class CsvDataExportPage extends Component {
       modifiedUntil,
       headingSource,
       languageCode,
+      filterExpression,
     } = this.state
 
     const additionalOptionsFormGroups = additionalOptions
@@ -267,27 +271,21 @@ class CsvDataExportPage extends Component {
               </Label>
               <Col md={10}>
                 <FormGroup check>
-                  <Label check>
-                    <Input
-                      type="radio"
-                      value={outputFormats.CSV}
-                      name="outputFormat"
-                      checked={outputFormat === outputFormats.CSV}
-                      onChange={this.handleOutputFormatChange}
-                    />
-                    {L.l('dataManagement.export.outputFormat.csv')}
-                  </Label>
-                  <span style={{ display: 'inline-block', width: '40px' }}></span>
-                  <Label check>
-                    <Input
-                      type="radio"
-                      value={outputFormats.XLSX}
-                      name="outputFormat"
-                      checked={outputFormat === outputFormats.XLSX}
-                      onChange={this.handleOutputFormatChange}
-                    />
-                    {L.l('dataManagement.export.outputFormat.xlsx')}
-                  </Label>
+                  {Object.values(outputFormats).map((of) => (
+                    <>
+                      <Label key={of} check>
+                        <Input
+                          type="radio"
+                          value={of}
+                          name="outputFormat"
+                          checked={outputFormat === of}
+                          onChange={this.handleOutputFormatChange}
+                        />
+                        {L.l(`dataManagement.export.outputFormat.${of.toLocaleLowerCase()}`)}
+                      </Label>
+                      <span style={{ display: 'inline-block', width: '40px' }}></span>
+                    </>
+                  ))}
                 </FormGroup>
               </Col>
             </FormGroup>
@@ -314,27 +312,21 @@ class CsvDataExportPage extends Component {
               </Label>
               <Col md={10}>
                 <FormGroup check>
-                  <Label check>
-                    <Input
-                      type="radio"
-                      value={exportModes.allEntities}
-                      name="exportMode"
-                      checked={exportMode === exportModes.allEntities}
-                      onChange={(event) => this.setState({ ...this.state, exportMode: event.target.value })}
-                    />
-                    {L.l('dataManagement.export.mode.allEntities')}
-                  </Label>
-                  <span style={{ display: 'inline-block', width: '40px' }}></span>
-                  <Label check>
-                    <Input
-                      type="radio"
-                      value={exportModes.selectedEntity}
-                      name="exportMode"
-                      checked={exportMode === exportModes.selectedEntity}
-                      onChange={(event) => this.setState({ ...this.state, exportMode: event.target.value })}
-                    />
-                    {L.l('dataManagement.export.mode.onlySelectedEntities')}
-                  </Label>
+                  {Object.entries(exportModes).map(([modeKey, modeValue]) => (
+                    <>
+                      <Label key={modeKey} check>
+                        <Input
+                          type="radio"
+                          value={modeValue}
+                          name="exportMode"
+                          checked={exportMode === modeValue}
+                          onChange={(e) => this.setState({ ...this.state, exportMode: e.target.value })}
+                        />
+                        {L.l(`dataManagement.export.mode.${modeKey}`)}
+                      </Label>
+                      <span style={{ display: 'inline-block', width: '40px' }}></span>
+                    </>
+                  ))}
                 </FormGroup>
               </Col>
             </FormGroup>
@@ -357,9 +349,9 @@ class CsvDataExportPage extends Component {
                       <Label check>
                         <Input
                           type="checkbox"
-                          onChange={(event) => this.setState({ exportOnlyOwnedRecords: event.target.checked })}
+                          onChange={(e) => this.setState({ exportOnlyOwnedRecords: e.target.checked })}
                           checked={exportOnlyOwnedRecords}
-                        />{' '}
+                        />
                         {L.l('dataManagement.export.onlyOwnedRecords')}
                       </Label>
                     </FormGroup>
@@ -391,6 +383,15 @@ class CsvDataExportPage extends Component {
                     </FormGroup>
                     {keyAttributeFormGroups}
                     {summaryFormGroups}
+                    <FormGroup row>
+                      <Label md={4}>{L.l('dataManagement.export.filterExpression')}</Label>
+                      <Col md={8}>
+                        <Input
+                          onChange={(e) => this.setState({ filterExpression: e.target.value })}
+                          value={filterExpression}
+                        />
+                      </Col>
+                    </FormGroup>
                   </div>
                 </AccordionDetails>
               </Accordion>
