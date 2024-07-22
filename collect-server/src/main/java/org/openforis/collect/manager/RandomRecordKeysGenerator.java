@@ -32,7 +32,6 @@ public class RandomRecordKeysGenerator {
 	}
 
 	public List<List<String>> generate(CollectSurvey survey, String currentMeasurementValue, String nextMeasurementValue, float percentage) {
-		CollectAnnotations annotations = new CollectAnnotations(survey);
 		AttributeDefinition measurementKeyDef = getFirstMeasurementKeyDef(survey);
 		if (measurementKeyDef == null) return Collections.emptyList();
 		
