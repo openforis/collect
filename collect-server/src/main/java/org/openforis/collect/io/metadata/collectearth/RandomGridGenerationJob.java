@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.openforis.collect.manager.RandomValuesGenerator;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
@@ -23,7 +24,7 @@ import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.commons.io.flat.FlatRecord;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
-import org.openforis.concurrency.Worker;
+import org.openforis.idm.metamodel.AttributeDefinition;
 
 /**
  * @author S. Ricci
@@ -37,17 +38,11 @@ public class RandomGridGenerationJob extends Job {
 	private File file;
 	private float percentage;
 	private String surveyFileName;
+	private String newQualifier;
 
 	@Override
 	protected void buildTasks() throws Throwable {
 		addTask(new RandomGridGenerationTask());
-	}
-
-	@Override
-	protected void initializeTask(Worker task) {
-		RandomGridGenerationTask t = (RandomGridGenerationTask) task;
-		t.setPercentage(percentage);
-		super.initializeTask(t);
 	}
 
 	@Override
@@ -73,9 +68,12 @@ public class RandomGridGenerationJob extends Job {
 		this.surveyFileName = surveyFileName;
 	}
 
+	public void setNewQualifier(String newQualifier) {
+		this.newQualifier = newQualifier;
+	}
+	
 	private class RandomGridGenerationTask extends Task {
 		private static final String ID_COLUMN = "id";
-		private float percentage;
 		private File outputFile;
 
 		@Override
@@ -88,11 +86,23 @@ public class RandomGridGenerationJob extends Job {
 					CsvWriter csvWriter = new CsvWriter(outputStream);
 					CsvReader csvReader = new CsvReader(file);
 			) {
+				csvReader.readHeaders();
+				List<String> headers = csvReader.getColumnNames();
+				csvWriter.writeHeaders(headers);
+				
+				List<AttributeDefinition> qualifierAttributeDefinitions = survey.getSchema().getQualifierAttributeDefinitions();
+				AttributeDefinition firstQualifierAttributeDefinition = qualifierAttributeDefinitions.isEmpty() ? null : qualifierAttributeDefinitions.get(0);
+				String qualifierAttributeName = firstQualifierAttributeDefinition.getName();
+				int qualifierColumnIndex = headers.indexOf(qualifierAttributeName);
+				
 				FlatRecord csvRecord = csvReader.nextRecord();
 				while (csvRecord != null) {
 					Integer plotId = csvRecord.getValue(ID_COLUMN, Integer.class);
 					if (randomPlotIds.contains(plotId)) {
-						csvWriter.writeNext(csvRecord);
+						Object[] values = csvRecord.toArray();
+						Object[] valuesUpdated = ArrayUtils.clone(values);
+						valuesUpdated[qualifierColumnIndex] = newQualifier;
+						csvWriter.writeNext(valuesUpdated);
 					}
 					csvRecord = csvReader.nextRecord();
 				}
@@ -101,6 +111,7 @@ public class RandomGridGenerationJob extends Job {
 
 		private Set<Integer> generateRandomPlotIds() throws FileNotFoundException, IOException {
 			CsvReader csvReader = new CsvReader(file);
+			csvReader.readHeaders();
 			CsvLine csvLine = csvReader.readNextLine();
 			List<Integer> plotIds = new ArrayList<>();
 			while (csvLine != null) {
@@ -113,9 +124,6 @@ public class RandomGridGenerationJob extends Job {
 			return new HashSet<>(randomPlotIds);
 		}
 		
-		public void setPercentage(float percentage) {
-			this.percentage = percentage;
-		}
 	}
 
 }
