@@ -58,6 +58,7 @@ public class RandomGridGenerationJob extends Job {
 		surveyFile.setType(SurveyFileType.COLLECT_EARTH_GRID);
 		surveyFile.setFilename(surveyFileName);
 		surveyManager.addSurveyFile(surveyFile, outputFile);
+		outputFile.delete();
 	}
 	
 	public void setSurvey(CollectSurvey survey) {
