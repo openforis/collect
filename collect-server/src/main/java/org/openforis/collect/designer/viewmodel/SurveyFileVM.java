@@ -104,9 +104,9 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 				surveyFile.setFilename(filename);
 				surveyFiles.add(surveyFile);
 			}
-			surveyManager.addSurveyFiles(survey, surveyFiles, uploadedFiles);
+			surveyManager.addSurveyFiles(surveyFiles, uploadedFiles);
 		} else {
-			surveyManager.addSurveyFile(survey, editedItem, uploadedFiles.get(0));			
+			surveyManager.addSurveyFile(editedItem, uploadedFiles.get(0));			
 		}
 	}
 

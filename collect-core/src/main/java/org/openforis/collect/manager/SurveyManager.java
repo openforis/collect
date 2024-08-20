@@ -1113,7 +1113,7 @@ public class SurveyManager {
 	}
 
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
-	public void addSurveyFile(CollectSurvey survey, SurveyFile file, File content) {
+	public void addSurveyFile(SurveyFile file, File content) {
 		try {
 			surveyFileDao.insert(file);
 			byte[] contentBytes = FileUtils.readFileToByteArray(content);
@@ -1124,12 +1124,12 @@ public class SurveyManager {
 	}
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
-	public void addSurveyFiles(CollectSurvey survey, List<SurveyFile> files, List<File> filesContent) {
+	public void addSurveyFiles(List<SurveyFile> files, List<File> filesContent) {
 		try {
 			Iterator<File> filesContentIt = filesContent.iterator();
 			for (SurveyFile file : files) {
 				File fileContent = filesContentIt.next();
-				addSurveyFile(survey, file, fileContent);
+				addSurveyFile(file, fileContent);
 			}
 		} catch(Exception e) {
 			throw new RuntimeException(e);

@@ -7,14 +7,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
 import org.openforis.collect.manager.RandomValuesGenerator;
+import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.SurveyFile;
+import org.openforis.collect.model.SurveyFile.SurveyFileType;
 import org.openforis.commons.io.csv.CsvLine;
 import org.openforis.commons.io.csv.CsvReader;
 import org.openforis.commons.io.csv.CsvWriter;
@@ -29,10 +31,12 @@ import org.openforis.concurrency.Worker;
  */
 public class RandomGridGenerationJob extends Job {
 
+	private SurveyManager surveyManager;
 	// input
+	private CollectSurvey survey;
 	private File file;
-
 	private float percentage;
+	private String surveyFileName;
 
 	@Override
 	protected void buildTasks() throws Throwable {
@@ -49,18 +53,35 @@ public class RandomGridGenerationJob extends Job {
 	@Override
 	protected void afterExecute() {
 		super.afterExecute();
-		// surveyManager.addSurveyFile(survey, editedItem, uploadedFiles.get(0));
+		File outputFile = ((RandomGridGenerationTask) getTasks().get(0)).outputFile;
+		SurveyFile surveyFile = new SurveyFile(survey);
+		surveyFile.setType(SurveyFileType.COLLECT_EARTH_GRID);
+		surveyFile.setFilename(surveyFileName);
+		surveyManager.addSurveyFile(surveyFile, outputFile);
+	}
+	
+	public void setSurvey(CollectSurvey survey) {
+		this.survey = survey;
+	}
+	
+	public void setPercentage(float percentage) {
+		this.percentage = percentage;
+	}
+	
+	public void setSurveyFileName(String surveyFileName) {
+		this.surveyFileName = surveyFileName;
 	}
 
 	private class RandomGridGenerationTask extends Task {
 		private static final String ID_COLUMN = "id";
 		private float percentage;
+		private File outputFile;
 
 		@Override
 		protected void execute() throws Throwable {
 			Set<Integer> randomPlotIds = generateRandomPlotIds();
 
-			File outputFile = File.createTempFile("random_grid", ".csv");
+			outputFile = File.createTempFile("random_grid", ".csv");
 			try (
 					FileOutputStream outputStream = new FileOutputStream(outputFile);
 					CsvWriter csvWriter = new CsvWriter(outputStream);

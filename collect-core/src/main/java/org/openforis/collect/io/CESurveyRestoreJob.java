@@ -227,7 +227,7 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 				SurveyFile surveyFile = new SurveyFile(survey);
 				surveyFile.setFilename(filename);
 				surveyFile.setType(surveyFileType);
-				surveyManager.addSurveyFile(survey, surveyFile, tempFile);
+				surveyManager.addSurveyFile(surveyFile, tempFile);
 				FileUtils.deleteQuietly(tempFile);
 			}
 		}
@@ -294,7 +294,7 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 					SurveyFile surveyFile = new SurveyFile(survey);
 					surveyFile.setFilename(fileName);
 					surveyFile.setType(SurveyFileType.COLLECT_EARTH_GRID);
-					surveyManager.addSurveyFile(survey, surveyFile, tempFile);
+					surveyManager.addSurveyFile(surveyFile, tempFile);
 					FileUtils.deleteQuietly(tempFile);
 				}
 			}
