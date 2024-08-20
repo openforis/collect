@@ -17,19 +17,6 @@ public class RandomRecordKeysGenerator {
 	@Autowired
 	private transient RecordManager recordManager;
 
-	private static <T> List<T> generateRandomSubset(List<T> collection, float percentageOverTotal) {
-		List<T> result = new ArrayList<T>();
-		int numberOfRecordsToGenerate = (int) Math.ceil(((collection.size() * percentageOverTotal) / 100));
-		List<T> currentCollection = new ArrayList<T>(collection);
-		for (int i = 0; i < numberOfRecordsToGenerate; i++) {
-			int existingRecordIndex = (int) Math.round(Math.random() * currentCollection.size());
-			T item = currentCollection.get(existingRecordIndex);
-			result.add(item);
-			currentCollection.remove(existingRecordIndex);
-		}
-		return result;
-	}
-	
 	private static <T> List<T> transformList(List<T> list, Transformer<T> transformer) {
 		List<T> result = new ArrayList<T>();
 		for (T item : list) {
@@ -58,7 +45,7 @@ public class RandomRecordKeysGenerator {
 		for (CollectRecordSummary recordSummary : recordSummaries) {
 			recordsKeys.add(recordSummary.getRootEntityKeyValues());
 		}
-		List<List<String>> randomRecordsKeys = generateRandomSubset(recordsKeys, percentageOverTotal);
+		List<List<String>> randomRecordsKeys = RandomValuesGenerator.generateRandomSubset(recordsKeys, percentageOverTotal);
 		List<List<String>> transformedRandomRecordsKeys = transformList(randomRecordsKeys, new Transformer<List<String>>() {
 			public List<String> transform(List<String> keyValues) {
 				List<String> newKeyValues = new ArrayList<String>(keyValues);

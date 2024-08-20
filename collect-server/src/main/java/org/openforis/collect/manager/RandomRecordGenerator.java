@@ -59,7 +59,7 @@ public class RandomRecordGenerator extends RecordGenerator {
 		}
 		//randomly select one record key among the ones with minimum measurements
 		List<RecordKey> recordKeys = new ArrayList<RecordKey>(filteredRecordMeasurementsByKey.keySet());
-		int recordKeyIdx = new Double(Math.floor(Math.random() * recordKeys.size())).intValue();
+		int recordKeyIdx = Double.valueOf(Math.floor(Math.random() * recordKeys.size())).intValue();
 		RecordKey randomRecordKey = recordKeys.get(recordKeyIdx);
 		List<AttributeDefinition> measurementKeyDefs = getMeasurementKeyDefs(survey);
 		String measurementAttrPath = measurementKeyDefs.get(0).getPath();
