@@ -174,8 +174,13 @@ public class Schema extends SurveyObject {
 		return getAnnotatedAttributeDefinitions(rootEntityDefinition, Annotation.QUALIFIER, true);
 	}
 	
-	public List<AttributeDefinition> getQualifierAttributeDefinitions() {
-		return getQualifierAttributeDefinitions(getRootEntityDefinitions().get(0));
+	public List<AttributeDefinition> getMeasurementAttributeDefinitions(EntityDefinition rootEntityDefinition) {
+		return getAnnotatedAttributeDefinitions(rootEntityDefinition, Annotation.MEASUREMENT, true);
+	}
+	
+	public List<AttributeDefinition> getMeasurementAttributeDefinitions() {
+		EntityDefinition rootEntityDefinition = getRootEntityDefinitions().get(0);
+		return getMeasurementAttributeDefinitions(rootEntityDefinition);
 	}
 	
 	public List<AttributeDefinition> getSummaryAttributeDefinitions(EntityDefinition entityDefinition) {

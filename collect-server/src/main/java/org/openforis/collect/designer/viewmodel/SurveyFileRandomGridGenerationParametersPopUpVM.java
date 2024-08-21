@@ -1,23 +1,13 @@
 package org.openforis.collect.designer.viewmodel;
 
-import static org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType.PUBLISHED;
-import static org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType.TEMPORARY;
-
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openforis.collect.designer.form.FormObject;
-import org.openforis.collect.designer.form.validator.SurveyNameValidator;
 import org.openforis.collect.designer.util.Resources;
-import org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.SurveyFile;
-import org.openforis.collect.model.SurveySummary;
-import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
-import org.zkoss.bind.Validator;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
@@ -37,6 +27,7 @@ public class SurveyFileRandomGridGenerationParametersPopUpVM extends BaseVM {
 	private static final String CLOSE_SURVEY_FILE_RANDOM_GRID_GENERATION_GLOBAL_COMMAND = "closeRandomGridGenerationPopUp";
 
 	public static final String PERCENTAGE_FIELD = "percentage";
+	public static final String NEXT_MEASUREMENT_FIELD = "nextMeasurement";
 
 	@WireVariable 
 	private SurveyManager surveyManager;
@@ -46,7 +37,6 @@ public class SurveyFileRandomGridGenerationParametersPopUpVM extends BaseVM {
 	
 	//temporary variables
 	private Map<String, Object> form;
-	private Validator nameValidator;
 
 	
 	public static Window openPopUp(SurveyFile sourceGridFile) {
@@ -68,14 +58,13 @@ public class SurveyFileRandomGridGenerationParametersPopUpVM extends BaseVM {
 		BindUtils.postGlobalCommand(null, null, CLOSE_SURVEY_FILE_RANDOM_GRID_GENERATION_GLOBAL_COMMAND, null);
 	}
 	
-
 	@Command
 	public void start(@ContextParam(ContextType.BINDER) Binder binder) {
 		Map<String, Object> args = new HashMap<String, Object>();
 		Object percentage = getFormFieldValue(binder, PERCENTAGE_FIELD);
-//		Double percentage = Double.valueOf(form.get(PERCENTAGE_FIELD).toString());
+		Object nextMeasurement = getFormFieldValue(binder, NEXT_MEASUREMENT_FIELD);
 		args.put("percentage", percentage);
-//		args.put("sourceGridFile", sourceGridFile);
+		args.put("nextMeasurement", nextMeasurement);
 		BindUtils.postGlobalCommand(null, null, START_SURVEY_FILE_RANDOM_GRID_GENERATION_GLOBAL_COMMAND, args);
 	}
 

@@ -5,10 +5,8 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URLConnection;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -18,8 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.SurveyFileFormObject;
 import org.openforis.collect.designer.util.MediaUtil;
@@ -35,8 +34,10 @@ import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.MediaTypes;
 import org.openforis.commons.collection.CollectionUtils;
-import org.openforis.commons.io.OpenForisIOUtils;
-import org.openforis.concurrency.JobManager;
+import org.openforis.concurrency.Worker.Status;
+import org.openforis.concurrency.WorkerStatusChangeEvent;
+import org.openforis.concurrency.WorkerStatusChangeListener;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
@@ -67,7 +68,7 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	@WireVariable
 	private SurveyManager surveyFileManager;
 	@WireVariable
-	private JobManager jobManager;
+	private CollectJobManager jobManager;
 	
 	private List<File> uploadedFiles;
 	private List<String> uploadedFileNames;
@@ -286,20 +287,47 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 		randomGridGenerationParametersPopup = SurveyFileRandomGridGenerationParametersPopUpVM.openPopUp(editedItem);
 	}
 	
+	@SuppressWarnings("incomplete-switch")
 	@GlobalCommand
 	public void startSurveyFileRandomGridGeneration(
-			@BindingParam(SurveyFileRandomGridGenerationParametersPopUpVM.PERCENTAGE_FIELD) Float percentage) {
+			@BindingParam(SurveyFileRandomGridGenerationParametersPopUpVM.PERCENTAGE_FIELD) Float percentage,
+			@BindingParam(SurveyFileRandomGridGenerationParametersPopUpVM.NEXT_MEASUREMENT_FIELD) String nextMeasurement) {
 		try {
-			RandomGridGenerationJob job = new RandomGridGenerationJob();
+			List<AttributeDefinition> measurementAttributeDefinitions = survey.getSchema().getMeasurementAttributeDefinitions();
+			String measurementAttrName = measurementAttributeDefinitions.get(0).getName();
+			String outputSurveyFileName = FilenameUtils.getBaseName(editedItem.getFilename()) + "_" + measurementAttrName + "_" + nextMeasurement + ".csv"; 
+			RandomGridGenerationJob job = jobManager.createJob(RandomGridGenerationJob.class);
 			job.setSurvey(survey);
 			byte[] fileContent = surveyManager.loadSurveyFileContent(editedItem);
-			Files.witeToTempFile(fileContent, "source_grid", ".csv");
-			job.setSurveyFileName("TEST.csv");
+			File file = Files.witeToTempFile(fileContent, "source_grid", ".csv");
+			job.setSurveyManager(surveyManager);
+			job.setFile(file);
+			job.setSurveyFileName(outputSurveyFileName);
 			job.setPercentage(percentage);
-			job.setNewQualifier("2");
-			jobManager.start(job);
+			job.setNewMeasurement(nextMeasurement);
+			jobManager.start(job, false);
+			job.addStatusChangeListener(new WorkerStatusChangeListener() {
+				public void statusChanged(WorkerStatusChangeEvent event) {
+					Status status = event.getTo();
+					switch (status) {
+					case COMPLETED:
+						MessageUtil.showInfo("survey.file.random_grid_generation.complete_successfully");
+						break;
+					case FAILED:
+						Map<String, Object> args = new HashMap<>();
+						args.put("details", job.getErrorMessage());
+						MessageUtil.showError("survey.file.random_grid_generation.error", args);
+						break;
+					}
+					if (status != Status.RUNNING) {
+						closeRandomGridGenerationPopUp();
+					}
+				}
+			});
 		} catch (Exception e) {
-			
+			Map<String, Object> args = new HashMap<>();
+			args.put("details", e.getMessage());
+			MessageUtil.showError("survey.file.random_grid_generation.error");
 		}
 	}
 	

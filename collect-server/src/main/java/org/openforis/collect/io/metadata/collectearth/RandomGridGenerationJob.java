@@ -12,12 +12,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openforis.collect.manager.RandomValuesGenerator;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveyFile.SurveyFileType;
+import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.io.csv.CsvLine;
 import org.openforis.commons.io.csv.CsvReader;
 import org.openforis.commons.io.csv.CsvWriter;
@@ -25,11 +27,16 @@ import org.openforis.commons.io.flat.FlatRecord;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * @author S. Ricci
  *
  */
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class RandomGridGenerationJob extends Job {
 
 	private SurveyManager surveyManager;
@@ -38,7 +45,7 @@ public class RandomGridGenerationJob extends Job {
 	private File file;
 	private float percentage;
 	private String surveyFileName;
-	private String newQualifier;
+	private String newMeasurement;
 
 	@Override
 	protected void buildTasks() throws Throwable {
@@ -48,9 +55,9 @@ public class RandomGridGenerationJob extends Job {
 	@Override
 	protected void validateInput() throws Throwable {
 		super.validateInput();
-		List<AttributeDefinition> qualifierAttributeDefinitions = survey.getSchema().getQualifierAttributeDefinitions();
-		if (qualifierAttributeDefinitions.isEmpty()) {
-			throw new Exception("Expected at least one qualifier");
+		List<AttributeDefinition> measurementAttributeDefinitions = survey.getSchema().getMeasurementAttributeDefinitions();
+		if (measurementAttributeDefinitions.isEmpty()) {
+			throw new Exception("Expected at least one measurement attribute");
 		}
 	}
 
@@ -65,12 +72,16 @@ public class RandomGridGenerationJob extends Job {
 		outputFile.delete();
 	}
 
-	private String getQualifierAttributeName() {
-		List<AttributeDefinition> qualifierAttributeDefinitions = survey.getSchema().getQualifierAttributeDefinitions();
-		AttributeDefinition firstQualifierAttributeDefinition = qualifierAttributeDefinitions.get(0);
-		return firstQualifierAttributeDefinition.getName();
+	private String getMeasurementAttributeName() {
+		List<AttributeDefinition> attributeDefinitions = survey.getSchema().getMeasurementAttributeDefinitions();
+		AttributeDefinition firstAttributeDefinition = attributeDefinitions.get(0);
+		return firstAttributeDefinition.getName();
 	}
 
+	public void setSurveyManager(SurveyManager surveyManager) {
+		this.surveyManager = surveyManager;
+	}
+	
 	public void setSurvey(CollectSurvey survey) {
 		this.survey = survey;
 	}
@@ -87,8 +98,8 @@ public class RandomGridGenerationJob extends Job {
 		this.surveyFileName = surveyFileName;
 	}
 
-	public void setNewQualifier(String newQualifier) {
-		this.newQualifier = newQualifier;
+	public void setNewMeasurement(String newMeasurement) {
+		this.newMeasurement = newMeasurement;
 	}
 
 	private class RandomGridGenerationTask extends Task {
@@ -97,46 +108,55 @@ public class RandomGridGenerationJob extends Job {
 
 		@Override
 		protected void execute() throws Throwable {
-			Set<Integer> randomPlotIds = generateRandomPlotIds();
+			Set<String> randomPlotIds = generateRandomPlotIds();
+			setTotalItems(randomPlotIds.size());
 
 			outputFile = File.createTempFile("random_grid", ".csv");
-			try (FileOutputStream outputStream = new FileOutputStream(outputFile);
-					CsvWriter csvWriter = new CsvWriter(outputStream);
-					CsvReader csvReader = new CsvReader(file);) {
+			FileOutputStream outputStream = null;
+			CsvWriter csvWriter = null;
+			CsvReader csvReader = null;
+			try {
+				outputStream = new FileOutputStream(outputFile);
+				csvWriter = new CsvWriter(outputStream);
+				csvReader = new CsvReader(file);
 				csvReader.readHeaders();
 				List<String> headers = csvReader.getColumnNames();
 				csvWriter.writeHeaders(headers);
 
-				String qualifierAttributeName = getQualifierAttributeName();
-				int qualifierColumnIndex = headers.indexOf(qualifierAttributeName);
+				String measurementAttributeName = getMeasurementAttributeName();
+				int measurementColumnIndex = headers.indexOf(measurementAttributeName);
 
 				FlatRecord csvRecord = csvReader.nextRecord();
 				while (csvRecord != null) {
-					Integer plotId = csvRecord.getValue(ID_COLUMN, Integer.class);
+					String plotId = csvRecord.getValue(ID_COLUMN, String.class);
 					if (randomPlotIds.contains(plotId)) {
 						Object[] values = csvRecord.toArray();
 						Object[] valuesUpdated = ArrayUtils.clone(values);
-						valuesUpdated[qualifierColumnIndex] = newQualifier;
+						valuesUpdated[measurementColumnIndex] = newMeasurement;
 						csvWriter.writeNext(valuesUpdated);
 						incrementProcessedItems();
 					}
 					csvRecord = csvReader.nextRecord();
 				}
+			} finally {
+				IOUtils.closeQuietly(csvReader);
+				IOUtils.closeQuietly(csvWriter);
+				IOUtils.closeQuietly(outputStream);
 			}
 		}
 
-		private Set<Integer> generateRandomPlotIds() throws FileNotFoundException, IOException {
-			CsvReader csvReader = new CsvReader(file);
-			csvReader.readHeaders();
-			CsvLine csvLine = csvReader.readNextLine();
-			List<Integer> plotIds = new ArrayList<>();
-			while (csvLine != null) {
-				Integer plotId = csvLine.getValue(ID_COLUMN, Integer.class);
-				plotIds.add(plotId);
-				csvLine = csvReader.readNextLine();
+		private Set<String> generateRandomPlotIds() throws FileNotFoundException, IOException {
+			List<String> plotIds = new ArrayList<>();
+			try (CsvReader csvReader = new CsvReader(file);) {
+				csvReader.readHeaders();
+				CsvLine csvLine = csvReader.readNextLine();
+				while (csvLine != null) {
+					String plotId = csvLine.getValue(ID_COLUMN, String.class);
+					plotIds.add(plotId);
+					csvLine = csvReader.readNextLine();
+				}
 			}
-			csvReader.close();
-			List<Integer> randomPlotIds = RandomValuesGenerator.generateRandomSubset(plotIds, percentage);
+			List<String> randomPlotIds = RandomValuesGenerator.generateRandomSubset(plotIds, percentage);
 			return new HashSet<>(randomPlotIds);
 		}
 

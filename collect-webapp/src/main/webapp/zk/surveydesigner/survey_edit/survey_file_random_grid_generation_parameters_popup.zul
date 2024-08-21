@@ -23,6 +23,12 @@
 				<doublebox width="150px" value="@bind(fx.percentage)"/>
             </fieldErrorHandler>
 		</row>
+		<row>
+			<label value="${labels.survey.file.random_grid_generation.next_measurement}:" />
+            <fieldErrorHandler message="@load(vmsgs['nextMeasurement'])">
+				<textbox width="150px" value="@bind(fx.nextMeasurement)" />
+            </fieldErrorHandler>
+		</row>
       </rows>
     </grid>
 
