@@ -10,7 +10,7 @@ public abstract class RandomValuesGenerator {
 		int numberOfRecordsToGenerate = (int) Math.ceil(((collection.size() * percentageOverTotal) / 100));
 		List<T> currentCollection = new ArrayList<T>(collection);
 		for (int i = 0; i < numberOfRecordsToGenerate; i++) {
-			int existingRecordIndex = (int) Math.round(Math.random() * currentCollection.size());
+			int existingRecordIndex = (int) Math.floor(Math.random() * currentCollection.size());
 			T item = currentCollection.get(existingRecordIndex);
 			result.add(item);
 			currentCollection.remove(existingRecordIndex);
