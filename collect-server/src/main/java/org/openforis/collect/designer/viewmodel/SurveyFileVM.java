@@ -5,8 +5,10 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.SurveyFileFormObject;
@@ -23,13 +26,17 @@ import org.openforis.collect.designer.util.MediaUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.io.metadata.collectearth.CSVFileValidationResult;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthGridTemplateGenerator;
+import org.openforis.collect.io.metadata.collectearth.RandomGridGenerationJob;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator.ValidationParameters;
 import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveyFile.SurveyFileType;
 import org.openforis.collect.utils.Dates;
+import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.MediaTypes;
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.io.OpenForisIOUtils;
+import org.openforis.concurrency.JobManager;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
@@ -37,12 +44,14 @@ import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.ExecutionArgParam;
+import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.media.Media;
 import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Listitem;
+import org.zkoss.zul.Window;
 
 /**
  * @author S. Ricci
@@ -55,12 +64,17 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	
 	@WireVariable
 	private SurveyManager surveyManager;
+	@WireVariable
+	private SurveyManager surveyFileManager;
+	@WireVariable
+	private JobManager jobManager;
 	
 	private List<File> uploadedFiles;
 	private List<String> uploadedFileNames;
 
 	private Map<String, String> form = new HashMap<String, String>();
 	private Set<String> selectedUploadedFileNames = new HashSet<>();
+	private Window randomGridGenerationParametersPopup;
 
 	public SurveyFileVM() {
 		setCommitChangesOnApply(false);
@@ -265,6 +279,33 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 		String fileName = editedItem.getFilename();
 		String contentType = URLConnection.guessContentTypeFromName(fileName);
 		Filedownload.save(content, contentType, fileName);
+	}
+	
+	@Command
+	public void openRandomGridGenerationParametersPopUp() {
+		randomGridGenerationParametersPopup = SurveyFileRandomGridGenerationParametersPopUpVM.openPopUp(editedItem);
+	}
+	
+	@GlobalCommand
+	public void startSurveyFileRandomGridGeneration(
+			@BindingParam(SurveyFileRandomGridGenerationParametersPopUpVM.PERCENTAGE_FIELD) Float percentage) {
+		try {
+			RandomGridGenerationJob job = new RandomGridGenerationJob();
+			job.setSurvey(survey);
+			byte[] fileContent = surveyManager.loadSurveyFileContent(editedItem);
+			Files.witeToTempFile(fileContent, "source_grid", ".csv");
+			job.setSurveyFileName("TEST.csv");
+			job.setPercentage(percentage);
+			job.setNewQualifier("2");
+			jobManager.start(job);
+		} catch (Exception e) {
+			
+		}
+	}
+	
+	@GlobalCommand
+	public void closeRandomGridGenerationPopUp() {
+		closePopUp(randomGridGenerationParametersPopup);
 	}
 	
 	private void updateForm(Binder binder) {

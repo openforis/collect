@@ -74,6 +74,10 @@ public class RandomGridGenerationJob extends Job {
 	public void setSurvey(CollectSurvey survey) {
 		this.survey = survey;
 	}
+	
+	public void setFile(File file) {
+		this.file = file;
+	}
 
 	public void setPercentage(float percentage) {
 		this.percentage = percentage;

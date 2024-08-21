@@ -156,6 +156,9 @@
 		</grid>
 		<box width="100%" align="center">
 			<hbox>
+				<button label="${labels.survey.file.random_grid_generation.title}"
+					onClick="@command('openRandomGridGenerationParametersPopUp')" />
+					
 				<button label="${labels.global.apply}"
 					onClick="@command('commitChanges')" />
 			</hbox>
