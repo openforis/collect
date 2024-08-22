@@ -177,6 +177,13 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 		}, messageKey, messageArgs);
 	}
 	
+	@GlobalCommand 
+	public void surveyFileRandomGridGenerationComplete(@ContextParam(ContextType.BINDER) Binder binder) {
+		closeSurveyFileEditPopUp(binder);
+		notifyChange("surveyFiles");
+	}
+	
+	
 	public boolean isSingleSurveyFileSelected() {
 		return selectedSurveyFiles.size() == 1;
 	}

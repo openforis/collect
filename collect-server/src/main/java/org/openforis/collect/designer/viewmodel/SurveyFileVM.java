@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.designer.form.FormObject;
@@ -25,19 +24,13 @@ import org.openforis.collect.designer.util.MediaUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.io.metadata.collectearth.CSVFileValidationResult;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthGridTemplateGenerator;
-import org.openforis.collect.io.metadata.collectearth.RandomGridGenerationJob;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator.ValidationParameters;
 import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveyFile.SurveyFileType;
 import org.openforis.collect.utils.Dates;
-import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.MediaTypes;
 import org.openforis.commons.collection.CollectionUtils;
-import org.openforis.concurrency.Worker.Status;
-import org.openforis.concurrency.WorkerStatusChangeEvent;
-import org.openforis.concurrency.WorkerStatusChangeListener;
-import org.openforis.idm.metamodel.AttributeDefinition;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
@@ -287,48 +280,9 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 		randomGridGenerationParametersPopup = SurveyFileRandomGridGenerationParametersPopUpVM.openPopUp(editedItem);
 	}
 	
-	@SuppressWarnings("incomplete-switch")
 	@GlobalCommand
-	public void startSurveyFileRandomGridGeneration(
-			@BindingParam(SurveyFileRandomGridGenerationParametersPopUpVM.PERCENTAGE_FIELD) Float percentage,
-			@BindingParam(SurveyFileRandomGridGenerationParametersPopUpVM.NEXT_MEASUREMENT_FIELD) String nextMeasurement) {
-		try {
-			List<AttributeDefinition> measurementAttributeDefinitions = survey.getSchema().getMeasurementAttributeDefinitions();
-			String measurementAttrName = measurementAttributeDefinitions.get(0).getName();
-			String outputSurveyFileName = FilenameUtils.getBaseName(editedItem.getFilename()) + "_" + measurementAttrName + "_" + nextMeasurement + ".csv"; 
-			RandomGridGenerationJob job = jobManager.createJob(RandomGridGenerationJob.class);
-			job.setSurvey(survey);
-			byte[] fileContent = surveyManager.loadSurveyFileContent(editedItem);
-			File file = Files.witeToTempFile(fileContent, "source_grid", ".csv");
-			job.setSurveyManager(surveyManager);
-			job.setFile(file);
-			job.setSurveyFileName(outputSurveyFileName);
-			job.setPercentage(percentage);
-			job.setNewMeasurement(nextMeasurement);
-			jobManager.start(job, false);
-			job.addStatusChangeListener(new WorkerStatusChangeListener() {
-				public void statusChanged(WorkerStatusChangeEvent event) {
-					Status status = event.getTo();
-					switch (status) {
-					case COMPLETED:
-						MessageUtil.showInfo("survey.file.random_grid_generation.complete_successfully");
-						break;
-					case FAILED:
-						Map<String, Object> args = new HashMap<>();
-						args.put("details", job.getErrorMessage());
-						MessageUtil.showError("survey.file.random_grid_generation.error", args);
-						break;
-					}
-					if (status != Status.RUNNING) {
-						closeRandomGridGenerationPopUp();
-					}
-				}
-			});
-		} catch (Exception e) {
-			Map<String, Object> args = new HashMap<>();
-			args.put("details", e.getMessage());
-			MessageUtil.showError("survey.file.random_grid_generation.error");
-		}
+	public void surveyFileRandomGridGenerationComplete() {
+		closeRandomGridGenerationPopUp();
 	}
 	
 	@GlobalCommand
@@ -355,7 +309,7 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 		setFormFieldValue(binder, SurveyFileFormObject.FILENAMES_FIELD_NAME, filename);
 		dispatchApplyChangesCommand(binder);
 	}
-
+	
 	private String normalizeFilename(String filename) {
 		return filename.replaceAll("[^\\w-.]", "_");
 	}
@@ -391,4 +345,10 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	public SurveyManager getSurveyManager() {
 		return surveyManager;
 	}
+	
+	public boolean isRandomGridGenerationAllowed() {
+		return survey.getFirstMeasurementKeyDef() != null;
+	}
+
+
 }

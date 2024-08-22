@@ -13,14 +13,14 @@
 
 	<grid>
       <columns>
-        <column width="130px" />
+        <column width="150px" />
         <column width="100%" />
       </columns>
       <rows>
         <row>
 			<label value="${labels.survey.file.random_grid_generation.percentage}:" />
             <fieldErrorHandler message="@load(vmsgs['percentage'])">
-				<doublebox width="150px" value="@bind(fx.percentage)"/>
+				<doublespinner width="150px" value="@bind(fx.percentage)" constraint="no negative, no zero"/>
             </fieldErrorHandler>
 		</row>
 		<row>

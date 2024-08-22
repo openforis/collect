@@ -19,7 +19,6 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveyFile.SurveyFileType;
-import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.io.csv.CsvLine;
 import org.openforis.commons.io.csv.CsvReader;
 import org.openforis.commons.io.csv.CsvWriter;
@@ -43,7 +42,7 @@ public class RandomGridGenerationJob extends Job {
 	// input
 	private CollectSurvey survey;
 	private File file;
-	private float percentage;
+	private double percentage;
 	private String surveyFileName;
 	private String newMeasurement;
 
@@ -55,8 +54,8 @@ public class RandomGridGenerationJob extends Job {
 	@Override
 	protected void validateInput() throws Throwable {
 		super.validateInput();
-		List<AttributeDefinition> measurementAttributeDefinitions = survey.getSchema().getMeasurementAttributeDefinitions();
-		if (measurementAttributeDefinitions.isEmpty()) {
+		AttributeDefinition measurementKeyDef = survey.getFirstMeasurementKeyDef();
+		if (measurementKeyDef == null) {
 			throw new Exception("Expected at least one measurement attribute");
 		}
 	}
@@ -64,18 +63,14 @@ public class RandomGridGenerationJob extends Job {
 	@Override
 	protected void afterExecute() {
 		super.afterExecute();
-		File outputFile = ((RandomGridGenerationTask) getTasks().get(0)).outputFile;
-		SurveyFile surveyFile = new SurveyFile(survey);
-		surveyFile.setType(SurveyFileType.COLLECT_EARTH_GRID);
-		surveyFile.setFilename(surveyFileName);
-		surveyManager.addSurveyFile(surveyFile, outputFile);
-		outputFile.delete();
-	}
-
-	private String getMeasurementAttributeName() {
-		List<AttributeDefinition> attributeDefinitions = survey.getSchema().getMeasurementAttributeDefinitions();
-		AttributeDefinition firstAttributeDefinition = attributeDefinitions.get(0);
-		return firstAttributeDefinition.getName();
+		if (isCompleted()) {
+			File outputFile = ((RandomGridGenerationTask) getTasks().get(0)).outputFile;
+			SurveyFile surveyFile = new SurveyFile(survey);
+			surveyFile.setType(SurveyFileType.COLLECT_EARTH_GRID);
+			surveyFile.setFilename(surveyFileName);
+			surveyManager.addSurveyFile(surveyFile, outputFile);
+			outputFile.delete();
+		}
 	}
 
 	public void setSurveyManager(SurveyManager surveyManager) {
@@ -90,7 +85,7 @@ public class RandomGridGenerationJob extends Job {
 		this.file = file;
 	}
 
-	public void setPercentage(float percentage) {
+	public void setPercentage(double percentage) {
 		this.percentage = percentage;
 	}
 
@@ -123,11 +118,14 @@ public class RandomGridGenerationJob extends Job {
 				List<String> headers = csvReader.getColumnNames();
 				csvWriter.writeHeaders(headers);
 
-				String measurementAttributeName = getMeasurementAttributeName();
+				AttributeDefinition measurementKeyDef = survey.getFirstMeasurementKeyDef();
+				String measurementAttributeName = measurementKeyDef.getName();
 				int measurementColumnIndex = headers.indexOf(measurementAttributeName);
 
 				FlatRecord csvRecord = csvReader.nextRecord();
 				while (csvRecord != null) {
+					if (!isRunning()) break;
+					
 					String plotId = csvRecord.getValue(ID_COLUMN, String.class);
 					if (randomPlotIds.contains(plotId)) {
 						Object[] values = csvRecord.toArray();
