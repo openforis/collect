@@ -1662,13 +1662,16 @@ select.form-control-lg:not([size]):not([multiple]), .input-group-lg > select.for
 .form-check {
   position: relative;
   display: block;
-  margin-bottom: 0.5rem; }
-  .form-check.disabled .form-check-label {
-    color: #b0bec5; }
+  margin-bottom: 0.5rem;
 
-.form-check-label {
-  padding-left: 1.25rem;
-  margin-bottom: 0; }
+  .form-check-label {
+    margin-right: 3rem;
+  }
+}
+
+.form-check.disabled .form-check-label {
+  color: #b0bec5; 
+}
 
 .form-check-input {
   position: absolute;
