@@ -272,19 +272,16 @@ class CsvDataExportPage extends Component {
               <Col md={10}>
                 <FormGroup check>
                   {Object.values(outputFormats).map((of) => (
-                    <>
-                      <Label key={of} check>
-                        <Input
-                          type="radio"
-                          value={of}
-                          name="outputFormat"
-                          checked={outputFormat === of}
-                          onChange={this.handleOutputFormatChange}
-                        />
-                        {L.l(`dataManagement.export.outputFormat.${of.toLocaleLowerCase()}`)}
-                      </Label>
-                      <span style={{ display: 'inline-block', width: '40px' }}></span>
-                    </>
+                    <Label key={of} check>
+                      <Input
+                        type="radio"
+                        value={of}
+                        name="outputFormat"
+                        checked={outputFormat === of}
+                        onChange={this.handleOutputFormatChange}
+                      />
+                      {L.l(`dataManagement.export.outputFormat.${of.toLocaleLowerCase()}`)}
+                    </Label>
                   ))}
                 </FormGroup>
               </Col>
@@ -313,19 +310,16 @@ class CsvDataExportPage extends Component {
               <Col md={10}>
                 <FormGroup check>
                   {Object.entries(exportModes).map(([modeKey, modeValue]) => (
-                    <>
-                      <Label key={modeKey} check>
-                        <Input
-                          type="radio"
-                          value={modeValue}
-                          name="exportMode"
-                          checked={exportMode === modeValue}
-                          onChange={(e) => this.setState({ ...this.state, exportMode: e.target.value })}
-                        />
-                        {L.l(`dataManagement.export.mode.${modeKey}`)}
-                      </Label>
-                      <span style={{ display: 'inline-block', width: '40px' }}></span>
-                    </>
+                    <Label key={modeKey} check>
+                      <Input
+                        type="radio"
+                        value={modeValue}
+                        name="exportMode"
+                        checked={exportMode === modeValue}
+                        onChange={(e) => this.setState({ ...this.state, exportMode: e.target.value })}
+                      />
+                      {L.l(`dataManagement.export.mode.${modeKey}`)}
+                    </Label>
                   ))}
                 </FormGroup>
               </Col>
