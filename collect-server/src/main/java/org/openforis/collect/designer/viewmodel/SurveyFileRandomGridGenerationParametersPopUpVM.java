@@ -33,49 +33,49 @@ public class SurveyFileRandomGridGenerationParametersPopUpVM extends SurveyBaseV
 	private static final String SURVEY_FILE_RANDOM_GRID_GENERATION_COMPLETE_GLOBAL_COMMAND = "surveyFileRandomGridGenerationComplete";
 	private static final String CLOSE_SURVEY_FILE_RANDOM_GRID_GENERATION_GLOBAL_COMMAND = "closeRandomGridGenerationPopUp";
 
-	public static final String PERCENTAGE_FIELD = "percentage";
-	public static final String NEXT_MEASUREMENT_FIELD = "nextMeasurement";
-
-	@WireVariable 
+	@WireVariable
 	private SurveyManager surveyManager;
-	
-	//input
+
+	// input
 	private SurveyFile sourceGridFile;
-	
-	//temporary variables
-	private Map<String, Object> form;
+
+	// temporary variables
+	private RandomGridGenerationParametersForm form = new RandomGridGenerationParametersForm();
 	private Window jobStatusPopUp;
 
-	
 	public static Window openPopUp(SurveyFile sourceGridFile) {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("sourceGridFile", sourceGridFile);
-		return openPopUp(Resources.Component.SURVEY_FILE_RANDOM_GRID_GENERATION_PARAMETERS_POPUP.getLocation(), true, args);
+		return openPopUp(Resources.Component.SURVEY_FILE_RANDOM_GRID_GENERATION_PARAMETERS_POPUP.getLocation(), true,
+				args);
 	}
 
 	@Init(superclass = false)
 	public void init(@ExecutionArgParam("sourceGridFile") SurveyFile sourceGridFile) {
 		super.init();
-		this.sourceGridFile = sourceGridFile; 
-		this.form = new HashMap<String, Object>();
-		this.form.put(PERCENTAGE_FIELD, 5);
+		this.sourceGridFile = sourceGridFile;
 	}
 	
+	@Command
+	public void applyChanges() {
+	}
+
 	@Command
 	public void close() {
 		BindUtils.postGlobalCommand(null, null, CLOSE_SURVEY_FILE_RANDOM_GRID_GENERATION_GLOBAL_COMMAND, null);
 	}
-	
+
 	@Command
 	public void start(@ContextParam(ContextType.BINDER) Binder binder) {
 		try {
 			AttributeDefinition measurementKeyDef = survey.getFirstMeasurementKeyDef();
 			String measurementAttrName = measurementKeyDef.getName();
-			
-			Double percentage = getFormFieldValue(binder, PERCENTAGE_FIELD);
-			String nextMeasurement = getFormFieldValue(binder, NEXT_MEASUREMENT_FIELD);
-			String outputSurveyFileName = FilenameUtils.getBaseName(sourceGridFile.getFilename()) + "_" + measurementAttrName + "_" + nextMeasurement + ".csv"; 
-	
+
+			Double percentage = form.getPercentage();
+			String nextMeasurement = form.getNextMeasurement();
+			String outputSurveyFileName = FilenameUtils.getBaseName(sourceGridFile.getFilename()) + "_"
+					+ measurementAttrName + "_" + nextMeasurement + ".csv";
+
 			RandomGridGenerationJob job = jobManager.createJob(RandomGridGenerationJob.class);
 			job.setSurvey(survey);
 			byte[] fileContent = surveyManager.loadSurveyFileContent(sourceGridFile);
@@ -86,40 +86,65 @@ public class SurveyFileRandomGridGenerationParametersPopUpVM extends SurveyBaseV
 			job.setPercentage(percentage);
 			job.setNewMeasurement(nextMeasurement);
 			jobManager.start(job);
-			jobStatusPopUp = JobStatusPopUpVM.openPopUp("survey.file.random_grid_generation.title", job, true, 
+			jobStatusPopUp = JobStatusPopUpVM.openPopUp("survey.file.random_grid_generation.title", job, true,
 					new JobEndHandler<RandomGridGenerationJob>() {
-				public void onJobEnd(RandomGridGenerationJob job) {
-					closeJobStatusPopUp();
-					switch(job.getStatus()) {
-					case COMPLETED:
-						MessageUtil.showInfo("survey.file.random_grid_generation.complete_successfully", outputSurveyFileName);
-						Map<String, Object> args = new HashMap<String, Object>();
-						args.put("outputSurveyFileName", outputSurveyFileName);
-						BindUtils.postGlobalCommand(null, null, SURVEY_FILE_RANDOM_GRID_GENERATION_COMPLETE_GLOBAL_COMMAND, args);
-						break;
-					case FAILED:
-						MessageUtil.showError("survey.file.random_grid_generation.error", job.getErrorMessage());
-						break;
-					default:
-					}
-				}
-			});
+						public void onJobEnd(RandomGridGenerationJob job) {
+							closeJobStatusPopUp();
+							switch (job.getStatus()) {
+							case COMPLETED:
+								MessageUtil.showInfo("survey.file.random_grid_generation.complete_successfully",
+										outputSurveyFileName);
+								Map<String, Object> args = new HashMap<String, Object>();
+								args.put("outputSurveyFileName", outputSurveyFileName);
+								BindUtils.postGlobalCommand(null, null,
+										SURVEY_FILE_RANDOM_GRID_GENERATION_COMPLETE_GLOBAL_COMMAND, args);
+								break;
+							case FAILED:
+								MessageUtil.showError("survey.file.random_grid_generation.error",
+										job.getErrorMessage());
+								break;
+							default:
+							}
+						}
+					});
 		} catch (Exception e) {
 			MessageUtil.showError("survey.file.random_grid_generation.error", e.getMessage());
 		}
-		
+
 	}
-	
+
 	private void closeJobStatusPopUp() {
 		closePopUp(jobStatusPopUp);
 	}
 
-	public Map<String, Object> getForm() {
+	public RandomGridGenerationParametersForm getForm() {
 		return form;
 	}
-	
-	public void setForm(Map<String, Object> form) {
+
+	public void setForm(RandomGridGenerationParametersForm form) {
 		this.form = form;
 	}
-	
+
+	public static class RandomGridGenerationParametersForm {
+		private Double percentage;
+		private String nextMeasurement;
+
+		public Double getPercentage() {
+			return percentage;
+		}
+
+		public void setPercentage(Double percentage) {
+			this.percentage = percentage;
+		}
+
+		public String getNextMeasurement() {
+			return nextMeasurement;
+		}
+
+		public void setNextMeasurement(String nextMeasurement) {
+			this.nextMeasurement = nextMeasurement;
+		}
+
+	}
+
 }

@@ -142,8 +142,8 @@
 					</fieldErrorHandler>
 					<fieldErrorHandler
 						message="@load(vmsgs['filenames'])">
-						<textbox width="300px"
-							value="@bind(fx.filenames)" rows="4"
+						<textbox width="500px"
+							value="@bind(fx.filenames)"
 							onChange="@command('applyChanges')"
 							readonly="@load(
 		                		fx.type eq 'COLLECT_EARTH_AREA_PER_ATTRIBUTE' 

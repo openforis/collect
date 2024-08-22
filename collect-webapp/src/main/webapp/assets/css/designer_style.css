@@ -85,6 +85,9 @@ textarea.z-textbox {
 .z-select {
 	height: 2rem;
 }
+.z-doublespinner {
+	height: 38px;
+}
 .nopadding {
 	padding: 0px;
 }
@@ -142,7 +145,7 @@ textarea.z-textbox {
 	padding: 6px 4px;
 	white-space: nowrap;
 }
-.z-textbox.error, .z-intbox.error, .z-select.error, .z-datebox.error {
+.z-textbox.error, .z-intbox.error, .z-select.error, .z-datebox.error, .z-doublespinner.error {
 	border: 2px inset #FF0000;
 	color: #000000;
 }
