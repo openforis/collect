@@ -182,8 +182,7 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 		closeSurveyFileEditPopUp(binder);
 		notifyChange("surveyFiles");
 	}
-	
-	
+
 	public boolean isSingleSurveyFileSelected() {
 		return selectedSurveyFiles.size() == 1;
 	}
