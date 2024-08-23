@@ -154,10 +154,9 @@
 				</row>
 			</rows>
 		</grid>
-		<box width="100%" align="right">
+		<box width="100%" align="right" visible="@load(fx.type eq 'COLLECT_EARTH_GRID')">
 			<button label="${labels.survey.file.random_grid_generation.title}"
-				onClick="@command('openRandomGridGenerationParametersPopUp')"
-				visible="@load(vm.randomGridGenerationAllowed)" />
+				onClick="@command('openRandomGridGenerationParametersPopUp')" />
 		</box>
 		<box width="100%" align="center">
 			<hbox>

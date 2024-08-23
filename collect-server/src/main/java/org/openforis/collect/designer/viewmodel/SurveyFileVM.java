@@ -352,7 +352,8 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	}
 
 	public boolean isRandomGridGenerationAllowed() {
-		return survey.getFirstMeasurementKeyDef() != null;
+		return survey.getFirstMeasurementKeyDef() != null && editedItem != null && !newItem
+				&& editedItem.getType() == SurveyFileType.COLLECT_EARTH_GRID;
 	}
 
 }
