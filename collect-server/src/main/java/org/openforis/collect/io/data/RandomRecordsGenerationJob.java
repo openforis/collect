@@ -17,12 +17,12 @@ import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.openforis.collect.concurrency.SurveyLockingJob;
 import org.openforis.collect.manager.RandomValuesGenerator;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecordSummary;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.SurveyFile;
@@ -30,7 +30,6 @@ import org.openforis.collect.model.SurveyFile.SurveyFileType;
 import org.openforis.commons.io.csv.CsvReader;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.commons.io.flat.FlatRecord;
-import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.model.Attribute;
@@ -46,12 +45,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class RandomRecordsGenerationJob extends Job {
+public class RandomRecordsGenerationJob extends SurveyLockingJob {
 
 	private SurveyManager surveyManager;
 	private RecordManager recordManager;
 	// input
-	private CollectSurvey survey;
 	private File file;
 	private double percentage;
 	private String outputGridSurveyFileName;
@@ -87,10 +85,6 @@ public class RandomRecordsGenerationJob extends Job {
 
 	public void setSurveyManager(SurveyManager surveyManager) {
 		this.surveyManager = surveyManager;
-	}
-
-	public void setSurvey(CollectSurvey survey) {
-		this.survey = survey;
 	}
 
 	public void setFile(File file) {

@@ -46,6 +46,7 @@ import org.openforis.collect.io.data.CSVDataImportJob.CSVDataImportInput;
 import org.openforis.collect.io.data.DataImportSummary;
 import org.openforis.collect.io.data.DataRestoreJob;
 import org.openforis.collect.io.data.DataRestoreSummaryJob;
+import org.openforis.collect.io.data.RandomRecordsGenerationJob;
 import org.openforis.collect.io.data.RecordProvider;
 import org.openforis.collect.io.data.RecordProviderConfiguration;
 import org.openforis.collect.io.data.TransactionalCSVDataImportJob;
@@ -698,6 +699,21 @@ public class RecordController extends BasicController implements Serializable {
 					recordId, sessionManager.getLoggedUsername()));
 		}
 		return res;
+	}
+	
+	@RequestMapping(value = "survey/{surveyId}/data/records/randomgrid", method = POST, produces = APPLICATION_JSON_VALUE)
+	public @ResponseBody JobProxy startRandomRecordsGenerationJob(@PathVariable("surveyId") int surveyId, 
+			@RequestParam String oldMeasurement, @RequestParam String newMeasurement, @RequestParam String outputGridSurveyFileName) {
+		RandomRecordsGenerationJob job = jobManager.createJob(RandomRecordsGenerationJob.class);
+		SessionState sessionState = sessionManager.getSessionState();
+		User loggedUser = sessionState.getUser();
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		job.setSurvey(survey);
+		job.setOldMeasurement(oldMeasurement);
+		job.setNewMeasurement(newMeasurement);
+		job.setOutputGridSurveyFileName(outputGridSurveyFileName);
+		jobManager.startSurveyJob(job);
+		return new JobProxy(job);
 	}
 
 	private Integer getStepNumberOrDefault(Integer stepNumber) {
