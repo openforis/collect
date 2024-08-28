@@ -65,6 +65,10 @@ export class EntityDefinition extends NodeDefinition {
     return this.findDefinitions((def) => def instanceof AttributeDefinition && def.qualifier, true)
   }
 
+  get measurementAttributeDefinition() {
+    return this.findDefinitions((def) => def instanceof AttributeDefinition && def.measurement, true)[0]
+  }
+
   visit(visitor, onlyInsideSingleEntities) {
     const queue = []
 

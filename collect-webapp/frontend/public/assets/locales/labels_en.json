@@ -12,6 +12,7 @@
     },
     "download": "Download",
     "emptyItem": "---Empty---",
+    "edit": "Edit",
     "exportToCsv": "Export to CSV",
     "exportToExcel": "Export to Excel",
     "label": "Label",
@@ -383,6 +384,13 @@
       "title": "Record validation report",
       "tooltipErrors": "Record Validation Report - Errors: {0} - Warnings: {1}",
       "tooltipOk": "Record Validation Report - No errors found"
+    },
+    "randomGrid": {
+      "title": "Random grid",
+      "oldMeasurement": "Current measurement",
+      "newMeasurement": "New measurement",
+      "percentage": "Percentage",
+      "generate": "Generate"
     }
   },
   "survey": {

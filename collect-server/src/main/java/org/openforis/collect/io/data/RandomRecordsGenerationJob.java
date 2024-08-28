@@ -35,6 +35,7 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -47,7 +48,9 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class RandomRecordsGenerationJob extends SurveyLockingJob {
 
+	@Autowired
 	private SurveyManager surveyManager;
+	@Autowired
 	private RecordManager recordManager;
 	// input
 	private File file;

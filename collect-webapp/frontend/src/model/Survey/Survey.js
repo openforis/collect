@@ -20,6 +20,7 @@ export class Survey extends Serializable {
   publishedId
   languages = []
   preferredLanguage
+  target
 
   constructor(jsonData) {
     super()
@@ -56,6 +57,10 @@ export class Survey extends Serializable {
 
   getVersionById(versionId) {
     return this.modelVersions.find((version) => version.id === versionId)
+  }
+
+  get isCollectEarth() {
+    return this.target === 'COLLECT_EARTH'
   }
 }
 

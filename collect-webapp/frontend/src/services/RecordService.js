@@ -177,4 +177,21 @@ export default class RecordService extends AbstractService {
   demoteRecord({ surveyId, recordId }) {
     return this.post(`survey/${surveyId}/data/records/demote/${recordId}`)
   }
+
+  startRandomRecordsGenerationJob({
+    surveyId,
+    oldMeasurement,
+    newMeasurement,
+    percentage,
+    inputGridSurveyFileName,
+    outputGridSurveyFileName,
+  }) {
+    return this.post(`survey/${surveyId}/data/records/randomgrid`, {
+      oldMeasurement,
+      newMeasurement,
+      percentage,
+      inputGridSurveyFileName,
+      outputGridSurveyFileName,
+    })
+  }
 }

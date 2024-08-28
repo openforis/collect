@@ -12,18 +12,20 @@ import SystemErrorDialog from 'common/containers/SystemErrorDialog'
 import EventQueue from 'model/event/EventQueue'
 
 import HomePage from 'scenes/HomePage'
+import DashboardPage from 'scenes/DashboardPage'
+import DataCleansingPage from 'scenes/DataCleansingPage'
+import MapPage from 'scenes/MapPage'
+import SaikuPage from 'scenes/SaikuPage'
+
 import BackupDataExportPage from 'datamanagement/pages/BackupDataExportPage'
 import BackupDataImportPage from 'datamanagement/pages/BackupDataImportPage'
 import CsvDataExportPage from 'datamanagement/pages/CsvDataExportPage'
 import CsvDataImportPage from 'datamanagement/pages/CsvDataImportPage'
 import RecordEditPage from 'datamanagement/pages/RecordEditPage'
-import BackupPage from 'backuprestore/pages/BackupPage'
-import DashboardPage from 'scenes/DashboardPage'
-import DataCleansingPage from 'scenes/DataCleansingPage'
 import DataManagementPage from 'datamanagement/pages/DataManagementPage'
-import MapPage from 'scenes/MapPage'
+import { RandomGridGenerationPage } from 'datamanagement/pages/RandomGridGenerationPage'
+import BackupPage from 'backuprestore/pages/BackupPage'
 import RestorePage from 'backuprestore/pages/RestorePage'
-import SaikuPage from 'scenes/SaikuPage'
 import SurveyClonePage from 'surveydesigner/pages/SurveyClonePage'
 import SurveyEditPage from 'surveydesigner/pages/SurveyEditPage'
 import SurveysListPage from 'surveydesigner/pages/SurveysListPage'
@@ -54,6 +56,11 @@ const DefaultLayoutRoutes = () => (
             <Route path="/datamanagement/backup" name="BackupDataExport" element={<BackupDataExportPage />} />
             <Route path="/datamanagement/backupimport" name="BackupDataImport" element={<BackupDataImportPage />} />
             <Route path="/datamanagement/csvimport" name="CsvDataImport" element={<CsvDataImportPage />} />
+            <Route
+              path="/datamanagement/randomgrid"
+              name="RandomGridGeneration"
+              element={<RandomGridGenerationPage />}
+            />
             <Route path="/datamanagement/:id" name="RecordEdit" element={<RecordEditPage />} />
             <Route path="/datacleansing" name="DataCleansing" element={<DataCleansingPage />} />
             <Route path="/map" name="Map" element={<MapPage />} />
