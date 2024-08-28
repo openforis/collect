@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.compress.utils.FileNameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openforis.collect.concurrency.SurveyLockingJob;
@@ -23,10 +24,14 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecordSummary;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveyFile.SurveyFileType;
+import org.openforis.collect.model.SurveySummary;
+import org.openforis.collect.model.User;
+import org.openforis.collect.utils.Files;
 import org.openforis.commons.io.csv.CsvReader;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.commons.io.flat.FlatRecord;
@@ -53,11 +58,35 @@ public class RandomRecordsGenerationJob extends SurveyLockingJob {
 	@Autowired
 	private RecordManager recordManager;
 	// input
-	private File file;
+	private User user;
 	private double percentage;
-	private String outputGridSurveyFileName;
+	private String sourceGridSurveyFileName;
 	private String oldMeasurement;
 	private String newMeasurement;
+	// temp variables
+	private CollectSurvey tempSurvey;
+	private String outputGridSurveyFileName;
+
+	@Override
+	protected void createInternalVariables() throws Throwable {
+		super.createInternalVariables();
+		String surveyUri = survey.getUri();
+		SurveySummary surveySummary = surveyManager.loadSummaryByUri(surveyUri);
+		if (!surveySummary.isTemporary()) {
+			tempSurvey = surveyManager.createTemporarySurveyFromPublished(surveyUri, user);
+		} else {
+			Integer tempSurveyId = surveySummary.getId();
+			tempSurvey = surveyManager.getOrLoadSurveyById(tempSurveyId);
+		}
+		outputGridSurveyFileName = generateOutputGridSurveyFileName();
+		// validate output grid file name
+		List<SurveyFile> surveyFileSummaries = surveyManager.loadSurveyFileSummaries(tempSurvey);
+		for (SurveyFile surveyFile : surveyFileSummaries) {
+			if (surveyFile.getFilename().equals(outputGridSurveyFileName)) {
+				throw new Exception("Grid file with the same name already exists: " + outputGridSurveyFileName);
+			}
+		}
+	}
 
 	@Override
 	protected void buildTasks() throws Throwable {
@@ -78,28 +107,35 @@ public class RandomRecordsGenerationJob extends SurveyLockingJob {
 		super.afterExecute();
 		if (isCompleted()) {
 			File outputFile = ((RandomGridGenerationTask) getTasks().get(0)).outputFile;
-			SurveyFile surveyFile = new SurveyFile(survey);
+			SurveyFile surveyFile = new SurveyFile(tempSurvey);
 			surveyFile.setType(SurveyFileType.COLLECT_EARTH_GRID);
+			String outputGridSurveyFileName = generateOutputGridSurveyFileName();
 			surveyFile.setFilename(outputGridSurveyFileName);
 			surveyManager.addSurveyFile(surveyFile, outputFile);
 			outputFile.delete();
 		}
 	}
 
+	private String generateOutputGridSurveyFileName() {
+		AttributeDefinition measurementKeyDef = survey.getFirstMeasurementKeyDef();
+		String inputName = FileNameUtils.getBaseName(sourceGridSurveyFileName);
+		return inputName + "_" + measurementKeyDef.getName() + "_" + newMeasurement + ".csv";
+	}
+
 	public void setSurveyManager(SurveyManager surveyManager) {
 		this.surveyManager = surveyManager;
 	}
-
-	public void setFile(File file) {
-		this.file = file;
+	
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public void setPercentage(double percentage) {
 		this.percentage = percentage;
 	}
 
-	public void setOutputGridSurveyFileName(String outputGridSurveyFileName) {
-		this.outputGridSurveyFileName = outputGridSurveyFileName;
+	public void setSourceGridSurveyFileName(String sourceGridSurveyFileName) {
+		this.sourceGridSurveyFileName = sourceGridSurveyFileName;
 	}
 
 	public void setOldMeasurement(String oldMeasurement) {
@@ -130,7 +166,7 @@ public class RandomRecordsGenerationJob extends SurveyLockingJob {
 				Attribute<?, Value> measurementKeyAttr = rootEntity.getChild(measurementKeyDef);
 				Value newMeasurementValue = measurementKeyDef.createValue(newMeasurement);
 				recordUpdater.updateAttribute(measurementKeyAttr, newMeasurementValue);
-//				recordManager.save(record);
+				recordManager.save(record);
 				incrementProcessedItems();
 			}
 			generateGridFile(randomPlotIds);
@@ -138,6 +174,10 @@ public class RandomRecordsGenerationJob extends SurveyLockingJob {
 
 		private void generateGridFile(Set<String> randomPlotIds)
 				throws IOException, FileNotFoundException, UnsupportedEncodingException {
+			SurveyFile sourceGridSurveyFile = loadSourceSurveyFile();
+			byte[] sourceSurveyFileContent = surveyManager.loadSurveyFileContent(sourceGridSurveyFile);
+			File sourceGridFile = Files.witeToTempFile(sourceSurveyFileContent, "temp_source_grid", ".csv");
+
 			outputFile = File.createTempFile("random_grid", ".csv");
 			FileOutputStream outputStream = null;
 			CsvWriter csvWriter = null;
@@ -145,7 +185,7 @@ public class RandomRecordsGenerationJob extends SurveyLockingJob {
 			try {
 				outputStream = new FileOutputStream(outputFile);
 				csvWriter = new CsvWriter(outputStream);
-				csvReader = new CsvReader(file);
+				csvReader = new CsvReader(sourceGridFile);
 				csvReader.readHeaders();
 				List<String> headers = csvReader.getColumnNames();
 				csvWriter.writeHeaders(headers);
@@ -173,6 +213,16 @@ public class RandomRecordsGenerationJob extends SurveyLockingJob {
 				IOUtils.closeQuietly(csvWriter);
 				IOUtils.closeQuietly(outputStream);
 			}
+		}
+
+		private SurveyFile loadSourceSurveyFile() {
+			List<SurveyFile> surveyFileSummaries = surveyManager.loadSurveyFileSummaries(tempSurvey);
+			for (SurveyFile surveyFile : surveyFileSummaries) {
+				if (surveyFile.getFilename().equals(sourceGridSurveyFileName)) {
+					return surveyFile;
+				}
+			}
+			return null;
 		}
 
 		private RandomRecordKeysGenerationResult generateRandomKeyValues() throws FileNotFoundException, IOException {

@@ -36,6 +36,10 @@ export default class SurveyService extends AbstractService {
     })
   }
 
+  fetchSurveyFilesSummaries(surveyId) {
+    return this.get(`survey/files/${surveyId}`)
+  }
+
   uploadSurveyFile(file) {
     return this.postFormData('survey/prepareimport', {
       file: file,

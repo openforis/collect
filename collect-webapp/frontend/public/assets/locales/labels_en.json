@@ -387,10 +387,11 @@
     },
     "randomGrid": {
       "title": "Random grid",
-      "oldMeasurement": "Current measurement",
+      "generate": "Generate",
       "newMeasurement": "New measurement",
+      "oldMeasurement": "Current measurement",
       "percentage": "Percentage",
-      "generate": "Generate"
+      "sourceGrid": "Source grid"
     }
   },
   "survey": {
