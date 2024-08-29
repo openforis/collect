@@ -7,8 +7,17 @@ import { SimpleFormItem } from 'common/components/Forms'
 import ServiceFactory from 'services/ServiceFactory'
 import { SurveySelectors } from 'store/survey'
 import L from 'utils/Labels'
+import Objects from 'utils/Objects'
+import { InputFieldValidator } from 'validation/InputFieldValidator'
 
 const randomGridLabelPrefix = 'dataManagement.randomGrid.'
+
+const validationsByField = {
+  oldMeasurement: [InputFieldValidator.validateRequired],
+  newMeasurement: [InputFieldValidator.validateRequired],
+  percentage: [InputFieldValidator.validateGreaterThan(0), InputFieldValidator.validateLessThan(100)],
+  sourceGridSurveyFileName: [InputFieldValidator.validateRequired],
+}
 
 const FormItemWithInput = (props) => {
   const {
@@ -19,12 +28,29 @@ const FormItemWithInput = (props) => {
     labelColSpan = 2,
     labelPrefix = '',
     inputOptions = [],
-    validations = [],
+    validations = {},
     state,
     setState,
   } = props
   const errorFeedback = validations[fieldId]
   const invalid = !!errorFeedback
+  const onChange = useCallback(
+    (e) => {
+      const newValue = e.target.value
+      setState((statePrev) => {
+        const validationsPrev = statePrev.validations
+        const stateNext = { ...statePrev, [fieldId]: newValue }
+        const newValidations = {
+          ...validationsPrev,
+          [fieldId]: InputFieldValidator.validateField({ object: stateNext, fieldKey: fieldId, validationsByField }),
+        }
+        stateNext.validations = newValidations
+        return stateNext
+      })
+    },
+    [setState]
+  )
+
   return (
     <SimpleFormItem
       fieldId={fieldId}
@@ -33,15 +59,7 @@ const FormItemWithInput = (props) => {
       labelColSpan={labelColSpan}
       fieldColSpan={fieldColSpan}
     >
-      <Input
-        invalid={invalid}
-        onChange={(e) => {
-          setState((statePrev) => ({ ...statePrev, [fieldId]: e.target.value }))
-        }}
-        style={inputStyle}
-        type={inputType}
-        value={state[fieldId]}
-      >
+      <Input invalid={invalid} onChange={onChange} style={inputStyle} type={inputType} value={state[fieldId]}>
         {inputType === 'select' ? inputOptions : undefined}
       </Input>
     </SimpleFormItem>
@@ -58,7 +76,7 @@ export const RandomGridGenerationPage = () => {
     percentage: 0,
     sourceGridSurveyFileName: '',
     gridFiles: [],
-    validations: [],
+    validations: {},
   })
 
   const { oldMeasurement, newMeasurement, percentage, sourceGridSurveyFileName, gridFiles, validations } = state
@@ -99,12 +117,20 @@ export const RandomGridGenerationPage = () => {
         dispatch(
           JobActions.startJobMonitor({
             jobId: job.id,
-            title: `${randomGridLabelPrefix}title`,
+            title: `${randomGridLabelPrefix}jobTitle`,
             handleJobCompleted: onJobComplete,
           })
         )
       })
   }, [surveyId, oldMeasurement, newMeasurement, percentage, sourceGridSurveyFileName])
+
+  const onGenerateClick = useCallback(() => {
+    const validationResults = InputFieldValidator.validateFields({ object: state, validationsByField })
+    setState((statePrev) => ({ ...statePrev, validations: validationResults }))
+    if (Objects.isEmpty(validationResults)) {
+      startJob()
+    }
+  }, [startJob, state])
 
   return (
     <Container>
@@ -115,12 +141,14 @@ export const RandomGridGenerationPage = () => {
             labelPrefix={randomGridLabelPrefix}
             state={state}
             setState={setState}
+            validations={validations}
           />
           <FormItemWithInput
             fieldId="newMeasurement"
             labelPrefix={randomGridLabelPrefix}
             state={state}
             setState={setState}
+            validations={validations}
           />
         </FormGroup>
         <FormGroup row>
@@ -130,20 +158,22 @@ export const RandomGridGenerationPage = () => {
             labelPrefix={randomGridLabelPrefix}
             state={state}
             setState={setState}
+            validations={validations}
           />
           <FormItemWithInput
-            fieldId="sourceGrid"
+            fieldId="sourceGridSurveyFileName"
             inputOptions={sourceGridFilesOptions}
             inputStyle={{ width: '400px' }}
             inputType="select"
             labelPrefix={randomGridLabelPrefix}
             state={state}
             setState={setState}
+            validations={validations}
           />
         </FormGroup>
         <Row>
           <Col sm={{ size: 'auto', offset: 5 }}>
-            <Button onClick={startJob} className="btn btn-success">
+            <Button onClick={onGenerateClick} className="btn btn-success">
               {L.l(`${randomGridLabelPrefix}generate`)}
             </Button>
           </Col>
