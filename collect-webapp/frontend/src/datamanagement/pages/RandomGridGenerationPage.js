@@ -102,8 +102,6 @@ export const RandomGridGenerationPage = () => {
     }
   }, [surveyId])
 
-  const onJobComplete = useCallback(() => {}, [])
-
   const startJob = useCallback(() => {
     ServiceFactory.recordService
       .startRandomRecordsGenerationJob({
@@ -118,7 +116,6 @@ export const RandomGridGenerationPage = () => {
           JobActions.startJobMonitor({
             jobId: job.id,
             title: `${randomGridLabelPrefix}jobTitle`,
-            handleJobCompleted: onJobComplete,
           })
         )
       })
