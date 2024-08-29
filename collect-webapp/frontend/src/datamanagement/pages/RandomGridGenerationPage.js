@@ -1,11 +1,52 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { Button, Col, Container, Form, FormGroup, Input, Label, Row } from 'reactstrap'
+import { Button, Col, Container, Form, FormGroup, Input, Row } from 'reactstrap'
 
 import * as JobActions from 'actions/job'
+import { SimpleFormItem } from 'common/components/Forms'
 import ServiceFactory from 'services/ServiceFactory'
 import { SurveySelectors } from 'store/survey'
 import L from 'utils/Labels'
+
+const randomGridLabelPrefix = 'dataManagement.randomGrid.'
+
+const FormItemWithInput = (props) => {
+  const {
+    fieldId,
+    fieldColSpan = 2,
+    inputStyle = undefined,
+    inputType = undefined,
+    labelColSpan = 2,
+    labelPrefix = '',
+    inputOptions = [],
+    validations = [],
+    state,
+    setState,
+  } = props
+  const errorFeedback = validations[fieldId]
+  const invalid = !!errorFeedback
+  return (
+    <SimpleFormItem
+      fieldId={fieldId}
+      errorFeedback={errorFeedback}
+      label={labelPrefix + fieldId}
+      labelColSpan={labelColSpan}
+      fieldColSpan={fieldColSpan}
+    >
+      <Input
+        invalid={invalid}
+        onChange={(e) => {
+          setState((statePrev) => ({ ...statePrev, [fieldId]: e.target.value }))
+        }}
+        style={inputStyle}
+        type={inputType}
+        value={state[fieldId]}
+      >
+        {inputType === 'select' ? inputOptions : undefined}
+      </Input>
+    </SimpleFormItem>
+  )
+}
 
 export const RandomGridGenerationPage = () => {
   const dispatch = useDispatch()
@@ -17,17 +58,22 @@ export const RandomGridGenerationPage = () => {
     percentage: 0,
     sourceGridSurveyFileName: '',
     gridFiles: [],
+    validations: [],
   })
 
-  const { oldMeasurement, newMeasurement, percentage, sourceGridSurveyFileName, gridFiles } = state
+  const { oldMeasurement, newMeasurement, percentage, sourceGridSurveyFileName, gridFiles, validations } = state
 
   const gridFileNames = gridFiles.map(({ fileName }) => fileName)
 
-  const sourceGridFilesOptions = ['', ...gridFileNames].map((fileName) => (
-    <option key={fileName} value={fileName}>
-      {fileName}
-    </option>
-  ))
+  const sourceGridFilesOptions = useMemo(
+    () =>
+      ['', ...gridFileNames].map((fileName) => (
+        <option key={fileName} value={fileName}>
+          {fileName}
+        </option>
+      )),
+    [gridFileNames]
+  )
 
   useEffect(() => {
     if (surveyId) {
@@ -53,7 +99,7 @@ export const RandomGridGenerationPage = () => {
         dispatch(
           JobActions.startJobMonitor({
             jobId: job.id,
-            title: 'dataManagement.randomGrid.title',
+            title: `${randomGridLabelPrefix}title`,
             handleJobCompleted: onJobComplete,
           })
         )
@@ -64,57 +110,41 @@ export const RandomGridGenerationPage = () => {
     <Container>
       <Form>
         <FormGroup row>
-          <Label md={2}>{L.l('dataManagement.randomGrid.oldMeasurement')}</Label>
-          <Col md={2}>
-            <Input
-              value={oldMeasurement}
-              onChange={(e) => {
-                setState((statePrev) => ({ ...statePrev, oldMeasurement: e.target.value }))
-              }}
-            />
-          </Col>
-          <Label md={2}>{L.l('dataManagement.randomGrid.newMeasurement')}</Label>
-          <Col md={2}>
-            <Input
-              value={newMeasurement}
-              onChange={(e) => {
-                setState((statePrev) => ({ ...statePrev, newMeasurement: e.target.value }))
-              }}
-            />
-          </Col>
+          <FormItemWithInput
+            fieldId="oldMeasurement"
+            labelPrefix={randomGridLabelPrefix}
+            state={state}
+            setState={setState}
+          />
+          <FormItemWithInput
+            fieldId="newMeasurement"
+            labelPrefix={randomGridLabelPrefix}
+            state={state}
+            setState={setState}
+          />
         </FormGroup>
         <FormGroup row>
-          <Label md={2}>{L.l('dataManagement.randomGrid.percentage')}</Label>
-          <Col md={2}>
-            <Input
-              type="number"
-              value={percentage}
-              onChange={(e) => {
-                setState((statePrev) => ({ ...statePrev, percentage: e.target.value }))
-              }}
-            />
-          </Col>
+          <FormItemWithInput
+            fieldId="percentage"
+            inputType="number"
+            labelPrefix={randomGridLabelPrefix}
+            state={state}
+            setState={setState}
+          />
+          <FormItemWithInput
+            fieldId="sourceGrid"
+            inputOptions={sourceGridFilesOptions}
+            inputStyle={{ width: '400px' }}
+            inputType="select"
+            labelPrefix={randomGridLabelPrefix}
+            state={state}
+            setState={setState}
+          />
         </FormGroup>
-        <FormGroup row>
-          <Label md={2}>{L.l('dataManagement.randomGrid.sourceGrid')}</Label>
-          <Col md={2}>
-            <Input
-              type="select"
-              style={{ width: '400px' }}
-              value={sourceGridSurveyFileName}
-              onChange={(e) => {
-                setState((statePrev) => ({ ...statePrev, sourceGridSurveyFileName: e.target.value }))
-              }}
-            >
-              {sourceGridFilesOptions}
-            </Input>
-          </Col>
-        </FormGroup>
-
         <Row>
           <Col sm={{ size: 'auto', offset: 5 }}>
             <Button onClick={startJob} className="btn btn-success">
-              {L.l('dataManagement.randomGrid.generate')}
+              {L.l(`${randomGridLabelPrefix}generate`)}
             </Button>
           </Col>
         </Row>
