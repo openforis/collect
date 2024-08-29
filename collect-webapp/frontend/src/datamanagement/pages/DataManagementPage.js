@@ -302,7 +302,7 @@ class DataManagementPage extends React.Component {
               <i className="fa fa-exclamation-triangle" aria-hidden="true"></i> Validation Report
             </Button>
           </Col>
-          <Col md={2}>
+          <Col md={1}>
             <ButtonDropdown
               isOpen={this.state.exportDropdownOpen}
               toggle={() => this.setState({ exportDropdownOpen: !this.state.exportDropdownOpen })}
@@ -323,7 +323,7 @@ class DataManagementPage extends React.Component {
               </DropdownMenu>
             </ButtonDropdown>
           </Col>
-          <Col md={2}>
+          <Col md={1}>
             {loggedUser.canImportRecords(userRoleInSurveyGroup) && (
               <ButtonDropdown
                 isOpen={this.state.importDropdownOpen}
@@ -345,7 +345,7 @@ class DataManagementPage extends React.Component {
               </ButtonDropdown>
             )}
           </Col>
-          <Col md={2}>
+          <Col md={1}>
             {loggedUser.canPromoteRecordsInBulk(userRoleInSurveyGroup) && (
               <UncontrolledDropdown>
                 <DropdownToggle color="warning" caret>

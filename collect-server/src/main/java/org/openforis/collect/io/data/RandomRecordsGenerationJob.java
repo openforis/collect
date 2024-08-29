@@ -156,7 +156,11 @@ public class RandomRecordsGenerationJob extends SurveyLockingJob {
 			AttributeDefinition measurementKeyDef = survey.getFirstMeasurementKeyDef();
 			RandomRecordKeysGenerationResult keyValuesGenerationResult = generateRandomKeyValues();
 			Set<String> randomPlotIds = keyValuesGenerationResult.keyValues;
-			setTotalItems(randomPlotIds.size());
+			int totalItems = randomPlotIds.size();
+			if (totalItems == 0) {
+				throw new Error("No records to clone");
+			}
+			setTotalItems(totalItems);
 
 			for (String plotId : randomPlotIds) {
 				int recordId = keyValuesGenerationResult.recordIdByKeyValue.get(plotId);

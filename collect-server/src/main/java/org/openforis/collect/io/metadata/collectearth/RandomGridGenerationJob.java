@@ -104,7 +104,11 @@ public class RandomGridGenerationJob extends Job {
 		@Override
 		protected void execute() throws Throwable {
 			Set<String> randomPlotIds = generateRandomPlotIds();
-			setTotalItems(randomPlotIds.size());
+			int totalRandomPlotIds = randomPlotIds.size();
+			if (totalRandomPlotIds == 0) {
+				throw new Error("Random grid cannot be generated: no records found (check the percentage value)");
+			}
+			setTotalItems(totalRandomPlotIds);
 
 			outputFile = File.createTempFile("random_grid", ".csv");
 			FileOutputStream outputStream = null;

@@ -132,41 +132,44 @@ export const RandomGridGenerationPage = () => {
   return (
     <Container>
       <Form>
-        <FormGroup row>
-          <FormItemWithInput
-            fieldId="oldMeasurement"
-            labelPrefix={randomGridLabelPrefix}
-            state={state}
-            setState={setState}
-            validations={validations}
-          />
-          <FormItemWithInput
-            fieldId="newMeasurement"
-            labelPrefix={randomGridLabelPrefix}
-            state={state}
-            setState={setState}
-            validations={validations}
-          />
-        </FormGroup>
-        <FormGroup row>
-          <FormItemWithInput
-            fieldId="percentage"
-            inputType="number"
-            labelPrefix={randomGridLabelPrefix}
-            state={state}
-            setState={setState}
-            validations={validations}
-          />
-          <FormItemWithInput
-            fieldId="sourceGridSurveyFileName"
-            inputOptions={sourceGridFilesOptions}
-            inputStyle={{ width: '400px' }}
-            inputType="select"
-            labelPrefix={randomGridLabelPrefix}
-            state={state}
-            setState={setState}
-            validations={validations}
-          />
+        <FormGroup tag="fieldset">
+          <legend>{L.l('common.parameters')}</legend>
+          <FormGroup row>
+            <FormItemWithInput
+              fieldId="oldMeasurement"
+              labelPrefix={randomGridLabelPrefix}
+              state={state}
+              setState={setState}
+              validations={validations}
+            />
+            <FormItemWithInput
+              fieldId="newMeasurement"
+              labelPrefix={randomGridLabelPrefix}
+              state={state}
+              setState={setState}
+              validations={validations}
+            />
+          </FormGroup>
+          <FormGroup row>
+            <FormItemWithInput
+              fieldId="percentage"
+              inputType="number"
+              labelPrefix={randomGridLabelPrefix}
+              state={state}
+              setState={setState}
+              validations={validations}
+            />
+            <FormItemWithInput
+              fieldId="sourceGridSurveyFileName"
+              inputOptions={sourceGridFilesOptions}
+              inputStyle={{ width: '400px' }}
+              inputType="select"
+              labelPrefix={randomGridLabelPrefix}
+              state={state}
+              setState={setState}
+              validations={validations}
+            />
+          </FormGroup>
         </FormGroup>
         <Row>
           <Col sm={{ size: 'auto', offset: 5 }}>
