@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - CE surveys: random grid generation;
 
+## [4.0.93] - 2024-08-22
+### Fixed
+- Fixed cannot demote record in analysis step;
+
 ## [4.0.92] - 2024-07-04
 ### Added
 - CSV data export: added filter condition (expression);

@@ -196,7 +196,12 @@ export default class User extends Serializable {
     const prevStep = Workflow.getPrevStep(recordStep)
     if (!prevStep) return false
 
-    return this.canEditRecord({ record, userInGroupRole: roleInGroup })
+    switch (recordStep) {
+      case Workflow.STEPS.analysis:
+        return this._hasAtLeastRole(User.ROLE.ANALYSIS)
+      default:
+        return this.canEditRecord({ record, roleInGroup })
+    }
   }
 
   canPromoteRecordWithErrors(roleInSurveyGroup) {
