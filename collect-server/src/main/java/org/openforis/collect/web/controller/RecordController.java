@@ -1,5 +1,6 @@
 package org.openforis.collect.web.controller;
 
+import static org.openforis.collect.web.ws.AppWS.MessageType.SURVEYS_UPDATED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
@@ -104,6 +105,9 @@ import org.openforis.collect.web.session.SessionState;
 import org.openforis.collect.web.ws.AppWS;
 import org.openforis.commons.web.HttpResponses;
 import org.openforis.commons.web.Response;
+import org.openforis.concurrency.Worker;
+import org.openforis.concurrency.WorkerStatusChangeEvent;
+import org.openforis.concurrency.WorkerStatusChangeListener;
 import org.openforis.concurrency.proxy.JobProxy;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -716,6 +720,15 @@ public class RecordController extends BasicController implements Serializable {
 		job.setNewMeasurement(newMeasurement);
 		job.setPercentage(percentage);
 		job.setSourceGridSurveyFileName(sourceGridSurveyFileName);
+		job.addStatusChangeListener(new WorkerStatusChangeListener() {
+			public void statusChanged(WorkerStatusChangeEvent event) {
+				if (event.getTo() == Worker.Status.COMPLETED) {
+					// surveys list updated (temporary survey may have been created):
+					// send surveys updated message to WS
+					appWS.sendMessage(SURVEYS_UPDATED);
+				}
+			}
+		});
 		jobManager.startSurveyJob(job);
 		return new JobProxy(job);
 	}
