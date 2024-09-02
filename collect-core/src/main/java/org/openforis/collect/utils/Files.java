@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +13,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.commons.io.OpenForisIOUtils;
 
 /**
  * 
@@ -38,16 +38,20 @@ public class Files {
 		return file;
 	}
 	
-	public static File writeToTempFile(String text, String tempFilePrefix, String tempFileSuffix) throws IOException {
+	public static File witeToTempFile(byte[] content, String tempFilePrefix, String tempFileSuffix) throws IOException {
 		File file = File.createTempFile(tempFilePrefix, tempFileSuffix);
-		Writer writer = null;
+		FileWriter fileWriter = null;
 		try {
-			writer = new FileWriter(file);
-			IOUtils.write(text.getBytes(), writer, "UTF-8");			
+			fileWriter = new FileWriter(file);
+			IOUtils.write(content, fileWriter, OpenForisIOUtils.UTF_8);
 		} finally {
-			IOUtils.closeQuietly(writer);
+			IOUtils.closeQuietly(fileWriter);
 		}
 		return file;
+	}
+	
+	public static File writeToTempFile(String text, String tempFilePrefix, String tempFileSuffix) throws IOException {
+		return witeToTempFile(text.getBytes(), tempFilePrefix, tempFileSuffix);
 	}
 	
 	public static File createTempDirectory() throws IOException {

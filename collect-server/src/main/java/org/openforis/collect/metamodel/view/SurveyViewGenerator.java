@@ -193,6 +193,7 @@ public class SurveyViewGenerator {
 		String name = def.getName();
 		String label = def.getLabel(Type.INSTANCE, languageCode);
 		boolean multiple = def.isMultiple();
+		boolean measurement = annotations.isMeasurementAttribute(def);
 		boolean qualifier = annotations.isQualifier(def);
 		boolean showInSummary = annotations.isShowInSummary(def);
 		AttributeType attributeType = AttributeType.valueOf(def);
@@ -281,6 +282,7 @@ public class SurveyViewGenerator {
 			view = new AttributeDefView(id, name, label, attributeType, fieldNames, key, multiple);
 		}
 		view.setShowInRecordSummaryList(showInSummary);
+		view.setMeasurement(measurement);
 		view.setQualifier(qualifier);
 		List<FieldLabel> fieldLabels = def.getFieldLabels();
 		Map<String, Boolean> visibilityByField = new HashMap<String, Boolean>();

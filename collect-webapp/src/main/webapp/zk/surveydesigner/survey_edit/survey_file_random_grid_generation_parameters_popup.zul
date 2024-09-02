@@ -1,0 +1,51 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+	<window id="surveyFileRandomGridGenerationPopUp"
+		title="${labels.survey.file.random_grid_generation.title}"
+		width="500px" border="normal" position="center"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyFileRandomGridGenerationParametersPopUpVM')"
+		form="@id('fx') 
+      @load(vm.form) 
+      @save(vm.form, before={'validate','applyChanges','start'})
+      @validator('org.openforis.collect.designer.form.validator.SurveyFileRandomGridGenerationFormValidator')"
+		validationMessages="@id('vmsgs')" closable="true"
+		onClose="@command('close')">
+
+		<grid>
+			<columns>
+				<column width="150px" />
+				<column width="100%" />
+			</columns>
+			<rows>
+				<row>
+					<label
+						value="${labels.survey.file.random_grid_generation.percentage}:" />
+					<fieldErrorHandler
+						message="@load(vmsgs['percentage'])">
+						<doublespinner width="150px"
+							value="@bind(fx.percentage)" onChange="@command('applyChanges')" />
+					</fieldErrorHandler>
+				</row>
+				<row>
+					<label
+						value="${labels.survey.file.random_grid_generation.next_measurement}:" />
+					<fieldErrorHandler
+						message="@load(vmsgs['nextMeasurement'])">
+						<textbox width="150px"
+							value="@bind(fx.nextMeasurement)"
+							onChange="@command('applyChanges')" />
+					</fieldErrorHandler>
+				</row>
+			</rows>
+		</grid>
+
+		<box width="100%" align="center">
+			<hlayout>
+				<button id="okBtn"
+					label="${labels.survey.file.random_grid_generation.start}"
+					onClick="@command('start')" />
+			</hlayout>
+		</box>
+	</window>
+</zk>

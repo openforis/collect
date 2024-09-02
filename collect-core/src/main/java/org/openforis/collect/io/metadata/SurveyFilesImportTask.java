@@ -54,7 +54,7 @@ public class SurveyFilesImportTask extends Task {
 				SurveyFile surveyFile = new SurveyFile(survey);
 				surveyFile.setFilename(fileName);
 				surveyFile.setType(type);
-				surveyManager.addSurveyFile(survey, surveyFile, file);
+				surveyManager.addSurveyFile(surveyFile, file);
 			}
 		}
 	}

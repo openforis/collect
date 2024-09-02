@@ -24,7 +24,12 @@ export default class Objects {
   }
 
   static isNotEmpty(obj) {
-    return typeof obj === 'object' && Object.keys(obj).length > 0
+    return (
+      obj !== null &&
+      obj !== undefined &&
+      obj !== '' &&
+      ((Array.isArray(obj) && obj.length > 0) || typeof obj !== 'object' || Object.keys(obj).length > 0)
+    )
   }
 
   static isEmpty(obj) {
@@ -61,18 +66,22 @@ export default class Objects {
       : null
   }
 
-  static getProp = (prop, defaultTo = null) => (obj) => {
-    const val = obj ? obj[prop] : null
-    return Objects.isNullOrUndefined(val) ? defaultTo : val
-  }
-
-  static getPath = (path, defaultTo = null) => (obj) => {
-    let currentObj = obj
-    const parts = [...path]
-    while (parts.length > 0 && currentObj) {
-      const part = parts.pop()
-      currentObj = Objects.getProp(part)(currentObj)
+  static getProp =
+    (prop, defaultTo = null) =>
+    (obj) => {
+      const val = obj ? obj[prop] : null
+      return Objects.isNullOrUndefined(val) ? defaultTo : val
     }
-    return currentObj || defaultTo
-  }
+
+  static getPath =
+    (path, defaultTo = null) =>
+    (obj) => {
+      let currentObj = obj
+      const parts = [...path]
+      while (parts.length > 0 && currentObj) {
+        const part = parts.pop()
+        currentObj = Objects.getProp(part)(currentObj)
+      }
+      return currentObj || defaultTo
+    }
 }

@@ -15,6 +15,8 @@ import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign;
+import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.ApplicationOptions;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -162,6 +164,24 @@ public class CollectSurvey extends Survey {
 			}
 		});
 		return fromCsvAttributes;
+	}
+	
+	public List<AttributeDefinition> getMeasurementKeyDefs() {
+		final CollectAnnotations annotations = getAnnotations();
+		List<AttributeDefinition> keyDefs = getSchema().getFirstRootEntityDefinition()
+				.getKeyAttributeDefinitions();
+		List<AttributeDefinition> measurementKeyDefs = new ArrayList<AttributeDefinition>(keyDefs);
+		CollectionUtils.filter(measurementKeyDefs, new Predicate<AttributeDefinition>() {
+			public boolean evaluate(AttributeDefinition keyDef) {
+				return annotations.isMeasurementAttribute(keyDef);
+			}
+		});
+		return measurementKeyDefs;
+	}
+
+	public AttributeDefinition getFirstMeasurementKeyDef() {
+		List<AttributeDefinition> measurementKeyDefs = getMeasurementKeyDefs();
+		return measurementKeyDefs.isEmpty() ? null : measurementKeyDefs.get(0);
 	}
 	
 	public boolean isCollectEarth() {

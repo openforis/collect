@@ -47,6 +47,11 @@ const routes = [
     surveySelectRequired: true,
   },
   {
+    path: '/datamanagement/randomgrid',
+    name: 'Random Grid Generation',
+    surveySelectRequired: true,
+  },
+  {
     path: '/datamanagement/:id',
     name: 'Record',
     pathRegExp: new RegExp('/datamanagement/(\\d)+'),

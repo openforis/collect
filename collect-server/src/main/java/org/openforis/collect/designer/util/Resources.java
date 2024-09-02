@@ -65,7 +65,8 @@ public class Resources {
 		SCHEMA_LABELS_IMPORT_POP_UP("survey_edit/schema_labels_import_popup.zul"),
 		ATTRIBUTE_CONVERSION_PARAMETERS_POPUP("survey_edit/schema/attribute_conversion_parameters_popup.zul"),
 		SAMPLING_POINT_DATA_IMPORT_POPUP("survey_edit/sampling_point_data/sampling_point_data_import_popup.zul"),
-		TAXONOMY_IMPORT_POPUP("survey_edit/taxonomy/taxonomy_import_popup.zul");
+		TAXONOMY_IMPORT_POPUP("survey_edit/taxonomy/taxonomy_import_popup.zul"),
+		SURVEY_FILE_RANDOM_GRID_GENERATION_PARAMETERS_POPUP("survey_edit/survey_file_random_grid_generation_parameters_popup.zul");
 		
 		private String location;
 		

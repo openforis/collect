@@ -5,6 +5,7 @@
       "common/*": ["./common/*"],
       "model/*": ["./model/*"],
       "services/*": ["./services/*"],
+      "store/*": ["./store/*"],
       "utils/*": ["./utils/*"]
     }
   },

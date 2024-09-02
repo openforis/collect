@@ -44,10 +44,13 @@ import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidation
 import org.openforis.collect.manager.validation.SurveyValidator.ValidationParameters;
 import org.openforis.collect.metamodel.SimpleSurveyCreationParameters;
 import org.openforis.collect.metamodel.SurveyTarget;
+import org.openforis.collect.metamodel.uiconfiguration.view.Views;
+import org.openforis.collect.metamodel.view.SurveyFileView;
 import org.openforis.collect.metamodel.view.SurveyView;
 import org.openforis.collect.metamodel.view.SurveyViewGenerator;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
+import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
@@ -207,6 +210,14 @@ public class SurveyController extends BasicController {
 			@RequestParam(value = "langCode", required = false, defaultValue = "en") String langCode) throws Exception {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		return generateView(survey, includeCodeListValues, langCode);
+	}
+	
+	@RequestMapping(value = "files/{surveyId}", method = GET)
+	public @ResponseBody List<SurveyFileView> loadSurveyFiles(@PathVariable int surveyId) throws Exception {
+		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
+		List<SurveyFile> fileSummaries = surveyManager.loadSurveyFileSummaries(survey);
+		List<SurveyFileView> fileViews = Views.fromObjects(fileSummaries,SurveyFileView.class);
+		return fileViews;
 	}
 
 	@RequestMapping(method = POST)

@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 
 import JobMonitorDialog from 'common/components/JobMonitorDialog'
 import * as JobActions from 'actions/job'
+import L from 'utils/Labels'
 
 class CurrentJobMonitorDialog extends Component {
   timer = null
@@ -87,15 +88,16 @@ class CurrentJobMonitorDialog extends Component {
     if (!open) {
       return null
     }
+    const { title, jobId, okButtonLabel, handleJobCompleted } = jobMonitorConfiguration
     return (
       <JobMonitorDialog
         open={open}
-        title={jobMonitorConfiguration.title}
-        jobId={jobMonitorConfiguration.jobId}
+        title={L.l(title)}
+        jobId={jobId}
         job={job}
         cancellingJob={cancellingJob}
-        okButtonLabel={jobMonitorConfiguration.okButtonLabel}
-        handleJobCompleted={jobMonitorConfiguration.handleJobCompleted}
+        okButtonLabel={okButtonLabel}
+        handleJobCompleted={handleJobCompleted}
         handleOkButtonClick={this.handleOkButtonClick}
         handleCancelButtonClick={this.handleCancelButtonClick}
         handleCloseButtonClick={this.handleCloseButtonClick}

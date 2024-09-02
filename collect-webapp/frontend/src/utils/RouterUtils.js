@@ -41,6 +41,10 @@ class RouterUtils {
     RouterUtils._navigateToUrl(navigate, '/datamanagement/csvimport')
   }
 
+  static navigateToRandomGridGenerationPage(navigate) {
+    RouterUtils._navigateToUrl(navigate, '/datamanagement/randomgrid')
+  }
+
   static navigateToNewSurveyPage(navigate) {
     RouterUtils._navigateToUrl(navigate, '/surveydesigner/new')
   }

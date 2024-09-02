@@ -69,6 +69,7 @@ class DataManagementPage extends React.Component {
     this.handleDemoteCleansingToEntryButtonClick = this.handleDemoteCleansingToEntryButtonClick.bind(this)
     this.handleMoveRecordsJobCompleted = this.handleMoveRecordsJobCompleted.bind(this)
     this.handleSurveyLanguageChange = this.handleSurveyLanguageChange.bind(this)
+    this.handleGenerateRandomGrid = this.handleGenerateRandomGrid.bind(this)
   }
 
   componentDidUpdate(prevProps) {
@@ -262,6 +263,10 @@ class DataManagementPage extends React.Component {
     this.props.selectActiveSurveyLanguage(lang)
   }
 
+  handleGenerateRandomGrid() {
+    RouterUtils.navigateToRandomGridGenerationPage(this.props.navigate)
+  }
+
   render() {
     const { survey, loggedUser, surveyLanguage, userRoleInSurveyGroup } = this.props
 
@@ -269,18 +274,20 @@ class DataManagementPage extends React.Component {
       return <div>{L.l('survey.selectPublishedSurveyFirst')}</div>
     }
 
+    const hasMeasurementDef = !!survey.schema.firstRootEntityDefinition?.measurementAttributeDefinition
+
     return (
       <MaxAvailableSpaceContainer ref={this.wrapperRef}>
         <Row className="justify-content-between">
           <Col md={2}>
             {loggedUser.canCreateRecords(userRoleInSurveyGroup) && (
-              <Button color={'info'} onClick={this.handleNewButtonClick}>
-                New
+              <Button color="info" onClick={this.handleNewButtonClick}>
+                {L.l('common.new')}
               </Button>
             )}
             {loggedUser.canEditRecords(userRoleInSurveyGroup) && this.state.selectedItem && (
-              <Button color={'success'} onClick={this.handleEditButtonClick}>
-                Edit
+              <Button color="success" onClick={this.handleEditButtonClick}>
+                {L.l('common.edit')}
               </Button>
             )}
             {loggedUser.canDeleteRecords(userRoleInSurveyGroup, this.state.selectedItems) &&
@@ -295,7 +302,7 @@ class DataManagementPage extends React.Component {
               <i className="fa fa-exclamation-triangle" aria-hidden="true"></i> Validation Report
             </Button>
           </Col>
-          <Col md={2}>
+          <Col md={1}>
             <ButtonDropdown
               isOpen={this.state.exportDropdownOpen}
               toggle={() => this.setState({ exportDropdownOpen: !this.state.exportDropdownOpen })}
@@ -316,7 +323,7 @@ class DataManagementPage extends React.Component {
               </DropdownMenu>
             </ButtonDropdown>
           </Col>
-          <Col md={2}>
+          <Col md={1}>
             {loggedUser.canImportRecords(userRoleInSurveyGroup) && (
               <ButtonDropdown
                 isOpen={this.state.importDropdownOpen}
@@ -338,7 +345,7 @@ class DataManagementPage extends React.Component {
               </ButtonDropdown>
             )}
           </Col>
-          <Col md={2}>
+          <Col md={1}>
             {loggedUser.canPromoteRecordsInBulk(userRoleInSurveyGroup) && (
               <UncontrolledDropdown>
                 <DropdownToggle color="warning" caret>
@@ -365,7 +372,16 @@ class DataManagementPage extends React.Component {
               </UncontrolledDropdown>
             )}
           </Col>
-          <Col md={2}>
+          {survey.isCollectEarth && hasMeasurementDef && (
+            <Col md={1}>
+              {loggedUser.canCreateRecords(userRoleInSurveyGroup) && (
+                <Button color="warning" onClick={this.handleGenerateRandomGrid}>
+                  {L.l('dataManagement.randomGrid')}
+                </Button>
+              )}
+            </Col>
+          )}
+          <Col md={1}>
             <FormControl>
               <SurveyLanguagesSelect
                 survey={survey}

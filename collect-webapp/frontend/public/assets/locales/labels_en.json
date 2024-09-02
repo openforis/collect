@@ -12,6 +12,7 @@
     },
     "download": "Download",
     "emptyItem": "---Empty---",
+    "edit": "Edit",
     "exportToCsv": "Export to CSV",
     "exportToExcel": "Export to Excel",
     "label": "Label",
@@ -383,6 +384,15 @@
       "title": "Record validation report",
       "tooltipErrors": "Record Validation Report - Errors: {0} - Warnings: {1}",
       "tooltipOk": "Record Validation Report - No errors found"
+    },
+    "randomGrid": {
+      "title": "Random grid",
+      "jobTitle": "Random grid generation",
+      "generate": "Generate",
+      "newMeasurement": "New measurement",
+      "oldMeasurement": "Current measurement",
+      "percentage": "Percentage",
+      "sourceGridSurveyFileName": "Source grid"
     }
   },
   "survey": {
@@ -684,7 +694,9 @@
     "duplicate_value": "Duplicate value",
     "severity": "Severity",
     "path": "Path",
-    "message": "Message"
+    "message": "Message",
+    "mustBeGreaterThan": "Must be greater than {0}",
+    "mustBeLowerThan": "Must be lower than {0}"
   },
   "connection": {
     "serverConnectionError": {

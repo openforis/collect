@@ -12,6 +12,7 @@ public class AttributeDefView extends NodeDefView {
 	private List<String> fieldNames;
 	private List<String> fieldLabels;
 	private boolean showInRecordSummaryList;
+	private boolean measurement;
 	private boolean qualifier;
 	private Map<String, Boolean> visibilityByField;
 	private boolean calculated;
@@ -38,6 +39,14 @@ public class AttributeDefView extends NodeDefView {
 
 	public void setShowInRecordSummaryList(boolean showInRecordSummaryList) {
 		this.showInRecordSummaryList = showInRecordSummaryList;
+	}
+	
+	public boolean isMeasurement() {
+		return measurement;
+	}
+	
+	public void setMeasurement(boolean measurement) {
+		this.measurement = measurement;
 	}
 
 	public boolean isQualifier() {

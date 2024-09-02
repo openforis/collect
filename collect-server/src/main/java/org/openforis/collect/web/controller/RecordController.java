@@ -1,5 +1,6 @@
 package org.openforis.collect.web.controller;
 
+import static org.openforis.collect.web.ws.AppWS.MessageType.SURVEYS_UPDATED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
@@ -46,6 +47,7 @@ import org.openforis.collect.io.data.CSVDataImportJob.CSVDataImportInput;
 import org.openforis.collect.io.data.DataImportSummary;
 import org.openforis.collect.io.data.DataRestoreJob;
 import org.openforis.collect.io.data.DataRestoreSummaryJob;
+import org.openforis.collect.io.data.RandomRecordsGenerationJob;
 import org.openforis.collect.io.data.RecordProvider;
 import org.openforis.collect.io.data.RecordProviderConfiguration;
 import org.openforis.collect.io.data.TransactionalCSVDataImportJob;
@@ -103,6 +105,9 @@ import org.openforis.collect.web.session.SessionState;
 import org.openforis.collect.web.ws.AppWS;
 import org.openforis.commons.web.HttpResponses;
 import org.openforis.commons.web.Response;
+import org.openforis.concurrency.Worker;
+import org.openforis.concurrency.WorkerStatusChangeEvent;
+import org.openforis.concurrency.WorkerStatusChangeListener;
 import org.openforis.concurrency.proxy.JobProxy;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -269,8 +274,8 @@ public class RecordController extends BasicController implements Serializable {
 							user.getUsername(), recordId));
 		}
 		CollectRecord record = lock
-				? recordManager.checkout(survey, user, recordId, step,
-						sessionManager.getSessionState().getSessionId(), true)
+				? recordManager.checkout(survey, user, recordId, step, sessionManager.getSessionState().getSessionId(),
+						true)
 				: recordManager.load(survey, recordId, step);
 		sessionRecordProvider.putRecord(record);
 		return toProxy(record);
@@ -392,7 +397,7 @@ public class RecordController extends BasicController implements Serializable {
 			FileUtils.copyInputStreamToFile(multipartFile.getInputStream(), tempFile);
 
 			CollectSurvey survey = surveyManager.getById(surveyId);
-			
+
 			DataRestoreSummaryJob job = jobManager.createJob(DataRestoreSummaryJob.class);
 			job.setUser(sessionManager.getLoggedUser());
 			job.setFullSummary(true);
@@ -400,7 +405,7 @@ public class RecordController extends BasicController implements Serializable {
 			job.setPublishedSurvey(survey);
 			job.setCloseRecordProviderOnComplete(false);
 			job.setDeleteInputFileOnDestroy(true);
-			
+
 			jobManager.start(job);
 			this.dataRestoreSummaryJob = job;
 			return new JobView(job);
@@ -603,19 +608,21 @@ public class RecordController extends BasicController implements Serializable {
 
 	@RequestMapping(value = "survey/{survey_id}/data/records/{record_id}/content/collect/data.collect-data", method = GET, produces = MediaTypes.ZIP_CONTENT_TYPE)
 	public void exportRecordToCollectFormat(@PathVariable(value = "survey_id") int surveyId,
-			@PathVariable(value = "record_id") int recordId, HttpServletResponse response) throws RecordPersistenceException, IOException {
+			@PathVariable(value = "record_id") int recordId, HttpServletResponse response)
+			throws RecordPersistenceException, IOException {
 		User user = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.getById(surveyId);
-		
+
 		RecordFilter filter = createRecordFilter(survey, user, userGroupManager);
 		filter.setRecordId(recordId);
-		
+
 		// check that record exists
 		List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter);
 		if (summaries.size() != 1) {
-			throw new IllegalArgumentException(String.format("Could not find record with id %d or multiple records found", recordId));
+			throw new IllegalArgumentException(
+					String.format("Could not find record with id %d or multiple records found", recordId));
 		}
-		
+
 		CollectRecordSummary recordSummary = summaries.get(0);
 
 		// start export job
@@ -625,7 +632,7 @@ public class RecordController extends BasicController implements Serializable {
 		job.setIncludeData(true);
 		job.setIncludeRecordFiles(true);
 		jobManager.start(job, false);
-		
+
 		// write generated file to response
 		File file = job.getOutputFile();
 		String surveyName = survey.getName();
@@ -698,6 +705,32 @@ public class RecordController extends BasicController implements Serializable {
 					recordId, sessionManager.getLoggedUsername()));
 		}
 		return res;
+	}
+
+	@RequestMapping(value = "survey/{surveyId}/data/records/randomgrid", method = POST, produces = APPLICATION_JSON_VALUE)
+	public @ResponseBody JobProxy startRandomRecordsGenerationJob(@PathVariable("surveyId") int surveyId,
+			@RequestParam String oldMeasurement, @RequestParam String newMeasurement, @RequestParam Double percentage,
+			@RequestParam String sourceGridSurveyFileName) {
+		User user = sessionManager.getLoggedUser();
+		RandomRecordsGenerationJob job = jobManager.createJob(RandomRecordsGenerationJob.class);
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		job.setUser(user);
+		job.setSurvey(survey);
+		job.setOldMeasurement(oldMeasurement);
+		job.setNewMeasurement(newMeasurement);
+		job.setPercentage(percentage);
+		job.setSourceGridSurveyFileName(sourceGridSurveyFileName);
+		job.addStatusChangeListener(new WorkerStatusChangeListener() {
+			public void statusChanged(WorkerStatusChangeEvent event) {
+				if (event.getTo() == Worker.Status.COMPLETED) {
+					// surveys list updated (temporary survey may have been created):
+					// send surveys updated message to WS
+					appWS.sendMessage(SURVEYS_UPDATED);
+				}
+			}
+		});
+		jobManager.startSurveyJob(job);
+		return new JobProxy(job);
 	}
 
 	private Integer getStepNumberOrDefault(Integer stepNumber) {
@@ -952,11 +985,10 @@ public class RecordController extends BasicController implements Serializable {
 			this.rootEntityKeyValues = rootEntityKeyValues;
 		}
 	}
-	
+
 	private static RecordFilter createRecordFilter(CollectSurvey survey, User user, UserGroupManager userGroupManager) {
 		return createRecordFilter(survey, user, userGroupManager, null, false);
 	}
-
 
 	private static RecordFilter createRecordFilter(CollectSurvey survey, User user, UserGroupManager userGroupManager,
 			Integer rootEntityId, boolean onlyOwnedRecords) {
@@ -968,14 +1000,14 @@ public class RecordController extends BasicController implements Serializable {
 		if (rootEntityId == null) {
 			rootEntityId = survey.getSchema().getFirstRootEntityDefinition().getId();
 		}
-		
+
 		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(survey.getUserGroupId(), user.getId());
-		
+
 		RecordFilter recordFilter = new RecordFilter(survey);
 		recordFilter.setRootEntityId(rootEntityId);
-		
-		if (onlyOwnedRecords || user.getRole() == UserRole.ENTRY_LIMITED ||
-				userInGroup != null && userInGroup.getRole() == UserGroupRole.DATA_CLEANER_LIMITED) {
+
+		if (onlyOwnedRecords || user.getRole() == UserRole.ENTRY_LIMITED
+				|| userInGroup != null && userInGroup.getRole() == UserGroupRole.DATA_CLEANER_LIMITED) {
 			recordFilter.setOwnerId(user.getId());
 		}
 		if (user.getRole() != UserRole.ADMIN) {
@@ -1075,11 +1107,11 @@ public class RecordController extends BasicController implements Serializable {
 		public void setModifiedUntil(Date modifiedUntil) {
 			this.modifiedUntil = modifiedUntil;
 		}
-		
+
 		public String getFilterExpression() {
 			return filterExpression;
 		}
-		
+
 		public void setFilterExpression(String filterExpression) {
 			this.filterExpression = filterExpression;
 		}

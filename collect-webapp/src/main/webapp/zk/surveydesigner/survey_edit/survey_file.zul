@@ -142,8 +142,8 @@
 					</fieldErrorHandler>
 					<fieldErrorHandler
 						message="@load(vmsgs['filenames'])">
-						<textbox width="300px"
-							value="@bind(fx.filenames)" rows="4"
+						<textbox width="500px"
+							value="@bind(fx.filenames)"
 							onChange="@command('applyChanges')"
 							readonly="@load(
 		                		fx.type eq 'COLLECT_EARTH_AREA_PER_ATTRIBUTE' 
@@ -154,8 +154,13 @@
 				</row>
 			</rows>
 		</grid>
+		<box width="100%" align="right" visible="@load(fx.type eq 'COLLECT_EARTH_GRID')">
+			<button label="${labels.survey.file.random_grid_generation.title}"
+				onClick="@command('openRandomGridGenerationParametersPopUp')" />
+		</box>
 		<box width="100%" align="center">
 			<hbox>
+					
 				<button label="${labels.global.apply}"
 					onClick="@command('commitChanges')" />
 			</hbox>
