@@ -18,6 +18,7 @@ import * as JobActions from 'actions/job'
 import L from 'utils/Labels'
 import Arrays from 'utils/Arrays'
 import { DataGrid } from 'common/components'
+import { DataExportFilterAccordion } from 'datamanagement/components/DataExportFilterAccordion'
 
 class BackupDataExportPage extends Component {
   constructor(props) {
@@ -36,16 +37,15 @@ class BackupDataExportPage extends Component {
     this.handleDataBackupErrorsDialogConfirm = this.handleDataBackupErrorsDialogConfirm.bind(this)
     this.handleBackupDataExportJobCompleted = this.handleBackupDataExportJobCompleted.bind(this)
     this.downloadExportedFile = this.downloadExportedFile.bind(this)
+    this.onFilterPropChange = this.onFilterPropChange.bind(this)
   }
 
   handleExportButtonClick() {
     const survey = this.props.survey
     const surveyId = survey.id
 
-    const backupExportParams = {
-      includeRecordFiles: this.state.includeRecordFiles,
-      onlyOwnedRecords: this.state.exportOnlyOwnedRecords,
-    }
+    const backupExportParams = { ...this.state, onlyOwnedRecords: this.state.exportOnlyOwnedRecords }
+
     ServiceFactory.recordService.startBackupDataExport(surveyId, backupExportParams).then((job) => {
       this.props.dispatch(
         JobActions.startJobMonitor({
@@ -99,6 +99,10 @@ class BackupDataExportPage extends Component {
     this.downloadExportedFile()
   }
 
+  onFilterPropChange({ prop, value }) {
+    this.setState({ [prop]: value })
+  }
+
   render() {
     if (!this.props.survey) {
       return <div>{L.l('survey.selectPublishedSurveyFirst')}</div>
@@ -108,24 +112,13 @@ class BackupDataExportPage extends Component {
     return (
       <Container>
         <Form>
+          <DataExportFilterAccordion filterObject={this.state} onPropChange={this.onFilterPropChange} />
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography>{L.l('general.additionalOptions')}</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <div>
-                <FormGroup row>
-                  <Col sm={{ size: 12 }}>
-                    <Label check>
-                      <Input
-                        type="checkbox"
-                        onChange={(event) => this.setState({ exportOnlyOwnedRecords: event.target.checked })}
-                        checked={this.state.exportOnlyOwnedRecords}
-                      />{' '}
-                      {L.l('dataManagement.backupDataExport.exportOnlyOwnedRecords')}
-                    </Label>
-                  </Col>
-                </FormGroup>
                 <FormGroup row>
                   <Col sm={{ size: 12 }}>
                     <Label check>
