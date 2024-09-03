@@ -15,6 +15,7 @@ import * as JobActions from 'actions/job'
 import Objects from 'utils/Objects'
 import Arrays from 'utils/Arrays'
 import L from 'utils/Labels'
+import { DataExportFilterAccordion } from 'datamanagement/components/DataExportFilterAccordion'
 
 const outputFormats = {
   CSV: 'CSV',
@@ -75,6 +76,7 @@ class CsvDataExportPage extends Component {
     this.handleCsvDataExportModalOkButtonClick = this.handleCsvDataExportModalOkButtonClick.bind(this)
     this.handleEntitySelect = this.handleEntitySelect.bind(this)
     this.handleOutputFormatChange = this.handleOutputFormatChange.bind(this)
+    this.onFilterPropChange = this.onFilterPropChange.bind(this)
   }
 
   static getDerivedStateFromProps(prevProps, prevState) {
@@ -188,23 +190,17 @@ class CsvDataExportPage extends Component {
     })
   }
 
+  onFilterPropChange({ prop, value }) {
+    this.setState({ [prop]: value })
+  }
+
   render() {
-    const { survey, keyAttributes, summaryAttributes, loggedUser, roleInSurvey } = this.props
+    const { survey } = this.props
 
     if (!survey) {
       return <div>Select survey first</div>
     }
-    const {
-      outputFormat,
-      stepGreaterOrEqual,
-      exportMode,
-      exportOnlyOwnedRecords,
-      modifiedSince,
-      modifiedUntil,
-      headingSource,
-      languageCode,
-      filterExpression,
-    } = this.state
+    const { outputFormat, stepGreaterOrEqual, exportMode, headingSource, languageCode } = this.state
 
     const additionalOptionsFormGroups = additionalOptions
       .filter((option) => !onlyExcelAdditionalOptions.includes(option) || outputFormat === outputFormats.XLSX)
@@ -230,35 +226,6 @@ class CsvDataExportPage extends Component {
         {L.l(`dataManagement.workflow.step.${stepCode.toLocaleLowerCase()}`)}
       </option>
     ))
-
-    const createAttributeFormGroup = function (context, attr, prefix, index) {
-      const name = prefix + index
-      const value = context.state[name]
-      return (
-        <FormGroup row key={name}>
-          <Label md={4}>{attr.labelOrName}</Label>
-          <Col md={8}>
-            <Input
-              name={name}
-              value={value}
-              onChange={(e) => {
-                context.setState({ name: e.target.value })
-              }}
-            />
-          </Col>
-        </FormGroup>
-      )
-    }
-
-    const keyAttributeFormGroups = keyAttributes.map((attr, i) => createAttributeFormGroup(this, attr, 'key', i))
-
-    const filteredSummaryAttributes = summaryAttributes.filter((a) =>
-      loggedUser.canFilterRecordsBySummaryAttribute(a, roleInSurvey)
-    )
-
-    const summaryFormGroups = filteredSummaryAttributes.map((attr, i) =>
-      createAttributeFormGroup(this, attr, 'summary', i)
-    )
 
     return (
       <Container>
@@ -333,62 +300,7 @@ class CsvDataExportPage extends Component {
               </FormGroup>
             )}
             <FormGroup row>
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>{L.l('dataManagement.export.filter')}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <div>
-                    <FormGroup check row>
-                      <Label check>
-                        <Input
-                          type="checkbox"
-                          onChange={(e) => this.setState({ exportOnlyOwnedRecords: e.target.checked })}
-                          checked={exportOnlyOwnedRecords}
-                        />
-                        {L.l('dataManagement.export.onlyOwnedRecords')}
-                      </Label>
-                    </FormGroup>
-                    <FormGroup row>
-                      <Label md={3} for="modifiedSince">
-                        {L.l('dataManagement.export.modifiedSince')}:
-                      </Label>
-                      <Col md={4}>
-                        <Input
-                          type="date"
-                          name="modifiedSince"
-                          id="modifiedSince"
-                          value={modifiedSince}
-                          onChange={(e) => this.setState({ modifiedSince: e.target.value })}
-                        />
-                      </Col>
-                      <Label md={1} for="modifiedUntil">
-                        {L.l('dataManagement.export.modifiedUntil')}:
-                      </Label>
-                      <Col md={4}>
-                        <Input
-                          type="date"
-                          name="modifiedUntil"
-                          id="modifiedUntil"
-                          value={modifiedUntil}
-                          onChange={(e) => this.setState({ modifiedUntil: e.target.value })}
-                        />
-                      </Col>
-                    </FormGroup>
-                    {keyAttributeFormGroups}
-                    {summaryFormGroups}
-                    <FormGroup row>
-                      <Label md={4}>{L.l('dataManagement.export.filterExpression')}</Label>
-                      <Col md={8}>
-                        <Input
-                          onChange={(e) => this.setState({ filterExpression: e.target.value })}
-                          value={filterExpression}
-                        />
-                      </Col>
-                    </FormGroup>
-                  </div>
-                </AccordionDetails>
-              </Accordion>
+              <DataExportFilterAccordion filterObject={this.state} onPropChange={this.onFilterPropChange} />
             </FormGroup>
             <FormGroup row>
               <Accordion>
