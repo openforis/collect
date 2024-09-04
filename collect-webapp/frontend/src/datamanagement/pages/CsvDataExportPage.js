@@ -110,7 +110,7 @@ class CsvDataExportPage extends Component {
     const surveyId = survey.id
 
     const keyAttributeValues = keyAttributes.map((_a, idx) => this.state['key' + idx], this)
-    const summaryAttributeValues = summaryAttributes.map((a, idx) => this.state['summary' + idx], this)
+    const summaryAttributeValues = summaryAttributes.map((_a, idx) => this.state['summary' + idx], this)
 
     const selectedEntityId =
       exportMode === exportModes.allEntities ? null : selectedEntityDefinition ? selectedEntityDefinition.id : null
