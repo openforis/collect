@@ -41,10 +41,24 @@ class BackupDataExportPage extends Component {
   }
 
   handleExportButtonClick() {
-    const survey = this.props.survey
-    const surveyId = survey.id
+    const { survey } = this.props
 
-    const backupExportParams = { ...this.state, onlyOwnedRecords: this.state.exportOnlyOwnedRecords }
+    const { id: surveyId } = survey
+
+    const rootEntityDef = survey.schema.firstRootEntityDefinition
+
+    const keyAttributes = rootEntityDef.keyAttributeDefinitions
+    const keyAttributeValues = keyAttributes.map((_a, idx) => this.state['key' + idx], this)
+
+    const summaryAttributes = rootEntityDef.attributeDefinitionsShownInRecordSummaryList
+    const summaryAttributeValues = summaryAttributes.map((_a, idx) => this.state['summary' + idx], this)
+
+    const backupExportParams = {
+      ...this.state,
+      onlyOwnedRecords: this.state.exportOnlyOwnedRecords,
+      keyAttributeValues,
+      summaryAttributeValues,
+    }
 
     ServiceFactory.recordService.startBackupDataExport(surveyId, backupExportParams).then((job) => {
       this.props.dispatch(
