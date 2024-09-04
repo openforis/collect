@@ -968,7 +968,7 @@ public class RecordController extends BasicController implements Serializable {
 		private String filterExpression;
 		private List<String> keyAttributeValues = new ArrayList<String>();
 		private List<String> summaryAttributeValues = new ArrayList<String>();
-		private List<String> rootEntityKeyValues;
+		private List<String> rootEntityKeyValues; // TODO check if they are used
 		// export options
 		private boolean includeRecordFiles;
 
