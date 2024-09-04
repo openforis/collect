@@ -970,8 +970,17 @@ public class RecordController extends BasicController implements Serializable {
 		private List<String> summaryAttributeValues = new ArrayList<String>();
 		private List<String> rootEntityKeyValues; // TODO check if they are used
 		// export options
+		private boolean countOnly;
 		private boolean includeRecordFiles;
 
+		public boolean isCountOnly() {
+			return countOnly;
+		}
+		
+		public void setCountOnly(boolean countOnly) {
+			this.countOnly = countOnly;
+		}
+		
 		public boolean isOnlyOwnedRecords() {
 			return onlyOwnedRecords;
 		}

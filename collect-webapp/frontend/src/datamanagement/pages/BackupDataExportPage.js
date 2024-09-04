@@ -41,6 +41,10 @@ class BackupDataExportPage extends Component {
   }
 
   handleExportButtonClick() {
+    this.startExportJob(true)
+  }
+
+  startExportJob(countOnly = false) {
     const { survey } = this.props
 
     const { id: surveyId } = survey
@@ -55,6 +59,7 @@ class BackupDataExportPage extends Component {
 
     const backupExportParams = {
       ...this.state,
+      countOnly,
       onlyOwnedRecords: this.state.exportOnlyOwnedRecords,
       keyAttributeValues,
       summaryAttributeValues,
@@ -66,11 +71,17 @@ class BackupDataExportPage extends Component {
           jobId: job.id,
           title: L.l('dataManagement.backupDataExport.exportingDataJobTitle'),
           okButtonLabel: L.l('common.download'),
-          handleJobCompleted: this.handleBackupDataExportJobCompleted,
+          handleJobCompleted: countOnly
+            ? this.handleBackupDataExportDryRunJobCompleted
+            : this.handleBackupDataExportJobCompleted,
           handleOkButtonClick: this.handleBackupDataExportModalOkButtonClick,
         })
       )
     })
+  }
+
+  handleBackupDataExportDryRunJobCompleted(job) {
+    this.props.dispatch(JobActions.closeJobMonitor())
   }
 
   handleBackupDataExportJobCompleted(job) {
