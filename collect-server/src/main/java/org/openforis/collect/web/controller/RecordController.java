@@ -585,7 +585,11 @@ public class RecordController extends BasicController implements Serializable {
 			@RequestBody BackupDataExportParameters parameters) throws IOException {
 		User user = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.getById(surveyId);
-		RecordFilter filter = createRecordFilter(survey, user, userGroupManager, null, parameters.onlyOwnedRecords);
+		RecordFilter filter = createRecordFilter(survey, user, userGroupManager, null, parameters.onlyOwnedRecords, 
+				parameters.modifiedSince, parameters.modifiedUntil);
+		filter.setFilterExpression(parameters.filterExpression);
+		filter.setKeyValues(parameters.keyAttributeValues);
+		filter.setSummaryValues(parameters.summaryAttributeValues);
 		fullBackupJob = jobManager.createJob(SurveyBackupJob.class);
 		fullBackupJob.setRecordFilter(filter);
 		fullBackupJob.setSurvey(survey);
@@ -957,9 +961,16 @@ public class RecordController extends BasicController implements Serializable {
 
 	public static class BackupDataExportParameters {
 
+		// records filter
 		private boolean onlyOwnedRecords;
-		private boolean includeRecordFiles;
+		private Date modifiedSince;
+		private Date modifiedUntil;
+		private String filterExpression;
+		private List<String> keyAttributeValues = new ArrayList<String>();
+		private List<String> summaryAttributeValues = new ArrayList<String>();
 		private List<String> rootEntityKeyValues;
+		// export options
+		private boolean includeRecordFiles;
 
 		public boolean isOnlyOwnedRecords() {
 			return onlyOwnedRecords;
@@ -983,6 +994,46 @@ public class RecordController extends BasicController implements Serializable {
 
 		public void setRootEntityKeyValues(List<String> rootEntityKeyValues) {
 			this.rootEntityKeyValues = rootEntityKeyValues;
+		}
+
+		public Date getModifiedSince() {
+			return modifiedSince;
+		}
+
+		public void setModifiedSince(Date modifiedSince) {
+			this.modifiedSince = modifiedSince;
+		}
+
+		public Date getModifiedUntil() {
+			return modifiedUntil;
+		}
+
+		public void setModifiedUntil(Date modifiedUntil) {
+			this.modifiedUntil = modifiedUntil;
+		}
+
+		public String getFilterExpression() {
+			return filterExpression;
+		}
+
+		public void setFilterExpression(String filterExpression) {
+			this.filterExpression = filterExpression;
+		}
+
+		public List<String> getKeyAttributeValues() {
+			return keyAttributeValues;
+		}
+
+		public void setKeyAttributeValues(List<String> keyAttributeValues) {
+			this.keyAttributeValues = keyAttributeValues;
+		}
+
+		public List<String> getSummaryAttributeValues() {
+			return summaryAttributeValues;
+		}
+
+		public void setSummaryAttributeValues(List<String> summaryAttributeValues) {
+			this.summaryAttributeValues = summaryAttributeValues;
 		}
 	}
 

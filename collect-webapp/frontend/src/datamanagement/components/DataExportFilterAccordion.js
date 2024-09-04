@@ -76,7 +76,7 @@ export const DataExportFilterAccordion = (props) => {
                 type="date"
                 name="modifiedSince"
                 id="modifiedSince"
-                value={filterObject['modifiedSince']}
+                value={filterObject['modifiedSince'] ?? ''}
                 onChange={(e) => onPropChange({ prop: 'modifiedSince', value: e.target.value })}
               />
             </Col>
@@ -88,7 +88,7 @@ export const DataExportFilterAccordion = (props) => {
                 type="date"
                 name="modifiedUntil"
                 id="modifiedUntil"
-                value={filterObject['modifiedUntil']}
+                value={filterObject['modifiedUntil'] ?? ''}
                 onChange={(e) => onPropChange({ prop: 'modifiedUntil', value: e.target.value })}
               />
             </Col>
@@ -100,7 +100,7 @@ export const DataExportFilterAccordion = (props) => {
             <Col md={8}>
               <Input
                 onChange={(e) => onPropChange({ prop: 'filterExpression', value: e.target.value })}
-                value={filterObject['filterExpression']}
+                value={filterObject['filterExpression'] ?? ''}
               />
             </Col>
           </FormGroup>
