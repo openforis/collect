@@ -725,19 +725,20 @@ public class RecordController extends BasicController implements Serializable {
 	@RequestMapping(value = "survey/{surveyId}/data/records/randomgrid", method = POST, produces = APPLICATION_JSON_VALUE)
 	public @ResponseBody JobProxy startRandomRecordsGenerationJob(@PathVariable("surveyId") int surveyId,
 			@RequestParam String oldMeasurement, @RequestParam String newMeasurement, @RequestParam Double percentage,
-			@RequestParam String sourceGridSurveyFileName) {
+			@RequestParam String sourceGridSurveyFileName, @RequestParam Boolean countOnly) {
 		User user = sessionManager.getLoggedUser();
 		RandomRecordsGenerationJob job = jobManager.createJob(RandomRecordsGenerationJob.class);
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		job.setUser(user);
 		job.setSurvey(survey);
+		job.setCountOnly(countOnly);
 		job.setOldMeasurement(oldMeasurement);
 		job.setNewMeasurement(newMeasurement);
 		job.setPercentage(percentage);
 		job.setSourceGridSurveyFileName(sourceGridSurveyFileName);
 		job.addStatusChangeListener(new WorkerStatusChangeListener() {
 			public void statusChanged(WorkerStatusChangeEvent event) {
-				if (event.getTo() == Worker.Status.COMPLETED) {
+				if (event.getTo() == Worker.Status.COMPLETED && !Boolean.TRUE.equals(countOnly)) {
 					// surveys list updated (temporary survey may have been created):
 					// send surveys updated message to WS
 					appWS.sendMessage(SURVEYS_UPDATED);

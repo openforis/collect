@@ -389,9 +389,11 @@
     },
     "randomGrid": {
       "title": "Random grid",
+      "confirmGenerateMessage": "- {0} records will be created with {1}={2};\n\n- a new data grid will be created and associated to the survey.\n\nContinue?",
       "jobTitle": "Random grid generation",
       "generate": "Generate",
       "newMeasurement": "New measurement",
+      "noRecordsMatchingFilter": "No records with selected measurement value or empty data set.",
       "oldMeasurement": "Current measurement",
       "percentage": "Percentage",
       "sourceGridSurveyFileName": "Source grid"

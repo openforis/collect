@@ -66,6 +66,7 @@ public class RandomRecordsGenerationJob extends SurveyLockingJob {
 	// temp variables
 	private CollectSurvey tempSurvey;
 	private String outputGridSurveyFileName;
+	private Boolean countOnly;
 
 	@Override
 	protected void createInternalVariables() throws Throwable {
@@ -105,7 +106,7 @@ public class RandomRecordsGenerationJob extends SurveyLockingJob {
 	@Override
 	protected void afterExecute() {
 		super.afterExecute();
-		if (isCompleted()) {
+		if (isCompleted() && !Boolean.TRUE.equals(countOnly)) {
 			File outputFile = ((RandomGridGenerationTask) getTasks().get(0)).outputFile;
 			SurveyFile surveyFile = new SurveyFile(tempSurvey);
 			surveyFile.setType(SurveyFileType.COLLECT_EARTH_GRID);
@@ -114,6 +115,14 @@ public class RandomRecordsGenerationJob extends SurveyLockingJob {
 			surveyManager.addSurveyFile(surveyFile, outputFile);
 			outputFile.delete();
 		}
+	}
+	
+	@Override
+	protected Map<String, Object> prepareResult() {
+		Map<String, Object> result = super.prepareResult();
+		RandomGridGenerationTask task = (RandomGridGenerationTask) getTasks().get(0);
+		result.put("recordsCount", task.getTotalItems());
+		return result;
 	}
 
 	private String generateOutputGridSurveyFileName() {
@@ -145,6 +154,10 @@ public class RandomRecordsGenerationJob extends SurveyLockingJob {
 	public void setNewMeasurement(String newMeasurement) {
 		this.newMeasurement = newMeasurement;
 	}
+	
+	public void setCountOnly(Boolean countOnly) {
+		this.countOnly = countOnly;
+	}
 
 	private class RandomGridGenerationTask extends Task {
 		private static final String ID_COLUMN = "id";
@@ -152,8 +165,6 @@ public class RandomRecordsGenerationJob extends SurveyLockingJob {
 
 		@Override
 		protected void execute() throws Throwable {
-			RecordUpdater recordUpdater = new RecordUpdater();
-			AttributeDefinition measurementKeyDef = survey.getFirstMeasurementKeyDef();
 			RandomRecordKeysGenerationResult keyValuesGenerationResult = generateRandomKeyValues();
 			Set<String> randomPlotIds = keyValuesGenerationResult.keyValues;
 			int totalItems = randomPlotIds.size();
@@ -162,18 +173,22 @@ public class RandomRecordsGenerationJob extends SurveyLockingJob {
 			}
 			setTotalItems(totalItems);
 
-			for (String plotId : randomPlotIds) {
-				int recordId = keyValuesGenerationResult.recordIdByKeyValue.get(plotId);
-				CollectRecord record = recordManager.load(survey, recordId);
-				record.setId(null);
-				Entity rootEntity = record.getRootEntity();
-				Attribute<?, Value> measurementKeyAttr = rootEntity.getChild(measurementKeyDef);
-				Value newMeasurementValue = measurementKeyDef.createValue(newMeasurement);
-				recordUpdater.updateAttribute(measurementKeyAttr, newMeasurementValue);
-				recordManager.save(record);
-				incrementProcessedItems();
+			if (!Boolean.TRUE.equals(countOnly)) {
+				RecordUpdater recordUpdater = new RecordUpdater();
+				AttributeDefinition measurementKeyDef = survey.getFirstMeasurementKeyDef();
+				for (String plotId : randomPlotIds) {
+					int recordId = keyValuesGenerationResult.recordIdByKeyValue.get(plotId);
+					CollectRecord record = recordManager.load(survey, recordId);
+					record.setId(null);
+					Entity rootEntity = record.getRootEntity();
+					Attribute<?, Value> measurementKeyAttr = rootEntity.getChild(measurementKeyDef);
+					Value newMeasurementValue = measurementKeyDef.createValue(newMeasurement);
+					recordUpdater.updateAttribute(measurementKeyAttr, newMeasurementValue);
+					recordManager.save(record);
+					incrementProcessedItems();
+				}
+				generateGridFile(randomPlotIds);
 			}
-			generateGridFile(randomPlotIds);
 		}
 
 		private void generateGridFile(Set<String> randomPlotIds)
@@ -255,5 +270,4 @@ public class RandomRecordsGenerationJob extends SurveyLockingJob {
 		Set<String> keyValues;
 		Map<String, Integer> recordIdByKeyValue;
 	}
-
 }

@@ -9,6 +9,7 @@ import { SurveySelectors } from 'store/survey'
 import L from 'utils/Labels'
 import Objects from 'utils/Objects'
 import { InputFieldValidator } from 'validation/InputFieldValidator'
+import Dialogs from 'common/components/Dialogs'
 
 const randomGridLabelPrefix = 'dataManagement.randomGrid.'
 
@@ -69,6 +70,10 @@ const FormItemWithInput = (props) => {
 export const RandomGridGenerationPage = () => {
   const dispatch = useDispatch()
   const surveyId = SurveySelectors.useSurveyId()
+  const survey = SurveySelectors.useSurvey()
+
+  const measurementAttrDef = survey?.schema?.firstRootEntityDefinition?.measurementAttributeDefinition
+  const measurementAttrName = measurementAttrDef?.name
 
   const [state, setState] = useState({
     oldMeasurement: '',
@@ -102,30 +107,56 @@ export const RandomGridGenerationPage = () => {
     }
   }, [surveyId])
 
-  const startJob = useCallback(() => {
-    ServiceFactory.recordService
-      .startRandomRecordsGenerationJob({
-        surveyId,
-        oldMeasurement,
-        newMeasurement,
-        percentage,
-        sourceGridSurveyFileName,
-      })
-      .then((job) => {
-        dispatch(
-          JobActions.startJobMonitor({
-            jobId: job.id,
-            title: `${randomGridLabelPrefix}jobTitle`,
-          })
-        )
-      })
-  }, [surveyId, oldMeasurement, newMeasurement, percentage, sourceGridSurveyFileName])
+  const startJob = useCallback(
+    (countOnly) => {
+      const onRandomRecordsOnlyCountsJobCompleted = (job) => {
+        setTimeout(() => {
+          dispatch(JobActions.closeJobMonitor())
+          if (job.completed) {
+            const { recordsCount } = job.result
+            if (recordsCount) {
+              Dialogs.confirm(
+                L.l('global.confirm'),
+                L.l(`${randomGridLabelPrefix}confirmGenerateMessage`, [
+                  recordsCount,
+                  measurementAttrName,
+                  newMeasurement,
+                ]),
+                startJob
+              )
+            } else {
+              Dialogs.alert(L.l(`${randomGridLabelPrefix}noRecordsMatchingFilter`))
+            }
+          }
+        }, 200)
+      }
+      ServiceFactory.recordService
+        .startRandomRecordsGenerationJob({
+          surveyId,
+          oldMeasurement,
+          newMeasurement,
+          percentage,
+          sourceGridSurveyFileName,
+          countOnly,
+        })
+        .then((job) => {
+          dispatch(
+            JobActions.startJobMonitor({
+              jobId: job.id,
+              title: `${randomGridLabelPrefix}jobTitle`,
+              handleJobCompleted: countOnly ? onRandomRecordsOnlyCountsJobCompleted : null,
+            })
+          )
+        })
+    },
+    [surveyId, oldMeasurement, newMeasurement, percentage, sourceGridSurveyFileName]
+  )
 
   const onGenerateClick = useCallback(() => {
     const validationResults = InputFieldValidator.validateFields({ object: state, validationsByField })
     setState((statePrev) => ({ ...statePrev, validations: validationResults }))
     if (Objects.isEmpty(validationResults)) {
-      startJob()
+      startJob(true)
     }
   }, [startJob, state])
 
