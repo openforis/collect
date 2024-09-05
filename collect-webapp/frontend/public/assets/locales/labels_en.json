@@ -248,6 +248,7 @@
       "fromCollectFormat": "from Collect format"
     },
     "backupDataExport": {
+      "confirmExportMessage": "{0} records will be exported.\n\nContinue?",
       "exportOnlyOwnedRecords": "Export only owned records",
       "includeUploadedFiles": "Include uploaded files (images, documents, etc.)",
       "exportingDataJobTitle": "Exporting data",
@@ -257,7 +258,8 @@
         "recordKey": "Key",
         "recordStep": "Step",
         "errorMessage": "Error"
-      }
+      },
+      "noRecordsMatchingFilter": "No records matching selected filter or empty data set."
     },
     "deleteRecords": {
       "confirmDeleteTitle": "Delete record",

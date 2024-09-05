@@ -40,54 +40,50 @@ public class CollectJobController extends BasicController {
 
 	@Autowired
 	private CollectJobManager jobManager;
-	
-	@RequestMapping(value = "application-job.json", method=GET)
+
+	@RequestMapping(value = "application-job.json", method = GET)
 	public @ResponseBody JobView getApplicationJob(HttpServletResponse response) {
 		ApplicationLockingJob job = jobManager.getApplicationJob();
 		return createJobView(response, job);
 	}
-	
-	@RequestMapping(value="application-job.json", method=DELETE)
-	public @ResponseBody
-	JobView abortApplicationJob(HttpServletResponse response) {
+
+	@RequestMapping(value = "application-job.json", method = DELETE)
+	public @ResponseBody JobView abortApplicationJob(HttpServletResponse response) {
 		ApplicationLockingJob job = jobManager.getApplicationJob();
 		return abortJob(response, job);
 	}
 
-	@RequestMapping(value = "survey-job.json", method=GET)
+	@RequestMapping(value = "survey-job.json", method = GET)
 	public @ResponseBody JobView getSurveyJob(HttpServletResponse response, @RequestParam("surveyId") int surveyId) {
 		SurveyLockingJob job = jobManager.getSurveyJob(surveyId);
 		return createJobView(response, job);
 	}
-	
-	@RequestMapping(value="survey-job.json", method=DELETE)
-	public @ResponseBody
-	JobView abortSurveyJob(HttpServletResponse response, @RequestParam("surveyId") int surveyId) {
+
+	@RequestMapping(value = "survey-job.json", method = DELETE)
+	public @ResponseBody JobView abortSurveyJob(HttpServletResponse response, @RequestParam("surveyId") int surveyId) {
 		SurveyLockingJob job = jobManager.getSurveyJob(surveyId);
 		return abortJob(response, job);
 	}
-	
-	@RequestMapping(value="{jobId}", method=GET)
-	public @ResponseBody
-	JobView getJob(HttpServletResponse response, @PathVariable("jobId") String jobId) {
+
+	@RequestMapping(value = "{jobId}", method = GET)
+	public @ResponseBody JobView getJob(HttpServletResponse response, @PathVariable("jobId") String jobId) {
 		Job job = jobManager.getJob(jobId);
 		return createJobView(response, job);
 	}
 
-	@RequestMapping(value="{jobId}", method=DELETE)
-	public @ResponseBody
-	JobView abortJob(HttpServletResponse response, @PathVariable("jobId") String jobId) {
+	@RequestMapping(value = "{jobId}", method = DELETE)
+	public @ResponseBody JobView abortJob(HttpServletResponse response, @PathVariable("jobId") String jobId) {
 		Job job = jobManager.getJob(jobId);
 		return abortJob(response, job);
 	}
-	
+
 	private JobView abortJob(HttpServletResponse response, Job job) {
 		if (job != null) {
 			job.abort();
 		}
 		return createJobView(response, job);
 	}
-	
+
 	private JobView createJobView(HttpServletResponse response, Job job) {
 		if (job == null) {
 			HttpResponses.setNoContentStatus(response);
@@ -98,7 +94,7 @@ public class CollectJobController extends BasicController {
 	}
 
 	public static class JobView extends WorkerView {
-		
+
 		private List<WorkerView> tasks;
 		private Map<String, Object> extras = new HashMap<String, Object>();
 
@@ -106,22 +102,22 @@ public class CollectJobController extends BasicController {
 			super(job);
 			tasks = Proxies.fromList(job.getTasks(), WorkerView.class);
 		}
-		
+
 		public void putExtra(String key, Object value) {
 			extras.put(key, value);
 		}
-		
+
 		public Map<String, Object> getExtras() {
 			return extras;
 		}
-		
+
 		public List<WorkerView> getTasks() {
 			return tasks;
 		}
 	}
-	
+
 	public static class WorkerView implements Proxy {
-		
+
 		private String id;
 		private String name;
 		private int progressPercent;
@@ -132,6 +128,7 @@ public class CollectJobController extends BasicController {
 		private Long remainingTime;
 		private Integer remainingMinutes;
 		private boolean ended;
+		private HashMap<String, Object> result;
 
 		public WorkerView(Worker worker) {
 			id = worker.getId().toString();
@@ -143,6 +140,7 @@ public class CollectJobController extends BasicController {
 			elapsedTime = calculateElapsedTime(worker);
 			remainingTime = calculateRemainingTime();
 			remainingMinutes = calculateRemainingMinutes();
+			result = worker.getResult() == null ? null : new HashMap<>(worker.getResult());
 		}
 
 		private long calculateElapsedTime(Worker worker) {
@@ -152,7 +150,7 @@ public class CollectJobController extends BasicController {
 				return new Date().getTime() - worker.getStartTime();
 			}
 		}
-		
+
 		public Long calculateRemainingTime() {
 			if (progressPercent <= 0) {
 				return null;
@@ -160,50 +158,50 @@ public class CollectJobController extends BasicController {
 			long estimatedTotalTime = (100 * elapsedTime) / progressPercent;
 			return estimatedTotalTime - elapsedTime;
 		}
-		
+
 		public Integer calculateRemainingMinutes() {
 			if (remainingTime == null) {
 				return null;
 			}
 			return Double.valueOf(Math.ceil((double) remainingTime / 60000)).intValue();
 		}
-		
+
 		public boolean isEnded() {
 			return ended;
 		}
-		
+
 		public boolean isCompleted() {
 			return status == Status.COMPLETED;
 		}
-		
+
 		public boolean isRunning() {
 			return status == Status.RUNNING;
 		}
-		
+
 		public boolean isFailed() {
 			return status == Status.FAILED;
 		}
-		
+
 		public String getId() {
 			return id;
 		}
-		
+
 		public String getName() {
 			return name;
 		}
-		
+
 		public int getProgressPercent() {
 			return progressPercent;
 		}
-		
+
 		public Status getStatus() {
 			return status;
 		}
-		
+
 		public String getErrorMessage() {
 			return errorMessage;
 		}
-		
+
 		public List<DataQueryExecutorError> getErrors() {
 			return errors;
 		}
@@ -211,14 +209,18 @@ public class CollectJobController extends BasicController {
 		public long getElapsedTime() {
 			return elapsedTime;
 		}
-		
+
 		public Long getRemainingTime() {
 			return remainingTime;
 		}
-		
+
 		public Integer getRemainingMinutes() {
 			return remainingMinutes;
 		}
+
+		public HashMap<String, Object> getResult() {
+			return result;
+		}
 	}
-	
+
 }

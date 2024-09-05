@@ -50,6 +50,7 @@ import org.openforis.collect.io.data.DataRestoreSummaryJob;
 import org.openforis.collect.io.data.RandomRecordsGenerationJob;
 import org.openforis.collect.io.data.RecordProvider;
 import org.openforis.collect.io.data.RecordProviderConfiguration;
+import org.openforis.collect.io.data.RecordsCountJob;
 import org.openforis.collect.io.data.TransactionalCSVDataImportJob;
 import org.openforis.collect.io.data.TransactionalDataRestoreJob;
 import org.openforis.collect.io.data.XMLParsingRecordProvider;
@@ -590,14 +591,20 @@ public class RecordController extends BasicController implements Serializable {
 		filter.setFilterExpression(parameters.filterExpression);
 		filter.setKeyValues(parameters.keyAttributeValues);
 		filter.setSummaryValues(parameters.summaryAttributeValues);
-		fullBackupJob = jobManager.createJob(SurveyBackupJob.class);
-		fullBackupJob.setRecordFilter(filter);
-		fullBackupJob.setSurvey(survey);
-		fullBackupJob.setIncludeData(true);
-		fullBackupJob.setIncludeRecordFiles(parameters.isIncludeRecordFiles());
-
-		jobManager.start(fullBackupJob);
-		return getFullBackupJobView();
+		if (parameters.countOnly) {
+			RecordsCountJob job = jobManager.createJob(RecordsCountJob.class);
+			job.setRecordFilter(filter);
+			jobManager.start(job);
+			return new JobView(job);
+		} else {
+			fullBackupJob = jobManager.createJob(SurveyBackupJob.class);
+			fullBackupJob.setRecordFilter(filter);
+			fullBackupJob.setSurvey(survey);
+			fullBackupJob.setIncludeData(true);
+			fullBackupJob.setIncludeRecordFiles(parameters.isIncludeRecordFiles());
+			jobManager.start(fullBackupJob);
+			return getFullBackupJobView();
+		}		
 	}
 
 	@RequestMapping(value = "survey/{surveyId}/data/records/exportresult.collect-data", method = GET)

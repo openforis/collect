@@ -19,6 +19,7 @@ import L from 'utils/Labels'
 import Arrays from 'utils/Arrays'
 import { DataGrid } from 'common/components'
 import { DataExportFilterAccordion } from 'datamanagement/components/DataExportFilterAccordion'
+import Dialogs from 'common/components/Dialogs'
 
 class BackupDataExportPage extends Component {
   constructor(props) {
@@ -36,6 +37,8 @@ class BackupDataExportPage extends Component {
     this.handleDataBackupErrorsDialogClose = this.handleDataBackupErrorsDialogClose.bind(this)
     this.handleDataBackupErrorsDialogConfirm = this.handleDataBackupErrorsDialogConfirm.bind(this)
     this.handleBackupDataExportJobCompleted = this.handleBackupDataExportJobCompleted.bind(this)
+    this.handleBackupDataExportDryRunJobCompleted = this.handleBackupDataExportDryRunJobCompleted.bind(this)
+    this.startExportJob = this.startExportJob.bind(this)
     this.downloadExportedFile = this.downloadExportedFile.bind(this)
     this.onFilterPropChange = this.onFilterPropChange.bind(this)
   }
@@ -81,7 +84,22 @@ class BackupDataExportPage extends Component {
   }
 
   handleBackupDataExportDryRunJobCompleted(job) {
-    this.props.dispatch(JobActions.closeJobMonitor())
+    // use timeout to avoid dispatching actions in job reducer
+    setTimeout(() => {
+      this.props.dispatch(JobActions.closeJobMonitor())
+      if (job.completed) {
+        const recordsCount = job.result.recordsCount
+        if (recordsCount) {
+          Dialogs.confirm(
+            L.l('global.confirm'),
+            L.l('dataManagement.backupDataExport.confirmExportMessage', [recordsCount]),
+            this.startExportJob
+          )
+        } else {
+          Dialogs.alert(L.l('dataManagement.backupDataExport.noRecordsMatchingFilter'))
+        }
+      }
+    }, 200)
   }
 
   handleBackupDataExportJobCompleted(job) {
@@ -89,6 +107,7 @@ class BackupDataExportPage extends Component {
     const surveyId = survey.id
     ServiceFactory.recordService.getBackupDataExportJob(surveyId).then((backupJob) => {
       if (Arrays.isNotEmpty(backupJob.extras.dataBackupErrors)) {
+        // use timeout to avoid dispatching actions in job reducer
         setTimeout(() => {
           this.props.dispatch(JobActions.closeJobMonitor())
 
@@ -96,7 +115,7 @@ class BackupDataExportPage extends Component {
             dataBackupErrorsDialogOpen: true,
             dataBackupErrors: backupJob.extras.dataBackupErrors,
           })
-        }, 500) //avoids that a reducer dispatches an action
+        }, 500)
       }
     })
   }
