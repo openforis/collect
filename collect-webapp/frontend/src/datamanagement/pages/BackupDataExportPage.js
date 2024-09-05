@@ -18,8 +18,8 @@ import * as JobActions from 'actions/job'
 import L from 'utils/Labels'
 import Arrays from 'utils/Arrays'
 import { DataGrid } from 'common/components'
-import { DataExportFilterAccordion } from 'datamanagement/components/DataExportFilterAccordion'
 import Dialogs from 'common/components/Dialogs'
+import { DataExportFilterAccordion } from 'datamanagement/components/DataExportFilterAccordion'
 
 class BackupDataExportPage extends Component {
   constructor(props) {
@@ -37,7 +37,7 @@ class BackupDataExportPage extends Component {
     this.handleDataBackupErrorsDialogClose = this.handleDataBackupErrorsDialogClose.bind(this)
     this.handleDataBackupErrorsDialogConfirm = this.handleDataBackupErrorsDialogConfirm.bind(this)
     this.handleBackupDataExportJobCompleted = this.handleBackupDataExportJobCompleted.bind(this)
-    this.handleBackupDataExportDryRunJobCompleted = this.handleBackupDataExportDryRunJobCompleted.bind(this)
+    this.handleBackupDataExportCountOnlyJobCompleted = this.handleBackupDataExportCountOnlyJobCompleted.bind(this)
     this.startExportJob = this.startExportJob.bind(this)
     this.downloadExportedFile = this.downloadExportedFile.bind(this)
     this.onFilterPropChange = this.onFilterPropChange.bind(this)
@@ -75,7 +75,7 @@ class BackupDataExportPage extends Component {
           title: L.l('dataManagement.backupDataExport.exportingDataJobTitle'),
           okButtonLabel: L.l('common.download'),
           handleJobCompleted: countOnly
-            ? this.handleBackupDataExportDryRunJobCompleted
+            ? this.handleBackupDataExportCountOnlyJobCompleted
             : this.handleBackupDataExportJobCompleted,
           handleOkButtonClick: this.handleBackupDataExportModalOkButtonClick,
         })
@@ -83,20 +83,20 @@ class BackupDataExportPage extends Component {
     })
   }
 
-  handleBackupDataExportDryRunJobCompleted(job) {
+  handleBackupDataExportCountOnlyJobCompleted(job) {
     // use timeout to avoid dispatching actions in job reducer
     setTimeout(() => {
       this.props.dispatch(JobActions.closeJobMonitor())
       if (job.completed) {
-        const recordsCount = job.result.recordsCount
+        const { recordsCount } = job.result
         if (recordsCount) {
           Dialogs.confirm(
             L.l('global.confirm'),
-            L.l('dataManagement.backupDataExport.confirmExportMessage', [recordsCount]),
+            L.l('dataManagement.export.confirmExportMessage', [recordsCount]),
             this.startExportJob
           )
         } else {
-          Dialogs.alert(L.l('dataManagement.backupDataExport.noRecordsMatchingFilter'))
+          Dialogs.alert(L.l('dataManagement.export.noRecordsMatchingFilter'))
         }
       }
     }, 200)

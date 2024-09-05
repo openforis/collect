@@ -8,8 +8,9 @@ import Typography from '@mui/material/Typography'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 import ServiceFactory from 'services/ServiceFactory'
+import Dialogs from 'common/components/Dialogs'
+import SurveyLanguagesSelect from 'common/components/SurveyLanguagesSelect'
 import SchemaTreeView from '../components/SchemaTreeView'
-import SurveyLanguagesSelect from '../../common/components/SurveyLanguagesSelect'
 import Workflow from 'model/Workflow'
 import * as JobActions from 'actions/job'
 import Objects from 'utils/Objects'
@@ -77,6 +78,8 @@ class CsvDataExportPage extends Component {
     this.handleEntitySelect = this.handleEntitySelect.bind(this)
     this.handleOutputFormatChange = this.handleOutputFormatChange.bind(this)
     this.onFilterPropChange = this.onFilterPropChange.bind(this)
+    this.startExportJob = this.startExportJob.bind(this)
+    this.handleDataExportCountOnlyJobCompleted = this.handleDataExportCountOnlyJobCompleted.bind(this)
   }
 
   static getDerivedStateFromProps(prevProps, prevState) {
@@ -92,6 +95,10 @@ class CsvDataExportPage extends Component {
     if (!this.validateForm()) {
       return
     }
+    this.startExportJob(true)
+  }
+
+  startExportJob(countOnly = false) {
     const { survey, rootEntityDef, keyAttributes, summaryAttributes } = this.props
 
     const {
@@ -130,6 +137,7 @@ class CsvDataExportPage extends Component {
       keyAttributeValues,
       summaryAttributeValues,
       filterExpression,
+      countOnly,
     }
 
     additionalOptions.forEach((o) => {
@@ -142,10 +150,30 @@ class CsvDataExportPage extends Component {
           jobId: job.id,
           title: L.l('dataManagement.export.exportDialog.title'),
           okButtonLabel: L.l('dataManagement.export.exportDialog.downloadExportedFile'),
+          handleJobCompleted: countOnly ? this.handleDataExportCountOnlyJobCompleted : null,
           handleOkButtonClick: this.handleCsvDataExportModalOkButtonClick,
         })
       )
     })
+  }
+
+  handleDataExportCountOnlyJobCompleted(job) {
+    // use timeout to avoid dispatching actions in job reducer
+    setTimeout(() => {
+      this.props.dispatch(JobActions.closeJobMonitor())
+      if (job.completed) {
+        const { recordsCount } = job.result
+        if (recordsCount) {
+          Dialogs.confirm(
+            L.l('global.confirm'),
+            L.l('dataManagement.export.confirmExportMessage', [recordsCount]),
+            this.startExportJob
+          )
+        } else {
+          Dialogs.alert(L.l('dataManagement.export.noRecordsMatchingFilter'))
+        }
+      }
+    }, 200)
   }
 
   validateForm() {

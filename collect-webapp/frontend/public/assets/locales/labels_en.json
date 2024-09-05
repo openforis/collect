@@ -209,6 +209,7 @@
         "includeImages": "Include images",
         "alwaysEvaluateCalculatedAttributes": "Always evaluate calculated attributes, even when they are not relevant (e.g. Collect Earth surveys)"
       },
+      "confirmExportMessage": "{0} records will be exported.\n\nContinue?",
       "exportDialog": {
         "title": "Exporting data",
         "downloadExportedFile": "Download exported file"
@@ -223,6 +224,7 @@
       },
       "modifiedSince": "Modified since",
       "modifiedUntil": "until",
+      "noRecordsMatchingFilter": "No records matching selected filter or empty data set.",
       "onlyOwnedRecords": "Export only owned records",
       "outputFormat": {
         "label": "Output format",
@@ -248,7 +250,6 @@
       "fromCollectFormat": "from Collect format"
     },
     "backupDataExport": {
-      "confirmExportMessage": "{0} records will be exported.\n\nContinue?",
       "exportOnlyOwnedRecords": "Export only owned records",
       "includeUploadedFiles": "Include uploaded files (images, documents, etc.)",
       "exportingDataJobTitle": "Exporting data",
@@ -258,8 +259,7 @@
         "recordKey": "Key",
         "recordStep": "Step",
         "errorMessage": "Error"
-      },
-      "noRecordsMatchingFilter": "No records matching selected filter or empty data set."
+      }
     },
     "deleteRecords": {
       "confirmDeleteTitle": "Delete record",

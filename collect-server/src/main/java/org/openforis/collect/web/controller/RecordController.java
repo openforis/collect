@@ -106,6 +106,7 @@ import org.openforis.collect.web.session.SessionState;
 import org.openforis.collect.web.ws.AppWS;
 import org.openforis.commons.web.HttpResponses;
 import org.openforis.commons.web.Response;
+import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Worker;
 import org.openforis.concurrency.WorkerStatusChangeEvent;
 import org.openforis.concurrency.WorkerStatusChangeListener;
@@ -543,18 +544,21 @@ public class RecordController extends BasicController implements Serializable {
 			@RequestBody CSVExportParametersForm parameters) throws IOException {
 		User user = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.getById(surveyId);
-
-		csvDataExportJob = jobManager.createJob(CSVDataExportJob.class);
-		csvDataExportJob.setSurvey(survey);
-
-		csvDataExportJob.setOutputFile(File.createTempFile("collect-csv-data-export", ".zip"));
-
 		CSVDataExportParameters exportParameters = parameters.toExportParameters(survey, user, userGroupManager);
-		csvDataExportJob.setParameters(exportParameters);
 
-		jobManager.start(csvDataExportJob);
-
-		return new JobView(csvDataExportJob);
+		Job job = null;
+		if (exportParameters.isCountOnly()) {
+			job = jobManager.createJob(RecordsCountJob.class);
+			((RecordsCountJob) job).setRecordFilter(exportParameters.getRecordFilter());
+		} else {
+			csvDataExportJob = jobManager.createJob(CSVDataExportJob.class);
+			csvDataExportJob.setSurvey(survey);
+			csvDataExportJob.setOutputFile(File.createTempFile("collect-csv-data-export", ".zip"));
+			csvDataExportJob.setParameters(exportParameters);
+			job = csvDataExportJob;
+		}
+		jobManager.start(job);
+		return new JobView(job);
 	}
 
 	@RequestMapping(value = "survey/{surveyId}/data/records/currentcsvexport", method = GET)
