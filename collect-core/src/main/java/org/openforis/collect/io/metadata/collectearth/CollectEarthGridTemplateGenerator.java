@@ -148,10 +148,11 @@ public class CollectEarthGridTemplateGenerator  {
 				rowValidations.addAll( validateCsvRows( csvReader , survey, headersFound , validationParameters.isValidateOnlyFirstLines() ) );
 				
 				long linesRead = csvReader.getLinesRead();
-				if( linesRead > CSV_LENGTH_ERROR ){
-					validationResults  = new CSVFileValidationResult(ErrorType.INVALID_NUMBER_OF_PLOTS_TOO_LARGE);
-					validationResults.setNumberOfRows( (int)linesRead );
-				}else if( csvReader.getLinesRead() > CSV_LENGTH_WARNING){
+//				if( linesRead > CSV_LENGTH_ERROR ){
+//					validationResults  = new CSVFileValidationResult(ErrorType.INVALID_NUMBER_OF_PLOTS_TOO_LARGE);
+//					validationResults.setNumberOfRows( (int)linesRead );
+//				}
+				if( linesRead > CSV_LENGTH_WARNING){
 					validationResults  = new CSVFileValidationResult(ErrorType.INVALID_NUMBER_OF_PLOTS_WARNING);
 					validationResults.setNumberOfRows( (int)linesRead );
 				}

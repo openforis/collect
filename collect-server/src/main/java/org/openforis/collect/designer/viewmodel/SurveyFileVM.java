@@ -160,17 +160,17 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 		case COLLECT_EARTH_GRID:
 			CollectEarthGridTemplateGenerator templateGenerator = new CollectEarthGridTemplateGenerator();
 			for (File uploadedFile : uploadedFiles) {
-				CSVFileValidationResult headersValidationResult = templateGenerator.validate(uploadedFile, survey,
+				CSVFileValidationResult validationResult = templateGenerator.validate(uploadedFile, survey,
 						new ValidationParameters());
-				if (!headersValidationResult.isSuccessful()) {
-					switch (headersValidationResult.getErrorType()) {
+				if (!validationResult.isSuccessful()) {
+					switch (validationResult.getErrorType()) {
 					case INVALID_FILE_TYPE:
 						MessageUtil.showWarning("survey.file.error.invalid_file_type", "CSV (Comma Separated Values)");
 						break;
 					case INVALID_HEADERS:
 						MessageUtil.showWarning("survey.file.type.collect_earth_grid.error.invalid_file_structure",
-								new Object[] { headersValidationResult.getExpectedHeaders().toString(),
-										headersValidationResult.getFoundHeaders().toString() });
+								new Object[] { validationResult.getExpectedHeaders().toString(),
+										validationResult.getFoundHeaders().toString() });
 						break;
 					case INVALID_NUMBER_OF_PLOTS_WARNING:
 						MessageUtil.showWarning("survey.file.error.warning_csv_size",

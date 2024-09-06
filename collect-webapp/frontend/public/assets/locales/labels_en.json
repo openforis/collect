@@ -447,6 +447,12 @@
         }
       }
     },
+    "file": {
+      "error": {
+        "invalid_content": "Invalid content",
+        "warning_csv_size": "Number of rows exceeding maximum"
+      }
+    },
     "import": {
       "file": "File",
       "acceptedFileTypesDescription": "Collect Survey (.collect) Collect Backup (.collect-backup), Collect Earth (.cep) or Collect Survey XML (.xml)",
