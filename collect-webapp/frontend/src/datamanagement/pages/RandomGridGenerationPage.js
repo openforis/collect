@@ -28,6 +28,7 @@ const FormItemWithInput = (props) => {
     inputType = undefined,
     labelColSpan = 2,
     labelPrefix = '',
+    label = undefined,
     inputOptions = [],
     validations = {},
     state,
@@ -56,7 +57,7 @@ const FormItemWithInput = (props) => {
     <SimpleFormItem
       fieldId={fieldId}
       errorFeedback={errorFeedback}
-      label={labelPrefix + fieldId}
+      label={label ?? labelPrefix + fieldId}
       labelColSpan={labelColSpan}
       fieldColSpan={fieldColSpan}
     >
@@ -168,14 +169,14 @@ export const RandomGridGenerationPage = () => {
           <FormGroup row>
             <FormItemWithInput
               fieldId="oldMeasurement"
-              labelPrefix={randomGridLabelPrefix}
+              label={L.l('dataManagement.randomGrid.oldMeasurement', [measurementAttrName])}
               state={state}
               setState={setState}
               validations={validations}
             />
             <FormItemWithInput
               fieldId="newMeasurement"
-              labelPrefix={randomGridLabelPrefix}
+              label={L.l('dataManagement.randomGrid.newMeasurement', [measurementAttrName])}
               state={state}
               setState={setState}
               validations={validations}
