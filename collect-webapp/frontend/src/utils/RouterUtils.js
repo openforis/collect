@@ -30,7 +30,7 @@ class RouterUtils {
   }
 
   static navigateToRecordBackupPage(navigate) {
-    RouterUtils._navigateToUrl(navigate, '/datamanagement/backup')
+    RouterUtils._navigateToUrl(navigate, '/datamanagement/xmlexport')
   }
 
   static navigateToRecordBackupImportPage(navigate) {

@@ -53,7 +53,7 @@ const DefaultLayoutRoutes = () => (
             <Route path="/dashboard" name="Dashboard" element={<DashboardPage />} />
             <Route path="/datamanagement" name="DataManagement" element={<DataManagementPage />} />
             <Route path="/datamanagement/csvexport" name="CsvDataExport" element={<CsvDataExportPage />} />
-            <Route path="/datamanagement/backup" name="BackupDataExport" element={<BackupDataExportPage />} />
+            <Route path="/datamanagement/xmlexport" name="BackupDataExport" element={<BackupDataExportPage />} />
             <Route path="/datamanagement/backupimport" name="BackupDataImport" element={<BackupDataImportPage />} />
             <Route path="/datamanagement/csvimport" name="CsvDataImport" element={<CsvDataImportPage />} />
             <Route

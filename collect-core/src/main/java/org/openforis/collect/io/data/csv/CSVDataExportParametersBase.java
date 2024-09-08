@@ -31,6 +31,7 @@ public abstract class CSVDataExportParametersBase {
 	private HeadingSource headingSource = HeadingSource.ATTRIBUTE_NAME;
 	private String languageCode = null;
 	private OutputFormat outputFormat = OutputFormat.CSV;
+	private boolean countOnly = false;
 
 	public Integer getEntityId() {
 		return entityId;
@@ -190,5 +191,13 @@ public abstract class CSVDataExportParametersBase {
 
 	public void setOutputFormat(OutputFormat outputFormat) {
 		this.outputFormat = outputFormat;
+	}
+
+	public boolean isCountOnly() {
+		return countOnly;
+	}
+
+	public void setCountOnly(boolean countOnly) {
+		this.countOnly = countOnly;
 	}
 }

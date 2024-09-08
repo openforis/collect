@@ -51,7 +51,7 @@ class UsersPage extends AbstractItemsListPage {
     if (selectedItemIds.length === 0) {
       return false
     } else if (selectedItemIds.indexOf(loggedUser.id) >= 0) {
-      Dialogs.alert(L.l('general.warning'), L.l('user.delete.cannotDeleteCurrentUser'))
+      Dialogs.alert(L.l('common.warning'), L.l('user.delete.cannotDeleteCurrentUser'))
       return false
     } else {
       const defaultAdminSelected = selectedItemIds.find((id) => {
@@ -59,7 +59,7 @@ class UsersPage extends AbstractItemsListPage {
         return user.username === User.DEFAULT_ADMIN_NAME
       })
       if (defaultAdminSelected) {
-        Dialogs.alert(L.l('general.warning'), L.l('user.delete.cannotDeleteDefaultAdminUser'))
+        Dialogs.alert(L.l('common.warning'), L.l('user.delete.cannotDeleteDefaultAdminUser'))
         return false
       } else {
         return true

@@ -50,6 +50,7 @@ import org.openforis.collect.io.data.DataRestoreSummaryJob;
 import org.openforis.collect.io.data.RandomRecordsGenerationJob;
 import org.openforis.collect.io.data.RecordProvider;
 import org.openforis.collect.io.data.RecordProviderConfiguration;
+import org.openforis.collect.io.data.RecordsCountJob;
 import org.openforis.collect.io.data.TransactionalCSVDataImportJob;
 import org.openforis.collect.io.data.TransactionalDataRestoreJob;
 import org.openforis.collect.io.data.XMLParsingRecordProvider;
@@ -105,6 +106,7 @@ import org.openforis.collect.web.session.SessionState;
 import org.openforis.collect.web.ws.AppWS;
 import org.openforis.commons.web.HttpResponses;
 import org.openforis.commons.web.Response;
+import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Worker;
 import org.openforis.concurrency.WorkerStatusChangeEvent;
 import org.openforis.concurrency.WorkerStatusChangeListener;
@@ -542,18 +544,21 @@ public class RecordController extends BasicController implements Serializable {
 			@RequestBody CSVExportParametersForm parameters) throws IOException {
 		User user = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.getById(surveyId);
-
-		csvDataExportJob = jobManager.createJob(CSVDataExportJob.class);
-		csvDataExportJob.setSurvey(survey);
-
-		csvDataExportJob.setOutputFile(File.createTempFile("collect-csv-data-export", ".zip"));
-
 		CSVDataExportParameters exportParameters = parameters.toExportParameters(survey, user, userGroupManager);
-		csvDataExportJob.setParameters(exportParameters);
 
-		jobManager.start(csvDataExportJob);
-
-		return new JobView(csvDataExportJob);
+		Job job = null;
+		if (exportParameters.isCountOnly()) {
+			job = jobManager.createJob(RecordsCountJob.class);
+			((RecordsCountJob) job).setRecordFilter(exportParameters.getRecordFilter());
+		} else {
+			csvDataExportJob = jobManager.createJob(CSVDataExportJob.class);
+			csvDataExportJob.setSurvey(survey);
+			csvDataExportJob.setOutputFile(File.createTempFile("collect-csv-data-export", ".zip"));
+			csvDataExportJob.setParameters(exportParameters);
+			job = csvDataExportJob;
+		}
+		jobManager.start(job);
+		return new JobView(job);
 	}
 
 	@RequestMapping(value = "survey/{surveyId}/data/records/currentcsvexport", method = GET)
@@ -585,15 +590,25 @@ public class RecordController extends BasicController implements Serializable {
 			@RequestBody BackupDataExportParameters parameters) throws IOException {
 		User user = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.getById(surveyId);
-		RecordFilter filter = createRecordFilter(survey, user, userGroupManager, null, parameters.onlyOwnedRecords);
-		fullBackupJob = jobManager.createJob(SurveyBackupJob.class);
-		fullBackupJob.setRecordFilter(filter);
-		fullBackupJob.setSurvey(survey);
-		fullBackupJob.setIncludeData(true);
-		fullBackupJob.setIncludeRecordFiles(parameters.isIncludeRecordFiles());
-
-		jobManager.start(fullBackupJob);
-		return getFullBackupJobView();
+		RecordFilter filter = createRecordFilter(survey, user, userGroupManager, null, parameters.onlyOwnedRecords, 
+				parameters.modifiedSince, parameters.modifiedUntil);
+		filter.setFilterExpression(parameters.filterExpression);
+		filter.setKeyValues(parameters.keyAttributeValues);
+		filter.setSummaryValues(parameters.summaryAttributeValues);
+		if (parameters.countOnly) {
+			RecordsCountJob job = jobManager.createJob(RecordsCountJob.class);
+			job.setRecordFilter(filter);
+			jobManager.start(job);
+			return new JobView(job);
+		} else {
+			fullBackupJob = jobManager.createJob(SurveyBackupJob.class);
+			fullBackupJob.setRecordFilter(filter);
+			fullBackupJob.setSurvey(survey);
+			fullBackupJob.setIncludeData(true);
+			fullBackupJob.setIncludeRecordFiles(parameters.isIncludeRecordFiles());
+			jobManager.start(fullBackupJob);
+			return getFullBackupJobView();
+		}		
 	}
 
 	@RequestMapping(value = "survey/{surveyId}/data/records/exportresult.collect-data", method = GET)
@@ -710,19 +725,20 @@ public class RecordController extends BasicController implements Serializable {
 	@RequestMapping(value = "survey/{surveyId}/data/records/randomgrid", method = POST, produces = APPLICATION_JSON_VALUE)
 	public @ResponseBody JobProxy startRandomRecordsGenerationJob(@PathVariable("surveyId") int surveyId,
 			@RequestParam String oldMeasurement, @RequestParam String newMeasurement, @RequestParam Double percentage,
-			@RequestParam String sourceGridSurveyFileName) {
+			@RequestParam String sourceGridSurveyFileName, @RequestParam Boolean countOnly) {
 		User user = sessionManager.getLoggedUser();
 		RandomRecordsGenerationJob job = jobManager.createJob(RandomRecordsGenerationJob.class);
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		job.setUser(user);
 		job.setSurvey(survey);
+		job.setCountOnly(countOnly);
 		job.setOldMeasurement(oldMeasurement);
 		job.setNewMeasurement(newMeasurement);
 		job.setPercentage(percentage);
 		job.setSourceGridSurveyFileName(sourceGridSurveyFileName);
 		job.addStatusChangeListener(new WorkerStatusChangeListener() {
 			public void statusChanged(WorkerStatusChangeEvent event) {
-				if (event.getTo() == Worker.Status.COMPLETED) {
+				if (event.getTo() == Worker.Status.COMPLETED && !Boolean.TRUE.equals(countOnly)) {
 					// surveys list updated (temporary survey may have been created):
 					// send surveys updated message to WS
 					appWS.sendMessage(SURVEYS_UPDATED);
@@ -957,10 +973,26 @@ public class RecordController extends BasicController implements Serializable {
 
 	public static class BackupDataExportParameters {
 
+		// records filter
 		private boolean onlyOwnedRecords;
+		private Date modifiedSince;
+		private Date modifiedUntil;
+		private String filterExpression;
+		private List<String> keyAttributeValues = new ArrayList<String>();
+		private List<String> summaryAttributeValues = new ArrayList<String>();
+		private List<String> rootEntityKeyValues; // TODO check if they are used
+		// export options
+		private boolean countOnly;
 		private boolean includeRecordFiles;
-		private List<String> rootEntityKeyValues;
 
+		public boolean isCountOnly() {
+			return countOnly;
+		}
+		
+		public void setCountOnly(boolean countOnly) {
+			this.countOnly = countOnly;
+		}
+		
 		public boolean isOnlyOwnedRecords() {
 			return onlyOwnedRecords;
 		}
@@ -983,6 +1015,46 @@ public class RecordController extends BasicController implements Serializable {
 
 		public void setRootEntityKeyValues(List<String> rootEntityKeyValues) {
 			this.rootEntityKeyValues = rootEntityKeyValues;
+		}
+
+		public Date getModifiedSince() {
+			return modifiedSince;
+		}
+
+		public void setModifiedSince(Date modifiedSince) {
+			this.modifiedSince = modifiedSince;
+		}
+
+		public Date getModifiedUntil() {
+			return modifiedUntil;
+		}
+
+		public void setModifiedUntil(Date modifiedUntil) {
+			this.modifiedUntil = modifiedUntil;
+		}
+
+		public String getFilterExpression() {
+			return filterExpression;
+		}
+
+		public void setFilterExpression(String filterExpression) {
+			this.filterExpression = filterExpression;
+		}
+
+		public List<String> getKeyAttributeValues() {
+			return keyAttributeValues;
+		}
+
+		public void setKeyAttributeValues(List<String> keyAttributeValues) {
+			this.keyAttributeValues = keyAttributeValues;
+		}
+
+		public List<String> getSummaryAttributeValues() {
+			return summaryAttributeValues;
+		}
+
+		public void setSummaryAttributeValues(List<String> summaryAttributeValues) {
+			this.summaryAttributeValues = summaryAttributeValues;
 		}
 	}
 

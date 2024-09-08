@@ -28,7 +28,8 @@
       "title": "Unexpected error",
       "message": "Please contact your system administrator."
     },
-    "unit": "Unit"
+    "unit": "Unit",
+    "warning": "Warning"
   },
   "general": {
     "account": "Account",
@@ -36,8 +37,7 @@
     "close": "Close",
     "additionalOptions": "Additional Options",
     "import": "Import",
-    "ok": "Ok",
-    "warning": "Warning"
+    "ok": "Ok"
   },
   "generic": {
     "validation": {
@@ -209,6 +209,7 @@
         "includeImages": "Include images",
         "alwaysEvaluateCalculatedAttributes": "Always evaluate calculated attributes, even when they are not relevant (e.g. Collect Earth surveys)"
       },
+      "confirmExportMessage": "{0} records will be exported.\n\nContinue?",
       "exportDialog": {
         "title": "Exporting data",
         "downloadExportedFile": "Download exported file"
@@ -223,6 +224,7 @@
       },
       "modifiedSince": "Modified since",
       "modifiedUntil": "until",
+      "noRecordsMatchingFilter": "No records matching selected filter or empty data set.",
       "onlyOwnedRecords": "Export only owned records",
       "outputFormat": {
         "label": "Output format",
@@ -240,7 +242,7 @@
       "fileHeadingsLanguage": "Headings language",
       "step": "Step",
       "toCsv": "to CSV/Excel",
-      "toCollectFormat": "to Collect/Calc format"
+      "toCollectFormat": "to Collect/Calc format (XML)"
     },
     "import": {
       "label": "Import",
@@ -387,12 +389,17 @@
     },
     "randomGrid": {
       "title": "Random grid",
+      "confirmGenerateMessage": "- {0} records will be created with {1}={2};\n\n- a new data grid will be created and associated to the survey.\n\nContinue?",
       "jobTitle": "Random grid generation",
       "generate": "Generate",
-      "newMeasurement": "New measurement",
-      "oldMeasurement": "Current measurement",
+      "newMeasurement": "New {0}",
+      "noRecordsMatchingFilter": "No records with selected measurement value or empty data set.",
+      "oldMeasurement": "Current {0}",
       "percentage": "Percentage",
-      "sourceGridSurveyFileName": "Source grid"
+      "sourceGridSurveyFileName": "Source grid",
+      "formValidationError": {
+        "newMeasurementCannotBeEqualToOldMeasurement": "New {0} cannot be equal to old {0}"
+      }
     }
   },
   "survey": {
@@ -441,6 +448,12 @@
           "targetSchemaName": "Target schema",
           "dateTimeFormat": "Date-time format"
         }
+      }
+    },
+    "file": {
+      "error": {
+        "invalid_content": "Invalid content",
+        "warning_csv_size": "Number of rows exceeding maximum"
       }
     },
     "import": {

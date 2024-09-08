@@ -143,7 +143,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	protected void onTaskCompleted(Worker task) {
 		super.onTaskCompleted(task);
 		if (task instanceof RecordFileEnumeratorTask) {
-			this.recordFilesToBeDeleted = ((RecordFileEnumeratorTask) task).getResult();
+			this.recordFilesToBeDeleted = ((RecordFileEnumeratorTask) task).getRecordFiles();
 		} else if (task instanceof DataRestoreTask) {
 			this.errors.addAll(((DataRestoreTask) task).getErrors());
 		}
@@ -236,12 +236,12 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 
 	private class RecordFileEnumeratorTask extends Task {
 		
-		private List<File> result;
+		private List<File> recordFiles;
 		
 		@Override
 		protected void initializeInternalVariables() throws Throwable {
 			super.initializeInternalVariables();
-			this.result = new ArrayList<File>();
+			this.recordFiles = new ArrayList<File>();
 		}
 		
 		@Override
@@ -269,7 +269,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 						if (existingRecordSummary != null && existingRecordSummary.getStep().afterEqual(step)) {
 							CollectRecord record = recordManager.load(publishedSurvey, existingRecordSummary.getId(), step, false);
 							List<File> files = recordFileManager.getAllFiles(record);
-							result.addAll(files);
+							recordFiles.addAll(files);
 						}
 					}
 					incrementProcessedItems();
@@ -286,8 +286,8 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			}
 		}
 		
-		public List<File> getResult() {
-			return result;
+		public List<File> getRecordFiles() {
+			return recordFiles;
 		}
 	}
 	

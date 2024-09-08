@@ -18,6 +18,8 @@ import * as JobActions from 'actions/job'
 import L from 'utils/Labels'
 import Arrays from 'utils/Arrays'
 import { DataGrid } from 'common/components'
+import Dialogs from 'common/components/Dialogs'
+import { DataExportFilterAccordion } from 'datamanagement/components/DataExportFilterAccordion'
 
 class BackupDataExportPage extends Component {
   constructor(props) {
@@ -35,28 +37,69 @@ class BackupDataExportPage extends Component {
     this.handleDataBackupErrorsDialogClose = this.handleDataBackupErrorsDialogClose.bind(this)
     this.handleDataBackupErrorsDialogConfirm = this.handleDataBackupErrorsDialogConfirm.bind(this)
     this.handleBackupDataExportJobCompleted = this.handleBackupDataExportJobCompleted.bind(this)
+    this.handleBackupDataExportCountOnlyJobCompleted = this.handleBackupDataExportCountOnlyJobCompleted.bind(this)
+    this.startExportJob = this.startExportJob.bind(this)
     this.downloadExportedFile = this.downloadExportedFile.bind(this)
+    this.onFilterPropChange = this.onFilterPropChange.bind(this)
   }
 
   handleExportButtonClick() {
-    const survey = this.props.survey
-    const surveyId = survey.id
+    this.startExportJob(true)
+  }
+
+  startExportJob(countOnly = false) {
+    const { survey } = this.props
+
+    const { id: surveyId } = survey
+
+    const rootEntityDef = survey.schema.firstRootEntityDefinition
+
+    const keyAttributes = rootEntityDef.keyAttributeDefinitions
+    const keyAttributeValues = keyAttributes.map((_a, idx) => this.state['key' + idx], this)
+
+    const summaryAttributes = rootEntityDef.attributeDefinitionsShownInRecordSummaryList
+    const summaryAttributeValues = summaryAttributes.map((_a, idx) => this.state['summary' + idx], this)
 
     const backupExportParams = {
-      includeRecordFiles: this.state.includeRecordFiles,
+      ...this.state,
+      countOnly,
       onlyOwnedRecords: this.state.exportOnlyOwnedRecords,
+      keyAttributeValues,
+      summaryAttributeValues,
     }
+
     ServiceFactory.recordService.startBackupDataExport(surveyId, backupExportParams).then((job) => {
       this.props.dispatch(
         JobActions.startJobMonitor({
           jobId: job.id,
           title: L.l('dataManagement.backupDataExport.exportingDataJobTitle'),
           okButtonLabel: L.l('common.download'),
-          handleJobCompleted: this.handleBackupDataExportJobCompleted,
+          handleJobCompleted: countOnly
+            ? this.handleBackupDataExportCountOnlyJobCompleted
+            : this.handleBackupDataExportJobCompleted,
           handleOkButtonClick: this.handleBackupDataExportModalOkButtonClick,
         })
       )
     })
+  }
+
+  handleBackupDataExportCountOnlyJobCompleted(job) {
+    // use timeout to avoid dispatching actions in job reducer
+    setTimeout(() => {
+      this.props.dispatch(JobActions.closeJobMonitor())
+      if (job.completed) {
+        const { recordsCount } = job.result
+        if (recordsCount) {
+          Dialogs.confirm(
+            L.l('global.confirm'),
+            L.l('dataManagement.export.confirmExportMessage', [recordsCount]),
+            this.startExportJob
+          )
+        } else {
+          Dialogs.alert(L.l('dataManagement.export.noRecordsMatchingFilter'))
+        }
+      }
+    }, 200)
   }
 
   handleBackupDataExportJobCompleted(job) {
@@ -64,6 +107,7 @@ class BackupDataExportPage extends Component {
     const surveyId = survey.id
     ServiceFactory.recordService.getBackupDataExportJob(surveyId).then((backupJob) => {
       if (Arrays.isNotEmpty(backupJob.extras.dataBackupErrors)) {
+        // use timeout to avoid dispatching actions in job reducer
         setTimeout(() => {
           this.props.dispatch(JobActions.closeJobMonitor())
 
@@ -71,7 +115,7 @@ class BackupDataExportPage extends Component {
             dataBackupErrorsDialogOpen: true,
             dataBackupErrors: backupJob.extras.dataBackupErrors,
           })
-        }, 500) //avoids that a reducer dispatches an action
+        }, 500)
       }
     })
   }
@@ -99,6 +143,10 @@ class BackupDataExportPage extends Component {
     this.downloadExportedFile()
   }
 
+  onFilterPropChange({ prop, value }) {
+    this.setState({ [prop]: value })
+  }
+
   render() {
     if (!this.props.survey) {
       return <div>{L.l('survey.selectPublishedSurveyFirst')}</div>
@@ -108,24 +156,13 @@ class BackupDataExportPage extends Component {
     return (
       <Container>
         <Form>
+          <DataExportFilterAccordion filterObject={this.state} onPropChange={this.onFilterPropChange} />
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography>{L.l('general.additionalOptions')}</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <div>
-                <FormGroup row>
-                  <Col sm={{ size: 12 }}>
-                    <Label check>
-                      <Input
-                        type="checkbox"
-                        onChange={(event) => this.setState({ exportOnlyOwnedRecords: event.target.checked })}
-                        checked={this.state.exportOnlyOwnedRecords}
-                      />{' '}
-                      {L.l('dataManagement.backupDataExport.exportOnlyOwnedRecords')}
-                    </Label>
-                  </Col>
-                </FormGroup>
                 <FormGroup row>
                   <Col sm={{ size: 12 }}>
                     <Label check>

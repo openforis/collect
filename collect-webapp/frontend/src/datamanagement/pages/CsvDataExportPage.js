@@ -8,13 +8,15 @@ import Typography from '@mui/material/Typography'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 import ServiceFactory from 'services/ServiceFactory'
+import Dialogs from 'common/components/Dialogs'
+import SurveyLanguagesSelect from 'common/components/SurveyLanguagesSelect'
 import SchemaTreeView from '../components/SchemaTreeView'
-import SurveyLanguagesSelect from '../../common/components/SurveyLanguagesSelect'
 import Workflow from 'model/Workflow'
 import * as JobActions from 'actions/job'
 import Objects from 'utils/Objects'
 import Arrays from 'utils/Arrays'
 import L from 'utils/Labels'
+import { DataExportFilterAccordion } from 'datamanagement/components/DataExportFilterAccordion'
 
 const outputFormats = {
   CSV: 'CSV',
@@ -75,6 +77,9 @@ class CsvDataExportPage extends Component {
     this.handleCsvDataExportModalOkButtonClick = this.handleCsvDataExportModalOkButtonClick.bind(this)
     this.handleEntitySelect = this.handleEntitySelect.bind(this)
     this.handleOutputFormatChange = this.handleOutputFormatChange.bind(this)
+    this.onFilterPropChange = this.onFilterPropChange.bind(this)
+    this.startExportJob = this.startExportJob.bind(this)
+    this.handleDataExportCountOnlyJobCompleted = this.handleDataExportCountOnlyJobCompleted.bind(this)
   }
 
   static getDerivedStateFromProps(prevProps, prevState) {
@@ -90,6 +95,10 @@ class CsvDataExportPage extends Component {
     if (!this.validateForm()) {
       return
     }
+    this.startExportJob(true)
+  }
+
+  startExportJob(countOnly = false) {
     const { survey, rootEntityDef, keyAttributes, summaryAttributes } = this.props
 
     const {
@@ -107,8 +116,8 @@ class CsvDataExportPage extends Component {
 
     const surveyId = survey.id
 
-    const keyAttributeValues = keyAttributes.map((a, idx) => this.state['key' + idx], this)
-    const summaryAttributeValues = summaryAttributes.map((a, idx) => this.state['summary' + idx], this)
+    const keyAttributeValues = keyAttributes.map((_a, idx) => this.state['key' + idx], this)
+    const summaryAttributeValues = summaryAttributes.map((_a, idx) => this.state['summary' + idx], this)
 
     const selectedEntityId =
       exportMode === exportModes.allEntities ? null : selectedEntityDefinition ? selectedEntityDefinition.id : null
@@ -128,6 +137,7 @@ class CsvDataExportPage extends Component {
       keyAttributeValues,
       summaryAttributeValues,
       filterExpression,
+      countOnly,
     }
 
     additionalOptions.forEach((o) => {
@@ -140,10 +150,30 @@ class CsvDataExportPage extends Component {
           jobId: job.id,
           title: L.l('dataManagement.export.exportDialog.title'),
           okButtonLabel: L.l('dataManagement.export.exportDialog.downloadExportedFile'),
+          handleJobCompleted: countOnly ? this.handleDataExportCountOnlyJobCompleted : null,
           handleOkButtonClick: this.handleCsvDataExportModalOkButtonClick,
         })
       )
     })
+  }
+
+  handleDataExportCountOnlyJobCompleted(job) {
+    // use timeout to avoid dispatching actions in job reducer
+    setTimeout(() => {
+      this.props.dispatch(JobActions.closeJobMonitor())
+      if (job.completed) {
+        const { recordsCount } = job.result
+        if (recordsCount) {
+          Dialogs.confirm(
+            L.l('global.confirm'),
+            L.l('dataManagement.export.confirmExportMessage', [recordsCount]),
+            this.startExportJob
+          )
+        } else {
+          Dialogs.alert(L.l('dataManagement.export.noRecordsMatchingFilter'))
+        }
+      }
+    }, 200)
   }
 
   validateForm() {
@@ -188,23 +218,17 @@ class CsvDataExportPage extends Component {
     })
   }
 
+  onFilterPropChange({ prop, value }) {
+    this.setState({ [prop]: value })
+  }
+
   render() {
-    const { survey, keyAttributes, summaryAttributes, loggedUser, roleInSurvey } = this.props
+    const { survey } = this.props
 
     if (!survey) {
       return <div>Select survey first</div>
     }
-    const {
-      outputFormat,
-      stepGreaterOrEqual,
-      exportMode,
-      exportOnlyOwnedRecords,
-      modifiedSince,
-      modifiedUntil,
-      headingSource,
-      languageCode,
-      filterExpression,
-    } = this.state
+    const { outputFormat, stepGreaterOrEqual, exportMode, headingSource, languageCode } = this.state
 
     const additionalOptionsFormGroups = additionalOptions
       .filter((option) => !onlyExcelAdditionalOptions.includes(option) || outputFormat === outputFormats.XLSX)
@@ -230,35 +254,6 @@ class CsvDataExportPage extends Component {
         {L.l(`dataManagement.workflow.step.${stepCode.toLocaleLowerCase()}`)}
       </option>
     ))
-
-    const createAttributeFormGroup = function (context, attr, prefix, index) {
-      const name = prefix + index
-      const value = context.state[name]
-      return (
-        <FormGroup row key={name}>
-          <Label md={4}>{attr.labelOrName}</Label>
-          <Col md={8}>
-            <Input
-              name={name}
-              value={value}
-              onChange={(e) => {
-                context.setState({ name: e.target.value })
-              }}
-            />
-          </Col>
-        </FormGroup>
-      )
-    }
-
-    const keyAttributeFormGroups = keyAttributes.map((attr, i) => createAttributeFormGroup(this, attr, 'key', i))
-
-    const filteredSummaryAttributes = summaryAttributes.filter((a) =>
-      loggedUser.canFilterRecordsBySummaryAttribute(a, roleInSurvey)
-    )
-
-    const summaryFormGroups = filteredSummaryAttributes.map((attr, i) =>
-      createAttributeFormGroup(this, attr, 'summary', i)
-    )
 
     return (
       <Container>
@@ -333,62 +328,7 @@ class CsvDataExportPage extends Component {
               </FormGroup>
             )}
             <FormGroup row>
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>{L.l('dataManagement.export.filter')}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <div>
-                    <FormGroup check row>
-                      <Label check>
-                        <Input
-                          type="checkbox"
-                          onChange={(e) => this.setState({ exportOnlyOwnedRecords: e.target.checked })}
-                          checked={exportOnlyOwnedRecords}
-                        />
-                        {L.l('dataManagement.export.onlyOwnedRecords')}
-                      </Label>
-                    </FormGroup>
-                    <FormGroup row>
-                      <Label md={3} for="modifiedSince">
-                        {L.l('dataManagement.export.modifiedSince')}:
-                      </Label>
-                      <Col md={4}>
-                        <Input
-                          type="date"
-                          name="modifiedSince"
-                          id="modifiedSince"
-                          value={modifiedSince}
-                          onChange={(e) => this.setState({ modifiedSince: e.target.value })}
-                        />
-                      </Col>
-                      <Label md={1} for="modifiedUntil">
-                        {L.l('dataManagement.export.modifiedUntil')}:
-                      </Label>
-                      <Col md={4}>
-                        <Input
-                          type="date"
-                          name="modifiedUntil"
-                          id="modifiedUntil"
-                          value={modifiedUntil}
-                          onChange={(e) => this.setState({ modifiedUntil: e.target.value })}
-                        />
-                      </Col>
-                    </FormGroup>
-                    {keyAttributeFormGroups}
-                    {summaryFormGroups}
-                    <FormGroup row>
-                      <Label md={4}>{L.l('dataManagement.export.filterExpression')}</Label>
-                      <Col md={8}>
-                        <Input
-                          onChange={(e) => this.setState({ filterExpression: e.target.value })}
-                          value={filterExpression}
-                        />
-                      </Col>
-                    </FormGroup>
-                  </div>
-                </AccordionDetails>
-              </Accordion>
+              <DataExportFilterAccordion filterObject={this.state} onPropChange={this.onFilterPropChange} />
             </FormGroup>
             <FormGroup row>
               <Accordion>
