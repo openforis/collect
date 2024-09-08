@@ -23,7 +23,7 @@ const validationsByField = {
 const FormItemWithInput = (props) => {
   const {
     fieldId,
-    fieldColSpan = 2,
+    fieldColSpan = 3,
     inputStyle = undefined,
     inputType = undefined,
     labelColSpan = 2,
@@ -156,10 +156,19 @@ export const RandomGridGenerationPage = () => {
   const onGenerateClick = useCallback(() => {
     const validationResults = InputFieldValidator.validateFields({ object: state, validationsByField })
     setState((statePrev) => ({ ...statePrev, validations: validationResults }))
-    if (Objects.isEmpty(validationResults)) {
+    if (!Objects.isEmpty(validationResults)) return
+
+    if (state.oldMeasurement === state.newMeasurement) {
+      Dialogs.alert(
+        L.l('common.warning'),
+        L.l(`${randomGridLabelPrefix}formValidationError.newMeasurementCannotBeEqualToOldMeasurement`, [
+          measurementAttrName,
+        ])
+      )
+    } else {
       startJob(true)
     }
-  }, [startJob, state])
+  }, [measurementAttrName, startJob, state])
 
   return (
     <Container>

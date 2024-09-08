@@ -1,16 +1,20 @@
 import Objects from 'utils/Objects'
 
-const validateRequired = (value) => (Objects.isEmpty(value) ? 'validation.required_field' : null)
-const validateGreaterThan = (minValue) => (value) =>
-  Number(value) <= minValue ? { messageKey: 'validation.mustBeGreaterThan', messageArgs: [minValue] } : null
-const validateLessThan = (maxValue) => (value) =>
-  Number(value) > maxValue ? { messageKey: 'validation.mustBeLowerThan', messageArgs: [maxValue] } : null
+const validateRequired = ({ value }) => (Objects.isEmpty(value) ? 'validation.required_field' : null)
+const validateGreaterThan =
+  (minValue) =>
+  ({ value }) =>
+    Number(value) <= minValue ? { messageKey: 'validation.mustBeGreaterThan', messageArgs: [minValue] } : null
+const validateLessThan =
+  (maxValue) =>
+  ({ value }) =>
+    Number(value) >= maxValue ? { messageKey: 'validation.mustBeLowerThan', messageArgs: [maxValue] } : null
 
 const validateField = ({ object, fieldKey, validationsByField }) => {
   const value = object[fieldKey]
   const validations = validationsByField[fieldKey] ?? []
   const validationResults = validations.reduce((acc, validation) => {
-    const validationResult = validation(value)
+    const validationResult = validation({ value, object, fieldKey })
     if (validationResult) {
       acc.push(validationResult)
     }

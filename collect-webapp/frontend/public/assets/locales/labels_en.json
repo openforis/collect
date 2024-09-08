@@ -28,7 +28,8 @@
       "title": "Unexpected error",
       "message": "Please contact your system administrator."
     },
-    "unit": "Unit"
+    "unit": "Unit",
+    "warning": "Warning"
   },
   "general": {
     "account": "Account",
@@ -36,8 +37,7 @@
     "close": "Close",
     "additionalOptions": "Additional Options",
     "import": "Import",
-    "ok": "Ok",
-    "warning": "Warning"
+    "ok": "Ok"
   },
   "generic": {
     "validation": {
@@ -396,7 +396,10 @@
       "noRecordsMatchingFilter": "No records with selected measurement value or empty data set.",
       "oldMeasurement": "Current {0}",
       "percentage": "Percentage",
-      "sourceGridSurveyFileName": "Source grid"
+      "sourceGridSurveyFileName": "Source grid",
+      "formValidationError": {
+        "newMeasurementCannotBeEqualToOldMeasurement": "New {0} cannot be equal to old {0}"
+      }
     }
   },
   "survey": {
