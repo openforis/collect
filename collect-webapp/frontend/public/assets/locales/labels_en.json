@@ -242,7 +242,7 @@
       "fileHeadingsLanguage": "Headings language",
       "step": "Step",
       "toCsv": "to CSV/Excel",
-      "toCollectFormat": "to Collect/Calc format"
+      "toCollectFormat": "to Collect/Calc format (XML)"
     },
     "import": {
       "label": "Import",

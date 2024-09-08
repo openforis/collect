@@ -32,8 +32,8 @@ const routes = [
     surveySelectRequired: true,
   },
   {
-    path: '/datamanagement/backup',
-    name: 'Backup data',
+    path: '/datamanagement/xmlexport',
+    name: 'Export to Collect/Calc format (XML)',
     surveySelectRequired: true,
   },
   {
