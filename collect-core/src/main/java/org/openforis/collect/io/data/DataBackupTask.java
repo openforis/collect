@@ -13,6 +13,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;
 import org.openforis.collect.manager.RecordManager;
@@ -29,6 +30,7 @@ import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.concurrency.Task;
+import org.openforis.idm.model.expression.ExpressionEvaluator;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -87,7 +89,7 @@ public class DataBackupTask extends Task {
 		}
 		summaryCSVWriter.writeHeaders(headers);
 	}
-
+	
 	@Override
 	protected long countTotalItems() {
 		int count = 0;
@@ -103,7 +105,7 @@ public class DataBackupTask extends Task {
 		}
 		return count;
 	}
-
+	
 	@Override
 	protected void execute() throws Throwable {
 		List<CollectRecordSummary> recordSummaries = recordManager.loadSummaries(recordFilter);
@@ -113,7 +115,6 @@ public class DataBackupTask extends Task {
 					if ( isRunning() ) {
 						if ( step.getStepNumber() <= summary.getStep().getStepNumber() ) {
 							backup(summary, step);
-							incrementProcessedItems();
 						}
 					} else {
 						break;
@@ -132,23 +133,36 @@ public class DataBackupTask extends Task {
 		ZipFiles.writeFile(zipOutputStream, summaryTempFile, SurveyBackupJob.DATA_SUMMARY_ENTRY_NAME);
 		super.onEnd();
 	}
+	
+	private boolean isFilterExpressionVerified(CollectRecord record) {
+		if (StringUtils.isBlank(recordFilter.getFilterExpression())) return true;
+		ExpressionEvaluator expressionEvaluator = record.getSurvey().getContext().getExpressionEvaluator();
+		try {
+			return expressionEvaluator.evaluateBoolean(record.getRootEntity(), null, recordFilter.getFilterExpression());
+		} catch (Exception e) {
+			return false;
+		}
+	}
 
 	private void backup(CollectRecordSummary summary, Step step) {
 		Integer id = summary.getId();
 		try {
 			CollectRecord record = recordManager.load(survey, id, step, false);
-			BackupRecordEntry recordEntry = new BackupRecordEntry(step, id);
-			ZipEntry entry = new ZipEntry(recordEntry.getName());
-			zipOutputStream.putNextEntry(entry);
-			OutputStreamWriter writer = new OutputStreamWriter(zipOutputStream);
-			dataMarshaller.write(record, writer);
-			zipOutputStream.closeEntry();
+			if (isFilterExpressionVerified(record)) {
+				BackupRecordEntry recordEntry = new BackupRecordEntry(step, id);
+				ZipEntry entry = new ZipEntry(recordEntry.getName());
+				zipOutputStream.putNextEntry(entry);
+				OutputStreamWriter writer = new OutputStreamWriter(zipOutputStream);
+				dataMarshaller.write(record, writer);
+				zipOutputStream.closeEntry();
+			}
 		} catch (Exception e) {
-			DataBackupError error = new DataBackupError(summary.getId(), summary.getRootEntityKeyValues(), 
+			DataBackupError error = new DataBackupError(id, summary.getRootEntityKeyValues(), 
 					summary.getStep(), e.getMessage());
 			errors.add(error);
 			logError(error.toString(), e);
 		}
+		incrementProcessedItems();
 	}
 
 	private void writeSummaryEntry(CollectRecordSummary summary) {
