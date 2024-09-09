@@ -18,8 +18,8 @@ COPY collect-installation/docker/tomcat/conf/Catalina/localhost/collect.xml $CAT
 COPY collect-installation/docker/tomcat/bin/setenv.sh $CATALINA_HOME/bin/setenv.sh
 RUN chmod +x $CATALINA_HOME/bin/setenv.sh
 
-ADD https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.40.0.0/sqlite-jdbc-3.40.0.0.jar $CATALINA_HOME/lib/
-ADD https://repo1.maven.org/maven2/org/postgresql/postgresql/42.5.1/postgresql-42.5.1.jar $CATALINA_HOME/lib/
-ADD https://repo1.maven.org/maven2/com/h2database/h2/2.1.214/h2-2.1.214.jar $CATALINA_HOME/lib/
+ADD https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.46.1.0/sqlite-jdbc-3.46.1.0.jar $CATALINA_HOME/lib/
+ADD https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.4/postgresql-42.7.4.jar $CATALINA_HOME/lib/
+ADD https://repo1.maven.org/maven2/com/h2database/h2/2.3.232/h2-2.3.232.jar $CATALINA_HOME/lib/
 
 EXPOSE 8080
