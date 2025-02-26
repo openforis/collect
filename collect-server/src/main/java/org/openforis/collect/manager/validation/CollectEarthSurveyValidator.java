@@ -80,9 +80,6 @@ public class CollectEarthSurveyValidator extends SurveyValidator {
 			if (def.getAncestorEntityDefinitions().size() > 1) {
 				results.add(new SurveyValidationResult(def.getPath(), 
 						"survey.validation.collect_earth.nested_entities_not_supported"));
-			} else if (def.isMultiple() && ! def.isEnumerable()) {
-				results.add(new SurveyValidationResult(def.getPath(), 
-						"survey.validation.collect_earth.multiple_entities_not_supported"));
 			}
 		}
 		return results;
