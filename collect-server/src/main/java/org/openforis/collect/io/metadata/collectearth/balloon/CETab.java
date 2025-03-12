@@ -9,6 +9,7 @@ package org.openforis.collect.io.metadata.collectearth.balloon;
 public class CETab extends CEFieldSet {
 
 	private boolean main;
+	private boolean multipleEntityForm;
 	private CEAncillaryFields ancillaryDataHeader;
 	
 	
@@ -31,5 +32,12 @@ public class CETab extends CEFieldSet {
 	public void setMain(boolean main) {
 		this.main = main;
 	}
-
+	
+	public boolean isMultipleEntityForm() {
+		return multipleEntityForm;
+	}
+	
+	public void setMultipleEntityForm(boolean multipleEntityForm) {
+		this.multipleEntityForm = multipleEntityForm;
+	}
 }

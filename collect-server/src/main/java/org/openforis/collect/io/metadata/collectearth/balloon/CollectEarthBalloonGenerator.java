@@ -23,6 +23,7 @@ import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIField;
 import org.openforis.collect.metamodel.ui.UIForm;
 import org.openforis.collect.metamodel.ui.UIFormComponent;
+import org.openforis.collect.metamodel.ui.UIFormContentContainer;
 import org.openforis.collect.metamodel.ui.UIFormSection;
 import org.openforis.collect.metamodel.ui.UIFormSet;
 import org.openforis.collect.metamodel.ui.UIOptions;
@@ -154,7 +155,6 @@ public class CollectEarthBalloonGenerator {
 	}
 	
 	private String getIdPlaceholdersSurvey() {
-		
 		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getFirstRootEntityDefinition().getKeyAttributeDefinitions();
 		StringBuilder sb = new StringBuilder();
 		for (AttributeDefinition def : keyAttributeDefinitions) {
@@ -269,48 +269,68 @@ public class CollectEarthBalloonGenerator {
 		}
 	}
 
+	private boolean ifMultipleEntityForm(UIForm form) {
+		if (form.getChildren().size() == 1) {
+			UIFormComponent firstChild = form.getChildren().get(0);
+			return firstChild instanceof UIFormSection && ((UIFormSection) firstChild).getNodeDefinition().isMultiple();
+		}
+		return false;
+	}
+	
 	private CETab createTabComponent(EntityDefinition rootEntityDef, UIForm form, boolean main) {
-		final CollectAnnotations annotations = survey.getAnnotations();
 		String label = form.getLabel(language, survey.getDefaultLanguage());
 		CETab tab = new CETab(rootEntityDef.getName(), label);
 		tab.setMain(main); //consider the first tab as the main one
+		tab.setMultipleEntityForm(ifMultipleEntityForm(form));
+		addFormChildrenToTab(tab, form);
+		return tab;
+	}
+
+
+	private void addFormChildrenToTab(CETab tab, UIFormContentContainer form) {
 		for (UIFormComponent formComponent : form.getChildren()) {
 			if (formComponent instanceof NodeDefinitionUIComponent) {
 				NodeDefinition nodeDef = ((NodeDefinitionUIComponent) formComponent).getNodeDefinition();
 				if (formComponent instanceof UIField) {
-					AttributeDefinition attrDef = ((UIField) formComponent).getAttributeDefinition();
-					String nodeName = nodeDef.getName();
-					boolean includeInHTML = ! (
-							HIDDEN_ATTRIBUTE_NAMES.contains(nodeName) 
-							|| (annotations.isFromCollectEarthCSV(attrDef) && ! annotations.isShowReadOnlyFieldInCollectEarth(attrDef))
-							|| ((UIField) formComponent).isHidden()
-							|| ((UIField) formComponent).getAttributeDefinition().isKey()
-					);
-					
-					boolean includeAsAncillaryData = annotations.isIncludedInCollectEarthHeader((AttributeDefinition) nodeDef) ;
-					
-					if (includeInHTML) {
-						CEComponent component = createComponent(nodeDef);
-						tab.addChild(component);
-					}else if ( includeAsAncillaryData){
-						CEAncillaryFields ancillaryDataHeader = tab.getAncillaryDataHeader();
-						if( ancillaryDataHeader == null ){
-							ancillaryDataHeader = new CEAncillaryFields("ancillary_data", "Ancillary data");
-							tab.setAncillaryDataHeader(ancillaryDataHeader);
-						}
-						CEComponent component = createComponent(nodeDef);
-						ancillaryDataHeader.addChild( component );
-					}
-					
+					addFieldComponentToTab(tab, (UIField) formComponent);
+				} else if (formComponent instanceof UIFormSection && ((UIFormSection) formComponent).getEntityDefinition().isMultiple()) {
+					addFormChildrenToTab(tab, (UIFormSection) formComponent);
 				} else if (formComponent instanceof UITable || formComponent instanceof UIFormSection) {
 					CEComponent component = createComponent(nodeDef);
-					tab.addChild(component);
+					tab.addChild(component);					
 				} else {
 					throw new IllegalArgumentException("Form component not supported: " + formComponent.getClass().getName()); //$NON-NLS-1$
 				}
 			}
 		}
-		return tab;
+	}
+
+	private void addFieldComponentToTab(CETab tab, UIField formComponent) {
+		CollectAnnotations annotations = survey.getAnnotations();
+		UIField uiField = (UIField) formComponent;
+		AttributeDefinition attrDef = uiField.getAttributeDefinition();
+		String nodeName = attrDef.getName();
+		boolean includeInHTML = ! (
+				HIDDEN_ATTRIBUTE_NAMES.contains(nodeName) 
+				|| (annotations.isFromCollectEarthCSV(attrDef) && ! annotations.isShowReadOnlyFieldInCollectEarth(attrDef))
+				|| uiField.isHidden()
+				|| uiField.getAttributeDefinition().isKey()
+		);
+		
+		boolean includeAsAncillaryData = annotations.isIncludedInCollectEarthHeader(attrDef) ;
+		
+		if (includeInHTML) {
+			CEComponent component = createComponent(attrDef);
+			tab.addChild(component);
+		} else if (includeAsAncillaryData){
+			CEAncillaryFields ancillaryDataHeader = tab.getAncillaryDataHeader();
+			if( ancillaryDataHeader == null ){
+				ancillaryDataHeader = new CEAncillaryFields("ancillary_data", "Ancillary data");
+				tab.setAncillaryDataHeader(ancillaryDataHeader);
+			}
+			CEComponent component = createComponent(attrDef);
+			ancillaryDataHeader.addChild( component );
+		}
 	}
 
 	private EntityDefinition getRootEntity() {
@@ -322,21 +342,18 @@ public class CollectEarthBalloonGenerator {
 	}
 	
 	private CEComponent createComponent(NodeDefinition def, int entityPosition) {
-		String label = def.getLabel(Type.INSTANCE, language);
-		if (label == null && ! isDefaultLanguage()) {
-			label = def.getLabel(Type.INSTANCE);
-		}
-		if (label == null) {
-			label = def.getName();
-		}
-		
+		String label = def.getFailSafeLabel(Type.INSTANCE, language);		
 		boolean multiple = def.isMultiple();
 		UIOptions uiOptions = survey.getUIOptions();
 		boolean hideWhenNotRelevant = uiOptions.isHideWhenNotRelevant(def);
 		CEComponent comp;
 		if (def instanceof EntityDefinition) {
-			if (def.isMultiple() && ((EntityDefinition) def).isEnumerable()) {
-				comp = createEnumeratedEntityComponent((EntityDefinition) def);
+			if (def.isMultiple()) {
+				if (((EntityDefinition) def).isEnumerable()) {
+					comp = createEnumeratedEntityComponent((EntityDefinition) def);
+				} else {
+					throw new IllegalStateException("Nested multiple forms not supported: " + def.getName()); //$NON-NLS-1$
+				}
 			} else {
 				String tooltip = def.getDescription(language);
 				CEFieldSet fieldSet = new CEFieldSet(def.getName(), label, tooltip);
@@ -412,26 +429,13 @@ public class CollectEarthBalloonGenerator {
 	}
 
 	private CEComponent createEnumeratedEntityComponent(EntityDefinition def) {
-		String label = def.getLabel(Type.INSTANCE, language);
-		if (label == null && ! isDefaultLanguage()) {
-			label = def.getLabel(Type.INSTANCE);
-		}
-		if (label == null) {
-			label = def.getName();
-		}
+		String label = def.getFailSafeLabel(Type.INSTANCE, language);
 		UIOptions uiOptions = survey.getUIOptions();
-		
 		String tableTooltip = def.getDescription(language);
 		CEEnumeratedEntityTable ceTable = new CEEnumeratedEntityTable(def.getName(), label, tableTooltip);
 		for (NodeDefinition child : def.getChildDefinitions()) {
 			if (! uiOptions.isHidden(child)) {
-				String heading = child.getLabel(Type.INSTANCE, language);
-				if (heading == null && ! isDefaultLanguage()) {
-					heading = child.getLabel(Type.INSTANCE);
-				}
-				if (heading == null) {
-					heading = child.getName();
-				}
+				String heading = child.getFailSafeLabel(Type.INSTANCE, language);
 				ceTable.addHeading(heading);
 			}
 		}
@@ -456,7 +460,7 @@ public class CollectEarthBalloonGenerator {
 		}
 		return ceTable;
 	}
-
+	
 	private String getHtmlParameterName(NodeDefinition def) {
 		return htmlParameterNameByNodePath.get(def.getPath());
 	}
@@ -523,10 +527,6 @@ public class CollectEarthBalloonGenerator {
 		}  else {
 			throw new IllegalArgumentException("Attribute type not supported: " + def.getClass().getName()); //$NON-NLS-1$
 		}
-	}
-
-	private boolean isDefaultLanguage() {
-		return language.equals(survey.getDefaultLanguage());
 	}
 
 }
