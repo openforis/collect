@@ -338,10 +338,12 @@ public class CollectEarthBalloonGenerator {
 	}
 	
 	private CEComponent createComponent(NodeDefinition def) {
-		return createComponent(def, 1);
+		EntityDefinition parentDef = def.getParentEntityDefinition();
+		boolean insideMultipleEntity = parentDef.isMultiple() && !parentDef.isRoot();
+		return createComponent(def, insideMultipleEntity ? null: 1);
 	}
 	
-	private CEComponent createComponent(NodeDefinition def, int entityPosition) {
+	private CEComponent createComponent(NodeDefinition def, Integer entityPosition) {
 		String label = def.getFailSafeLabel(Type.INSTANCE, language);		
 		boolean multiple = def.isMultiple();
 		UIOptions uiOptions = survey.getUIOptions();
@@ -393,7 +395,6 @@ public class CollectEarthBalloonGenerator {
 				((CEField) comp).setReadOnly(true);
 				((CEField) comp).setExtra(true);
 			}
-			
 			if( attrDef.isCalculated() ){
 				((CEField) comp).setReadOnly(true);
 				((CEField) comp).setCalculated(true);
@@ -462,10 +463,13 @@ public class CollectEarthBalloonGenerator {
 	}
 	
 	private String getHtmlParameterName(NodeDefinition def) {
-		return htmlParameterNameByNodePath.get(def.getPath());
+		EntityDefinition parentDef = def.getParentEntityDefinition();
+		String path = parentDef.isRoot() || !parentDef.isMultiple() ? def.getPath()
+				: parentDef.getPath() + "[$index]/" + def.getName(); 
+		return htmlParameterNameByNodePath.get(path);
 	}
 	
-	private String getEnumeratedEntityComponentHtmlParameterName(EntityDefinition entityDef, int entityPosition, NodeDefinition childDef) {
+	private String getEnumeratedEntityComponentHtmlParameterName(EntityDefinition entityDef, Integer entityPosition, NodeDefinition childDef) {
 		String nodePath = entityDef.getPath() + "[" + entityPosition + "]/" + childDef.getName(); //$NON-NLS-1$ //$NON-NLS-2$
 		return htmlParameterNameByNodePath.get(nodePath);
 	}

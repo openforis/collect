@@ -604,7 +604,7 @@ var initSteps = function() {
 		    next: NEXT_LABEL,
 		    previous: PREVIOUS_LABEL
 		},
-		onStepChanged : function(event, currentIndex, priorIndex) {
+		onStepChanged : function(_event, currentIndex, priorIndex) {
 			var stepHeadings = $form.find(".steps .steps ul li");
 			var stepHeading = $(stepHeadings[currentIndex]);
 			if (stepHeading.hasClass("notrelevant")) {

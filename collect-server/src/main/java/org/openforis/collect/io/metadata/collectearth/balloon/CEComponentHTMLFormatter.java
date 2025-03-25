@@ -50,10 +50,16 @@ public class CEComponentHTMLFormatter {
 	}
 
 	private XMLBuilder createBuilder(CETab tab, XMLBuilder parentBuilder) throws Exception {
-		parentBuilder.e("h3").t(  HtmlUnicodeEscaperUtil.escapeHtmlUnicode(  tab.getLabel() ) ); //$NON-NLS-1$
+		XMLBuilder headingBuilder = parentBuilder.e("h3");
+		headingBuilder.t(  HtmlUnicodeEscaperUtil.escapeHtmlUnicode(  tab.getLabel() ) ); //$NON-NLS-1$
+		
 
 		XMLBuilder bodyContentBuilder = parentBuilder.e("section"); //$NON-NLS-1$
-		bodyContentBuilder.a("class", "step"); //$NON-NLS-1$ //$NON-NLS-2$
+		String cssClass = "step";  //$NON-NLS-1$
+		if (tab.isMultipleEntityForm()) {
+			cssClass += " form-template";  //$NON-NLS-1$
+		}
+		bodyContentBuilder.a("class", cssClass); //$NON-NLS-1$
 
 		if (tab.getAncillaryDataHeader() != null) {
 			createBuilder( tab.getAncillaryDataHeader(), bodyContentBuilder);
