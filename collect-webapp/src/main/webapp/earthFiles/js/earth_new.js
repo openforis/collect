@@ -599,6 +599,33 @@ var getSourceSectionId = function(headingId) {
 	return headingId.replace("-t-", "-p-")
 }
 
+var cloneStepTemplate = function ({headingId, sourceHeading, stepHeadings, currentIndex}) {
+	var sourceSectionId = getSourceSectionId(headingId);
+	var sourceSection = $("#" + sourceSectionId).children(".form-group")[0];
+	var content = $(sourceSection).clone();
+	var headingPrefix = sourceHeading.text();
+	var newEntityIndex = stepHeadings.filter((_i, headingEl) => {
+		var t = getTabText(headingEl);
+		return t.substring(0, t.lastIndexOf(' ')) === headingPrefix
+	}).length
+	var title = headingPrefix + " (" + (newEntityIndex + 1) + ")";
+	content.find("input, label").each(function(_i, elem) {
+		var el = $(elem);
+		var id = el.attr("id");
+		if (id && id.includes("$index")) {
+			el.attr("id", id.replace("$index", newEntityIndex));
+			var name = el.attr("name");
+			el.attr("name", name.replace("$index", newEntityIndex));
+		}
+		var forAttr = el.attr("for");
+		if (forAttr && forAttr.includes("$index")) {
+			el.attr("for", forAttr.replace("$index", newEntityIndex));
+		}
+	});
+	$stepsContainer.steps('insert', currentIndex, { title, content })
+	$stepsContainer.steps("setCurrentIndex", currentIndex);
+}
+
 var initSteps = function() {
 	$steps = $stepsContainer.steps({
 		headerTag : "h3",
@@ -630,28 +657,12 @@ var initSteps = function() {
 				$stepsContainer.steps('setCurrentIndex', nextStepIndex);
 				currentStepIndex = nextStepIndex;
 			} else if (sourceHeading.hasClass("form-template")) {
-				var title = sourceHeading.text();
-				var sourceSectionId = getSourceSectionId(headingId);
-				var sourceSection = $("#" + sourceSectionId).children(".form-group")[0];
-				var content = $(sourceSection).clone();
-				var newEntityIndex = stepHeadings.filter((index, headingEl) => {
-					var t = getTabText(headingEl);
-					return t === title
-				}).length
-				content.find("input, label").each(function(i, elem) {
-					var el = $(elem);
-					var id = el.attr("id");
-					if (id && id.includes("$index")) {
-						el.attr("id", id.replace("$index", newEntityIndex));
-						var name = el.attr("name");
-						el.attr("name", name.replace("$index", newEntityIndex));
-					}
-					var forAttr = el.attr("for");
-					if (forAttr && forAttr.includes("$index")) {
-						el.attr("for", forAttr.replace("$index", entitiesCount));
-					}
-				});
-				$stepsContainer.steps('add', { title, content })
+				var headingPrefix = sourceHeading.text();
+				if (confirm("Create a new " + headingPrefix + "?")) {
+					cloneStepTemplate({headingId, sourceHeading, stepHeadings, currentIndex})
+				} else {
+					$stepsContainer.steps('setCurrentIndex', priorIndex);
+				}
 			} else {
 				currentStepIndex = currentIndex;
 			}
