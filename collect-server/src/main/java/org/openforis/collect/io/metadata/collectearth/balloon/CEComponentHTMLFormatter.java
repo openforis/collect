@@ -53,11 +53,13 @@ public class CEComponentHTMLFormatter {
 		XMLBuilder headingBuilder = parentBuilder.e("h3");
 		headingBuilder.t(  HtmlUnicodeEscaperUtil.escapeHtmlUnicode(  tab.getLabel() ) ); //$NON-NLS-1$
 		
-
 		XMLBuilder bodyContentBuilder = parentBuilder.e("section"); //$NON-NLS-1$
 		String cssClass = "step";  //$NON-NLS-1$
 		if (tab.isMultipleEntityForm()) {
+			headingBuilder.a("data-node-def-name", tab.getName()); //$NON-NLS-1$
 			cssClass += " form-template";  //$NON-NLS-1$
+			headingBuilder.a("data-template", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+			headingBuilder.a("class", "form-template"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		bodyContentBuilder.a("class", cssClass); //$NON-NLS-1$
 

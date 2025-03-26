@@ -618,7 +618,11 @@ var initSteps = function() {
 				}
 				$stepsContainer.steps('setCurrentIndex', nextStepIndex);
 				currentStepIndex = nextStepIndex;
-			}else{
+			} else if (stepHeading.hasClass("template")) {
+				var title = 'Test'
+				var content = "Test content"
+				$stepsContainer.steps('add', { title, content })
+			} else {
 				currentStepIndex = currentIndex;
 			}
 			updateStepsErrorFeedback();

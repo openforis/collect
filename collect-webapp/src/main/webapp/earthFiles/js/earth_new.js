@@ -591,6 +591,14 @@ var initDateTimePickers = function() {
 	});
 };
 
+var getSourceHeadingId = function(headingId) {
+	return headingId.replace("-t-", "-h-")
+}
+
+var getSourceSectionId = function(headingId) {
+	return headingId.replace("-t-", "-p-")
+}
+
 var initSteps = function() {
 	$steps = $stepsContainer.steps({
 		headerTag : "h3",
@@ -604,9 +612,12 @@ var initSteps = function() {
 		    next: NEXT_LABEL,
 		    previous: PREVIOUS_LABEL
 		},
-		onStepChanged : function(event, currentIndex, priorIndex) {
+		onStepChanged : function(_event, currentIndex, priorIndex) {
 			var stepHeadings = $form.find(".steps .steps ul li");
 			var stepHeading = $(stepHeadings[currentIndex]);
+			var headingId = stepHeading.find('a')[0].id
+			var sourceHeadingId = getSourceHeadingId(headingId)
+			var sourceHeading = $("#" + sourceHeadingId)
 			if (stepHeading.hasClass("notrelevant")) {
 				var nextStepIndex;
 				var firstRelevantHeadingIdx = findFirstRelevantElementIndex(stepHeadings, currentIndex, currentIndex < priorIndex);
@@ -618,7 +629,30 @@ var initSteps = function() {
 				}
 				$stepsContainer.steps('setCurrentIndex', nextStepIndex);
 				currentStepIndex = nextStepIndex;
-			}else{
+			} else if (sourceHeading.hasClass("form-template")) {
+				var title = sourceHeading.text();
+				var sourceSectionId = getSourceSectionId(headingId);
+				var sourceSection = $("#" + sourceSectionId).children(".form-group")[0];
+				var content = $(sourceSection).clone();
+				var newEntityIndex = stepHeadings.filter((index, headingEl) => {
+					var t = getTabText(headingEl);
+					return t === title
+				}).length
+				content.find("input, label").each(function(i, elem) {
+					var el = $(elem);
+					var id = el.attr("id");
+					if (id && id.includes("$index")) {
+						el.attr("id", id.replace("$index", newEntityIndex));
+						var name = el.attr("name");
+						el.attr("name", name.replace("$index", newEntityIndex));
+					}
+					var forAttr = el.attr("for");
+					if (forAttr && forAttr.includes("$index")) {
+						el.attr("for", forAttr.replace("$index", entitiesCount));
+					}
+				});
+				$stepsContainer.steps('add', { title, content })
+			} else {
 				currentStepIndex = currentIndex;
 			}
 			updateStepsErrorFeedback();
@@ -1020,3 +1054,12 @@ var parseInteger = function(str, defaultValue) {
 		}
 	}
 };
+
+var getTabText = function (tabEl) {
+	return $(tabEl).children("a").first()
+		.clone()
+	    .children()
+	    .remove()
+	    .end()
+	    .text();
+}

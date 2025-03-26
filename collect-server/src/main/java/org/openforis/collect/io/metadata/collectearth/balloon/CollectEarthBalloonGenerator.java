@@ -269,7 +269,7 @@ public class CollectEarthBalloonGenerator {
 		}
 	}
 
-	private boolean ifMultipleEntityForm(UIForm form) {
+	private boolean isMultipleEntityForm(UIForm form) {
 		if (form.getChildren().size() == 1) {
 			UIFormComponent firstChild = form.getChildren().get(0);
 			return firstChild instanceof UIFormSection && ((UIFormSection) firstChild).getNodeDefinition().isMultiple();
@@ -281,7 +281,7 @@ public class CollectEarthBalloonGenerator {
 		String label = form.getLabel(language, survey.getDefaultLanguage());
 		CETab tab = new CETab(rootEntityDef.getName(), label);
 		tab.setMain(main); //consider the first tab as the main one
-		tab.setMultipleEntityForm(ifMultipleEntityForm(form));
+		tab.setMultipleEntityForm(isMultipleEntityForm(form));
 		addFormChildrenToTab(tab, form);
 		return tab;
 	}
