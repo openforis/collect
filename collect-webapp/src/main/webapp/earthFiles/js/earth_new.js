@@ -37,10 +37,7 @@ $(function() {
 
 	initSteps();
 	fillYears();
-	initCodeButtonGroups();
-	initDateTimePickers();
-	initBooleanButtons();
-	initializeChangeEventSaver();
+	initFormInputFields();
 	// Declares the Jquery Dialog ( The Bootstrap dialog does
 	// not work in Google Earth )
 	$("#dialogSuccess").dialog({
@@ -492,8 +489,15 @@ var updateStepsErrorFeedback = function() {
 	});
 };
 
-var initCodeButtonGroups = function() {
-	$form.find("button.code-item").click(function(event) {
+var initFormInputFields = function(parentContainer = null) {
+	initCodeButtonGroups(parentContainer);
+	initDateTimePickers(parentContainer);
+	initBooleanButtons(parentContainer);
+	initializeChangeEventSaver(parentContainer);
+}
+
+var initCodeButtonGroups = function(parentContainer = null) {
+	(parentContainer || $form).find("button.code-item").click(function(event) {
 		event.preventDefault();
 		// update hidden input field
 		var btn = $(this);
@@ -555,8 +559,8 @@ var initCodeButtonGroups = function() {
 	});
 };
 
-var initBooleanButtons = function() {
-	$('.boolean-group').each(function() {
+var initBooleanButtons = function(parentContainer = null) {
+	(parentContainer || $form).find('.boolean-group').each(function() {
 		var group = $(this);
 		var hiddenField = group.find("input[type='hidden']");
 		group.find("button").click(function() {
@@ -573,9 +577,9 @@ var initBooleanButtons = function() {
 	});
 };
 
-var initDateTimePickers = function() {
+var initDateTimePickers = function(parentContainer = null) {
 	// http://eonasdan.github.io/bootstrap-datetimepicker/
-	$('.datepicker').datetimepicker({
+	(parentContainer || $form).find('.datepicker').datetimepicker({
 		format : DATE_FORMAT
 	}).on('dp.change', function(e) {
 		var inputField = $(this).find(".form-control");
@@ -583,7 +587,7 @@ var initDateTimePickers = function() {
 		updateData(inputField);
 	});
 
-	$('.timepicker').datetimepicker({
+	(parentContainer || $form).find('.timepicker').datetimepicker({
 		format : TIME_FORMAT
 	}).on('dp.change', function(e) {
 		var inputField = $(this).find(".form-control");
@@ -601,27 +605,21 @@ var getSourceSectionId = function(headingId) {
 
 var cloneStepTemplate = function ({headingId, sourceHeading, stepHeadings, currentIndex}) {
 	var sourceSectionId = getSourceSectionId(headingId);
-	var sourceSection = $("#" + sourceSectionId).children(".form-group")[0];
-	var content = $(sourceSection).clone();
+	var sourceSectionChildren = $("#" + sourceSectionId).children();
+	var content = $(sourceSectionChildren).clone();
 	var headingPrefix = sourceHeading.text();
 	var newEntityIndex = stepHeadings.filter((_i, headingEl) => {
 		var t = getTabText(headingEl);
 		return t.substring(0, t.lastIndexOf(' ')) === headingPrefix
 	}).length
 	var title = headingPrefix + " (" + (newEntityIndex + 1) + ")";
-	content.find("input, label").each(function(_i, elem) {
+	content.find("input, label, div.code-items-group, div.code-items").each(function(_i, elem) {
 		var el = $(elem);
-		var id = el.attr("id");
-		if (id && id.includes("$index")) {
-			el.attr("id", id.replace("$index", newEntityIndex));
-			var name = el.attr("name");
-			el.attr("name", name.replace("$index", newEntityIndex));
-		}
-		var forAttr = el.attr("for");
-		if (forAttr && forAttr.includes("$index")) {
-			el.attr("for", forAttr.replace("$index", newEntityIndex));
-		}
+		replaceTextInAttribute(el, "id", "$index", newEntityIndex)
+		replaceTextInAttribute(el, "name", "$index", newEntityIndex)
+		replaceTextInAttribute(el, "for", "$index", newEntityIndex)
 	});
+	initFormInputFields(content);
 	$stepsContainer.steps('insert', currentIndex, { title, content })
 	$stepsContainer.steps("setCurrentIndex", currentIndex);
 }
@@ -906,16 +904,16 @@ function escapeRegExp(string){
 	return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 }
 
-var initializeChangeEventSaver = function() {
+var initializeChangeEventSaver = function(parentContainer = null) {
 	// SAVING DATA WHEN DATA CHANGES
 	// Bind event to Before user leaves page with function parameter e
 	// The window onbeforeunload or onunload events do not work in Google Earth
 	// OBS! The change event is not fired for the hidden inputs when the value
 	// is updated through jQuery's val()
-	$('input[name^=collect], textarea[name^=collect], select[name^=collect], select[name^=hidden], button[name^=collect]').change(function(e) {
+	(parentContainer || $form).find('input[name^=collect], textarea[name^=collect], select[name^=collect], select[name^=hidden], button[name^=collect]').change(function(e) {
 		updateData(e.target);
 	});
-	$('input:text[name^=collect], textarea[name^=collect]').keyup(function(e) {
+	(parentContainer || $form).find('input:text[name^=collect], textarea[name^=collect]').keyup(function(e) {
 		updateData(e.target, 1500);
 	});
 };
@@ -1073,4 +1071,11 @@ var getTabText = function (tabEl) {
 	    .remove()
 	    .end()
 	    .text();
+}
+
+var replaceTextInAttribute = function (el, attrName, textToSearch, textToReplace) {
+	var attrValue = el.attr(attrName);
+	if (attrValue && attrValue.includes(textToSearch)) {
+		el.attr(attrName, attrValue.replace(textToSearch, textToReplace));
+	}
 }

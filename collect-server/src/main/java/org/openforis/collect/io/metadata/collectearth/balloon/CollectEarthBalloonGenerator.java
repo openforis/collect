@@ -474,7 +474,7 @@ public class CollectEarthBalloonGenerator {
 		return htmlParameterNameByNodePath.get(nodePath);
 	}
 	
-	private String getParentCodeParameterName(EntityDefinition parentDef, int entityPosition, CodeAttributeDefinition codeAttrDef) {
+	private String getParentCodeParameterName(EntityDefinition parentDef, Integer entityPosition, CodeAttributeDefinition codeAttrDef) {
 		CodeAttributeDefinition parentCodeAttrDef = codeAttrDef.getParentCodeAttributeDefinition();
 		if (parentCodeAttrDef == null) {
 			return null;
