@@ -165,6 +165,61 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 	lastUpdateInputFieldName = inputFieldName;
 };
 
+var sendEntityCreateRequest = function () {
+	$.ajax({
+		data : data,
+		type : "POST",
+		url : HOST + '',
+		timeout: REQUEST_TIMEOUT,
+		dataType : 'json',
+		beforeSend : function() {
+			if (blockUI) {
+				if (activelySaved) {
+					$.blockUI({
+						message : 'Submitting data..'
+					});
+				} else {
+					$.blockUI({
+						message : null,
+						overlayCSS: { backgroundColor: 'transparent' }
+					});
+				}
+			}
+		}
+	})
+	.done(function(json) {
+		if (DEBUG) {
+			log("4/4 json response received");
+		}
+		if (json.success) {
+			handleSuccessfullDataUpdateResponse(json, activelySaved, blockUI);
+		} else {
+			handleFailureDataUpdateResponse(inputField, activelySaved, blockUI, retryCount, 
+				json.message);
+		}
+	})
+	.fail(function(xhr, textStatus, errorThrown) {
+		// try again
+		if("abort" != errorThrown) {
+			if (isSuccessfullResponse(xhr.responseText)) {
+				if (DEBUG) {
+					log("failed but the response is successfull: " + xhr.responseText);
+				}
+				handleSuccessfullDataUpdateResponse($.parseJSON(xhr.responseText), activelySaved, blockUI);
+			} else {
+				handleFailureDataUpdateResponse(inputField, activelySaved, blockUI, retryCount, 
+					errorThrown, xhr, textStatus, errorThrown);
+			}
+		}
+	})
+	.always(function() {
+		ajaxTimeout = null;
+		lastUpdateRequest = null;
+		lastUpdateInputFieldName = null;
+
+	});
+}
+
 var isValidResponse = function(text) {
 	try {
 		var json = $.parseJSON(text);

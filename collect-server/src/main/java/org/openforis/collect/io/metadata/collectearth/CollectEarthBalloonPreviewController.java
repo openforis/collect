@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openforis.collect.earth.app.server.AbstractPlacemarkDataController;
+import org.openforis.collect.earth.app.server.PlacemarkEntityCreateParams;
 import org.openforis.collect.earth.app.server.PlacemarkUpdateRequest;
 import org.openforis.collect.io.metadata.collectearth.balloon.CollectEarthBalloonGenerator;
 import org.openforis.collect.manager.SessionManager;
@@ -41,6 +42,13 @@ public class CollectEarthBalloonPreviewController extends AbstractPlacemarkDataC
 	public void saveDataExpanded(PlacemarkUpdateRequest updateRequest, HttpServletResponse response) throws IOException {
 		super.saveDataExpanded(updateRequest, response);
 	}
+	
+	@Override
+	@PostMapping(value="/preview_create-entity")
+	public void createEntity(PlacemarkEntityCreateParams params, HttpServletResponse response) throws IOException {
+		super.createEntity(params, response);
+	}
+
 
 	@GetMapping(value = "/collectearthpreview.html")
 	public void showCollectEarthBalloonPreview(HttpServletResponse response,
