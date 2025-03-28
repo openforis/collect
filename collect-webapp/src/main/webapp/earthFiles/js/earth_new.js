@@ -165,26 +165,20 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 	lastUpdateInputFieldName = inputFieldName;
 };
 
-var sendEntityCreateRequest = function () {
+var sendEntityCreateRequest = function (entityName, resolve, reject) {
+	var data = createPlacemarkUpdateRequest();
+	Object.assign(data, {entityName})
 	$.ajax({
 		data : data,
 		type : "POST",
-		url : HOST + '',
+		url : HOST + 'create-entity',
 		timeout: REQUEST_TIMEOUT,
 		dataType : 'json',
 		beforeSend : function() {
-			if (blockUI) {
-				if (activelySaved) {
-					$.blockUI({
-						message : 'Submitting data..'
-					});
-				} else {
-					$.blockUI({
-						message : null,
-						overlayCSS: { backgroundColor: 'transparent' }
-					});
-				}
-			}
+			$.blockUI({
+				message : null,
+				overlayCSS: { backgroundColor: 'transparent' }
+			});
 		}
 	})
 	.done(function(json) {
@@ -197,26 +191,10 @@ var sendEntityCreateRequest = function () {
 			handleFailureDataUpdateResponse(inputField, activelySaved, blockUI, retryCount, 
 				json.message);
 		}
+		resolve()
 	})
 	.fail(function(xhr, textStatus, errorThrown) {
-		// try again
-		if("abort" != errorThrown) {
-			if (isSuccessfullResponse(xhr.responseText)) {
-				if (DEBUG) {
-					log("failed but the response is successfull: " + xhr.responseText);
-				}
-				handleSuccessfullDataUpdateResponse($.parseJSON(xhr.responseText), activelySaved, blockUI);
-			} else {
-				handleFailureDataUpdateResponse(inputField, activelySaved, blockUI, retryCount, 
-					errorThrown, xhr, textStatus, errorThrown);
-			}
-		}
-	})
-	.always(function() {
-		ajaxTimeout = null;
-		lastUpdateRequest = null;
-		lastUpdateInputFieldName = null;
-
+		reject()
 	});
 }
 
@@ -265,7 +243,7 @@ var handleFailureDataUpdateResponse = function(inputField, activelySaved, blockU
 	loadPlacemarkData(true);
 };
 
-var createPlacemarkUpdateRequest = function(inputField) {
+var createPlacemarkUpdateRequest = function(inputField = null) {
 	var values;
 	if (inputField == null) {
 		values = serializeFormToJSON($form);
@@ -659,24 +637,29 @@ var getSourceSectionId = function(headingId) {
 }
 
 var cloneStepTemplate = function ({headingId, sourceHeading, stepHeadings, currentIndex}) {
-	var sourceSectionId = getSourceSectionId(headingId);
-	var sourceSectionChildren = $("#" + sourceSectionId).children();
-	var content = $(sourceSectionChildren).clone();
-	var headingPrefix = sourceHeading.text();
-	var newEntityIndex = stepHeadings.filter((_i, headingEl) => {
-		var t = getTabText(headingEl);
-		return t.substring(0, t.lastIndexOf(' ')) === headingPrefix
-	}).length
-	var title = headingPrefix + " (" + (newEntityIndex + 1) + ")";
-	content.find("input, label, div.code-items-group, div.code-items").each(function(_i, elem) {
-		var el = $(elem);
-		replaceTextInAttribute(el, "id", "$index", newEntityIndex)
-		replaceTextInAttribute(el, "name", "$index", newEntityIndex)
-		replaceTextInAttribute(el, "for", "$index", newEntityIndex)
-	});
-	initFormInputFields(content);
-	$stepsContainer.steps('insert', currentIndex, { title, content })
-	$stepsContainer.steps("setCurrentIndex", currentIndex);
+	var entityName = "test"
+	sendEntityCreateRequest(entityName, function() {
+		var sourceSectionId = getSourceSectionId(headingId);
+		var sourceSectionChildren = $("#" + sourceSectionId).children();
+		var content = $(sourceSectionChildren).clone();
+		var headingPrefix = sourceHeading.text();
+		var newEntityIndex = stepHeadings.filter((_i, headingEl) => {
+			var t = getTabText(headingEl);
+			return t.substring(0, t.lastIndexOf(' ')) === headingPrefix
+		}).length
+		var title = headingPrefix + " (" + (newEntityIndex + 1) + ")";
+		content.find("input, label, div.code-items-group, div.code-items").each(function(_i, elem) {
+			var el = $(elem);
+			replaceTextInAttribute(el, "id", "$index", newEntityIndex)
+			replaceTextInAttribute(el, "name", "$index", newEntityIndex)
+			replaceTextInAttribute(el, "for", "$index", newEntityIndex)
+		});
+		initFormInputFields(content);
+		$stepsContainer.steps('insert', currentIndex, { title, content })
+		$stepsContainer.steps("setCurrentIndex", currentIndex);
+	}, function() {
+		console.log("ERROR")
+	})
 }
 
 var initSteps = function() {
