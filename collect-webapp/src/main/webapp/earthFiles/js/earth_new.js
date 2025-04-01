@@ -131,10 +131,10 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 				log("4/4 json response received");
 			}
 			if (json.success) {
-				handleSuccessfullDataUpdateResponse(json, activelySaved, blockUI);
+				handleSuccessfullDataUpdateResponse({json, showFeedbackMessage: activelySaved, unblockWhenDone: blockUI});
 			} else {
-				handleFailureDataUpdateResponse(inputField, activelySaved, blockUI, retryCount, 
-					json.message);
+				handleFailureDataUpdateResponse({inputField, activelySaved, blockUI, retryCount, 
+					errorMessage: json.message});
 			}
 		})
 		.fail(function(xhr, textStatus, errorThrown) {
@@ -144,10 +144,10 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 					if (DEBUG) {
 						log("failed but the response is successfull: " + xhr.responseText);
 					}
-					handleSuccessfullDataUpdateResponse($.parseJSON(xhr.responseText), activelySaved, blockUI);
+					handleSuccessfullDataUpdateResponse({json: $.parseJSON(xhr.responseText), showFeedbackMessage: activelySaved, unblockWhenDone: blockUI});
 				} else {
-					handleFailureDataUpdateResponse(inputField, activelySaved, blockUI, retryCount, 
-						errorThrown, xhr, textStatus, errorThrown);
+					handleFailureDataUpdateResponse({inputField, activelySaved, blockUI, retryCount, 
+						errorMessage: errorThrown, xhr, textStatus, errorThrown});
 				}
 			}
 		})
@@ -168,6 +168,9 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 var sendEntityCreateRequest = function (entityName, resolve, reject) {
 	var data = createPlacemarkUpdateRequest();
 	Object.assign(data, {entityName})
+	if (DEBUG) {
+		log("1/2 sending entity create request");
+	}
 	$.ajax({
 		data : data,
 		type : "POST",
@@ -183,18 +186,23 @@ var sendEntityCreateRequest = function (entityName, resolve, reject) {
 	})
 	.done(function(json) {
 		if (DEBUG) {
-			log("4/4 json response received");
+			log("2/2 json response received");
 		}
 		if (json.success) {
-			handleSuccessfullDataUpdateResponse(json, activelySaved, blockUI);
+			handleSuccessfullDataUpdateResponse({json});
 		} else {
-			handleFailureDataUpdateResponse(inputField, activelySaved, blockUI, retryCount, 
-				json.message);
+			handleFailureDataUpdateResponse({errorMessage: json.message});
 		}
 		resolve()
 	})
 	.fail(function(xhr, textStatus, errorThrown) {
+		if (DEBUG) {
+			log("2/2a error sending entity create request");
+		}
 		reject()
+	})
+	.always(function() {
+		$.unblockUI();
 	});
 }
 
@@ -216,7 +224,7 @@ var isSuccessfullResponse = function(text) {
 	}
 };
 
-var handleSuccessfullDataUpdateResponse = function(json, showFeedbackMessage, unblockWhenDone) {
+var handleSuccessfullDataUpdateResponse = function({json, showFeedbackMessage, unblockWhenDone}) {
 	if (DEBUG) {
 		log("data updated successfully, updating UI...");
 	}
@@ -235,7 +243,7 @@ var handleSuccessfullDataUpdateResponse = function(json, showFeedbackMessage, un
 	}
 };
 
-var handleFailureDataUpdateResponse = function(inputField, activelySaved, blockUI, retryCount, errorMessage, xhr, textStatus, errorThrown) {
+var handleFailureDataUpdateResponse = function({inputField, activelySaved, blockUI, retryCount, errorMessage, xhr, textStatus, errorThrown}) {
 	if (DEBUG) {
 		log("error updating data: " + errorMessage);
 	}
@@ -637,7 +645,7 @@ var getSourceSectionId = function(headingId) {
 }
 
 var cloneStepTemplate = function ({headingId, sourceHeading, stepHeadings, currentIndex}) {
-	var entityName = "test"
+	var entityName = sourceHeading.data("nodeDefName");
 	sendEntityCreateRequest(entityName, function() {
 		var sourceSectionId = getSourceSectionId(headingId);
 		var sourceSectionChildren = $("#" + sourceSectionId).children();

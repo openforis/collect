@@ -6,6 +6,7 @@ package org.openforis.collect.metamodel.ui;
 import java.util.Collections;
 import java.util.List;
 
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.LanguageSpecificTextMap;
 
@@ -52,5 +53,20 @@ public class UIForm extends UIFormContentContainer {
 	public void removeLabel(String language) {
 		labels.remove(language);
 	}
+	
+	public boolean isMultipleEntityForm() {
+		EntityDefinition entityDefinition = getMultipleEntityDefinition();
+		return entityDefinition != null && entityDefinition.isMultiple();
+	}
 
+	public EntityDefinition getMultipleEntityDefinition() {
+		UIFormComponent firstChild = getFirstChild();
+		return firstChild != null && firstChild instanceof UIFormSection
+				? ((UIFormSection) firstChild).getEntityDefinition()
+				: null;
+	}
+
+	private UIFormComponent getFirstChild() {
+		return getChildren().size() == 1 ? getChildren().getFirst() : null;
+	}
 }

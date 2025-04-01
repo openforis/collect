@@ -262,26 +262,19 @@ public class CollectEarthBalloonGenerator {
 			UIFormSet formSet = uiConfiguration.getMainFormSet();
 			for (UIForm form : formSet.getForms()) {
 				boolean main = tabSet.getTabs().isEmpty();
-				CETab tab = createTabComponent(rootEntityDef, form, main);
+				EntityDefinition entityDef = form.getMultipleEntityDefinition();
+				CETab tab = createTabComponent(entityDef == null ? rootEntityDef: entityDef, form, main);
 				tabSet.addTab(tab);
 			}
 			return tabSet;
 		}
 	}
 
-	private boolean isMultipleEntityForm(UIForm form) {
-		if (form.getChildren().size() == 1) {
-			UIFormComponent firstChild = form.getChildren().get(0);
-			return firstChild instanceof UIFormSection && ((UIFormSection) firstChild).getNodeDefinition().isMultiple();
-		}
-		return false;
-	}
-	
 	private CETab createTabComponent(EntityDefinition rootEntityDef, UIForm form, boolean main) {
 		String label = form.getLabel(language, survey.getDefaultLanguage());
 		CETab tab = new CETab(rootEntityDef.getName(), label);
 		tab.setMain(main); //consider the first tab as the main one
-		tab.setMultipleEntityForm(isMultipleEntityForm(form));
+		tab.setMultipleEntityForm(form.isMultipleEntityForm());
 		addFormChildrenToTab(tab, form);
 		return tab;
 	}

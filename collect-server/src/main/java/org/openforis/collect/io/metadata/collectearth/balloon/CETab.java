@@ -12,15 +12,6 @@ public class CETab extends CEFieldSet {
 	private boolean multipleEntityForm;
 	private CEAncillaryFields ancillaryDataHeader;
 	
-	
-	public CEAncillaryFields getAncillaryDataHeader() {
-		return ancillaryDataHeader;
-	}
-
-	public void setAncillaryDataHeader(CEAncillaryFields ancillaryDataHeader) {
-		this.ancillaryDataHeader = ancillaryDataHeader;
-	}
-
 	public CETab(String name, String label) {
 		super(name, HtmlUnicodeEscaperUtil.escapeHtmlUnicode( label ), null);
 	}
@@ -39,5 +30,13 @@ public class CETab extends CEFieldSet {
 	
 	public void setMultipleEntityForm(boolean multipleEntityForm) {
 		this.multipleEntityForm = multipleEntityForm;
+	}
+	
+	public CEAncillaryFields getAncillaryDataHeader() {
+		return ancillaryDataHeader;
+	}
+
+	public void setAncillaryDataHeader(CEAncillaryFields ancillaryDataHeader) {
+		this.ancillaryDataHeader = ancillaryDataHeader;
 	}
 }
