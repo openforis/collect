@@ -470,8 +470,12 @@ var updateFieldStateCache = function(inputFieldInfoByParameterName) {
 	});
 };
 
+var getStepHeadings = function() {
+	return $form.find(".steps .steps ul li");
+}
+
 var getStepHeading = function(index) {
-	var stepHeading = $form.find(".steps .steps ul li").eq(index);
+	var stepHeading = getStepHeadings().eq(index);
 	return stepHeading;
 };
 
@@ -495,6 +499,19 @@ var toggleStepVisibility = function(index, visible) {
 	}
 };
 
+var removeStepHeadingsDeleteButton = function() {
+	getStepHeadings().find('button').remove()
+}
+
+var addStepHeadingDeleteButton = function({index, entityName}) {
+	var stepHeading = getStepHeading(index);
+	var deleteButton = $('<button class="form-delete-btn" data-node-def-name="' + entityName + '" title="Delete"><span>X</span></button>')
+	deleteButton.on("click", () => {
+		alert('delete')
+	})
+	stepHeading.children().first().append(deleteButton)
+}
+
 var showCurrentStep = function() {
 	setStepsAsVisited(currentStepIndex);
 	var stepHeading = getStepHeading(currentStepIndex);
@@ -507,7 +524,7 @@ var showCurrentStep = function() {
 
 var setStepsAsVisited = function(upToStepIndex) {
 	if (! upToStepIndex) {
-		upToStepIndex = $stepsContainer.find(".steps ul li").length - 1;
+		upToStepIndex = getStepHeadings().length - 1;
 	}
 	for (var stepIndex = 0; stepIndex <= upToStepIndex; stepIndex ++) {
 		var stepHeading = getStepHeading(stepIndex);
@@ -665,6 +682,9 @@ var cloneStepTemplate = function ({headingId, sourceHeading, stepHeadings, curre
 		initFormInputFields(content);
 		$stepsContainer.steps('insert', currentIndex, { title, content })
 		$stepsContainer.steps("setCurrentIndex", currentIndex);
+		
+		removeStepHeadingsDeleteButton();
+		addStepHeadingDeleteButton({index: currentIndex, entityName})
 	}, function() {
 		console.log("ERROR")
 	})
@@ -684,7 +704,7 @@ var initSteps = function() {
 		    previous: PREVIOUS_LABEL
 		},
 		onStepChanged : function(_event, currentIndex, priorIndex) {
-			var stepHeadings = $form.find(".steps .steps ul li");
+			var stepHeadings = getStepHeadings();
 			var stepHeading = $(stepHeadings[currentIndex]);
 			var headingId = stepHeading.find('a')[0].id
 			var sourceHeadingId = getSourceHeadingId(headingId)

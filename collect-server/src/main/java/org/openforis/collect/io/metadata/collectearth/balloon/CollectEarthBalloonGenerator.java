@@ -270,9 +270,9 @@ public class CollectEarthBalloonGenerator {
 		}
 	}
 
-	private CETab createTabComponent(EntityDefinition rootEntityDef, UIForm form, boolean main) {
+	private CETab createTabComponent(EntityDefinition entityDef, UIForm form, boolean main) {
 		String label = form.getLabel(language, survey.getDefaultLanguage());
-		CETab tab = new CETab(rootEntityDef.getName(), label);
+		CETab tab = new CETab(entityDef.getName(), label);
 		tab.setMain(main); //consider the first tab as the main one
 		tab.setMultipleEntityForm(form.isMultipleEntityForm());
 		addFormChildrenToTab(tab, form);

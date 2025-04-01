@@ -278,3 +278,11 @@ div.actions.clearfix{
 .boolean-group {
   padding-left: 10px;
 }
+
+.form-delete-btn {
+	background: red;
+    color: white;
+    border-radius: 50%;
+    border-color: transparent;
+	margin-left: 10px;
+}
