@@ -285,4 +285,6 @@ div.actions.clearfix{
     border-radius: 50%;
     border-color: transparent;
 	margin-left: 10px;
+	padding: 0;
+	line-height: 1rem;
 }

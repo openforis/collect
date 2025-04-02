@@ -74,6 +74,13 @@ var sendCreateNewRecordRequest = function() {
 	sendDataUpdateRequest(findById(ACTIVELY_SAVED_FIELD_ID), false, true);
 };
 
+var defaultBeforeSendRequest = function() {
+	$.blockUI({
+		message : null,
+		overlayCSS: { backgroundColor: 'transparent' }
+	});
+}
+
 var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, retryCount) {
 	delay = defaultIfNull(delay, 100);
 	retryCount = defaultIfNull(retryCount, 0);
@@ -118,10 +125,7 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 							message : 'Submitting data..'
 						});
 					} else {
-						$.blockUI({
-							message : null,
-							overlayCSS: { backgroundColor: 'transparent' }
-						});
+						defaultBeforeSendRequest();
 					}
 				}
 			}
@@ -165,24 +169,20 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 	lastUpdateInputFieldName = inputFieldName;
 };
 
-var sendEntityCreateRequest = function (entityName, resolve, reject) {
+
+var sendEntityCreateOrDeleteRequest = function ({method, url, label, params, resolve, reject}) {
 	var data = createPlacemarkUpdateRequest();
-	Object.assign(data, {entityName})
+	Object.assign(data, params)
 	if (DEBUG) {
-		log("1/2 sending entity create request");
+		log("1/2 sending " + label + " request");
 	}
 	$.ajax({
-		data : data,
-		type : "POST",
-		url : HOST + 'create-entity',
+		data,
+		type: method,
+		url,
 		timeout: REQUEST_TIMEOUT,
 		dataType : 'json',
-		beforeSend : function() {
-			$.blockUI({
-				message : null,
-				overlayCSS: { backgroundColor: 'transparent' }
-			});
-		}
+		beforeSend : defaultBeforeSendRequest
 	})
 	.done(function(json) {
 		if (DEBUG) {
@@ -197,13 +197,23 @@ var sendEntityCreateRequest = function (entityName, resolve, reject) {
 	})
 	.fail(function(xhr, textStatus, errorThrown) {
 		if (DEBUG) {
-			log("2/2a error sending entity create request");
+			log("2/2a error sending request");
 		}
 		reject()
 	})
 	.always(function() {
 		$.unblockUI();
 	});
+}
+
+var sendEntityCreateRequest = function (entityName, resolve, reject) {
+	sendEntityCreateOrDeleteRequest({ method: "POST", url: HOST + 'create-entity', params: {entityName}, 
+		label: "entity create", resolve, reject })
+}
+
+var sendEntityDeleteRequest = function (entityName, resolve, reject) {
+	sendEntityCreateOrDeleteRequest({ method: "DELETE", url: HOST + 'delete-entity', params: {entityName}, 
+		label: "entity delete", resolve, reject })
 }
 
 var isValidResponse = function(text) {
@@ -256,8 +266,9 @@ var createPlacemarkUpdateRequest = function(inputField = null) {
 	if (inputField == null) {
 		values = serializeFormToJSON($form);
 	} else {
+		var $inputField = $(inputField)
 		values = {};
-		values[encodeURIComponent($(inputField).attr('name'))] = $(inputField).val();
+		values[encodeURIComponent($inputField.attr('name'))] = $inputField.val();
 		values[encodeURIComponent(ACTIVELY_SAVED_FIELD_ID)] = findById(ACTIVELY_SAVED_FIELD_ID).val();
 		$form.find("." + EXTRA_FIELD_CLASS).each(function() {
 			var $this = $(this);
@@ -503,11 +514,19 @@ var removeStepHeadingsDeleteButton = function() {
 	getStepHeadings().find('button').remove()
 }
 
-var addStepHeadingDeleteButton = function({index, entityName}) {
+var addStepHeadingDeleteButton = function({index, sourceHeading}) {
+	var entityName = sourceHeading.data("nodeDefName");
 	var stepHeading = getStepHeading(index);
+	var headingPrefix = sourceHeading.text();
 	var deleteButton = $('<button class="form-delete-btn" data-node-def-name="' + entityName + '" title="Delete"><span>X</span></button>')
 	deleteButton.on("click", () => {
-		alert('delete')
+		if (confirm("Delete this " + headingPrefix + "?")) {
+			sendEntityDeleteRequest(entityName, function () {
+				
+			}, function () {
+				
+			})
+		}
 	})
 	stepHeading.children().first().append(deleteButton)
 }
@@ -661,30 +680,35 @@ var getSourceSectionId = function(headingId) {
 	return headingId.replace("-t-", "-p-")
 }
 
-var cloneStepTemplate = function ({headingId, sourceHeading, stepHeadings, currentIndex}) {
+var cloneStepTemplate = function ({headingId, sourceHeading, indexNext}) {
+	var stepHeadings = getStepHeadings();
+	var sourceSectionId = getSourceSectionId(headingId);
+	var sourceSectionChildren = $("#" + sourceSectionId).children();
+	var content = $(sourceSectionChildren).clone();
+	var headingPrefix = sourceHeading.text();
+	var newEntityIndex = stepHeadings.filter((_i, headingEl) => {
+		var t = getTabText(headingEl);
+		return t.substring(0, t.lastIndexOf(' ')) === headingPrefix
+	}).length
+	var title = headingPrefix + " (" + (newEntityIndex + 1) + ")";
+	content.find("input, label, div.code-items-group, div.code-items").each(function(_i, elem) {
+		var el = $(elem);
+		replaceTextInAttribute(el, "id", "$index", newEntityIndex)
+		replaceTextInAttribute(el, "name", "$index", newEntityIndex)
+		replaceTextInAttribute(el, "for", "$index", newEntityIndex)
+	});
+	initFormInputFields(content);
+	$stepsContainer.steps('insert', indexNext, { title, content })
+	
+	removeStepHeadingsDeleteButton();
+	addStepHeadingDeleteButton({index: indexNext, sourceHeading})
+}
+
+var addEntityAndCloneStepTemplate = function ({headingId, sourceHeading, indexNext}) {
 	var entityName = sourceHeading.data("nodeDefName");
 	sendEntityCreateRequest(entityName, function() {
-		var sourceSectionId = getSourceSectionId(headingId);
-		var sourceSectionChildren = $("#" + sourceSectionId).children();
-		var content = $(sourceSectionChildren).clone();
-		var headingPrefix = sourceHeading.text();
-		var newEntityIndex = stepHeadings.filter((_i, headingEl) => {
-			var t = getTabText(headingEl);
-			return t.substring(0, t.lastIndexOf(' ')) === headingPrefix
-		}).length
-		var title = headingPrefix + " (" + (newEntityIndex + 1) + ")";
-		content.find("input, label, div.code-items-group, div.code-items").each(function(_i, elem) {
-			var el = $(elem);
-			replaceTextInAttribute(el, "id", "$index", newEntityIndex)
-			replaceTextInAttribute(el, "name", "$index", newEntityIndex)
-			replaceTextInAttribute(el, "for", "$index", newEntityIndex)
-		});
-		initFormInputFields(content);
-		$stepsContainer.steps('insert', currentIndex, { title, content })
-		$stepsContainer.steps("setCurrentIndex", currentIndex);
-		
-		removeStepHeadingsDeleteButton();
-		addStepHeadingDeleteButton({index: currentIndex, entityName})
+		cloneStepTemplate({headingId, sourceHeading, indexNext});
+		$stepsContainer.steps("setCurrentIndex", indexNext);
 	}, function() {
 		console.log("ERROR")
 	})
@@ -723,7 +747,7 @@ var initSteps = function() {
 			} else if (sourceHeading.hasClass("form-template")) {
 				var headingPrefix = sourceHeading.text();
 				if (confirm("Create a new " + headingPrefix + "?")) {
-					cloneStepTemplate({headingId, sourceHeading, stepHeadings, currentIndex})
+					addEntityAndCloneStepTemplate({headingId, sourceHeading, indexNext: currentIndex})
 				} else {
 					$stepsContainer.steps('setCurrentIndex', priorIndex);
 				}
@@ -1037,16 +1061,20 @@ var serializeFormToJSON = function(form) {
    var o = {};
    var a = form.serializeArray();
    $.each(a, function() {
+	 if (!this.name.includes('$index')) { // skip parameters in template
 	   var key = encodeURIComponent(this.name);
 	   var value = this.value || '';
-       if (o[key]) {
-           if (!o[key].push) {
-               o[key] = [o[key]];
-           }
-           o[key].push(value);
-       } else {
-           o[key] = value;
-       }
+	   var existingValue = o[key]
+	   if (existingValue) {
+		   // multiple values: transform item in "key" into an array
+	       if (!existingValue.push) {
+	           o[key] = [existingValue];
+	       }
+	       o[key].push(value);
+	   } else {
+	       o[key] = value;
+	   }
+     }
    });
    //include unchecked checkboxes
    form.find('input[type=checkbox]:not(:checked)').each(function() {
