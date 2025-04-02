@@ -170,7 +170,7 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 };
 
 
-var sendEntityCreateOrDeleteRequest = function ({method, url, label, params, resolve, reject}) {
+var sendEntityCreateOrDeleteRequest = function ({method = "POST", url, label, params, resolve, reject}) {
 	var data = createPlacemarkUpdateRequest();
 	Object.assign(data, params)
 	if (DEBUG) {
@@ -207,12 +207,12 @@ var sendEntityCreateOrDeleteRequest = function ({method, url, label, params, res
 }
 
 var sendEntityCreateRequest = function (entityName, resolve, reject) {
-	sendEntityCreateOrDeleteRequest({ method: "POST", url: HOST + 'create-entity', params: {entityName}, 
+	sendEntityCreateOrDeleteRequest({ url: HOST + 'create-entity', params: {entityName}, 
 		label: "entity create", resolve, reject })
 }
 
 var sendEntityDeleteRequest = function (entityName, resolve, reject) {
-	sendEntityCreateOrDeleteRequest({ method: "DELETE", url: HOST + 'delete-entity', params: {entityName}, 
+	sendEntityCreateOrDeleteRequest({ url: HOST + 'delete-entity', params: {entityName}, 
 		label: "entity delete", resolve, reject })
 }
 
