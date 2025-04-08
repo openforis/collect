@@ -706,11 +706,14 @@ var deleteStepByNodeDefName = function(nodeDefName) {
 		var stepToDelete = $(stepsWithSameHeading.get(stepIndexToDelete)).children("a").first()[0];
 		if (stepToDelete) {
 			var stepToDeleteAbsoluteIndex = Number(stepToDelete.id.substring(stepToDelete.id.lastIndexOf('-') + 1));
-			var nextCurrentSelectedIndex = stepToDeleteAbsoluteIndex - 1
+			var nextCurrentSelectedIndex = stepToDeleteAbsoluteIndex - 1;
+			// change current selected step before deletion, otherwise it won't be deleted
 			$stepsContainer.steps("setCurrentIndex", nextCurrentSelectedIndex); 
+			// remove step from steps
 			$stepsContainer.steps('remove', stepToDeleteAbsoluteIndex);
 			if (stepIndexToDelete > 0) {
-				addStepHeadingDeleteButton({index: nextCurrentSelectedIndex, sourceHeading: templateSectionHeader})
+				// add step delete button to the last step with the same nodeDefName
+				addStepHeadingDeleteButton({index: nextCurrentSelectedIndex, sourceHeading: templateSectionHeader});
 			}
 		}
 	}
