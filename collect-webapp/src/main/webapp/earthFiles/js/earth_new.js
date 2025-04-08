@@ -15,6 +15,7 @@ var COLLECT_EARTH_NOT_RUNNING_STATE = "collectEarthNotRunning";
 var ERROR_STATE = "error";
 
 var $form = null; //to be initialized
+var $stepsContainer = null; //to be initialized
 var stateByInputFieldName = {};
 var lastUpdateRequest = null; //last update request sent to the server
 var lastUpdateInputFieldName = null;
@@ -305,6 +306,12 @@ var interpretJsonSaveResponse = function(json, showFeedbackMessage) {
 	if (DEBUG) {
 		log("Parsing response:")
 	}
+	if (json.deletedEntityDefName) {
+		if (DEBUG) {
+			log("Removing deleted multiple form " + json.deletedEntityDefName);
+			deleteStepByNodeDefName(json.deletedEntityDefName)
+		}
+	}
 	
 	if (DEBUG) {
 		log("1/4: Update field status cache")
@@ -330,7 +337,10 @@ var interpretJsonSaveResponse = function(json, showFeedbackMessage) {
 		log("Response parsed correctly");
 	}
 	
-	if (showFeedbackMessage) { // show feedback message
+	if (showFeedbackMessage) {
+		if (DEBUG) {
+			log("Showing feedback message");
+		}
 		if (json.success) {
 			if (isAnyErrorInForm()) {
 				var message = "<ul>";
@@ -680,17 +690,47 @@ var getSourceSectionId = function(headingId) {
 	return headingId.replace("-t-", "-p-")
 }
 
-var cloneStepTemplate = function ({headingId, sourceHeading, indexNext}) {
+var getSourceTabId = function(sectionHeadingId) {
+	return sectionHeadingId.replace('-h-', '-t-')
+}
+
+var deleteStepByNodeDefName = function(nodeDefName) {
+	var templateSectionHeader = $form.find(".steps .content h3.form-template[data-node-def-name='" + nodeDefName+ "']");
+	var templateSectionHeaderId = templateSectionHeader.attr('id');
+	var templateTabId = getSourceTabId(templateSectionHeaderId);
+	var templateTab = $("#" + templateTabId);
+	var templateTabText = templateTab.text();
+	var stepsWithSameHeading = getStepsWithSameHeadingPrefix(templateTabText)
+	var stepIndexToDelete = stepsWithSameHeading.length - 1
+	if (stepIndexToDelete >= 0) {
+		var stepToDelete = $(stepsWithSameHeading.get(stepIndexToDelete)).children("a").first()[0];
+		if (stepToDelete) {
+			var stepToDeleteAbsoluteIndex = Number(stepToDelete.id.substring(stepToDelete.id.lastIndexOf('-') + 1));
+			var nextCurrentSelectedIndex = stepToDeleteAbsoluteIndex - 1
+			$stepsContainer.steps("setCurrentIndex", nextCurrentSelectedIndex); 
+			$stepsContainer.steps('remove', stepToDeleteAbsoluteIndex);
+			if (stepIndexToDelete > 0) {
+				addStepHeadingDeleteButton({index: nextCurrentSelectedIndex, sourceHeading: templateSectionHeader})
+			}
+		}
+	}
+}
+
+var getStepsWithSameHeadingPrefix = function(headingPrefix) {
 	var stepHeadings = getStepHeadings();
+	return stepHeadings.filter((_i, headingEl) => {
+		var t = getTabText(headingEl);
+		return t.substring(0, t.lastIndexOf(' ')) === headingPrefix
+	})
+}
+
+var cloneStepTemplate = function ({headingId, sourceHeading, indexNext}) {
 	var sourceSectionId = getSourceSectionId(headingId);
 	var sourceSectionChildren = $("#" + sourceSectionId).children();
 	var content = $(sourceSectionChildren).clone();
 	var headingPrefix = sourceHeading.text();
-	var newEntityIndex = stepHeadings.filter((_i, headingEl) => {
-		var t = getTabText(headingEl);
-		return t.substring(0, t.lastIndexOf(' ')) === headingPrefix
-	}).length
-	var title = headingPrefix + " (" + (newEntityIndex + 1) + ")";
+	var newEntityIndex = getStepsWithSameHeadingPrefix(headingPrefix).length + 1 // index is 1 based
+	var title = headingPrefix + " (" + (newEntityIndex) + ")";
 	content.find("input, label, div.code-items-group, div.code-items").each(function(_i, elem) {
 		var el = $(elem);
 		replaceTextInAttribute(el, "id", "$index", newEntityIndex)
