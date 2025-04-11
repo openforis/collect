@@ -67,6 +67,6 @@ public class UIForm extends UIFormContentContainer {
 	}
 
 	private UIFormComponent getFirstChild() {
-		return getChildren().size() == 1 ? getChildren().getFirst() : null;
+		return getChildren().size() == 1 ? getChildren().get(0) : null;
 	}
 }
