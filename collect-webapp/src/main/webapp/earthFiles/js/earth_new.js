@@ -319,6 +319,11 @@ var interpretJsonSaveResponse = function(json, showFeedbackMessage) {
 	updateFieldStateCache(json.inputFieldInfoByParameterName);
 	
 	if (DEBUG) {
+		log("1a/4: Create missing multiple form steps")
+	}
+	createMissingMultipleFormSteps(json.inputFieldInfoByParameterName)
+	
+	if (DEBUG) {
 		log("2/4: Update input field status")
 	}
 	updateInputFieldsState(json.inputFieldInfoByParameterName);
@@ -395,6 +400,28 @@ var getEnumeratedEntityNestedAttributeErrorMessageLabel = function(inputField) {
 	var label = entityHeading + " [" + enumeratorHeading + " " + rowHeading + "] / " + attributeHeading;
 	return label;
 };
+
+var createMissingMultipleFormSteps = function(inputFieldInfoByParameterName) {
+	$.each(inputFieldInfoByParameterName, function(fieldName, info) {
+		var el = findById(fieldName);
+		if (el.length == 0 && fieldName.includes("[")) {
+			var fieldNameFirstPart = fieldName.substring(0, fieldName.indexOf("[") + 1);
+			var fieldNameSecondPart = fieldName.substring(fieldName.indexOf("]"));
+			var templateFieldName = fieldNameFirstPart + '$index' + fieldNameSecondPart;
+			var templateEl = findById(templateFieldName);
+			if (templateEl.length === 1) {
+				let templateSection = templateEl.closest('section');
+				var templateSectionId = templateSection.attr('id');
+				var sourceHeadingId = getSourceHeadingIdBySectionId(templateSectionId);
+				var sourceHeading = findById(sourceHeadingId);
+				var templateTabId = getSourceTabIdBySectionHeadingId(sourceHeadingId);
+				var templateTab = findById(templateTabId);
+				var templateSectionAbsoluteIndex = getStepHeadings().index(templateTab);
+				cloneStepTemplate({sourceHeading, indexNext: templateSectionAbsoluteIndex});
+			}
+		}
+	})
+}
 
 var updateInputFieldsState = function(inputFieldInfoByParameterName) {
 	if (DEBUG) {
@@ -690,14 +717,22 @@ var getSourceSectionId = function(headingId) {
 	return headingId.replace("-t-", "-p-")
 }
 
-var getSourceTabId = function(sectionHeadingId) {
+var getSourceSectionIdBySourceHeadingId = function(sourceHeadingId) {
+	return sourceHeadingId.replace("-h-", "-p-")
+}
+
+var getSourceTabIdBySectionHeadingId = function(sectionHeadingId) {
 	return sectionHeadingId.replace('-h-', '-t-')
+}
+
+var getSourceHeadingIdBySectionId = function(sectionId) {
+	return sectionId.replace('-p-', '-h-')
 }
 
 var deleteStepByNodeDefName = function(nodeDefName) {
 	var templateSectionHeader = $form.find(".steps .content h3.form-template[data-node-def-name='" + nodeDefName+ "']");
 	var templateSectionHeaderId = templateSectionHeader.attr('id');
-	var templateTabId = getSourceTabId(templateSectionHeaderId);
+	var templateTabId = getSourceTabIdBySectionHeadingId(templateSectionHeaderId);
 	var templateTab = $("#" + templateTabId);
 	var templateTabText = templateTab.text();
 	var stepsWithSameHeading = getStepsWithSameHeadingPrefix(templateTabText)
@@ -727,8 +762,9 @@ var getStepsWithSameHeadingPrefix = function(headingPrefix) {
 	})
 }
 
-var cloneStepTemplate = function ({headingId, sourceHeading, indexNext}) {
-	var sourceSectionId = getSourceSectionId(headingId);
+var cloneStepTemplate = function ({sourceHeading, indexNext}) {
+	var sourceHeadingId = sourceHeading.attr('id')
+	var sourceSectionId = getSourceSectionIdBySourceHeadingId(sourceHeadingId);
 	var sourceSectionChildren = $("#" + sourceSectionId).children();
 	var content = $(sourceSectionChildren).clone();
 	var headingPrefix = sourceHeading.text();
@@ -747,10 +783,10 @@ var cloneStepTemplate = function ({headingId, sourceHeading, indexNext}) {
 	addStepHeadingDeleteButton({index: indexNext, sourceHeading})
 }
 
-var addEntityAndCloneStepTemplate = function ({headingId, sourceHeading, indexNext}) {
+var addEntityAndCloneStepTemplate = function ({sourceHeading, indexNext}) {
 	var entityName = sourceHeading.data("nodeDefName");
 	sendEntityCreateRequest(entityName, function() {
-		cloneStepTemplate({headingId, sourceHeading, indexNext});
+		cloneStepTemplate({sourceHeading, indexNext});
 		$stepsContainer.steps("setCurrentIndex", indexNext);
 	}, function() {
 		console.log("ERROR")
@@ -790,7 +826,7 @@ var initSteps = function() {
 			} else if (sourceHeading.hasClass("form-template")) {
 				var headingPrefix = sourceHeading.text();
 				if (confirm("Create a new " + headingPrefix + "?")) {
-					addEntityAndCloneStepTemplate({headingId, sourceHeading, indexNext: currentIndex})
+					addEntityAndCloneStepTemplate({sourceHeading, indexNext: currentIndex})
 				} else {
 					$stepsContainer.steps('setCurrentIndex', priorIndex);
 				}
@@ -1143,7 +1179,7 @@ var enableSelect = function(selectName, enable) { // #elementsCover
 };
 
 var findById = function(id) {
-	var newId = id.replace(/(:|\.|\[|\]|,)/g, "\\$1");
+	var newId = id.replace(/(:|\.|\[|\]|,|\$)/g, "\\$1");
 	return $("#" + newId);
 };
 
