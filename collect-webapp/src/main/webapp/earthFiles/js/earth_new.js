@@ -414,9 +414,9 @@ var createMissingMultipleFormSteps = function(inputFieldInfoByParameterName) {
 				var templateSectionId = templateSection.attr('id');
 				var sourceHeadingId = getSourceHeadingIdBySectionId(templateSectionId);
 				var sourceHeading = findById(sourceHeadingId);
-				var templateTabId = getSourceTabIdBySectionHeadingId(sourceHeadingId);
-				var templateTab = findById(templateTabId);
-				var templateSectionAbsoluteIndex = getStepHeadings().index(templateTab);
+				var templateTabAnchorId = getSourceTabAnchorIdBySectionHeadingId(sourceHeadingId);
+				var templateTabAnchor = findById(templateTabAnchorId);
+				var templateSectionAbsoluteIndex = getStepHeadingsAnchors().index(templateTabAnchor);
 				cloneStepTemplate({sourceHeading, indexNext: templateSectionAbsoluteIndex});
 			}
 		}
@@ -520,6 +520,10 @@ var updateFieldStateCache = function(inputFieldInfoByParameterName) {
 
 var getStepHeadings = function() {
 	return $form.find(".steps .steps ul li");
+}
+
+var getStepHeadingsAnchors = function() { 
+	return getStepHeadings().find('a');
 }
 
 var getStepHeading = function(index) {
@@ -721,7 +725,7 @@ var getSourceSectionIdBySourceHeadingId = function(sourceHeadingId) {
 	return sourceHeadingId.replace("-h-", "-p-")
 }
 
-var getSourceTabIdBySectionHeadingId = function(sectionHeadingId) {
+var getSourceTabAnchorIdBySectionHeadingId = function(sectionHeadingId) {
 	return sectionHeadingId.replace('-h-', '-t-')
 }
 
@@ -732,7 +736,7 @@ var getSourceHeadingIdBySectionId = function(sectionId) {
 var deleteStepByNodeDefName = function(nodeDefName) {
 	var templateSectionHeader = $form.find(".steps .content h3.form-template[data-node-def-name='" + nodeDefName+ "']");
 	var templateSectionHeaderId = templateSectionHeader.attr('id');
-	var templateTabId = getSourceTabIdBySectionHeadingId(templateSectionHeaderId);
+	var templateTabId = getSourceTabAnchorIdBySectionHeadingId(templateSectionHeaderId);
 	var templateTab = $("#" + templateTabId);
 	var templateTabText = templateTab.text();
 	var stepsWithSameHeading = getStepsWithSameHeadingPrefix(templateTabText)
@@ -786,7 +790,8 @@ var cloneStepTemplate = function ({sourceHeading, indexNext}) {
 var addEntityAndCloneStepTemplate = function ({sourceHeading, indexNext}) {
 	var entityName = sourceHeading.data("nodeDefName");
 	sendEntityCreateRequest(entityName, function() {
-		cloneStepTemplate({sourceHeading, indexNext});
+		// cloneStepTemplate({sourceHeading, indexNext});
+		// new step created when response data is processed
 		$stepsContainer.steps("setCurrentIndex", indexNext);
 	}, function() {
 		console.log("ERROR")
