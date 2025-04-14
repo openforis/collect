@@ -551,10 +551,6 @@ var toggleStepVisibility = function(index, visible) {
 	}
 };
 
-var removeStepHeadingsDeleteButton = function() {
-	getStepHeadings().find('button').remove()
-}
-
 var addStepHeadingDeleteButton = function({index, sourceHeading}) {
 	var entityName = sourceHeading.data("nodeDefName");
 	var stepHeading = getStepHeading(index);
@@ -563,13 +559,32 @@ var addStepHeadingDeleteButton = function({index, sourceHeading}) {
 	deleteButton.on("click", () => {
 		if (confirm("Delete this " + headingPrefix + "?")) {
 			sendEntityDeleteRequest(entityName, function () {
-				
+
 			}, function () {
 				
 			})
 		}
 	})
 	stepHeading.children().first().append(deleteButton)
+}
+
+var addStepHeadingAddButtons = function() {
+	var templateSectionHeadings = $form.find(".steps .content h3.form-template");
+	templateSectionHeadings.each(function (_index, templateSectionHeading) {
+		var $templateSectionHeading = $(templateSectionHeading)
+		var entityName = $templateSectionHeading.data("nodeDefName");
+		var entityLabel = $templateSectionHeading.text();
+		var button = $('<button class="form-add-btn" data-node-def-name="' + entityName + '" title="Add"><span>+</span></button>')
+		button.on("click", () => {
+			if (confirm("Create a new " + entityLabel + "?")) {
+				addStepByNodeDefName(entityName)
+			}
+		})
+		var templateSectionHeadingId = $templateSectionHeading.attr('id');
+		var tabAnchorId = getSourceTabAnchorIdBySectionHeadingId(templateSectionHeadingId);
+		var tabAnchor = findById(tabAnchorId);
+		tabAnchor.append(button);		
+	});	
 }
 
 var showCurrentStep = function() {
@@ -733,12 +748,25 @@ var getSourceHeadingIdBySectionId = function(sectionId) {
 	return sectionId.replace('-p-', '-h-')
 }
 
+var addStepByNodeDefName = function (nodeDefName) {
+	var templateSectionHeading = findTemplateSectionHeaderByNodeDefName(nodeDefName);
+	var templateSectionHeadingId = templateSectionHeading.attr('id');
+	var templateTabAnchorId = getSourceTabAnchorIdBySectionHeadingId(templateSectionHeadingId);
+	var templateTabAnchor = findById(templateTabAnchorId);
+	var index = getStepHeadingsAnchors().index(templateTabAnchor);
+	addEntityAndCloneStepTemplate({sourceHeading: templateSectionHeading, indexNext: index})
+}
+
+var findTemplateSectionHeaderByNodeDefName = function (nodeDefName) {
+	return $form.find(".steps .content h3.form-template[data-node-def-name='" + nodeDefName+ "']");
+}
+
 var deleteStepByNodeDefName = function(nodeDefName) {
-	var templateSectionHeader = $form.find(".steps .content h3.form-template[data-node-def-name='" + nodeDefName+ "']");
+	var templateSectionHeader = findTemplateSectionHeaderByNodeDefName(nodeDefName);
 	var templateSectionHeaderId = templateSectionHeader.attr('id');
 	var templateTabId = getSourceTabAnchorIdBySectionHeadingId(templateSectionHeaderId);
 	var templateTab = $("#" + templateTabId);
-	var templateTabText = templateTab.text();
+	var templateTabText = removeSuffix(templateTab.text(), '+');
 	var stepsWithSameHeading = getStepsWithSameHeadingPrefix(templateTabText)
 	var stepIndexToDelete = stepsWithSameHeading.length - 1
 	if (stepIndexToDelete >= 0) {
@@ -783,7 +811,7 @@ var cloneStepTemplate = function ({sourceHeading, indexNext}) {
 	initFormInputFields(content);
 	$stepsContainer.steps('insert', indexNext, { title, content })
 	
-	removeStepHeadingsDeleteButton();
+	addStepHeadingAddButtons();
 	addStepHeadingDeleteButton({index: indexNext, sourceHeading})
 }
 
@@ -845,6 +873,8 @@ var initSteps = function() {
 		}
 	});
 	$stepsContainer.find("a[href='#finish']").addClass("btn-finish");
+	
+	addStepHeadingAddButtons()
 };
 
 var findFirstRelevantElementIndex = function(group, startFromIndex, reverseOrder) {
@@ -1256,4 +1286,11 @@ var replaceTextInAttribute = function (el, attrName, textToSearch, textToReplace
 	if (attrValue && attrValue.includes(textToSearch)) {
 		el.attr(attrName, attrValue.replace(textToSearch, textToReplace));
 	}
+}
+
+var removeSuffix = function (text, suffix) {
+	if (text.endsWith(suffix)) {
+		return text.substring(0, text.length - suffix.length)
+	}
+	return text
 }

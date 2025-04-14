@@ -288,3 +288,12 @@ div.actions.clearfix{
 	padding: 0;
 	line-height: 1rem;
 }
+
+.form-add-btn {
+	background: green;
+	color: white;
+	border-color: transparent;
+	margin-left: 10px;
+	padding: 2px;
+	line-height: 1.4rem;
+}
