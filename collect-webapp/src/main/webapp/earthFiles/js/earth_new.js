@@ -555,36 +555,37 @@ var addStepHeadingDeleteButton = function({index, sourceHeading}) {
 	var entityName = sourceHeading.data("nodeDefName");
 	var stepHeading = getStepHeading(index);
 	var entityLabel = sourceHeading.text();
-	var stepsWithSameHeadingPrefix = getStepsWithSameHeadingPrefix(entityLabel)
+	var stepsWithSameHeadingPrefix = getStepsWithSameHeadingPrefix(entityLabel);
 	stepsWithSameHeadingPrefix.find('button.form-delete-btn').remove();
 	
-	var deleteButton = $('<button class="form-delete-btn" data-node-def-name="' + entityName + '" title="Delete"><span>X</span></button>')
+	var deleteButton = $('<button class="form-delete-btn" data-node-def-name="' + entityName + '" title="Delete"><span>X</span></button>');
 	deleteButton.on("click", () => {
 		if (confirm("Delete this " + entityLabel + "?")) {
-			sendEntityDeleteRequest(entityName, function () {}, function () {})
+			sendEntityDeleteRequest(entityName, function () {}, function () {});
 		}
-	})
-	stepHeading.children().first().append(deleteButton)		
+	});
+	var stepHeadingAnchor = stepHeading.children().first();
+	stepHeadingAnchor.append(deleteButton);		
 }
 
 var addStepHeadingAddButtons = function() {
 	var templateSectionHeadings = $form.find(".steps .content h3.form-template");
 	templateSectionHeadings.each(function (_index, templateSectionHeading) {
-		var $templateSectionHeading = $(templateSectionHeading)
+		var $templateSectionHeading = $(templateSectionHeading);
 		var templateSectionHeadingId = $templateSectionHeading.attr('id')
 		var entityName = $templateSectionHeading.data("nodeDefName");
 		var entityLabel = $templateSectionHeading.text();
-		var button = $('<button class="form-add-btn" data-node-def-name="' + entityName + '" title="Add"><span>+</span></button>')
+		var button = $('<button class="form-add-btn" data-node-def-name="' + entityName + '" title="Add"><span>+</span></button>');
 		button.on("click", () => {
 			if (confirm("Create a new " + entityLabel + "?")) {
-				addStepByNodeDefName(entityName)
+				addStepByNodeDefName(entityName);
 			}
-		})
+		});
 		var templateSectionHeadingId = $templateSectionHeading.attr('id');
 		var tabAnchorId = getSourceTabAnchorIdBySectionHeadingId(templateSectionHeadingId);
 		var tabAnchor = findById(tabAnchorId);
-		tabAnchor.append(button);		
-		tabAnchor.closest('li').addClass("visited").removeClass("disabled");
+		tabAnchor.append(button);
+		tabAnchor.closest('li').addClass("done");
 	});	
 }
 
@@ -812,7 +813,9 @@ var cloneStepTemplate = function ({sourceHeading, indexNext}) {
 	});
 	initFormInputFields(content);
 	$stepsContainer.steps('insert', indexNext, { title, content })
-	
+	// add "step" class to all sections in steps content (not added automatically when inserting a new step)
+	$stepsContainer.find('section').addClass('step')	
+	// add action buttons
 	addStepHeadingAddButtons();
 	addStepHeadingDeleteButton({index: indexNext, sourceHeading})
 }
