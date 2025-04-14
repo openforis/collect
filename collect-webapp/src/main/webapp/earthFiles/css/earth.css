@@ -279,9 +279,8 @@ div.actions.clearfix{
   padding-left: 10px;
 }
 
-.form-delete-btn {
-	background: red;
-    color: white;
+.form-delete-btn, .form-add-btn {
+	color: white;
     border-radius: 50%;
     border-color: transparent;
 	margin-left: 10px;
@@ -289,11 +288,11 @@ div.actions.clearfix{
 	line-height: 1rem;
 }
 
+.form-delete-btn {
+	background: red;
+}
+
 .form-add-btn {
 	background: green;
-	color: white;
-	border-color: transparent;
-	margin-left: 10px;
 	padding: 2px;
-	line-height: 1.4rem;
 }

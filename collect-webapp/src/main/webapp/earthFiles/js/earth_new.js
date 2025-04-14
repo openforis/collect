@@ -554,24 +554,24 @@ var toggleStepVisibility = function(index, visible) {
 var addStepHeadingDeleteButton = function({index, sourceHeading}) {
 	var entityName = sourceHeading.data("nodeDefName");
 	var stepHeading = getStepHeading(index);
-	var headingPrefix = sourceHeading.text();
+	var entityLabel = sourceHeading.text();
+	var stepsWithSameHeadingPrefix = getStepsWithSameHeadingPrefix(entityLabel)
+	stepsWithSameHeadingPrefix.find('button.form-delete-btn').remove();
+	
 	var deleteButton = $('<button class="form-delete-btn" data-node-def-name="' + entityName + '" title="Delete"><span>X</span></button>')
 	deleteButton.on("click", () => {
-		if (confirm("Delete this " + headingPrefix + "?")) {
-			sendEntityDeleteRequest(entityName, function () {
-
-			}, function () {
-				
-			})
+		if (confirm("Delete this " + entityLabel + "?")) {
+			sendEntityDeleteRequest(entityName, function () {}, function () {})
 		}
 	})
-	stepHeading.children().first().append(deleteButton)
+	stepHeading.children().first().append(deleteButton)		
 }
 
 var addStepHeadingAddButtons = function() {
 	var templateSectionHeadings = $form.find(".steps .content h3.form-template");
 	templateSectionHeadings.each(function (_index, templateSectionHeading) {
 		var $templateSectionHeading = $(templateSectionHeading)
+		var templateSectionHeadingId = $templateSectionHeading.attr('id')
 		var entityName = $templateSectionHeading.data("nodeDefName");
 		var entityLabel = $templateSectionHeading.text();
 		var button = $('<button class="form-add-btn" data-node-def-name="' + entityName + '" title="Add"><span>+</span></button>')
@@ -584,6 +584,7 @@ var addStepHeadingAddButtons = function() {
 		var tabAnchorId = getSourceTabAnchorIdBySectionHeadingId(templateSectionHeadingId);
 		var tabAnchor = findById(tabAnchorId);
 		tabAnchor.append(button);		
+		tabAnchor.closest('li').addClass("visited").removeClass("disabled");
 	});	
 }
 
@@ -597,7 +598,7 @@ var showCurrentStep = function() {
 	stepHeading.removeClass("done");
 };
 
-var setStepsAsVisited = function(upToStepIndex) {
+var setStepsAsVisited = function(upToStepIndex = undefined) {
 	if (! upToStepIndex) {
 		upToStepIndex = getStepHeadings().length - 1;
 	}
@@ -778,6 +779,7 @@ var deleteStepByNodeDefName = function(nodeDefName) {
 			$stepsContainer.steps("setCurrentIndex", nextCurrentSelectedIndex); 
 			// remove step from steps
 			$stepsContainer.steps('remove', stepToDeleteAbsoluteIndex);
+			addStepHeadingAddButtons();
 			if (stepIndexToDelete > 0) {
 				// add step delete button to the last step with the same nodeDefName
 				addStepHeadingDeleteButton({index: nextCurrentSelectedIndex, sourceHeading: templateSectionHeader});
@@ -839,6 +841,21 @@ var initSteps = function() {
 		    next: NEXT_LABEL,
 		    previous: PREVIOUS_LABEL
 		},
+		onStepChanging: function (_event, currentIndex, nextIndex) {
+			var stepHeadings = getStepHeadings();
+			var nextStepHeading = $(stepHeadings[nextIndex]);
+			var nextHeadingId = nextStepHeading.find('a').attr('id');
+			var nextSourceHeadingId = getSourceHeadingId(nextHeadingId);
+			var nextSourceHeading = findById(nextSourceHeadingId);
+			if (nextSourceHeading.hasClass("form-template")) {
+				var finalIndex = nextIndex + (nextIndex > currentIndex ? 1: -1);
+				if (finalIndex >= 0 && finalIndex <= stepHeadings.length - 1) {
+					$stepsContainer.steps('setCurrentIndex', finalIndex);				
+				} 
+				return false;
+			}
+			return true;
+		},
 		onStepChanged : function(_event, currentIndex, priorIndex) {
 			var stepHeadings = getStepHeadings();
 			var stepHeading = $(stepHeadings[currentIndex]);
@@ -857,12 +874,7 @@ var initSteps = function() {
 				$stepsContainer.steps('setCurrentIndex', nextStepIndex);
 				currentStepIndex = nextStepIndex;
 			} else if (sourceHeading.hasClass("form-template")) {
-				var headingPrefix = sourceHeading.text();
-				if (confirm("Create a new " + headingPrefix + "?")) {
-					addEntityAndCloneStepTemplate({sourceHeading, indexNext: currentIndex})
-				} else {
-					$stepsContainer.steps('setCurrentIndex', priorIndex);
-				}
+				// it should not happen, prevented by onStepChanging
 			} else {
 				currentStepIndex = currentIndex;
 			}
