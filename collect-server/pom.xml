@@ -107,26 +107,26 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 			</plugin>
-			<plugin>
-				<groupId>io.github.swagger2markup</groupId>
-				<artifactId>swagger2markup-maven-plugin</artifactId>
-				<version>1.3.7</version>
-				<configuration>
-					<swaggerInput>${basedir}/doc/restful_api/restful_api.yaml</swaggerInput>
-					<outputFile>${project.build.directory}/generated-docs/asciidoc/RESTful_API_Doc</outputFile>
-					<config>
-						<swagger2markup.markupLanguage>ASCIIDOC</swagger2markup.markupLanguage>
-					</config>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>convertSwagger2markup</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>io.github.swagger2markup</groupId>-->
+<!--				<artifactId>swagger2markup-maven-plugin</artifactId>-->
+<!--				<version>1.3.7</version>-->
+<!--				<configuration>-->
+<!--					<swaggerInput>${basedir}/doc/restful_api/restful_api.yaml</swaggerInput>-->
+<!--					<outputFile>${project.build.directory}/generated-docs/asciidoc/RESTful_API_Doc</outputFile>-->
+<!--					<config>-->
+<!--						<swagger2markup.markupLanguage>ASCIIDOC</swagger2markup.markupLanguage>-->
+<!--					</config>-->
+<!--				</configuration>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<phase>prepare-package</phase>-->
+<!--						<goals>-->
+<!--							<goal>convertSwagger2markup</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
 		</plugins>
 	</build>
 

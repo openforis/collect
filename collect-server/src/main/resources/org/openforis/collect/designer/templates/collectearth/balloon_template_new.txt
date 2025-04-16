@@ -54,7 +54,7 @@
  	* STATIC CONSTANTS 
  	* DO NOT REMOVE THIS LINE
  	*/
-	var DEBUG = true; // if set to true, log messages will appear in a box in the bottom part of the balloon
+	var DEBUG = false; // if set to true, log messages will appear in a box in the bottom part of the balloon
  	var NEXT_ID = "$[next_id]";
  	var HOST = "$[host]";
  	

@@ -15,6 +15,7 @@ var COLLECT_EARTH_NOT_RUNNING_STATE = "collectEarthNotRunning";
 var ERROR_STATE = "error";
 
 var $form = null; //to be initialized
+var $stepsContainer = null; //to be initialized
 var stateByInputFieldName = {};
 var lastUpdateRequest = null; //last update request sent to the server
 var lastUpdateInputFieldName = null;
@@ -37,10 +38,7 @@ $(function() {
 
 	initSteps();
 	fillYears();
-	initCodeButtonGroups();
-	initDateTimePickers();
-	initBooleanButtons();
-	initializeChangeEventSaver();
+	initFormInputFields();
 	// Declares the Jquery Dialog ( The Bootstrap dialog does
 	// not work in Google Earth )
 	$("#dialogSuccess").dialog({
@@ -76,6 +74,13 @@ var updateData = function(inputField, delay) {
 var sendCreateNewRecordRequest = function() {
 	sendDataUpdateRequest(findById(ACTIVELY_SAVED_FIELD_ID), false, true);
 };
+
+var defaultBeforeSendRequest = function() {
+	$.blockUI({
+		message : null,
+		overlayCSS: { backgroundColor: 'transparent' }
+	});
+}
 
 var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, retryCount) {
 	delay = defaultIfNull(delay, 100);
@@ -121,10 +126,7 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 							message : 'Submitting data..'
 						});
 					} else {
-						$.blockUI({
-							message : null,
-							overlayCSS: { backgroundColor: 'transparent' }
-						});
+						defaultBeforeSendRequest();
 					}
 				}
 			}
@@ -134,10 +136,10 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 				log("4/4 json response received");
 			}
 			if (json.success) {
-				handleSuccessfullDataUpdateResponse(json, activelySaved, blockUI);
+				handleSuccessfullDataUpdateResponse({json, showFeedbackMessage: activelySaved, unblockWhenDone: blockUI});
 			} else {
-				handleFailureDataUpdateResponse(inputField, activelySaved, blockUI, retryCount, 
-					json.message);
+				handleFailureDataUpdateResponse({inputField, activelySaved, blockUI, retryCount, 
+					errorMessage: json.message});
 			}
 		})
 		.fail(function(xhr, textStatus, errorThrown) {
@@ -147,10 +149,10 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 					if (DEBUG) {
 						log("failed but the response is successfull: " + xhr.responseText);
 					}
-					handleSuccessfullDataUpdateResponse($.parseJSON(xhr.responseText), activelySaved, blockUI);
+					handleSuccessfullDataUpdateResponse({json: $.parseJSON(xhr.responseText), showFeedbackMessage: activelySaved, unblockWhenDone: blockUI});
 				} else {
-					handleFailureDataUpdateResponse(inputField, activelySaved, blockUI, retryCount, 
-						errorThrown, xhr, textStatus, errorThrown);
+					handleFailureDataUpdateResponse({inputField, activelySaved, blockUI, retryCount, 
+						errorMessage: errorThrown, xhr, textStatus, errorThrown});
 				}
 			}
 		})
@@ -167,6 +169,53 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 	
 	lastUpdateInputFieldName = inputFieldName;
 };
+
+
+var sendEntityCreateOrDeleteRequest = function ({method = "POST", url, label, params, resolve, reject}) {
+	var data = createPlacemarkUpdateRequest();
+	Object.assign(data, params)
+	if (DEBUG) {
+		log("1/2 sending " + label + " request");
+	}
+	$.ajax({
+		data,
+		type: method,
+		url,
+		timeout: REQUEST_TIMEOUT,
+		dataType : 'json',
+		beforeSend : defaultBeforeSendRequest
+	})
+	.done(function(json) {
+		if (DEBUG) {
+			log("2/2 json response received");
+		}
+		if (json.success) {
+			handleSuccessfullDataUpdateResponse({json});
+		} else {
+			handleFailureDataUpdateResponse({errorMessage: json.message});
+		}
+		resolve()
+	})
+	.fail(function(xhr, textStatus, errorThrown) {
+		if (DEBUG) {
+			log("2/2a error sending request");
+		}
+		reject()
+	})
+	.always(function() {
+		$.unblockUI();
+	});
+}
+
+var sendEntityCreateRequest = function (entityName, resolve, reject) {
+	sendEntityCreateOrDeleteRequest({ url: HOST + 'create-entity', params: {entityName}, 
+		label: "entity create", resolve, reject })
+}
+
+var sendEntityDeleteRequest = function (entityName, resolve, reject) {
+	sendEntityCreateOrDeleteRequest({ url: HOST + 'delete-entity', params: {entityName}, 
+		label: "entity delete", resolve, reject })
+}
 
 var isValidResponse = function(text) {
 	try {
@@ -186,7 +235,7 @@ var isSuccessfullResponse = function(text) {
 	}
 };
 
-var handleSuccessfullDataUpdateResponse = function(json, showFeedbackMessage, unblockWhenDone) {
+var handleSuccessfullDataUpdateResponse = function({json, showFeedbackMessage, unblockWhenDone}) {
 	if (DEBUG) {
 		log("data updated successfully, updating UI...");
 	}
@@ -205,7 +254,7 @@ var handleSuccessfullDataUpdateResponse = function(json, showFeedbackMessage, un
 	}
 };
 
-var handleFailureDataUpdateResponse = function(inputField, activelySaved, blockUI, retryCount, errorMessage, xhr, textStatus, errorThrown) {
+var handleFailureDataUpdateResponse = function({inputField, activelySaved, blockUI, retryCount, errorMessage, xhr, textStatus, errorThrown}) {
 	if (DEBUG) {
 		log("error updating data: " + errorMessage);
 	}
@@ -213,13 +262,14 @@ var handleFailureDataUpdateResponse = function(inputField, activelySaved, blockU
 	loadPlacemarkData(true);
 };
 
-var createPlacemarkUpdateRequest = function(inputField) {
+var createPlacemarkUpdateRequest = function(inputField = null) {
 	var values;
 	if (inputField == null) {
 		values = serializeFormToJSON($form);
 	} else {
+		var $inputField = $(inputField)
 		values = {};
-		values[encodeURIComponent($(inputField).attr('name'))] = $(inputField).val();
+		values[encodeURIComponent($inputField.attr('name'))] = $inputField.val();
 		values[encodeURIComponent(ACTIVELY_SAVED_FIELD_ID)] = findById(ACTIVELY_SAVED_FIELD_ID).val();
 		$form.find("." + EXTRA_FIELD_CLASS).each(function() {
 			var $this = $(this);
@@ -256,11 +306,22 @@ var interpretJsonSaveResponse = function(json, showFeedbackMessage) {
 	if (DEBUG) {
 		log("Parsing response:")
 	}
+	if (json.deletedEntityDefName) {
+		if (DEBUG) {
+			log("Removing deleted multiple form " + json.deletedEntityDefName);
+			deleteStepByNodeDefName(json.deletedEntityDefName)
+		}
+	}
 	
 	if (DEBUG) {
 		log("1/4: Update field status cache")
 	}
 	updateFieldStateCache(json.inputFieldInfoByParameterName);
+	
+	if (DEBUG) {
+		log("1a/4: Create missing multiple form steps")
+	}
+	createMissingMultipleFormSteps(json.inputFieldInfoByParameterName)
 	
 	if (DEBUG) {
 		log("2/4: Update input field status")
@@ -281,7 +342,10 @@ var interpretJsonSaveResponse = function(json, showFeedbackMessage) {
 		log("Response parsed correctly");
 	}
 	
-	if (showFeedbackMessage) { // show feedback message
+	if (showFeedbackMessage) {
+		if (DEBUG) {
+			log("Showing feedback message");
+		}
 		if (json.success) {
 			if (isAnyErrorInForm()) {
 				var message = "<ul>";
@@ -336,6 +400,28 @@ var getEnumeratedEntityNestedAttributeErrorMessageLabel = function(inputField) {
 	var label = entityHeading + " [" + enumeratorHeading + " " + rowHeading + "] / " + attributeHeading;
 	return label;
 };
+
+var createMissingMultipleFormSteps = function(inputFieldInfoByParameterName) {
+	$.each(inputFieldInfoByParameterName, function(fieldName, info) {
+		var el = findById(fieldName);
+		if (el.length == 0 && fieldName.includes("[")) {
+			var fieldNameFirstPart = fieldName.substring(0, fieldName.indexOf("[") + 1);
+			var fieldNameSecondPart = fieldName.substring(fieldName.indexOf("]"));
+			var templateFieldName = fieldNameFirstPart + '$index' + fieldNameSecondPart;
+			var templateEl = findById(templateFieldName);
+			if (templateEl.length === 1) {
+				let templateSection = templateEl.closest('section');
+				var templateSectionId = templateSection.attr('id');
+				var sourceHeadingId = getSourceHeadingIdBySectionId(templateSectionId);
+				var sourceHeading = findById(sourceHeadingId);
+				var templateTabAnchorId = getSourceTabAnchorIdBySectionHeadingId(sourceHeadingId);
+				var templateTabAnchor = findById(templateTabAnchorId);
+				var templateSectionAbsoluteIndex = getStepHeadingsAnchors().index(templateTabAnchor);
+				cloneStepTemplate({sourceHeading, indexNext: templateSectionAbsoluteIndex});
+			}
+		}
+	})
+}
 
 var updateInputFieldsState = function(inputFieldInfoByParameterName) {
 	if (DEBUG) {
@@ -432,8 +518,16 @@ var updateFieldStateCache = function(inputFieldInfoByParameterName) {
 	});
 };
 
+var getStepHeadings = function() {
+	return $form.find(".steps .steps ul li");
+}
+
+var getStepHeadingsAnchors = function() { 
+	return getStepHeadings().find('a');
+}
+
 var getStepHeading = function(index) {
-	var stepHeading = $form.find(".steps .steps ul li").eq(index);
+	var stepHeading = getStepHeadings().eq(index);
 	return stepHeading;
 };
 
@@ -457,6 +551,44 @@ var toggleStepVisibility = function(index, visible) {
 	}
 };
 
+var addStepHeadingDeleteButton = function({index, sourceHeading}) {
+	var entityName = sourceHeading.data("nodeDefName");
+	var stepHeading = getStepHeading(index);
+	var entityLabel = sourceHeading.text();
+	var stepsWithSameHeadingPrefix = getStepsWithSameHeadingPrefix(entityLabel);
+	stepsWithSameHeadingPrefix.find('button.form-delete-btn').remove();
+	
+	var deleteButton = $('<button class="form-delete-btn" data-node-def-name="' + entityName + '" title="Delete"><span>X</span></button>');
+	deleteButton.on("click", () => {
+		if (confirm("Delete this " + entityLabel + "?")) {
+			sendEntityDeleteRequest(entityName, function () {}, function () {});
+		}
+	});
+	var stepHeadingAnchor = stepHeading.children().first();
+	stepHeadingAnchor.append(deleteButton);		
+}
+
+var addStepHeadingAddButtons = function() {
+	var templateSectionHeadings = $form.find(".steps .content h3.form-template");
+	templateSectionHeadings.each(function (_index, templateSectionHeading) {
+		var $templateSectionHeading = $(templateSectionHeading);
+		var templateSectionHeadingId = $templateSectionHeading.attr('id')
+		var entityName = $templateSectionHeading.data("nodeDefName");
+		var entityLabel = $templateSectionHeading.text();
+		var button = $('<button class="form-add-btn" data-node-def-name="' + entityName + '" title="Add"><span>+</span></button>');
+		button.on("click", () => {
+			if (confirm("Create a new " + entityLabel + "?")) {
+				addStepByNodeDefName(entityName);
+			}
+		});
+		var templateSectionHeadingId = $templateSectionHeading.attr('id');
+		var tabAnchorId = getSourceTabAnchorIdBySectionHeadingId(templateSectionHeadingId);
+		var tabAnchor = findById(tabAnchorId);
+		tabAnchor.append(button);
+		tabAnchor.closest('li').addClass("done");
+	});	
+}
+
 var showCurrentStep = function() {
 	setStepsAsVisited(currentStepIndex);
 	var stepHeading = getStepHeading(currentStepIndex);
@@ -467,9 +599,9 @@ var showCurrentStep = function() {
 	stepHeading.removeClass("done");
 };
 
-var setStepsAsVisited = function(upToStepIndex) {
+var setStepsAsVisited = function(upToStepIndex = undefined) {
 	if (! upToStepIndex) {
-		upToStepIndex = $stepsContainer.find(".steps ul li").length - 1;
+		upToStepIndex = getStepHeadings().length - 1;
 	}
 	for (var stepIndex = 0; stepIndex <= upToStepIndex; stepIndex ++) {
 		var stepHeading = getStepHeading(stepIndex);
@@ -492,8 +624,15 @@ var updateStepsErrorFeedback = function() {
 	});
 };
 
-var initCodeButtonGroups = function() {
-	$form.find("button.code-item").click(function(event) {
+var initFormInputFields = function(parentContainer = null) {
+	initCodeButtonGroups(parentContainer);
+	initDateTimePickers(parentContainer);
+	initBooleanButtons(parentContainer);
+	initializeChangeEventSaver(parentContainer);
+}
+
+var initCodeButtonGroups = function(parentContainer = null) {
+	(parentContainer || $form).find("button.code-item").click(function(event) {
 		event.preventDefault();
 		// update hidden input field
 		var btn = $(this);
@@ -555,8 +694,8 @@ var initCodeButtonGroups = function() {
 	});
 };
 
-var initBooleanButtons = function() {
-	$('.boolean-group').each(function() {
+var initBooleanButtons = function(parentContainer = null) {
+	(parentContainer || $form).find('.boolean-group').each(function() {
 		var group = $(this);
 		var hiddenField = group.find("input[type='hidden']");
 		group.find("button").click(function() {
@@ -573,9 +712,9 @@ var initBooleanButtons = function() {
 	});
 };
 
-var initDateTimePickers = function() {
+var initDateTimePickers = function(parentContainer = null) {
 	// http://eonasdan.github.io/bootstrap-datetimepicker/
-	$('.datepicker').datetimepicker({
+	(parentContainer || $form).find('.datepicker').datetimepicker({
 		format : DATE_FORMAT
 	}).on('dp.change', function(e) {
 		var inputField = $(this).find(".form-control");
@@ -583,13 +722,94 @@ var initDateTimePickers = function() {
 		updateData(inputField);
 	});
 
-	$('.timepicker').datetimepicker({
+	(parentContainer || $form).find('.timepicker').datetimepicker({
 		format : TIME_FORMAT
 	}).on('dp.change', function(e) {
 		var inputField = $(this).find(".form-control");
 		updateData(inputField);
 	});
 };
+
+var addStepByNodeDefName = function (nodeDefName) {
+	var templateSectionHeading = findTemplateSectionHeaderByNodeDefName(nodeDefName);
+	var templateSectionHeadingId = templateSectionHeading.attr('id');
+	var templateTabAnchorId = getSourceTabAnchorIdBySectionHeadingId(templateSectionHeadingId);
+	var templateTabAnchor = findById(templateTabAnchorId);
+	var index = getStepHeadingsAnchors().index(templateTabAnchor);
+	addEntityAndCloneStepTemplate({sourceHeading: templateSectionHeading, indexNext: index})
+}
+
+var findTemplateSectionHeaderByNodeDefName = function (nodeDefName) {
+	return $form.find(".steps .content h3.form-template[data-node-def-name='" + nodeDefName+ "']");
+}
+
+var deleteStepByNodeDefName = function(nodeDefName) {
+	var templateSectionHeader = findTemplateSectionHeaderByNodeDefName(nodeDefName);
+	var templateSectionHeaderId = templateSectionHeader.attr('id');
+	var templateTabId = getSourceTabAnchorIdBySectionHeadingId(templateSectionHeaderId);
+	var templateTab = $("#" + templateTabId);
+	var templateTabText = removeSuffix(templateTab.text(), '+');
+	var stepsWithSameHeading = getStepsWithSameHeadingPrefix(templateTabText)
+	var stepIndexToDelete = stepsWithSameHeading.length - 1
+	if (stepIndexToDelete >= 0) {
+		var stepToDelete = $(stepsWithSameHeading.get(stepIndexToDelete)).children("a").first()[0];
+		if (stepToDelete) {
+			var stepToDeleteAbsoluteIndex = Number(stepToDelete.id.substring(stepToDelete.id.lastIndexOf('-') + 1));
+			var nextCurrentSelectedIndex = stepToDeleteAbsoluteIndex - 1;
+			// change current selected step before deletion, otherwise it won't be deleted
+			$stepsContainer.steps("setCurrentIndex", nextCurrentSelectedIndex); 
+			// remove step from steps
+			$stepsContainer.steps('remove', stepToDeleteAbsoluteIndex);
+			addStepHeadingAddButtons();
+			if (stepIndexToDelete > 0) {
+				// add step delete button to the last step with the same nodeDefName
+				addStepHeadingDeleteButton({index: nextCurrentSelectedIndex, sourceHeading: templateSectionHeader});
+			}
+		}
+	}
+}
+
+var getStepsWithSameHeadingPrefix = function(headingPrefix) {
+	var stepHeadings = getStepHeadings();
+	return stepHeadings.filter((_i, headingEl) => {
+		var t = getTabText(headingEl);
+		return t.substring(0, t.lastIndexOf(' ')) === headingPrefix
+	})
+}
+
+var cloneStepTemplate = function ({sourceHeading, indexNext}) {
+	var sourceHeadingId = sourceHeading.attr('id')
+	var sourceSectionId = getSourceSectionIdBySourceHeadingId(sourceHeadingId);
+	var sourceSectionChildren = $("#" + sourceSectionId).children();
+	var content = $(sourceSectionChildren).clone();
+	var headingPrefix = sourceHeading.text();
+	var newEntityIndex = getStepsWithSameHeadingPrefix(headingPrefix).length + 1 // index is 1 based
+	var title = headingPrefix + " (" + (newEntityIndex) + ")";
+	content.find("input, label, div.code-items-group, div.code-items").each(function(_i, elem) {
+		var el = $(elem);
+		replaceTextInAttribute(el, "id", "$index", newEntityIndex)
+		replaceTextInAttribute(el, "name", "$index", newEntityIndex)
+		replaceTextInAttribute(el, "for", "$index", newEntityIndex)
+	});
+	initFormInputFields(content);
+	$stepsContainer.steps('insert', indexNext, { title, content })
+	// add "step" class to all sections in steps content (not added automatically when inserting a new step)
+	$stepsContainer.find('section').addClass('step')	
+	// add action buttons
+	addStepHeadingAddButtons();
+	addStepHeadingDeleteButton({index: indexNext, sourceHeading})
+}
+
+var addEntityAndCloneStepTemplate = function ({sourceHeading, indexNext}) {
+	var entityName = sourceHeading.data("nodeDefName");
+	sendEntityCreateRequest(entityName, function() {
+		// cloneStepTemplate({sourceHeading, indexNext});
+		// new step created when response data is processed
+		$stepsContainer.steps("setCurrentIndex", indexNext);
+	}, function() {
+		console.log("ERROR")
+	})
+}
 
 var initSteps = function() {
 	$steps = $stepsContainer.steps({
@@ -604,9 +824,27 @@ var initSteps = function() {
 		    next: NEXT_LABEL,
 		    previous: PREVIOUS_LABEL
 		},
+		onStepChanging: function (_event, currentIndex, nextIndex) {
+			var stepHeadings = getStepHeadings();
+			var nextStepHeading = $(stepHeadings[nextIndex]);
+			var nextHeadingId = nextStepHeading.find('a').attr('id');
+			var nextSourceHeadingId = getStepSourceHeadingIdByTabHeadingId(nextHeadingId);
+			var nextSourceHeading = findById(nextSourceHeadingId);
+			if (nextSourceHeading.hasClass("form-template")) {
+				var finalIndex = nextIndex + (nextIndex > currentIndex ? 1: -1);
+				if (finalIndex >= 0 && finalIndex <= stepHeadings.length - 1) {
+					$stepsContainer.steps('setCurrentIndex', finalIndex);				
+				} 
+				return false;
+			}
+			return true;
+		},
 		onStepChanged : function(_event, currentIndex, priorIndex) {
-			var stepHeadings = $form.find(".steps .steps ul li");
+			var stepHeadings = getStepHeadings();
 			var stepHeading = $(stepHeadings[currentIndex]);
+			var headingId = stepHeading.find('a')[0].id
+			var sourceHeadingId = getStepSourceHeadingIdByTabHeadingId(headingId)
+			var sourceHeading = $("#" + sourceHeadingId)
 			if (stepHeading.hasClass("notrelevant")) {
 				var nextStepIndex;
 				var firstRelevantHeadingIdx = findFirstRelevantElementIndex(stepHeadings, currentIndex, currentIndex < priorIndex);
@@ -618,10 +856,8 @@ var initSteps = function() {
 				}
 				$stepsContainer.steps('setCurrentIndex', nextStepIndex);
 				currentStepIndex = nextStepIndex;
-			} else if (stepHeading.hasClass("template")) {
-				var title = 'Test'
-				var content = "Test content"
-				$stepsContainer.steps('add', { title, content })
+			} else if (sourceHeading.hasClass("form-template")) {
+				// it should not happen, prevented by onStepChanging
 			} else {
 				currentStepIndex = currentIndex;
 			}
@@ -632,6 +868,8 @@ var initSteps = function() {
 		}
 	});
 	$stepsContainer.find("a[href='#finish']").addClass("btn-finish");
+	
+	addStepHeadingAddButtons()
 };
 
 var findFirstRelevantElementIndex = function(group, startFromIndex, reverseOrder) {
@@ -865,16 +1103,16 @@ function escapeRegExp(string){
 	return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 }
 
-var initializeChangeEventSaver = function() {
+var initializeChangeEventSaver = function(parentContainer = null) {
 	// SAVING DATA WHEN DATA CHANGES
 	// Bind event to Before user leaves page with function parameter e
 	// The window onbeforeunload or onunload events do not work in Google Earth
 	// OBS! The change event is not fired for the hidden inputs when the value
 	// is updated through jQuery's val()
-	$('input[name^=collect], textarea[name^=collect], select[name^=collect], select[name^=hidden], button[name^=collect]').change(function(e) {
+	(parentContainer || $form).find('input[name^=collect], textarea[name^=collect], select[name^=collect], select[name^=hidden], button[name^=collect]').change(function(e) {
 		updateData(e.target);
 	});
-	$('input:text[name^=collect], textarea[name^=collect]').keyup(function(e) {
+	(parentContainer || $form).find('input:text[name^=collect], textarea[name^=collect]').keyup(function(e) {
 		updateData(e.target, 1500);
 	});
 };
@@ -932,16 +1170,20 @@ var serializeFormToJSON = function(form) {
    var o = {};
    var a = form.serializeArray();
    $.each(a, function() {
+	 if (!this.name.includes('$index')) { // skip parameters in template
 	   var key = encodeURIComponent(this.name);
 	   var value = this.value || '';
-       if (o[key]) {
-           if (!o[key].push) {
-               o[key] = [o[key]];
-           }
-           o[key].push(value);
-       } else {
-           o[key] = value;
-       }
+	   var existingValue = o[key]
+	   if (existingValue) {
+		   // multiple values: transform item in "key" into an array
+	       if (!existingValue.push) {
+	           o[key] = [existingValue];
+	       }
+	       o[key].push(value);
+	   } else {
+	       o[key] = value;
+	   }
+     }
    });
    //include unchecked checkboxes
    form.find('input[type=checkbox]:not(:checked)').each(function() {
@@ -967,7 +1209,7 @@ var enableSelect = function(selectName, enable) { // #elementsCover
 };
 
 var findById = function(id) {
-	var newId = id.replace(/(:|\.|\[|\]|,)/g, "\\$1");
+	var newId = id.replace(/(:|\.|\[|\]|,|\$)/g, "\\$1");
 	return $("#" + newId);
 };
 
@@ -1024,3 +1266,47 @@ var parseInteger = function(str, defaultValue) {
 		}
 	}
 };
+
+var getTabText = function (tabEl) {
+	return $(tabEl).children("a").first()
+		.clone()
+	    .children()
+	    .remove()
+	    .end()
+	    .text();
+}
+
+var replaceTextInAttribute = function (el, attrName, textToSearch, textToReplace) {
+	var attrValue = el.attr(attrName);
+	if (attrValue && attrValue.includes(textToSearch)) {
+		el.attr(attrName, attrValue.replace(textToSearch, textToReplace));
+	}
+}
+
+var removeSuffix = function (text, suffix) {
+	if (text.endsWith(suffix)) {
+		return text.substring(0, text.length - suffix.length)
+	}
+	return text
+}
+
+// steps utils
+var getStepSourceHeadingIdByTabHeadingId = function(headingId) {
+	return headingId.replace("-t-", "-h-")
+}
+
+var getStepSourceSectionIdByTabHeadingId = function(headingId) {
+	return headingId.replace("-t-", "-p-")
+}
+
+var getSourceSectionIdBySourceHeadingId = function(sourceHeadingId) {
+	return sourceHeadingId.replace("-h-", "-p-")
+}
+
+var getSourceTabAnchorIdBySectionHeadingId = function(sectionHeadingId) {
+	return sectionHeadingId.replace('-h-', '-t-')
+}
+
+var getSourceHeadingIdBySectionId = function(sectionId) {
+	return sectionId.replace('-p-', '-h-')
+}
