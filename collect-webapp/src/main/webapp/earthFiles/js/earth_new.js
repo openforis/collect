@@ -730,26 +730,6 @@ var initDateTimePickers = function(parentContainer = null) {
 	});
 };
 
-var getSourceHeadingId = function(headingId) {
-	return headingId.replace("-t-", "-h-")
-}
-
-var getSourceSectionId = function(headingId) {
-	return headingId.replace("-t-", "-p-")
-}
-
-var getSourceSectionIdBySourceHeadingId = function(sourceHeadingId) {
-	return sourceHeadingId.replace("-h-", "-p-")
-}
-
-var getSourceTabAnchorIdBySectionHeadingId = function(sectionHeadingId) {
-	return sectionHeadingId.replace('-h-', '-t-')
-}
-
-var getSourceHeadingIdBySectionId = function(sectionId) {
-	return sectionId.replace('-p-', '-h-')
-}
-
 var addStepByNodeDefName = function (nodeDefName) {
 	var templateSectionHeading = findTemplateSectionHeaderByNodeDefName(nodeDefName);
 	var templateSectionHeadingId = templateSectionHeading.attr('id');
@@ -848,7 +828,7 @@ var initSteps = function() {
 			var stepHeadings = getStepHeadings();
 			var nextStepHeading = $(stepHeadings[nextIndex]);
 			var nextHeadingId = nextStepHeading.find('a').attr('id');
-			var nextSourceHeadingId = getSourceHeadingId(nextHeadingId);
+			var nextSourceHeadingId = getStepSourceHeadingIdByTabHeadingId(nextHeadingId);
 			var nextSourceHeading = findById(nextSourceHeadingId);
 			if (nextSourceHeading.hasClass("form-template")) {
 				var finalIndex = nextIndex + (nextIndex > currentIndex ? 1: -1);
@@ -863,7 +843,7 @@ var initSteps = function() {
 			var stepHeadings = getStepHeadings();
 			var stepHeading = $(stepHeadings[currentIndex]);
 			var headingId = stepHeading.find('a')[0].id
-			var sourceHeadingId = getSourceHeadingId(headingId)
+			var sourceHeadingId = getStepSourceHeadingIdByTabHeadingId(headingId)
 			var sourceHeading = $("#" + sourceHeadingId)
 			if (stepHeading.hasClass("notrelevant")) {
 				var nextStepIndex;
@@ -1308,4 +1288,25 @@ var removeSuffix = function (text, suffix) {
 		return text.substring(0, text.length - suffix.length)
 	}
 	return text
+}
+
+// steps utils
+var getStepSourceHeadingIdByTabHeadingId = function(headingId) {
+	return headingId.replace("-t-", "-h-")
+}
+
+var getStepSourceSectionIdByTabHeadingId = function(headingId) {
+	return headingId.replace("-t-", "-p-")
+}
+
+var getSourceSectionIdBySourceHeadingId = function(sourceHeadingId) {
+	return sourceHeadingId.replace("-h-", "-p-")
+}
+
+var getSourceTabAnchorIdBySectionHeadingId = function(sectionHeadingId) {
+	return sectionHeadingId.replace('-h-', '-t-')
+}
+
+var getSourceHeadingIdBySectionId = function(sectionId) {
+	return sectionId.replace('-p-', '-h-')
 }
