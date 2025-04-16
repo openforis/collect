@@ -832,7 +832,7 @@ var initSteps = function() {
 			var nextSourceHeading = findById(nextSourceHeadingId);
 			if (nextSourceHeading.hasClass("form-template")) {
 				var finalIndex = nextIndex + (nextIndex > currentIndex ? 1: -1);
-				if (finalIndex >= 0 && finalIndex <= stepHeadings.length - 1) {
+				if (finalIndex >= 0 && finalIndex <= stepHeadings.length - 1 && !$(stepHeadings[finalIndex]).hasClass('notrelevant')) {
 					$stepsContainer.steps('setCurrentIndex', finalIndex);				
 				} 
 				return false;
