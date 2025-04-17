@@ -136,10 +136,9 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 				log("4/4 json response received");
 			}
 			if (json.success) {
-				handleSuccessfullDataUpdateResponse({json, showFeedbackMessage: activelySaved, unblockWhenDone: blockUI});
+				handleSuccessfullDataUpdateResponse(json, activelySaved, blockUI);
 			} else {
-				handleFailureDataUpdateResponse({inputField, activelySaved, blockUI, retryCount, 
-					errorMessage: json.message});
+				handleFailureDataUpdateResponse(json.message);
 			}
 		})
 		.fail(function(xhr, textStatus, errorThrown) {
@@ -149,10 +148,9 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 					if (DEBUG) {
 						log("failed but the response is successfull: " + xhr.responseText);
 					}
-					handleSuccessfullDataUpdateResponse({json: $.parseJSON(xhr.responseText), showFeedbackMessage: activelySaved, unblockWhenDone: blockUI});
+					handleSuccessfullDataUpdateResponse($.parseJSON(xhr.responseText), activelySaved, blockUI);
 				} else {
-					handleFailureDataUpdateResponse({inputField, activelySaved, blockUI, retryCount, 
-						errorMessage: errorThrown, xhr, textStatus, errorThrown});
+					handleFailureDataUpdateResponse(errorThrown);
 				}
 			}
 		})
@@ -171,16 +169,27 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 };
 
 
-var sendEntityCreateOrDeleteRequest = function ({method = "POST", url, label, params, resolve, reject}) {
+var sendEntityCreateOrDeleteRequest = function (options) {
+	var method = options.method || "POST";
+	var url = options.url;
+	var label = options.label;
+	var params = options.params;
+	var resolve = options.resolve;
+	var reject = options.reject;
+	
 	var data = createPlacemarkUpdateRequest();
-	Object.assign(data, params)
+	for (var key in params) {
+	  	if (Object.hasOwnProperty.call(params, key)) {
+  	  		data[key] = params[key];
+	  	}
+	}
 	if (DEBUG) {
 		log("1/2 sending " + label + " request");
 	}
 	$.ajax({
-		data,
+		data: data,
 		type: method,
-		url,
+		url: url,
 		timeout: REQUEST_TIMEOUT,
 		dataType : 'json',
 		beforeSend : defaultBeforeSendRequest
@@ -190,9 +199,9 @@ var sendEntityCreateOrDeleteRequest = function ({method = "POST", url, label, pa
 			log("2/2 json response received");
 		}
 		if (json.success) {
-			handleSuccessfullDataUpdateResponse({json});
+			handleSuccessfullDataUpdateResponse(json);
 		} else {
-			handleFailureDataUpdateResponse({errorMessage: json.message});
+			handleFailureDataUpdateResponse(json.message);
 		}
 		resolve()
 	})
@@ -208,13 +217,13 @@ var sendEntityCreateOrDeleteRequest = function ({method = "POST", url, label, pa
 }
 
 var sendEntityCreateRequest = function (entityName, resolve, reject) {
-	sendEntityCreateOrDeleteRequest({ url: HOST + 'create-entity', params: {entityName}, 
-		label: "entity create", resolve, reject })
+	sendEntityCreateOrDeleteRequest({ url: HOST + 'create-entity', params: {entityName: entityName}, 
+		label: "entity create", resolve: resolve, reject: reject })
 }
 
 var sendEntityDeleteRequest = function (entityName, resolve, reject) {
-	sendEntityCreateOrDeleteRequest({ url: HOST + 'delete-entity', params: {entityName}, 
-		label: "entity delete", resolve, reject })
+	sendEntityCreateOrDeleteRequest({ url: HOST + 'delete-entity', params: {entityName: entityName}, 
+		label: "entity delete", resolve: resolve, reject: reject })
 }
 
 var isValidResponse = function(text) {
@@ -235,7 +244,7 @@ var isSuccessfullResponse = function(text) {
 	}
 };
 
-var handleSuccessfullDataUpdateResponse = function({json, showFeedbackMessage, unblockWhenDone}) {
+var handleSuccessfullDataUpdateResponse = function(json, showFeedbackMessage, unblockWhenDone) {
 	if (DEBUG) {
 		log("data updated successfully, updating UI...");
 	}
@@ -254,7 +263,8 @@ var handleSuccessfullDataUpdateResponse = function({json, showFeedbackMessage, u
 	}
 };
 
-var handleFailureDataUpdateResponse = function({inputField, activelySaved, blockUI, retryCount, errorMessage, xhr, textStatus, errorThrown}) {
+var handleFailureDataUpdateResponse = function(errorMessage) {
+	// {inputField, activelySaved, blockUI, retryCount, errorMessage, xhr, textStatus, errorThrown}
 	if (DEBUG) {
 		log("error updating data: " + errorMessage);
 	}
@@ -262,7 +272,7 @@ var handleFailureDataUpdateResponse = function({inputField, activelySaved, block
 	loadPlacemarkData(true);
 };
 
-var createPlacemarkUpdateRequest = function(inputField = null) {
+var createPlacemarkUpdateRequest = function(inputField) {
 	var values;
 	if (inputField == null) {
 		values = serializeFormToJSON($form);
@@ -404,23 +414,24 @@ var getEnumeratedEntityNestedAttributeErrorMessageLabel = function(inputField) {
 var createMissingMultipleFormSteps = function(inputFieldInfoByParameterName) {
 	$.each(inputFieldInfoByParameterName, function(fieldName, info) {
 		var el = findById(fieldName);
-		if (el.length == 0 && fieldName.includes("[")) {
-			var fieldNameFirstPart = fieldName.substring(0, fieldName.indexOf("[") + 1);
+		var indexOfParenthesis = fieldName.indexOf("[");
+		if (el.length == 0 && indexOfParenthesis >= 0) {
+			var fieldNameFirstPart = fieldName.substring(0, indexOfParenthesis + 1);
 			var fieldNameSecondPart = fieldName.substring(fieldName.indexOf("]"));
 			var templateFieldName = fieldNameFirstPart + '$index' + fieldNameSecondPart;
-			var templateEl = findById(templateFieldName);
-			if (templateEl.length === 1) {
-				let templateSection = templateEl.closest('section');
+			var templateFieldEl = findById(templateFieldName);
+			if (templateFieldEl.length == 1) {
+				var templateSection = templateFieldEl.closest('section');
 				var templateSectionId = templateSection.attr('id');
 				var sourceHeadingId = getSourceHeadingIdBySectionId(templateSectionId);
 				var sourceHeading = findById(sourceHeadingId);
 				var templateTabAnchorId = getSourceTabAnchorIdBySectionHeadingId(sourceHeadingId);
 				var templateTabAnchor = findById(templateTabAnchorId);
 				var templateSectionAbsoluteIndex = getStepHeadingsAnchors().index(templateTabAnchor);
-				cloneStepTemplate({sourceHeading, indexNext: templateSectionAbsoluteIndex});
+				cloneStepTemplate({sourceHeading: sourceHeading, indexNext: templateSectionAbsoluteIndex});
 			}
 		}
-	})
+	});
 }
 
 var updateInputFieldsState = function(inputFieldInfoByParameterName) {
@@ -551,7 +562,10 @@ var toggleStepVisibility = function(index, visible) {
 	}
 };
 
-var addStepHeadingDeleteButton = function({index, sourceHeading}) {
+var addStepHeadingDeleteButton = function(options) {
+	var index = options.index
+	var sourceHeading = options.sourceHeading
+	
 	var entityName = sourceHeading.data("nodeDefName");
 	var stepHeading = getStepHeading(index);
 	var entityLabel = sourceHeading.text();
@@ -559,10 +573,8 @@ var addStepHeadingDeleteButton = function({index, sourceHeading}) {
 	stepsWithSameHeadingPrefix.find('button.form-delete-btn').remove();
 	
 	var deleteButton = $('<button class="form-delete-btn" data-node-def-name="' + entityName + '" title="Delete"><span>X</span></button>');
-	deleteButton.on("click", () => {
-		if (confirm("Delete this " + entityLabel + "?")) {
-			sendEntityDeleteRequest(entityName, function () {}, function () {});
-		}
+	deleteButton.on("click", function () {
+		sendEntityDeleteRequest(entityName, function () {}, function () {});
 	});
 	var stepHeadingAnchor = stepHeading.children().first();
 	stepHeadingAnchor.append(deleteButton);		
@@ -576,10 +588,8 @@ var addStepHeadingAddButtons = function() {
 		var entityName = $templateSectionHeading.data("nodeDefName");
 		var entityLabel = $templateSectionHeading.text();
 		var button = $('<button class="form-add-btn" data-node-def-name="' + entityName + '" title="Add"><span>+</span></button>');
-		button.on("click", () => {
-			if (confirm("Create a new " + entityLabel + "?")) {
-				addStepByNodeDefName(entityName);
-			}
+		button.on("click", function () {
+			addStepByNodeDefName(entityName);
 		});
 		var templateSectionHeadingId = $templateSectionHeading.attr('id');
 		var tabAnchorId = getSourceTabAnchorIdBySectionHeadingId(templateSectionHeadingId);
@@ -599,7 +609,7 @@ var showCurrentStep = function() {
 	stepHeading.removeClass("done");
 };
 
-var setStepsAsVisited = function(upToStepIndex = undefined) {
+var setStepsAsVisited = function(upToStepIndex) {
 	if (! upToStepIndex) {
 		upToStepIndex = getStepHeadings().length - 1;
 	}
@@ -624,14 +634,14 @@ var updateStepsErrorFeedback = function() {
 	});
 };
 
-var initFormInputFields = function(parentContainer = null) {
+var initFormInputFields = function(parentContainer) {
 	initCodeButtonGroups(parentContainer);
 	initDateTimePickers(parentContainer);
 	initBooleanButtons(parentContainer);
 	initializeChangeEventSaver(parentContainer);
 }
 
-var initCodeButtonGroups = function(parentContainer = null) {
+var initCodeButtonGroups = function(parentContainer) {
 	(parentContainer || $form).find("button.code-item").click(function(event) {
 		event.preventDefault();
 		// update hidden input field
@@ -694,7 +704,7 @@ var initCodeButtonGroups = function(parentContainer = null) {
 	});
 };
 
-var initBooleanButtons = function(parentContainer = null) {
+var initBooleanButtons = function(parentContainer) {
 	(parentContainer || $form).find('.boolean-group').each(function() {
 		var group = $(this);
 		var hiddenField = group.find("input[type='hidden']");
@@ -712,7 +722,7 @@ var initBooleanButtons = function(parentContainer = null) {
 	});
 };
 
-var initDateTimePickers = function(parentContainer = null) {
+var initDateTimePickers = function(parentContainer) {
 	// http://eonasdan.github.io/bootstrap-datetimepicker/
 	(parentContainer || $form).find('.datepicker').datetimepicker({
 		format : DATE_FORMAT
@@ -771,13 +781,16 @@ var deleteStepByNodeDefName = function(nodeDefName) {
 
 var getStepsWithSameHeadingPrefix = function(headingPrefix) {
 	var stepHeadings = getStepHeadings();
-	return stepHeadings.filter((_i, headingEl) => {
+	return stepHeadings.filter(function (_i, headingEl) {
 		var t = getTabText(headingEl);
-		return t.substring(0, t.lastIndexOf(' ')) === headingPrefix
+		return t.substring(0, t.lastIndexOf(' ')) == headingPrefix
 	})
 }
 
-var cloneStepTemplate = function ({sourceHeading, indexNext}) {
+var cloneStepTemplate = function (options) {
+	var sourceHeading = options.sourceHeading;
+	var indexNext = options.indexNext;
+	
 	var sourceHeadingId = sourceHeading.attr('id')
 	var sourceSectionId = getSourceSectionIdBySourceHeadingId(sourceHeadingId);
 	var sourceSectionChildren = $("#" + sourceSectionId).children();
@@ -792,15 +805,18 @@ var cloneStepTemplate = function ({sourceHeading, indexNext}) {
 		});
 	});
 	initFormInputFields(content);
-	$stepsContainer.steps('insert', indexNext, { title, content })
+	$stepsContainer.steps('insert', indexNext, { title: title, content: content });
 	// add "step" class to all sections in steps content (not added automatically when inserting a new step)
 	$stepsContainer.find('section').addClass('step')	
 	// add action buttons
 	addStepHeadingAddButtons();
-	addStepHeadingDeleteButton({index: indexNext, sourceHeading})
+	addStepHeadingDeleteButton({index: indexNext, sourceHeading: sourceHeading})
 }
 
-var addEntityAndCloneStepTemplate = function ({sourceHeading, indexNext}) {
+var addEntityAndCloneStepTemplate = function (options) {
+	var sourceHeading = options.sourceHeading;
+	var indexNext = options.indexNext;
+	
 	var entityName = sourceHeading.data("nodeDefName");
 	sendEntityCreateRequest(entityName, function() {
 		// cloneStepTemplate({sourceHeading, indexNext});
@@ -1103,7 +1119,7 @@ function escapeRegExp(string){
 	return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 }
 
-var initializeChangeEventSaver = function(parentContainer = null) {
+var initializeChangeEventSaver = function(parentContainer) {
 	// SAVING DATA WHEN DATA CHANGES
 	// Bind event to Before user leaves page with function parameter e
 	// The window onbeforeunload or onunload events do not work in Google Earth
@@ -1170,7 +1186,7 @@ var serializeFormToJSON = function(form) {
    var o = {};
    var a = form.serializeArray();
    $.each(a, function() {
-	 if (!this.name.includes('$index')) { // skip parameters in template
+	 if (this.name.indexOf('$index') < 0) { // skip parameters in template
 	   var key = encodeURIComponent(this.name);
 	   var value = this.value || '';
 	   var existingValue = o[key]
@@ -1278,7 +1294,7 @@ var getTabText = function (tabEl) {
 
 var replaceTextInAttribute = function (el, attrName, textToSearch, textToReplace) {
 	var attrValue = el.attr(attrName);
-	if (attrValue && attrValue.includes(textToSearch)) {
+	if (attrValue && attrValue.indexOf(textToSearch) >= 0) {
 		el.attr(attrName, attrValue.replace(textToSearch, textToReplace));
 	}
 }
