@@ -309,8 +309,8 @@ var interpretJsonSaveResponse = function(json, showFeedbackMessage) {
 	if (json.deletedEntityDefName) {
 		if (DEBUG) {
 			log("Removing deleted multiple form " + json.deletedEntityDefName);
-			deleteStepByNodeDefName(json.deletedEntityDefName)
 		}
+		deleteStepByNodeDefName(json.deletedEntityDefName)
 	}
 	
 	if (DEBUG) {
@@ -785,11 +785,11 @@ var cloneStepTemplate = function ({sourceHeading, indexNext}) {
 	var headingPrefix = sourceHeading.text();
 	var newEntityIndex = getStepsWithSameHeadingPrefix(headingPrefix).length + 1 // index is 1 based
 	var title = headingPrefix + " (" + (newEntityIndex) + ")";
-	content.find("input, label, div.code-items-group, div.code-items").each(function(_i, elem) {
+	content.find("input, select, label, div.code-items-group, div.code-items").each(function(_i, elem) {
 		var el = $(elem);
-		replaceTextInAttribute(el, "id", "$index", newEntityIndex)
-		replaceTextInAttribute(el, "name", "$index", newEntityIndex)
-		replaceTextInAttribute(el, "for", "$index", newEntityIndex)
+		["id", "name", "for", "data-parent-id-field-id"].forEach(function(attr) {
+			replaceTextInAttribute(el, attr, "$index", newEntityIndex);
+		});
 	});
 	initFormInputFields(content);
 	$stepsContainer.steps('insert', indexNext, { title, content })
@@ -832,7 +832,7 @@ var initSteps = function() {
 			var nextSourceHeading = findById(nextSourceHeadingId);
 			if (nextSourceHeading.hasClass("form-template")) {
 				var finalIndex = nextIndex + (nextIndex > currentIndex ? 1: -1);
-				if (finalIndex >= 0 && finalIndex <= stepHeadings.length - 1) {
+				if (finalIndex >= 0 && finalIndex <= stepHeadings.length - 1 && !$(stepHeadings[finalIndex]).hasClass('notrelevant')) {
 					$stepsContainer.steps('setCurrentIndex', finalIndex);				
 				} 
 				return false;
