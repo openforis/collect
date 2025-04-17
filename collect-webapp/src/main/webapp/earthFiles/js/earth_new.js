@@ -1300,8 +1300,9 @@ var replaceTextInAttribute = function (el, attrName, textToSearch, textToReplace
 }
 
 var removeSuffix = function (text, suffix) {
-	if (text.endsWith(suffix)) {
-		return text.substring(0, text.length - suffix.length)
+	var finalLength = text.length - suffix.length
+	if (text.indexOf(suffix) == finalLength) {
+		return text.substring(0, finalLength)
 	}
 	return text
 }
