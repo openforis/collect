@@ -138,6 +138,21 @@
 		</table>
 	</div>
 
+	<div id="confirm_dialog" style="display: none">
+		<table>
+			<tr>
+				<td valign="top">
+					<span class="ui-icon ui-icon-circle-check"
+						style="float: left; margin: 0 7px 70px 0;"> </span>
+				</td>
+				<td valign="top">
+					<div id="confirm_dialog_message">
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+
 	<div id="contentDiv" style="height:600px; width:400px;">
 		<div id="loadingPanel">
 			<span>Loading...</span>

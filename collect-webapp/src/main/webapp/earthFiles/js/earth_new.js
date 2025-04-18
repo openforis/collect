@@ -45,12 +45,26 @@ $(function() {
 		modal : true,
 		width : "400",
 		autoOpen : false,
+		resizable: false,
 		buttons : {
 			Ok : function() {
 				$(this).dialog("close");
 			}
 		}
 	});
+	$("#confirm_dialog").dialog({
+		modal : true,
+		width : "300",
+		autoOpen : false,
+		resizable: false,
+		buttons : {
+			Cancel : function() {
+				$(this).dialog("close");
+			}
+		},
+		title: 'Confirm',
+	});
+	
 	// SAVING DATA WHEN USER SUBMITS
 	$form.submit(function(e) {
 		e.preventDefault();
@@ -574,7 +588,9 @@ var addStepHeadingDeleteButton = function(options) {
 	
 	var deleteButton = $('<button class="form-delete-btn" data-node-def-name="' + entityName + '" title="Delete"><span>X</span></button>');
 	deleteButton.on("click", function () {
-		sendEntityDeleteRequest(entityName, function () {}, function () {});
+		showConfirm('Delete the form ' + entityLabel + "?", function () {
+			sendEntityDeleteRequest(entityName, function () {}, function () {});
+		});
 	});
 	var stepHeadingAnchor = stepHeading.children().first();
 	stepHeadingAnchor.append(deleteButton);		
@@ -589,7 +605,9 @@ var addStepHeadingAddButtons = function() {
 		var entityLabel = $templateSectionHeading.text();
 		var button = $('<button class="form-add-btn" data-node-def-name="' + entityName + '" title="Add"><span>+</span></button>');
 		button.on("click", function () {
-			addStepByNodeDefName(entityName);
+			showConfirm('Add a new ' + entityLabel + "?", function () {
+				addStepByNodeDefName(entityName);				
+			});
 		});
 		var templateSectionHeadingId = $templateSectionHeading.attr('id');
 		var tabAnchorId = getSourceTabAnchorIdBySectionHeadingId(templateSectionHeadingId);
@@ -1029,6 +1047,22 @@ var showMessage = function(message, type) {
 		title: title
 	});
 	$("#dialogSuccess").dialog("open");
+};
+
+var showConfirm = function (message, onConfirm) {
+	$('#confirm_dialog_message').html(message);
+	$("#confirm_dialog").dialog({
+		buttons : {
+			Cancel : function() {
+				$(this).dialog("close");
+			},
+			Ok: function () {
+				onConfirm();
+				$(this).dialog("close");
+			}
+		}
+	});
+	$("#confirm_dialog").dialog("open");
 };
 
 var fillDataWithJson = function(inputFieldInfoByParameterName) {
