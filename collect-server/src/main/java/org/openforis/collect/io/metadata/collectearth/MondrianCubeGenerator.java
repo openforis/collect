@@ -139,20 +139,21 @@ public class MondrianCubeGenerator {
 						if (childDef instanceof CodeAttributeDefinition && !childDef.isMultiple()) {
 							CodeAttributeDefinition codeAttr = (CodeAttributeDefinition) childDef;
 							
-							Join join = new Join(null);
-							
 							DataTable dataTable = rdbSchema.getDataTable(entityDef);
 							CodeValueFKColumn foreignKeyCodeColumn = dataTable.getForeignKeyCodeColumn(codeAttr);
-							join.leftKey = foreignKeyCodeColumn.getName();
-							
-							CodeTable codeListTable = rdbSchema.getCodeListTable(codeAttr);
-							join.rightKey = CodeListTables.getIdColumnName(rdbConfig, codeListTable.getName());;
-							
-							join.tables = Arrays.asList(
-									new Table(entityName), 
-									new Table(codeListTable.getName())
-							);
-							hierarchy.join = join;
+							if (foreignKeyCodeColumn != null) {
+								Join join = new Join(null);
+								join.leftKey = foreignKeyCodeColumn.getName();
+								
+								CodeTable codeListTable = rdbSchema.getCodeListTable(codeAttr);
+								join.rightKey = CodeListTables.getIdColumnName(rdbConfig, codeListTable.getName());;
+								
+								join.tables = Arrays.asList(
+										new Table(entityName), 
+										new Table(codeListTable.getName())
+								);
+								hierarchy.join = join;
+							}
 						}else{
 							hierarchy.table = new Table(entityName);
 						}
