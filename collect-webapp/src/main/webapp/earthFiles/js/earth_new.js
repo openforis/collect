@@ -605,9 +605,7 @@ var addStepHeadingAddButtons = function() {
 		var entityLabel = $templateSectionHeading.text();
 		var button = $('<button class="form-add-btn" data-node-def-name="' + entityName + '" title="Add"><span>+</span></button>');
 		button.on("click", function () {
-			showConfirm('Add a new ' + entityLabel + "?", function () {
-				addStepByNodeDefName(entityName);				
-			});
+			addStepByNodeDefName(entityName);
 		});
 		var templateSectionHeadingId = $templateSectionHeading.attr('id');
 		var tabAnchorId = getSourceTabAnchorIdBySectionHeadingId(templateSectionHeadingId);
@@ -647,6 +645,7 @@ var updateStepsErrorFeedback = function() {
 		var stepHeading = getStepHeading(index);
 		if (! stepHeading.hasClass("disabled")) {
 			var hasErrors = $(this).find(".form-group.has-error").length > 0;
+			console.log('===toggling error class', hasErrors)
 			stepHeading.toggleClass("error", hasErrors);
 		}
 	});
@@ -868,7 +867,14 @@ var initSteps = function() {
 				var finalIndex = nextIndex + (nextIndex > currentIndex ? 1: -1);
 				if (finalIndex >= 0 && finalIndex <= stepHeadings.length - 1 && !$(stepHeadings[finalIndex]).hasClass('notrelevant')) {
 					$stepsContainer.steps('setCurrentIndex', finalIndex);				
-				} 
+				}
+				// workaround: when returning "false", the class "error" will be added to the tab; remove it with a timeout
+				var sourceStepHeading = $(stepHeadings[currentIndex])
+				if (!sourceStepHeading.hasClass('error')) {
+					setTimeout(function () {
+						sourceStepHeading.removeClass("error")
+					}, 10);
+				}
 				return false;
 			}
 			return true;
