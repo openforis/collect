@@ -605,9 +605,7 @@ var addStepHeadingAddButtons = function() {
 		var entityLabel = $templateSectionHeading.text();
 		var button = $('<button class="form-add-btn" data-node-def-name="' + entityName + '" title="Add"><span>+</span></button>');
 		button.on("click", function () {
-			showConfirm('Add a new ' + entityLabel + "?", function () {
-				addStepByNodeDefName(entityName);				
-			});
+			addStepByNodeDefName(entityName);
 		});
 		var templateSectionHeadingId = $templateSectionHeading.attr('id');
 		var tabAnchorId = getSourceTabAnchorIdBySectionHeadingId(templateSectionHeadingId);
@@ -841,8 +839,17 @@ var addEntityAndCloneStepTemplate = function (options) {
 		// new step created when response data is processed
 		$stepsContainer.steps("setCurrentIndex", indexNext);
 	}, function() {
-		console.log("ERROR")
+		logError("Error creating new entity");
 	})
+}
+
+var isStepHeadingFormTemplate = function(index) {
+	var stepHeadings = getStepHeadings();
+	var stepHeading = $(stepHeadings[index]);
+	var headingId = stepHeading.find('a').attr('id');
+	var sourceHeadingId = getStepSourceHeadingIdByTabHeadingId(headingId);
+	var sourceHeading = findById(sourceHeadingId);
+	return sourceHeading.hasClass("form-template")
 }
 
 var initSteps = function() {
@@ -859,16 +866,19 @@ var initSteps = function() {
 		    previous: PREVIOUS_LABEL
 		},
 		onStepChanging: function (_event, currentIndex, nextIndex) {
-			var stepHeadings = getStepHeadings();
-			var nextStepHeading = $(stepHeadings[nextIndex]);
-			var nextHeadingId = nextStepHeading.find('a').attr('id');
-			var nextSourceHeadingId = getStepSourceHeadingIdByTabHeadingId(nextHeadingId);
-			var nextSourceHeading = findById(nextSourceHeadingId);
-			if (nextSourceHeading.hasClass("form-template")) {
-				var finalIndex = nextIndex + (nextIndex > currentIndex ? 1: -1);
-				if (finalIndex >= 0 && finalIndex <= stepHeadings.length - 1 && !$(stepHeadings[finalIndex]).hasClass('notrelevant')) {
-					$stepsContainer.steps('setCurrentIndex', finalIndex);				
-				} 
+			if (isStepHeadingFormTemplate(nextIndex)) {
+				var firstRelevantHeadingIdx = findFirstRelevantStepHeadingIndex(currentIndex, currentIndex > nextIndex);
+				if (firstRelevantHeadingIdx >= 0) {
+					$stepsContainer.steps('setCurrentIndex', firstRelevantHeadingIdx);
+				}
+				// workaround: when returning "false", the class "error" will be added to the tab; remove it with a timeout
+				var stepHeadings = getStepHeadings();
+				var sourceStepHeading = $(stepHeadings[currentIndex]);
+				if (!sourceStepHeading.hasClass('error')) {
+					setTimeout(function () {
+						sourceStepHeading.removeClass("error");
+					}, 10);
+				}
 				return false;
 			}
 			return true;
@@ -876,12 +886,9 @@ var initSteps = function() {
 		onStepChanged : function(_event, currentIndex, priorIndex) {
 			var stepHeadings = getStepHeadings();
 			var stepHeading = $(stepHeadings[currentIndex]);
-			var headingId = stepHeading.find('a')[0].id
-			var sourceHeadingId = getStepSourceHeadingIdByTabHeadingId(headingId)
-			var sourceHeading = $("#" + sourceHeadingId)
 			if (stepHeading.hasClass("notrelevant")) {
 				var nextStepIndex;
-				var firstRelevantHeadingIdx = findFirstRelevantElementIndex(stepHeadings, currentIndex, currentIndex < priorIndex);
+				var firstRelevantHeadingIdx = findFirstRelevantStepHeadingIndex(currentIndex, currentIndex < priorIndex);
 				if (firstRelevantHeadingIdx >= 0) {
 					nextStepIndex = firstRelevantHeadingIdx;
 				} else {
@@ -890,7 +897,7 @@ var initSteps = function() {
 				}
 				$stepsContainer.steps('setCurrentIndex', nextStepIndex);
 				currentStepIndex = nextStepIndex;
-			} else if (sourceHeading.hasClass("form-template")) {
+			} else if (isStepHeadingFormTemplate(currentIndex)) {
 				// it should not happen, prevented by onStepChanging
 			} else {
 				currentStepIndex = currentIndex;
@@ -906,14 +913,16 @@ var initSteps = function() {
 	addStepHeadingAddButtons()
 };
 
-var findFirstRelevantElementIndex = function(group, startFromIndex, reverseOrder) {
-	var idx = reverseOrder ? startFromIndex - 1 : startFromIndex + 1;
-	while (reverseOrder ? idx >= 0 : idx < group.length) {
-		var el = $(group[idx]);
-		if (! el.hasClass("notrelevant")) {
+var findFirstRelevantStepHeadingIndex = function(startFromIndex, reverseOrder) {
+	var stepHeadings = getStepHeadings();
+	var offset = reverseOrder ? -1 : 1;
+	var idx = startFromIndex + offset;
+	while (reverseOrder ? idx >= 0 : idx < stepHeadings.length) {
+		var el = $(stepHeadings[idx]);
+		if (!el.hasClass("notrelevant") && !isStepHeadingFormTemplate(idx)) {
 			return idx;
 		}
-		idx = reverseOrder ? idx - 1 : idx + 1;
+		idx = idx + offset;
 	}
 	return -1;
 };
