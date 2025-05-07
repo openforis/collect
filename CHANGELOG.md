@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.100] - 2025-05-08
+### Added
+- Collect Earth: added 0.1ha plot area option;
+
+## [4.0.99] - 2025-05-06
+### Fixed
+- Collect Earth multiple entity forms: layout improvements;
+
+## [4.0.98] - 2025-04-25
+### Added
+- Support multiple entity (forms) in Collect Earth surveys;
+
 ## [4.0.97] - 2024-09-17
 ### Fixed
 - Fixed error starting up Collect control panel;

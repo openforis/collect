@@ -94,6 +94,7 @@
 					<combobox rows="1"
 						selectedItem="@load(fx.collectEarthPlotArea) @save(fx.collectEarthPlotArea)"
 						onChange="@command('applyChanges')">
+						<comboitem label="0.1 ha" value="0_1" />
 						<comboitem label="0.25 ha" value="0_25" />
 						<comboitem label="0.50 ha" value="0_5" />
 						<comboitem label="1 ha" value="1" />
