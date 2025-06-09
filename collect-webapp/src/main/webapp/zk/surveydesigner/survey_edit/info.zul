@@ -124,82 +124,6 @@
 			visible="@load(vm.collectEarthSurvey)">
 			<caption
 				label="${labels.survey.collect_earth.other_settings.$}" />
-			<hlayout style="padding: 10px">
-
-				<fieldErrorHandler
-					message="@load(vmsgs['bingMapsKey'])">
-					<label
-						use="org.openforis.collect.designer.component.FieldLabel"
-						value="${labels.survey.collect_earth.other_settings.bing_maps}" />
-				</fieldErrorHandler>
-				<fieldErrorHandler
-					message="@load(vmsgs['bingMapsKey'])">
-					<textbox width="600px" value="@bind(fx.bingMapsKey)"
-						onChange="@command('applyChanges')" />
-				</fieldErrorHandler>
-
-				<button sclass="icon"
-					tooltiptext="${labels.survey.collect_earth.other_settings.bing_maps_tooltip}"
-					href="http://www.bingmapsportal.com" target="_blank"
-					image="/assets/images/info-small.png" />
-			</hlayout>
-<!--
-			<hlayout style="padding: 10px">
-
-				<fieldErrorHandler
-					message="@load(vmsgs['planetMapsKey'])">
-					<label
-						use="org.openforis.collect.designer.component.FieldLabel"
-						value="${labels.survey.collect_earth.other_settings.planet_maps}" />
-				</fieldErrorHandler>
-				<fieldErrorHandler
-					message="@load(vmsgs['planetMapsKey'])">
-					<textbox width="350px" value="@bind(fx.planetMapsKey)"
-						onChange="@command('applyChanges')" />
-				</fieldErrorHandler>
-
-				<button sclass="icon"
-					tooltiptext="${labels.survey.collect_earth.other_settings.planet_maps_tooltip}"
-					href="https://www.planet.com" target="_blank"
-					image="/assets/images/info-small.png" />
-			</hlayout>
--->
-			<hlayout style="padding: 10px">
-
-				<fieldErrorHandler
-					message="@load(vmsgs['openBingMaps'])">
-					<label
-						value="${labels.survey.collect_earth.other_settings.open_bing_maps}:" />
-					<checkbox
-						checked="@load(fx.openBingMaps eq true) @save(fx.openBingMaps)"
-						onCheck="@command('applyChanges')" />
-				</fieldErrorHandler>
-
-				<space width="30px" />
-
-				<fieldErrorHandler
-					message="@load(vmsgs['openPlanetMaps'])">
-					<label
-						value="${labels.survey.collect_earth.other_settings.open_planet_maps}:" />
-					<checkbox
-						checked="@load(fx.openPlanetMaps eq true) @save(fx.openPlanetMaps)"
-						onCheck="@command('applyChanges')" />
-				</fieldErrorHandler>
-
-				<space width="30px" />
-
-				<fieldErrorHandler
-					message="@load(vmsgs['openYandexMaps'])">
-					<label
-						value="${labels.survey.collect_earth.other_settings.open_yandex_maps}:" />
-					<checkbox
-						checked="@load(fx.openYandexMaps eq true) @save(fx.openYandexMaps)"
-						onCheck="@command('applyChanges')" />
-				</fieldErrorHandler>
-
-				<space width="30px" />
-
-			</hlayout>
 
 			<hlayout style="padding: 10px">
 				<fieldErrorHandler
@@ -247,18 +171,7 @@
 
 			<hlayout style="padding: 10px">
 
-				<fieldErrorHandler
-					message="@load(vmsgs['openGEECodeEditor'])">
-					<label
-						value="${labels.survey.collect_earth.other_settings.open_gee_code_editor}:" />
-					<checkbox
-						checked="@load(fx.openGEECodeEditor eq true) @save(fx.openGEECodeEditor)"
-						onCheck="@command('applyChanges')" />
-				</fieldErrorHandler>
-
-				<space width="30px" />
-
-				<fieldErrorHandler
+			    <fieldErrorHandler
 					message="@load(vmsgs['openGEEApp'])">
 					<label
 						value="${labels.survey.collect_earth.other_settings.open_gee_app}:" />
@@ -266,18 +179,7 @@
 						checked="@load(fx.openGEEApp eq true) @save(fx.openGEEApp)"
 						onCheck="@command('applyChanges')" />
 				</fieldErrorHandler>
-
-				<space width="30px" />
-
-				<fieldErrorHandler
-					message="@load(vmsgs['openGEEExplorer'])">
-					<label
-						value="${labels.survey.collect_earth.other_settings.open_gee_explorer}:" />
-					<checkbox
-						checked="@load(fx.openGEEExplorer eq true) @save(fx.openGEEExplorer)"
-						onCheck="@command('applyChanges')" />
-				</fieldErrorHandler>
-
+				
 			</hlayout>
 
 			<hlayout>
@@ -289,7 +191,7 @@
 				</fieldErrorHandler>
 				<fieldErrorHandler
 					message="@load(vmsgs['extraMapUrl'])">
-					<textbox width="350px" value="@bind(fx.extraMapUrl)"
+					<textbox width="550px" value="@bind(fx.extraMapUrl)"
 						placeholder="${labels.survey.collect_earth.other_settings.extra_map_url_placeholder}"
 						onChange="@command('applyChanges')" />
 				</fieldErrorHandler>
