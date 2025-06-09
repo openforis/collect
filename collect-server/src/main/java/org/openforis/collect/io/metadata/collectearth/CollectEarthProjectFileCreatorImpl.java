@@ -161,16 +161,8 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 			p.put("number_of_sampling_points_in_plot", String.valueOf(survey.getAnnotations().getCollectEarthSamplePoints()));
 			p.put("inner_point_side", "2");
 			p.put("ui_language", language);
-			p.put("bing_maps_key", getBingMapsKey(survey));
-			p.put("open_bing_maps", isBingMapsEnabled(survey));
-			p.put("open_earth_map", isEarthMapEnabled(survey));
-	//		p.put("planet_maps_key", getPlanetMapsKey(survey));
-			p.put("open_planet_maps", isPlanetMapsEnabled(survey));
-			p.put("open_yandex_maps", isYandexMapsEnabled(survey));
-			p.put("open_earth_engine", isGEEExplorerEnabled(survey));
 			p.put("open_gee_app", isGEEAppEnabled(survey));
 			p.put("open_maxar_securewatch", isSecureWatchEnabled(survey));
-			p.put("open_gee_playground", isGEECodeEditorEnabled(survey));
 			p.put("open_street_view", isStreetViewEnabled(survey));
 			p.put("extra_map_url", StringUtils.trimToEmpty(getExtraMapUrl(survey)));
 			p.put("coordinates_reference_system", getSRSUsed(survey));
@@ -198,49 +190,9 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		return spatialReferenceSystems.get(0).getId();
 	}
 
-	private String getBingMapsKey(CollectSurvey survey){
-		CollectAnnotations annotations = survey.getAnnotations();
-		return annotations.getBingMapsKey();
-	}
-/*
-	private String getPlanetMapsKey(CollectSurvey survey){
-		CollectAnnotations annotations = survey.getAnnotations();
-		return annotations.getPlanetMapsKey();
-	}
-*/
 	private String getExtraMapUrl(CollectSurvey survey){
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.getExtraMapUrl();
-	}
-
-	private String isBingMapsEnabled(CollectSurvey survey){
-		CollectAnnotations annotations = survey.getAnnotations();
-		return annotations.isBingMapsEnabled()?"true":"false";
-	}
-
-	private String isEarthMapEnabled(CollectSurvey survey){
-		CollectAnnotations annotations = survey.getAnnotations();
-		return annotations.isEarthMapEnabled()?"true":"false";
-	}
-
-	private String isPlanetMapsEnabled(CollectSurvey survey){
-		CollectAnnotations annotations = survey.getAnnotations();
-		return annotations.isPlanetMapsEnabled()?"true":"false";
-	}
-
-	private String isYandexMapsEnabled(CollectSurvey survey){
-		CollectAnnotations annotations = survey.getAnnotations();
-		return annotations.isYandexMapsEnabled()?"true":"false";
-	}
-
-	private String isGEEExplorerEnabled(CollectSurvey survey){
-		CollectAnnotations annotations = survey.getAnnotations();
-		return annotations.isGEEExplorerEnabled()?"true":"false";
-	}
-
-	private String isGEECodeEditorEnabled(CollectSurvey survey){
-		CollectAnnotations annotations = survey.getAnnotations();
-		return annotations.isGEECodeEditorEnabled()?"true":"false";
 	}
 
 	private String isGEEAppEnabled(CollectSurvey survey){

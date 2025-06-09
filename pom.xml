@@ -256,11 +256,11 @@
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.12</version>
+				<version>1.6.14</version>
 				<extensions>true</extensions>
 				<configuration>
-					<serverId>ossrh</serverId>
-					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<serverId>ossrh-staging-api</serverId>
+					<nexusUrl>https://ossrh-staging-api.central.sonatype.com</nexusUrl>
 					<stagingProgressTimeoutMinutes>120</stagingProgressTimeoutMinutes>
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
 				</configuration>
