@@ -27,7 +27,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<openforis.commons.version>0.1.34</openforis.commons.version>
 		<spring.version>5.3.27</spring.version>
-		<spring-security.version>5.8.3</spring-security.version>
+		<spring-security.version>5.8.11</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>
 		<log4j.version>2.20.0</log4j.version>
 		<slf4j.version>1.7.36</slf4j.version>
