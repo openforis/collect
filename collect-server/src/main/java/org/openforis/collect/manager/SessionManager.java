@@ -46,9 +46,10 @@ public class SessionManager {
 		String sessionId = session.getId();
 		SessionState sessionState = new SessionState(sessionId);
 		if (CollectConfiguration.isDevelopmentMode()) {
-			sessionState.setUser(userManager.loadAdminUser());
+//			sessionState.setUser(userManager.loadAdminUser());
 //			sessionState.setUser(userManager.loadByUserName("view"));
-//			sessionState.setUser(userManager.loadByUserName("entry"));
+//			sessionState.setUser(userManager.loadByUserName("editor"));
+			sessionState.setUser(userManager.loadByUserName("cleanser"));
 		}
 		session.setAttribute(SessionState.SESSION_ATTRIBUTE_NAME, sessionState);
 	}

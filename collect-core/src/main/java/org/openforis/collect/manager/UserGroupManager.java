@@ -43,6 +43,8 @@ public interface UserGroupManager extends ItemManager<UserGroup, Integer> {
 	
 	Map<String, String> getQualifiers(int userGroupId, int userId);
 	
+	Map<String, String> getAllApplicableQualifiers(int surveyUserGroupId, int mostSpecificUserGroupId);
+	
 	void associateResource(int userGroupId, String resourceType, String resourceId);
 	
 	void disassociateResource(int userGroupId, String resourceType, String resourceId);
