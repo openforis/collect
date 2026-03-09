@@ -1073,7 +1073,8 @@ public class RecordController extends BasicController implements Serializable {
 			rootEntityId = survey.getSchema().getFirstRootEntityDefinition().getId();
 		}
 
-		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(survey.getUserGroupId(), user.getId());
+		Integer surveyUserGroupId = survey.getUserGroupId();
+		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyUserGroupId, user.getId());
 
 		RecordFilter recordFilter = new RecordFilter(survey);
 		recordFilter.setRootEntityId(rootEntityId);
@@ -1083,7 +1084,18 @@ public class RecordController extends BasicController implements Serializable {
 			recordFilter.setOwnerId(user.getId());
 		}
 		if (user.getRole() != UserRole.ADMIN) {
-			Map<String, String> qualifiers = userGroupManager.getQualifiers(survey.getUserGroupId(), user.getId());
+			Integer mostSpecificGroupId = userInGroup.getGroupId();
+			Map<String, String> qualifiers = new HashMap<String, String>();
+			Integer currentGroupId = mostSpecificGroupId;
+			while (currentGroupId != null) {
+				UserGroup group = userGroupManager.loadById(currentGroupId);
+				Map<String, String> groupQualifiers = group.getQualifiersByName();
+				qualifiers.putAll(groupQualifiers);
+				if (currentGroupId == surveyUserGroupId) {
+					break;
+				}
+				currentGroupId = group.getParentId();
+			}
 			if (!qualifiers.isEmpty()) {
 				recordFilter.setQualifiersByName(qualifiers);
 			}
