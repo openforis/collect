@@ -317,6 +317,22 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		UserGroup associatedGroup = loadById(userInGroup.getGroupId());
 		return associatedGroup.getQualifiersByName();
 	}
+	
+	@Override
+	public Map<String, String> getAllApplicableQualifiers(int surveyUserGroupId, int mostSpecificUserGroupId) {
+		Map<String, String> qualifiers = new HashMap<String, String>();
+		Integer currentGroupId = mostSpecificUserGroupId;
+		while (currentGroupId != null) {
+			UserGroup group = loadById(currentGroupId);
+			Map<String, String> groupQualifiers = group.getQualifiersByName();
+			qualifiers.putAll(groupQualifiers);
+			if (currentGroupId == surveyUserGroupId) {
+				break;
+			}
+			currentGroupId = group.getParentId();
+		}
+		return qualifiers;
+	}
 
 	private List<UserGroup> fillLazyLoadedFields(List<UserGroup> groups) {
 		for (UserGroup group : groups) {

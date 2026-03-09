@@ -1085,17 +1085,7 @@ public class RecordController extends BasicController implements Serializable {
 		}
 		if (user.getRole() != UserRole.ADMIN) {
 			Integer mostSpecificGroupId = userInGroup.getGroupId();
-			Map<String, String> qualifiers = new HashMap<String, String>();
-			Integer currentGroupId = mostSpecificGroupId;
-			while (currentGroupId != null) {
-				UserGroup group = userGroupManager.loadById(currentGroupId);
-				Map<String, String> groupQualifiers = group.getQualifiersByName();
-				qualifiers.putAll(groupQualifiers);
-				if (currentGroupId == surveyUserGroupId) {
-					break;
-				}
-				currentGroupId = group.getParentId();
-			}
+			Map<String, String> qualifiers = userGroupManager.getAllApplicableQualifiers(surveyUserGroupId, mostSpecificGroupId);
 			if (!qualifiers.isEmpty()) {
 				recordFilter.setQualifiersByName(qualifiers);
 			}
