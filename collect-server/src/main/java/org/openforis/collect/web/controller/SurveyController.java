@@ -633,7 +633,7 @@ public class SurveyController extends BasicController {
 	public static class SurveyCreationParameters {
 
 		public enum TemplateType {
-			BLANK, BIOPHYSICAL, COLLECT_EARTH, COLLECT_EARTH_IPCC,
+			BLANK, BIOPHYSICAL, COLLECT_EARTH, COLLECT_EARTH_IPCC, COLLECT_EARTH_MULTIPURPOSE
 			// SOCIOECONOMIC,
 		}
 

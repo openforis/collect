@@ -67,6 +67,7 @@ public class SurveyService {
 		switch (templateType) {
 		case COLLECT_EARTH:
 		case COLLECT_EARTH_IPCC:
+		case COLLECT_EARTH_MULTIPURPOSE:
 			target = SurveyTarget.COLLECT_EARTH;
 			break;
 		default:

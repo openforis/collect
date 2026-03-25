@@ -1,0 +1,3448 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<survey lastId="2111206" created="2026-03-25T18:10:48.690+01:00" modified="2026-03-25T18:34:33.812+01:00" collectearth:bingKey="AjVg2KjkXqNtIcnLTZfIwahJATb-LGJigDTj1eCHBah5BTTgWU8rBQD0cTC8-6IA" collectearth:openEarthMap="true" collectearth:plotarea="0.1" collectearth:openBingMaps="true" collectearth:samplepoints="1" collect:target="CE" collect:collectVersion="4.0.104" xsi:schemaLocation="http://www.openforis.org/idml/3.0  &#9;&#9;https://raw.github.com/openforis/ollect/master/collect-core/src/main/resources/idml3.xsd       &#9;&#9;http://www.openforis.org/collect/3.0/ui  &#9;&#9;https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd" xmlns="http://www.openforis.org/idml/3.0" xmlns:collect="http://www.openforis.org/collect/3.0/collect" xmlns:ui="http://www.openforis.org/collect/3.0/ui" xmlns:collectearth="http://www.openforis.org/collect/3.0/collectearth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <project xml:lang="es">PLANTILLA - IPCC AFOLU 2000-2023 (cambiar nombre)</project>
+  <project xml:lang="pt">MODELO - IPCC AFOLU 2000-2023 (alterar nome)</project>
+  <project xml:lang="fr">MODÈLE - IPCC AFOLU 2000-2023 (changer le nom)</project>
+  <project>Template - ART-TREES + UNFCCC RL + IPCC AFOLU</project>
+  <uri>http://www.openforis.org/idm/multipurpose_survey_template_v1</uri>
+  <description xml:lang="fr">Il s'agit de l'enquête standard qui devrait être utilisée pour les évaluations des données d'activité afin de se conformer aux lignes directrices proposées par le GIEC pour la représentation cohérente des terres.
+
+Vous pouvez ajouter d'autres questions à l'enquête ou modifier les codes des questions à choix multiples (à l'exception des catégories d'utilisation des terres et des conversions qui ne doivent pas être modifiées. Vous devez adapter les subdivisions d'utilisation des terres à votre situation nationale).
+
+Cette enquête comprend des attributs calculés (qui sont traités par Collect au fur et à mesure que vous remplissez les données du questionnaire) qui vous aident à reconstruire la série temporelle complète d'utilisation des terres de chaque parcelle.
+
+Le résultat de cette enquête est directement exportable vers l'outil d'inventaire des gaz à effet de serre du GIEC.
+
+En savoir plus sur les Lignes directrices du GIEC : https://www.ipcc-nggip.iges.or.jp/public/2006gl/french/pdf/4_Volume4/V4_03_Ch3_Representation.pdf</description>
+  <description xml:lang="pt">Este é o levantamento padrão que deve ser usado para avaliações de dados de atividades para cumprir com as diretrizes propostas do IPCC para a Representação Consistente de Terras.
+
+Você pode adicionar mais perguntas à questionário ou modificar os códigos nas perguntas de múltipla escolha (exceto para as categorias de Uso do Solo e conversões que não devem ser alteradas. Você deve adaptar as Subdivisões de Uso do Solo às suas circunstâncias nacionais).
+
+Este questionário inclui atributos calculados (que são processados ​​pelo Collect à medida que você preenche os dados no questionário) que ajudam a reconstruir a Série Temporal de Uso da Terra completa de cada parcela.
+
+O resultado deste questionário pode ser exportado diretamente para o IPCC Green House Gas Inventory Tool.
+
+Mais sobre as Diretrizes do IPCC:  https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/4_Volume4/V4_03_Ch3_Representation.pdf</description>
+  <description xml:lang="es">Esta es la encuesta estándar que debe usarse para las evaluaciones de datos de actividad para cumplir con las guías propuestas por el IPCC para la Representación Coherente de las Tierras.
+
+Puede agregar más preguntas a la encuesta o modificar los códigos en las preguntas de opción múltiple (a excepción de las categorías y conversiones de Uso de la tierra que no deben cambiarse. Debe adaptar las Subdivisiones de uso de la tierra a sus circunstancias nacionales).
+
+Este cuestionario incluye atributos calculados (que son procesados ​​por Recopilar a medida que completa los datos en el cuestionario) que lo ayudan a reconstruir la serie temporal completa del uso de la tierra de cada parcela.
+
+El resultado de esta encuesta se puede exportar directamente a la herramienta Inventario de gases de efecto invernadero del IPCC.
+
+Ver guía del IPCC : https://www.ipcc-nggip.iges.or.jp/public/2006gl/spanish/pdf/4_Volume4/V4_03_Ch3_Representation.pdf</description>
+  <description>This survey has been designed to collect reference data compliant with different reporting frameworks (e.g. IPCC guidelines, ART-TREES requirements and for UNFCCC reporting). 
+Any change should be documented and justified, considering national circumstances.</description>
+  <language>en</language>
+  <language>fr</language>
+  <language>pt</language>
+  <language>es</language>
+  <applicationOptions>
+    <options type="ui">
+<n0:tabSet name="plot_tab_set" xmlns:n0="http://www.openforis.org/collect/3.0/ui">
+  <n0:tab name="tab_63365">
+    <n0:label>LU &lt;END YEAR&gt;</n0:label>
+    <n0:label xml:lang="fr">UT 2022</n0:label>
+    <n0:label xml:lang="es">UT 2023</n0:label>
+    <n0:label xml:lang="pt">UT 2023</n0:label>
+  </n0:tab>
+  <n0:tab name="tab_2066549">
+    <n0:label>Change</n0:label>
+  </n0:tab>
+  <n0:tab name="tab_10007">
+    <n0:label>Data coming from the CSV</n0:label>
+    <n0:label xml:lang="fr">Info a partir du CSV</n0:label>
+    <n0:label xml:lang="es">Datos provenientes del CSV</n0:label>
+    <n0:label xml:lang="pt">Dados provenientes do CSV</n0:label>
+  </n0:tab>
+  <n0:tab name="tab_2012574">
+    <n0:label>CE Internal Attributes</n0:label>
+    <n0:label xml:lang="fr">Attributs internes CE</n0:label>
+    <n0:label xml:lang="es">Atributos internos CE</n0:label>
+    <n0:label xml:lang="pt">Atributos internos do CE</n0:label>
+  </n0:tab>
+  <n0:tab name="tab_2065254">
+    <n0:label>Data quality</n0:label>
+  </n0:tab>
+</n0:tabSet>
+    </options>
+  </applicationOptions>
+  <codeLists>
+    <list id="35" name="land_uses">
+      <label type="item" xml:lang="fr">Utilisation des terres</label>
+      <label type="list">Land Uses</label>
+      <label type="item" xml:lang="es">Usos de la tierra</label>
+      <label type="item">IPCC Land Use representation Categories/Subdivisions</label>
+      <description>Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
+
+This codelist represents the Categories and Subdivisions (the conversions are defined in the land_use_conversions codelist ) necessary to classify each of the plots.
+
+The category level is fixed, every survey should use the six IPCC categories without modifying them.
+
+The second level, subdivisions, should be adapted to the specific land-uses of each country.
+
+The categories (Forest/Settlement/Cropland/Grassland/Wetland/Other) are FIXED AND SHOULD NOT BE MODIFIED. DO NOT MODIFY THE CODES EITHER (F/C/G/S/W/O as this is important to calculate the conversion classes). You can modify the labels if they do not fit your language.
+
+DO NOT MODIFY THE CATEGORY/SUBDIVISON structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do the calculations of the yearly changes will not work.
+
+SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representation</description>
+      <description xml:lang="fr">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
+
+This codelist represents the Categories and Subdivisions (the conversions are defined in the land_use_conversions codelist ) necessary to classify each of the plots.
+
+The category level is fixed, every survey should use the six IPCC categories without modifying them.
+
+The second level, subdivisions, should be adapted to the specific land-uses of each country.
+
+The categories (Forest/Settlement/Cropland/Grassland/Wetland/Other) are FIXED AND SHOULD NOT BE MODIFIED. DO NOT MODIFY THE CODES EITHER (F/C/G/S/W/O as this is important to calculate the conversion classes). You can modify the labels if they do not fit your language.
+
+DO NOT MODIFY THE CATEGORY/SUBDIVISON structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do the calculations of the yearly changes will not work.
+
+SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representation</description>
+      <description xml:lang="pt">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
+
+This codelist represents the Categories and Subdivisions (the conversions are defined in the land_use_conversions codelist ) necessary to classify each of the plots.
+
+The category level is fixed, every survey should use the six IPCC categories without modifying them.
+
+The second level, subdivisions, should be adapted to the specific land-uses of each country.
+
+The categories (Forest/Settlement/Cropland/Grassland/Wetland/Other) are FIXED AND SHOULD NOT BE MODIFIED. DO NOT MODIFY THE CODES EITHER (F/C/G/S/W/O as this is important to calculate the conversion classes). You can modify the labels if they do not fit your language.
+
+DO NOT MODIFY THE CATEGORY/SUBDIVISON structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do the calculations of the yearly changes will not work.
+
+SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representation</description>
+      <description xml:lang="es">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
+
+This codelist represents the Categories and Subdivisions (the conversions are defined in the land_use_conversions codelist ) necessary to classify each of the plots.
+
+The category level is fixed, every survey should use the six IPCC categories without modifying them.
+
+The second level, subdivisions, should be adapted to the specific land-uses of each country.
+
+The categories (Forest/Settlement/Cropland/Grassland/Wetland/Other) are FIXED AND SHOULD NOT BE MODIFIED. DO NOT MODIFY THE CODES EITHER (F/C/G/S/W/O as this is important to calculate the conversion classes). You can modify the labels if they do not fit your language.
+
+DO NOT MODIFY THE CATEGORY/SUBDIVISON structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do the calculations of the yearly changes will not work.
+
+SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representation</description>
+      <codingScheme scope="local" />
+      <hierarchy>
+        <level name="use" />
+        <level name="subdivision" />
+      </hierarchy>
+      <items>
+        <item id="2070602">
+          <code>F</code>
+          <label>Forest</label>
+          <label xml:lang="fr">Terres forestières</label>
+          <item id="2070603">
+            <code>Forest_type1</code>
+            <label>&lt;Forest type I&gt;</label>
+            <label xml:lang="fr">Forêt dense</label>
+            <description xml:lang="fr">Forêt dense humide semi-décidue et forêt dense sèche &gt; 80% de couverture arborée</description>
+          </item>
+          <item id="2070604">
+            <code>Forest_type2</code>
+            <label>&lt;Forest type II&gt;</label>
+            <label xml:lang="fr">Forêt claire et savane boisée </label>
+            <description xml:lang="fr">Forêt claire désigne une forêt ouverte avec des arbres espacés et une canopée clairsemée avec un couvert arboré compris entre 30 % et 80 %. Savane boisée décrit une savane boisée avec un couvert arboré significatif mais pas dense, créant un mélange d'arbres et de zones herbeuses ouvertes où coexistent les deux types de végétation, avec un couvert arboré également compris entre 30 % et 80 %.</description>
+          </item>
+          <item id="2070608">
+            <code>Plantation</code>
+            <label>Forest plantation</label>
+            <label xml:lang="fr">Plantation forestière </label>
+          </item>
+        </item>
+        <item id="2070610">
+          <code>C</code>
+          <label>Cropland</label>
+          <label xml:lang="fr">Terres cultivées</label>
+          <item id="2070611">
+            <code>Annual_crop</code>
+            <label>Annual Crop</label>
+            <label xml:lang="fr">Plantation fruitière </label>
+          </item>
+          <item id="2070612">
+            <code>Perennial_crop</code>
+            <label>Perennial Crop</label>
+            <label xml:lang="fr">Culture et jachère </label>
+          </item>
+        </item>
+        <item id="2070615">
+          <code>G</code>
+          <label>Grassland</label>
+          <label xml:lang="fr">Prairies</label>
+          <item id="2070616">
+            <code>Grassland_type1</code>
+            <label>&lt;Grassland Type I&gt;</label>
+            <label xml:lang="fr">Savane herbeuse  </label>
+            <description xml:lang="fr">Savane herbeuse désigne un type de savane dominée principalement par des herbes, avec très peu ou pas d'arbres ou d'arbustes et un couvert arboré de moins de 10%.</description>
+          </item>
+          <item id="2078583">
+            <code>Grassland_type2</code>
+            <label>&lt;Grassland Type II&gt;</label>
+          </item>
+          <item id="2078584">
+            <code>Grassland_type3</code>
+            <label>&lt;Grassland Type III&gt;</label>
+          </item>
+        </item>
+        <item id="2070617">
+          <code>S</code>
+          <label>Settlement</label>
+          <label xml:lang="fr">Etablissements</label>
+          <item id="2070618">
+            <code>Settlement_type1</code>
+            <label>&lt;Settlement type I&gt;</label>
+            <label xml:lang="fr">Agglomération</label>
+          </item>
+          <item id="2070619">
+            <code>Settlement_type2</code>
+            <label>&lt;Settlement type II&gt;</label>
+            <label xml:lang="fr">Infrastructure</label>
+            <description xml:lang="fr">réseau routier, aéroport, marches, etc.</description>
+          </item>
+          <item id="2070620">
+            <code>Settlement_other</code>
+            <label>Other</label>
+            <label xml:lang="fr">Site minier/carrière</label>
+          </item>
+        </item>
+        <item id="2070621">
+          <code>W</code>
+          <label>Wetland</label>
+          <label xml:lang="fr">Terres humides</label>
+          <item id="2070622">
+            <code>Water_body</code>
+            <label>Water body</label>
+            <label xml:lang="fr">Plan d’eau fermé</label>
+            <description xml:lang="fr">Mares, barrages, lacs, toute retenue d’eau fermee ou l’eau ne coule pas</description>
+          </item>
+          <item id="2070623">
+            <code>Wetland_type1</code>
+            <label>&lt;Wetland Type I&gt;</label>
+            <label xml:lang="fr">Cours d’eau</label>
+            <description xml:lang="fr">Cours d’eau/rivieres saisonniers ou permanents</description>
+          </item>
+          <item id="2079117">
+            <code>Wetland_type2</code>
+            <label>&lt;Wetland Type II&gt;</label>
+          </item>
+        </item>
+        <item id="2070624">
+          <code>O</code>
+          <label>Otherland</label>
+          <label xml:lang="fr">Autres terres</label>
+          <item id="2070625">
+            <code>Other_land_type1</code>
+            <label>&lt;Other land type I&gt;</label>
+            <label xml:lang="fr">Surface rocheuse ou cuirassée </label>
+          </item>
+          <item id="2070626">
+            <code>Other_land_type2</code>
+            <label>&lt;Other land type II&gt;</label>
+            <label xml:lang="fr">Surface sableuse  </label>
+            <description xml:lang="fr">Plage</description>
+          </item>
+          <item id="2070627">
+            <code>Other_land_type3</code>
+            <label>&lt;Other land type III&gt;</label>
+            <label xml:lang="fr">Sol érodé, dénudé</label>
+          </item>
+        </item>
+      </items>
+    </list>
+    <list id="111087" name="ecological_zones">
+      <label type="item">Ecological zone</label>
+      <label type="list">Ecological zones</label>
+      <label type="item" xml:lang="fr">Zones Ecologiques</label>
+      <label type="item" xml:lang="es">Zonas ecológicas</label>
+      <description>Global Ecological Zones (GEZ)
+See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/
+
+Source FAO geonetwork https://data.apps.fao.org/map/catalog/srv/eng/catalog.search?id=47105&amp;fname=gez2010.zip&amp;access=private#/metadata/2fb209d0-fd34-4e5e-a3d8-a13c241eb61b
+
+
+Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+
+Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Asset ID : users/sanchezpaus/gez_2010_wgs84
+GEE Script code : 
+1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
+2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
+      <description xml:lang="fr">Global Ecological Zones (GEZ)
+See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/
+
+Source FAO geonetwork https://data.apps.fao.org/map/catalog/srv/eng/catalog.search?id=47105&amp;fname=gez2010.zip&amp;access=private#/metadata/2fb209d0-fd34-4e5e-a3d8-a13c241eb61b
+
+
+Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+
+Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Asset ID : users/sanchezpaus/gez_2010_wgs84
+GEE Script code : 
+1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
+2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
+      <description xml:lang="es">Global Ecological Zones (GEZ)
+See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/
+
+Source FAO geonetwork https://data.apps.fao.org/map/catalog/srv/eng/catalog.search?id=47105&amp;fname=gez2010.zip&amp;access=private#/metadata/2fb209d0-fd34-4e5e-a3d8-a13c241eb61b
+
+
+Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+
+Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Asset ID : users/sanchezpaus/gez_2010_wgs84
+GEE Script code : 
+1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
+2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
+      <description xml:lang="pt">Global Ecological Zones (GEZ)
+See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/
+
+Source FAO geonetwork https://data.apps.fao.org/map/catalog/srv/eng/catalog.search?id=47105&amp;fname=gez2010.zip&amp;access=private#/metadata/2fb209d0-fd34-4e5e-a3d8-a13c241eb61b
+
+
+Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+
+Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Asset ID : users/sanchezpaus/gez_2010_wgs84
+GEE Script code : 
+1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
+2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2012178">
+          <code>41</code>
+          <label>Ba</label>
+          <label xml:lang="fr">Ba</label>
+          <label xml:lang="pt">Floresta boreal de coníferas</label>
+          <label xml:lang="es">Bosque de coníferas boreales</label>
+          <description>Boreal coniferous forest</description>
+          <description xml:lang="fr">Forêt de conifères boréale</description>
+        </item>
+        <item id="2012179">
+          <code>43</code>
+          <label>BM</label>
+          <label xml:lang="fr">BM</label>
+          <label xml:lang="pt">Sistema montanhoso boreal</label>
+          <label xml:lang="es">Sistema montañoso boreal</label>
+          <description>Boreal mountain system</description>
+          <description xml:lang="fr">Système de montagne boréal</description>
+        </item>
+        <item id="2012180">
+          <code>42</code>
+          <label>Bb</label>
+          <label xml:lang="fr">Bb</label>
+          <label xml:lang="pt">Bosque de tundra boreal</label>
+          <label xml:lang="es">Bosque de tundra boreal</label>
+          <description>Boreal tundra woodland</description>
+          <description xml:lang="fr">Forêt de toundra boréale</description>
+        </item>
+        <item id="2012181">
+          <code>50</code>
+          <label>P</label>
+          <label xml:lang="fr">P</label>
+          <label xml:lang="pt">Polar</label>
+          <label xml:lang="es">Polar</label>
+          <description>Polar</description>
+          <description xml:lang="fr">Polaire</description>
+        </item>
+        <item id="2012182">
+          <code>24</code>
+          <label>SBWh</label>
+          <label xml:lang="fr">SBWh</label>
+          <label xml:lang="pt">Deserto subtropical</label>
+          <label xml:lang="es">Desierto subtropical</label>
+          <description>Subtropical desert</description>
+          <description xml:lang="fr">Désert subtropical</description>
+        </item>
+        <item id="2012183">
+          <code>22</code>
+          <label>SCs</label>
+          <label xml:lang="fr">SCs</label>
+          <label xml:lang="pt">Floresta seca subtropical</label>
+          <label xml:lang="es">Bosque seco subtropical</label>
+          <description>Subtropical dry forest</description>
+          <description xml:lang="fr">Forêt sèche subtropicale</description>
+        </item>
+        <item id="2012184">
+          <code>21</code>
+          <label>SCf</label>
+          <label xml:lang="fr">SCf</label>
+          <label xml:lang="pt">Floresta úmida subtropical</label>
+          <label xml:lang="es">Bosque húmedo subtropical</label>
+          <description>Subtropical humid forest</description>
+          <description xml:lang="fr">Forêt humide subtropicale</description>
+        </item>
+        <item id="2012185">
+          <code>25</code>
+          <label>SM</label>
+          <label xml:lang="fr">SM</label>
+          <label xml:lang="pt">Sistema montanhoso subtropical</label>
+          <label xml:lang="es">Sistema montañoso subtropical</label>
+          <description>Subtropical mountain system</description>
+          <description xml:lang="fr">Système de montagne subtropical</description>
+        </item>
+        <item id="2012186">
+          <code>23</code>
+          <label>SBSh</label>
+          <label xml:lang="fr">SBSh</label>
+          <label xml:lang="pt">Estepe subtropical</label>
+          <label xml:lang="es">Estepa subtropical</label>
+          <description>Subtropical steppe</description>
+          <description xml:lang="fr">Steppe subtropicale</description>
+        </item>
+        <item id="2012187">
+          <code>32</code>
+          <label>TeDc</label>
+          <label xml:lang="fr">TeDc</label>
+          <label xml:lang="pt">Floresta continental temperada</label>
+          <label xml:lang="es">Bosque continental templado</label>
+          <description>Temperate continental forest</description>
+          <description xml:lang="fr">Forêt continentale tempérée</description>
+        </item>
+        <item id="2012188">
+          <code>34</code>
+          <label>TeBWk</label>
+          <label xml:lang="fr">TeBWk</label>
+          <label xml:lang="pt">Deserto temperado</label>
+          <label xml:lang="es">Desierto templado</label>
+          <description>Temperate desert</description>
+          <description xml:lang="fr">Désert tempéré</description>
+        </item>
+        <item id="2012189">
+          <code>35</code>
+          <label>TeM</label>
+          <label xml:lang="fr">TeM</label>
+          <label xml:lang="pt">Sistema montanhoso temperado</label>
+          <label xml:lang="es">Sistema montañoso templado</label>
+          <description>Temperate mountain system</description>
+          <description xml:lang="fr">Système de montagne tempéré</description>
+        </item>
+        <item id="2012190">
+          <code>31</code>
+          <label>TeDo</label>
+          <label xml:lang="fr">TeDo</label>
+          <label xml:lang="pt">Floresta oceânica temperada</label>
+          <label xml:lang="es">Bosque oceánico templado</label>
+          <description>Temperate oceanic forest</description>
+          <description xml:lang="fr">Forêt océanique tempérée</description>
+        </item>
+        <item id="2012191">
+          <code>33</code>
+          <label>TeBSk</label>
+          <label xml:lang="fr">TeBSk</label>
+          <label xml:lang="pt">Estepe temperada</label>
+          <label xml:lang="es">Estepa templada</label>
+          <description>Temperate steppe</description>
+          <description xml:lang="fr">Steppe tempérée</description>
+        </item>
+        <item id="2012192">
+          <code>15</code>
+          <label>TBWh</label>
+          <label xml:lang="fr">TBWh</label>
+          <label xml:lang="pt">Deserto tropical</label>
+          <label xml:lang="es">Desierto tropical</label>
+          <description>Tropical desert</description>
+          <description xml:lang="fr">Désert tropical</description>
+        </item>
+        <item id="2012193">
+          <code>13</code>
+          <label>TAwb</label>
+          <label xml:lang="fr">TAwb</label>
+          <label xml:lang="pt">Floresta tropical seca</label>
+          <label xml:lang="es">Bosque seco tropical</label>
+          <description>Tropical dry forest</description>
+          <description xml:lang="fr">Forêt tropicale sèche</description>
+        </item>
+        <item id="2012194">
+          <code>12</code>
+          <label>TAwa</label>
+          <label xml:lang="fr">TAwa</label>
+          <label xml:lang="pt">Floresta tropical úmida</label>
+          <label xml:lang="es">Bosque húmedo tropical</label>
+          <description>Tropical moist forest</description>
+          <description xml:lang="fr">Forêt tropicale humide</description>
+        </item>
+        <item id="2012195">
+          <code>16</code>
+          <label>TM</label>
+          <label xml:lang="fr">TM</label>
+          <label xml:lang="pt">Sistema montanhoso tropical</label>
+          <label xml:lang="es">Sistema montañoso tropical</label>
+          <description>Tropical mountain system</description>
+          <description xml:lang="fr">Système de montagne tropical</description>
+        </item>
+        <item id="2012196">
+          <code>11</code>
+          <label>TAr</label>
+          <label xml:lang="fr">TAr</label>
+          <label xml:lang="pt">Floresta tropical</label>
+          <label xml:lang="es">Bosque tropical</label>
+          <description>Tropical rainforest</description>
+          <description xml:lang="fr">Pluie de forêt tropicale</description>
+        </item>
+        <item id="2012197">
+          <code>14</code>
+          <label>TBSh</label>
+          <label xml:lang="fr">TBSh</label>
+          <label xml:lang="pt">Matagal tropical</label>
+          <label xml:lang="es">Matorral tropical</label>
+          <description>Tropical shrubland</description>
+          <description xml:lang="fr">Arbuste Tropical</description>
+        </item>
+        <item id="2012198">
+          <code>90</code>
+          <label>Water</label>
+          <label xml:lang="fr">Water</label>
+          <label xml:lang="pt">Água</label>
+          <label xml:lang="es">Agua</label>
+          <description>Water</description>
+          <description xml:lang="fr">Eau</description>
+        </item>
+        <item id="2012199">
+          <code>0</code>
+          <label>No data</label>
+          <label xml:lang="fr">No data</label>
+          <label xml:lang="pt">Sem dados</label>
+          <label xml:lang="es">Sin datos</label>
+          <description>No data</description>
+          <description xml:lang="fr">Pas de données</description>
+        </item>
+      </items>
+    </list>
+    <list id="222129" name="land_use_conversions">
+      <label type="item">IPCC Land Use representation Categories/Conversions</label>
+      <label type="list">Sub-Categories</label>
+      <description>Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
+
+This codelist represents the Categories and Conversions (the land uses are defined in the land_uses codelist ) necessary to classify the LU transitions.
+
+Both category and conversion level are fixed, every survey should use the six IPCC categories and 36 conversions classes without modifying them.
+
+For each category there is one remaining (Forest remaining Forest) and five changing conversions (Grassland becoming Forest, Cropland becoming Forest, etc...).
+
+DO NOT MODIFY THE CATEGORY/CONVERIOSN structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do, the calculations of the yearly changes will not work.
+
+SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representatio</description>
+      <description xml:lang="es">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
+
+This codelist represents the Categories and Conversions (the land uses are defined in the land_uses codelist ) necessary to classify the LU transitions.
+
+Both category and conversion level are fixed, every survey should use the six IPCC categories and 36 conversions classes without modifying them.
+
+For each category there is one remaining (Forest remaining Forest) and five changing conversions (Grassland becoming Forest, Cropland becoming Forest, etc...).
+
+DO NOT MODIFY THE CATEGORY/CONVERIOSN structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do, the calculations of the yearly changes will not work.
+
+SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representatio</description>
+      <description xml:lang="fr">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
+
+This codelist represents the Categories and Conversions (the land uses are defined in the land_uses codelist ) necessary to classify the LU transitions.
+
+Both category and conversion level are fixed, every survey should use the six IPCC categories and 36 conversions classes without modifying them.
+
+For each category there is one remaining (Forest remaining Forest) and five changing conversions (Grassland becoming Forest, Cropland becoming Forest, etc...).
+
+DO NOT MODIFY THE CATEGORY/CONVERIOSN structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do, the calculations of the yearly changes will not work.
+
+SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representatio</description>
+      <description xml:lang="pt">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
+
+This codelist represents the Categories and Conversions (the land uses are defined in the land_uses codelist ) necessary to classify the LU transitions.
+
+Both category and conversion level are fixed, every survey should use the six IPCC categories and 36 conversions classes without modifying them.
+
+For each category there is one remaining (Forest remaining Forest) and five changing conversions (Grassland becoming Forest, Cropland becoming Forest, etc...).
+
+DO NOT MODIFY THE CATEGORY/CONVERIOSN structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do, the calculations of the yearly changes will not work.
+
+SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representatio</description>
+      <hierarchy>
+        <level name="category" />
+        <level name="conversion" />
+      </hierarchy>
+      <items>
+        <item id="2012272">
+          <code>S</code>
+          <label>Settlement</label>
+          <label xml:lang="fr">Établissement</label>
+          <label xml:lang="es">Asentamientos</label>
+          <item id="2012273">
+            <code>SS</code>
+            <label>S &gt; S</label>
+            <label xml:lang="fr">E &gt; E</label>
+            <label xml:lang="pt">A &gt; A</label>
+            <label xml:lang="es">A &gt; A</label>
+            <description>Settlement remaining Settlement</description>
+            <description xml:lang="fr">Établissements restants Établissements</description>
+            <description xml:lang="es">Asentamiento que se mantiene como Asentamiento</description>
+          </item>
+          <item id="2012274">
+            <code>CS</code>
+            <label>C &gt; S</label>
+            <label xml:lang="fr">TC &gt; E</label>
+            <label xml:lang="pt">TA &gt; A</label>
+            <label xml:lang="es">C &gt; A</label>
+            <description>Cropland becoming Settlement</description>
+            <description xml:lang="fr">Terres cultivees devenues Établissements</description>
+            <description xml:lang="es">Tierra de cultivo convertida a Asentamiento</description>
+          </item>
+          <item id="2012275">
+            <code>FS</code>
+            <label>F &gt; S</label>
+            <label xml:lang="fr">TF &gt; E</label>
+            <label xml:lang="pt">F &gt; A</label>
+            <label xml:lang="es">F &gt; A</label>
+            <description>Forest becoming Settlement</description>
+            <description xml:lang="fr">Terres forestieres devenues Établissements</description>
+            <description xml:lang="es">Tierra forestal convertida a Asentamiento</description>
+          </item>
+          <item id="2012276">
+            <code>GS</code>
+            <label>G &gt; S</label>
+            <label xml:lang="fr">P &gt; E</label>
+            <label xml:lang="pt">P &gt; A</label>
+            <label xml:lang="es">P &gt; A</label>
+            <description>Grassland becoming Settlement</description>
+            <description xml:lang="fr">Prairies devenues Établissements</description>
+            <description xml:lang="es">Pastizal convertido a Asentamiento</description>
+          </item>
+          <item id="2012277">
+            <code>WS</code>
+            <label>W &gt; S</label>
+            <label xml:lang="fr">TH &gt; E</label>
+            <label xml:lang="pt">U &gt; A</label>
+            <label xml:lang="es">H &gt; A</label>
+            <description>Wetland becoming Settlement</description>
+            <description xml:lang="fr">Terres humides devenues Établissements</description>
+            <description xml:lang="es">Humedal convertido a Asentamiento</description>
+          </item>
+          <item id="2012278">
+            <code>OS</code>
+            <label>O &gt; S</label>
+            <label xml:lang="fr">AT &gt; E</label>
+            <label xml:lang="pt">O &gt; A</label>
+            <label xml:lang="es">O &gt; A</label>
+            <description>Otherland becoming Settlement</description>
+            <description xml:lang="fr">Autres terres devenues Établissements</description>
+            <description xml:lang="es">Otra tierra convertida a Asentamiento</description>
+          </item>
+        </item>
+        <item id="2012279">
+          <code>C</code>
+          <label>Cropland</label>
+          <label xml:lang="fr">Terre cultivéee</label>
+          <label xml:lang="es">Tierras de cultivo</label>
+          <item id="2012280">
+            <code>CC</code>
+            <label>C &gt; C</label>
+            <label xml:lang="fr">TC &gt; TC</label>
+            <label xml:lang="pt">TA &gt; TA</label>
+            <label xml:lang="es">C &gt; C</label>
+            <description>Cropland remaining Cropland</description>
+            <description xml:lang="fr">Terres cultivées terres restantes terres cultivées</description>
+            <description xml:lang="es">Tierra de cultivo que se mantiene como Tierra de cultivo</description>
+          </item>
+          <item id="2012281">
+            <code>SC</code>
+            <label>S &gt; C</label>
+            <label xml:lang="fr">E &gt; TC</label>
+            <label xml:lang="pt">A &gt; TA</label>
+            <label xml:lang="es">A &gt; C</label>
+            <description>Settlement becoming Cropland</description>
+            <description xml:lang="fr">Établissements devenus des terres cultivées</description>
+            <description xml:lang="es">Asentamiento convertido a Tierra de cultivo</description>
+          </item>
+          <item id="2012282">
+            <code>FC</code>
+            <label>F &gt; C</label>
+            <label xml:lang="fr">TF &gt; TC</label>
+            <label xml:lang="pt">F &gt; TA</label>
+            <label xml:lang="es">F &gt; C</label>
+            <description>Forest becoming Cropland</description>
+            <description xml:lang="fr">Terres forestières devenues des terres cultivées</description>
+            <description xml:lang="es">Tierra forestal convertida a Tierra de cultivo</description>
+          </item>
+          <item id="2012283">
+            <code>GC</code>
+            <label>G &gt; C</label>
+            <label xml:lang="fr">P &gt; TC</label>
+            <label xml:lang="pt">P &gt; TA</label>
+            <label xml:lang="es">P &gt; C</label>
+            <description>Grassland becoming Cropland</description>
+            <description xml:lang="fr">Prairies devenues des terres cultivées</description>
+            <description xml:lang="es">Pastizal convertido a Tierra de cultivo</description>
+          </item>
+          <item id="2012284">
+            <code>WC</code>
+            <label>W &gt; C</label>
+            <label xml:lang="fr">TH &gt; TC</label>
+            <label xml:lang="pt">U &gt; TA</label>
+            <label xml:lang="es">H &gt; C</label>
+            <description>Wetland becoming Cropland</description>
+            <description xml:lang="fr">Terres humides devenues des terres cultivées</description>
+            <description xml:lang="es">Humedal convertido a Tierra de cultivo</description>
+          </item>
+          <item id="2012285">
+            <code>OC</code>
+            <label>O &gt; C</label>
+            <label xml:lang="fr">AT &gt; TC</label>
+            <label xml:lang="pt">O &gt; TA</label>
+            <label xml:lang="es">O &gt; C</label>
+            <description>Otherland becoming Cropland</description>
+            <description xml:lang="fr">Autres terres devenues des terres cultivées</description>
+            <description xml:lang="es">Otra tierra convertida a Tierra de cultivo</description>
+          </item>
+        </item>
+        <item id="2012286">
+          <code>F</code>
+          <label>Forest land</label>
+          <label xml:lang="fr">Terre forestière</label>
+          <label xml:lang="es">Tierras forestales</label>
+          <item id="2012287">
+            <code>FF</code>
+            <label>F &gt; F</label>
+            <label xml:lang="fr">TF &gt; TF</label>
+            <label xml:lang="pt">F &gt; F</label>
+            <label xml:lang="es">F &gt; F</label>
+            <description>Forest remaining Forest</description>
+            <description xml:lang="fr">Terres forestières restantes terres forestières</description>
+            <description xml:lang="es">Tierra forestal que se mantiene como Tierra Forestal</description>
+          </item>
+          <item id="2012288">
+            <code>SF</code>
+            <label>S &gt; F</label>
+            <label xml:lang="fr">E &gt; TF</label>
+            <label xml:lang="pt">A &gt; F</label>
+            <label xml:lang="es">A &gt; F</label>
+            <description>Settlement becoming Forest</description>
+            <description xml:lang="fr">Établissements devenus des terres forestières</description>
+            <description xml:lang="es">Asentamiento convertido a Tierra Forestal</description>
+          </item>
+          <item id="2012289">
+            <code>CF</code>
+            <label>C &gt; F</label>
+            <label xml:lang="fr">TC &gt; TF</label>
+            <label xml:lang="pt">TA &gt; F</label>
+            <label xml:lang="es">C &gt; F</label>
+            <description>Cropland becoming Forest</description>
+            <description xml:lang="fr">Terres cultivées devenues terres forestières</description>
+            <description xml:lang="es">Tierra de cultivo convertida a Tierra Forestal</description>
+          </item>
+          <item id="2012290">
+            <code>GF</code>
+            <label>G &gt; F</label>
+            <label xml:lang="fr">P &gt; TF</label>
+            <label xml:lang="pt">P &gt; F</label>
+            <label xml:lang="es">P &gt; F</label>
+            <description>Grassland becoming Forest</description>
+            <description xml:lang="fr">Prairies devenues des terres forestières</description>
+            <description xml:lang="es">Pastizal convertida a Tierra Forestal</description>
+          </item>
+          <item id="2012291">
+            <code>WF</code>
+            <label>W &gt; F</label>
+            <label xml:lang="fr">TH &gt; TF</label>
+            <label xml:lang="pt">U &gt; F</label>
+            <label xml:lang="es">H &gt; F</label>
+            <description>Wetland becoming Forest</description>
+            <description xml:lang="fr">Terres humides devenues des terres forestières</description>
+            <description xml:lang="es">Humedal convertido a Tierra Forestal</description>
+          </item>
+          <item id="2012292">
+            <code>OF</code>
+            <label>O &gt; F</label>
+            <label xml:lang="fr">AT &gt; TF</label>
+            <label xml:lang="pt">O &gt; F</label>
+            <label xml:lang="es">O &gt; F</label>
+            <description>Otherland becoming Forest</description>
+            <description xml:lang="fr">Autres terres devenues terres forestières</description>
+            <description xml:lang="es">Otras tierras convertida a Tierra Forestal</description>
+          </item>
+        </item>
+        <item id="2012293">
+          <code>G</code>
+          <label>Grassland</label>
+          <label xml:lang="fr">Prairie</label>
+          <label xml:lang="es">Pastizales</label>
+          <item id="2012294">
+            <code>GG</code>
+            <label>G &gt; G</label>
+            <label xml:lang="fr">P &gt; P</label>
+            <label xml:lang="pt">P &gt; P</label>
+            <label xml:lang="es">P &gt; P</label>
+            <description>Grassland remaining Grassland</description>
+            <description xml:lang="fr">Prairies restantes prairies</description>
+            <description xml:lang="es">Pastizal que se mantiene como Pastizal</description>
+          </item>
+          <item id="2012295">
+            <code>SG</code>
+            <label>S &gt; G</label>
+            <label xml:lang="fr">E &gt; P</label>
+            <label xml:lang="pt">A &gt; P</label>
+            <label xml:lang="es">A &gt; P</label>
+            <description>Settlement becoming Grassland</description>
+            <description xml:lang="fr">Établissements devenus prairies</description>
+            <description xml:lang="es">Asentamiento convertido a Pastizal</description>
+          </item>
+          <item id="2012296">
+            <code>CG</code>
+            <label>C &gt; G</label>
+            <label xml:lang="fr">TC &gt; P</label>
+            <label xml:lang="pt">TA &gt; P</label>
+            <label xml:lang="es">C &gt; P</label>
+            <description>Cropland becoming Grassland</description>
+            <description xml:lang="fr">Terres cultivees devenues prairies</description>
+            <description xml:lang="es">Tierra de cultivo convertida a Pastizal</description>
+          </item>
+          <item id="2012297">
+            <code>FG</code>
+            <label>F &gt; G</label>
+            <label xml:lang="fr">TF &gt; P</label>
+            <label xml:lang="pt">F &gt; P</label>
+            <label xml:lang="es">F &gt; P</label>
+            <description>Forest becoming Grassland</description>
+            <description xml:lang="fr">Terres forestieres devenues prairies</description>
+            <description xml:lang="es">Tierra forestal convertida a Pastizal</description>
+          </item>
+          <item id="2012298">
+            <code>WG</code>
+            <label>W &gt; G</label>
+            <label xml:lang="fr">TH &gt; P</label>
+            <label xml:lang="pt">U &gt; P</label>
+            <label xml:lang="es">H &gt; P</label>
+            <description>Wetland becoming Grassland</description>
+            <description xml:lang="fr">Terres humides devenues prairies</description>
+            <description xml:lang="es">Humedal convertido a Pastizal</description>
+          </item>
+          <item id="2012299">
+            <code>OG</code>
+            <label>O &gt; G</label>
+            <label xml:lang="fr">AT &gt; P</label>
+            <label xml:lang="pt">O &gt; P</label>
+            <label xml:lang="es">O &gt; P</label>
+            <description>Otherland becoming Grassland</description>
+            <description xml:lang="fr">Autres terres devenues prairies</description>
+            <description xml:lang="es">Otra tierra convertida a Pastizal</description>
+          </item>
+        </item>
+        <item id="2012300">
+          <code>W</code>
+          <label>Wetland</label>
+          <label xml:lang="fr">Terre humide</label>
+          <label xml:lang="es">Humedales</label>
+          <item id="2012301">
+            <code>WW</code>
+            <label>W &gt; W</label>
+            <label xml:lang="fr">TH &gt; TH</label>
+            <label xml:lang="pt">U &gt; U</label>
+            <label xml:lang="es">H &gt; H</label>
+            <description>Wetland remaining Wetland</description>
+            <description xml:lang="fr">Terres humides restantes terres humides</description>
+            <description xml:lang="es">Humedal que se mantiene como Humedal</description>
+          </item>
+          <item id="2012302">
+            <code>SW</code>
+            <label>S &gt; W</label>
+            <label xml:lang="fr">E &gt; TH</label>
+            <label xml:lang="pt">A &gt; U</label>
+            <label xml:lang="es">A &gt; H</label>
+            <description>Settlement becoming Wetland</description>
+            <description xml:lang="fr">Établissements devenus terres humides</description>
+            <description xml:lang="es">Asentamiento convertido a Humedal</description>
+          </item>
+          <item id="2012303">
+            <code>CW</code>
+            <label>C &gt; W</label>
+            <label xml:lang="fr">TC &gt; TH</label>
+            <label xml:lang="pt">TA &gt; U</label>
+            <label xml:lang="es">C &gt; H</label>
+            <description>Cropland becoming Wetland</description>
+            <description xml:lang="fr">Terres cultivees devenues terres humides</description>
+            <description xml:lang="es">Tierra de cultivo convertida a Humedal</description>
+          </item>
+          <item id="2012304">
+            <code>FW</code>
+            <label>F &gt; W</label>
+            <label xml:lang="fr">TF &gt; TH</label>
+            <label xml:lang="pt">F &gt; U</label>
+            <label xml:lang="es">F &gt; H</label>
+            <description>Forest becoming Wetland</description>
+            <description xml:lang="fr">Terres forestieres devenues terres humides</description>
+            <description xml:lang="es">Tierra forestal convertida a Humedal</description>
+          </item>
+          <item id="2012305">
+            <code>GW</code>
+            <label>G &gt; W</label>
+            <label xml:lang="fr">P &gt; TH</label>
+            <label xml:lang="pt">P &gt; U</label>
+            <label xml:lang="es">P &gt; H</label>
+            <description>Grassland becoming Wetland</description>
+            <description xml:lang="fr">Prairies devenues terres humides</description>
+            <description xml:lang="es">Pastizal convertido a Humedal</description>
+          </item>
+          <item id="2012306">
+            <code>OW</code>
+            <label>O &gt; W</label>
+            <label xml:lang="fr">AT &gt; TH</label>
+            <label xml:lang="pt">O &gt; P</label>
+            <label xml:lang="es">O &gt; P</label>
+            <description>Otherland becoming Wetland</description>
+            <description xml:lang="fr">Autres terres devenues terres humides</description>
+            <description xml:lang="es">Otra tierra convertida a Humedal</description>
+          </item>
+        </item>
+        <item id="2012307">
+          <code>O</code>
+          <label>Other land</label>
+          <label xml:lang="fr">Autre terre</label>
+          <label xml:lang="es">Otras tierras</label>
+          <item id="2012308">
+            <code>OO</code>
+            <label>O &gt; O</label>
+            <label xml:lang="fr">AT &gt; AT</label>
+            <label xml:lang="pt">O &gt; O</label>
+            <label xml:lang="es">O &gt; O</label>
+            <description>Otherland remaining Otherland</description>
+            <description xml:lang="fr">Autres terres restantes Autres terres</description>
+            <description xml:lang="es">Otra tierra que se mantiene como Otra tierra</description>
+          </item>
+          <item id="2012309">
+            <code>SO</code>
+            <label>S &gt; O</label>
+            <label xml:lang="fr">E &gt; AT</label>
+            <label xml:lang="pt">A &gt; O</label>
+            <label xml:lang="es">A &gt; O</label>
+            <description>Settlement becoming Otherland</description>
+            <description xml:lang="fr">Établissements devenus d'autres terres</description>
+            <description xml:lang="es">Asentamiento convertido a Otra tierra</description>
+          </item>
+          <item id="2012310">
+            <code>CO</code>
+            <label>C &gt; O</label>
+            <label xml:lang="fr">TC &gt; AT</label>
+            <label xml:lang="pt">TA &gt; O</label>
+            <label xml:lang="es">C &gt; O</label>
+            <description>Cropland becoming Otherland</description>
+            <description xml:lang="fr">Terres cultivées devenues d'autres terres</description>
+            <description xml:lang="es">Tierra de cultivo convertida a Otra tierra</description>
+          </item>
+          <item id="2012311">
+            <code>FO</code>
+            <label>F &gt; O</label>
+            <label xml:lang="fr">TF &gt; AT</label>
+            <label xml:lang="pt">F &gt; O</label>
+            <label xml:lang="es">F &gt; O</label>
+            <description>Forest becoming Otherland</description>
+            <description xml:lang="fr">Forest devenues d'autres terres</description>
+            <description xml:lang="es">Tierra forestal convertida a Otra tierra</description>
+          </item>
+          <item id="2012312">
+            <code>GO</code>
+            <label>G &gt; O</label>
+            <label xml:lang="fr">P &gt; AT</label>
+            <label xml:lang="pt">P &gt; O</label>
+            <label xml:lang="es">P &gt; O</label>
+            <description>Grassland becoming Otherland</description>
+            <description xml:lang="fr">Prairies devenues d'autres terres</description>
+            <description xml:lang="es">Pastizal convertido a Otra tierra</description>
+          </item>
+          <item id="2012313">
+            <code>WO</code>
+            <label>W &gt; O</label>
+            <label xml:lang="fr">TH &gt; AT</label>
+            <label xml:lang="pt">U &gt; O</label>
+            <label xml:lang="es">H &gt; O</label>
+            <description>Wetland becoming Otherland</description>
+            <description xml:lang="fr">Terres humides devenues d'autres terres</description>
+            <description xml:lang="es">Humedal convertido a Otra tierra</description>
+          </item>
+        </item>
+      </items>
+    </list>
+    <list id="140" name="plot_coverage">
+      <label type="item">Control dots</label>
+      <label type="list">Coverages</label>
+      <label type="item" xml:lang="fr">Points de contrôle</label>
+      <label type="item" xml:lang="es">Puntos de control</label>
+      <label type="item" xml:lang="pt">Pontos de controle</label>
+      <description>Classes of cover within the plot. 
+The user counts the number of dots that fall within certain land use/land cover/element to classify the plot.
+For plots with 49 dots (7x7). In case of using other type of plots like 5x5 (25 dots) modify the codelist accordingly.
+
+In the case of 49 dots plots, the user is asked to specify the number of plots if less than 5 fall within a land use/cover. Otherwise the user chooses between ranges. The reasoning for this is to improve the speed of the assessment. If other approach is preferred you should change the codelist accordingly.</description>
+      <description xml:lang="es">Classes of cover within the plot. 
+The user counts the number of dots that fall within certain land use/land cover/element to classify the plot.
+For plots with 49 dots (7x7). In case of using other type of plots like 5x5 (25 dots) modify the codelist accordingly.
+
+In the case of 49 dots plots, the user is asked to specify the number of plots if less than 5 fall within a land use/cover. Otherwise the user chooses between ranges. The reasoning for this is to improve the speed of the assessment. If other approach is preferred you should change the codelist accordingly.</description>
+      <description xml:lang="fr">Classes of cover within the plot. 
+The user counts the number of dots that fall within certain land use/land cover/element to classify the plot.
+For plots with 49 dots (7x7). In case of using other type of plots like 5x5 (25 dots) modify the codelist accordingly.
+
+In the case of 49 dots plots, the user is asked to specify the number of plots if less than 5 fall within a land use/cover. Otherwise the user chooses between ranges. The reasoning for this is to improve the speed of the assessment. If other approach is preferred you should change the codelist accordingly.</description>
+      <description xml:lang="pt">Classes of cover within the plot. 
+The user counts the number of dots that fall within certain land use/land cover/element to classify the plot.
+For plots with 49 dots (7x7). In case of using other type of plots like 5x5 (25 dots) modify the codelist accordingly.
+
+In the case of 49 dots plots, the user is asked to specify the number of plots if less than 5 fall within a land use/cover. Otherwise the user chooses between ranges. The reasoning for this is to improve the speed of the assessment. If other approach is preferred you should change the codelist accordingly.</description>
+      <items>
+        <item id="2012862">
+          <code>0</code>
+          <label>0 Points – No Coverage</label>
+          <label xml:lang="fr">0 Points – No Coverage</label>
+          <label xml:lang="pt">0 Pontos – No Coverage</label>
+          <label xml:lang="es">0 Puntos – Sin Cobertura</label>
+        </item>
+        <item id="2012863">
+          <code>2</code>
+          <label>1 Points</label>
+          <label xml:lang="fr">1 Points</label>
+          <label xml:lang="pt">1  Pontos</label>
+          <label xml:lang="es">1 puntos</label>
+        </item>
+        <item id="2012864">
+          <code>4</code>
+          <label>2 Points</label>
+          <label xml:lang="fr">2 Points</label>
+          <label xml:lang="pt">2  Pontos</label>
+          <label xml:lang="es">2 puntos</label>
+        </item>
+        <item id="2012865">
+          <code>6</code>
+          <label>3 Points</label>
+          <label xml:lang="fr">3 Points</label>
+          <label xml:lang="pt">3  Pontos</label>
+          <label xml:lang="es">3 puntos</label>
+        </item>
+        <item id="2012866">
+          <code>8</code>
+          <label>4 Points</label>
+          <label xml:lang="fr">4 Points</label>
+          <label xml:lang="pt">4  Pontos</label>
+          <label xml:lang="es">4 puntos</label>
+        </item>
+        <item id="2012867">
+          <code>10</code>
+          <label>5 Points</label>
+          <label xml:lang="fr">5 Points</label>
+          <label xml:lang="pt">5  Pontos</label>
+          <label xml:lang="es">5 puntos</label>
+        </item>
+        <item id="2012868">
+          <code>12</code>
+          <label>6 Points</label>
+          <label xml:lang="fr">6 Points</label>
+          <label xml:lang="pt">6  Pontos</label>
+          <label xml:lang="es">6 puntos</label>
+        </item>
+        <item id="2012869">
+          <code>14</code>
+          <label>7 Points</label>
+          <label xml:lang="fr">7 Points</label>
+          <label xml:lang="pt">7  Pontos</label>
+          <label xml:lang="es">7 puntos</label>
+        </item>
+        <item id="2012870">
+          <code>16</code>
+          <label>8 Points</label>
+          <label xml:lang="fr">8 Points</label>
+          <label xml:lang="pt">8  Pontos</label>
+          <label xml:lang="es">8 puntos</label>
+        </item>
+        <item id="2012871">
+          <code>18</code>
+          <label>9 Points</label>
+          <label xml:lang="fr">9 Points</label>
+          <label xml:lang="pt">9  Pontos</label>
+          <label xml:lang="es">9 puntos</label>
+        </item>
+        <item id="2012872">
+          <code>20</code>
+          <label>10 Points</label>
+          <label xml:lang="fr">10 Points</label>
+          <label xml:lang="pt">10  Pontos</label>
+          <label xml:lang="es">10 puntos</label>
+        </item>
+        <item id="2012873">
+          <code>22</code>
+          <label>11 Points</label>
+          <label xml:lang="fr">11 Points</label>
+          <label xml:lang="pt">11  Pontos</label>
+          <label xml:lang="es">11 puntos</label>
+        </item>
+        <item id="2012874">
+          <code>24</code>
+          <label>12 Points</label>
+          <label xml:lang="fr">12 Points</label>
+          <label xml:lang="pt">12  Pontos</label>
+          <label xml:lang="es">12 puntos</label>
+        </item>
+        <item id="2012875">
+          <code>26</code>
+          <label>13 Points</label>
+          <label xml:lang="fr">13 Points</label>
+          <label xml:lang="pt">13  Pontos</label>
+          <label xml:lang="es">13 puntos</label>
+        </item>
+        <item id="2012876">
+          <code>28</code>
+          <label>14 Points</label>
+          <label xml:lang="fr">14 Points</label>
+          <label xml:lang="pt">14  Pontos</label>
+          <label xml:lang="es">14 puntos</label>
+        </item>
+        <item id="2012877">
+          <code>30</code>
+          <label>15 Points</label>
+          <label xml:lang="fr">15 Points</label>
+          <label xml:lang="pt">15  Pontos</label>
+          <label xml:lang="es">15 puntos</label>
+        </item>
+        <item id="2012878">
+          <code>32</code>
+          <label>16 Points</label>
+          <label xml:lang="fr">16 Points</label>
+          <label xml:lang="pt">16  Pontos</label>
+          <label xml:lang="es">16 puntos</label>
+        </item>
+        <item id="2012879">
+          <code>34</code>
+          <label>17 Points</label>
+          <label xml:lang="fr">17 Points</label>
+          <label xml:lang="pt">17  Pontos</label>
+          <label xml:lang="es">17 puntos</label>
+        </item>
+        <item id="2012880">
+          <code>36</code>
+          <label>18 Points</label>
+          <label xml:lang="fr">18 Points</label>
+          <label xml:lang="pt">18  Pontos</label>
+          <label xml:lang="es">18 puntos</label>
+        </item>
+        <item id="2012881">
+          <code>38</code>
+          <label>19 Points</label>
+          <label xml:lang="fr">19 Points</label>
+          <label xml:lang="pt">19  Pontos</label>
+          <label xml:lang="es">19 puntos</label>
+        </item>
+        <item id="2012882">
+          <code>40</code>
+          <label>20 Points</label>
+          <label xml:lang="fr">20 Points</label>
+          <label xml:lang="pt">20  Pontos</label>
+          <label xml:lang="es">20 puntos</label>
+        </item>
+        <item id="2012883">
+          <code>42</code>
+          <label>21 Points</label>
+          <label xml:lang="fr">21 Points</label>
+          <label xml:lang="pt">21  Pontos</label>
+          <label xml:lang="es">21 puntos</label>
+        </item>
+        <item id="2012884">
+          <code>44</code>
+          <label>22 Points</label>
+          <label xml:lang="fr">22 Points</label>
+          <label xml:lang="pt">22  Pontos</label>
+          <label xml:lang="es">22 puntos</label>
+        </item>
+        <item id="2012885">
+          <code>46</code>
+          <label>23 Points</label>
+          <label xml:lang="fr">23 Points</label>
+          <label xml:lang="pt">23  Pontos</label>
+          <label xml:lang="es">23 puntos</label>
+        </item>
+        <item id="2012886">
+          <code>48</code>
+          <label>24 Points</label>
+          <label xml:lang="fr">24 Points</label>
+          <label xml:lang="pt">24  Pontos</label>
+          <label xml:lang="es">24 puntos</label>
+        </item>
+        <item id="2012887">
+          <code>50</code>
+          <label>25 Points</label>
+          <label xml:lang="fr">25 Points</label>
+          <label xml:lang="pt">25  Pontos</label>
+          <label xml:lang="es">25 puntos</label>
+        </item>
+        <item id="2012888">
+          <code>52</code>
+          <label>26 Points</label>
+          <label xml:lang="fr">26 Points</label>
+          <label xml:lang="pt">26  Pontos</label>
+          <label xml:lang="es">26 puntos</label>
+        </item>
+        <item id="2012889">
+          <code>54</code>
+          <label>27 Points</label>
+          <label xml:lang="fr">27 Points</label>
+          <label xml:lang="pt">27  Pontos</label>
+          <label xml:lang="es">27 puntos</label>
+        </item>
+        <item id="2012890">
+          <code>56</code>
+          <label>28 Points</label>
+          <label xml:lang="fr">28 Points</label>
+          <label xml:lang="pt">28  Pontos</label>
+          <label xml:lang="es">28 puntos</label>
+        </item>
+        <item id="2012891">
+          <code>58</code>
+          <label>29 Points</label>
+          <label xml:lang="fr">29 Points</label>
+          <label xml:lang="pt">29  Pontos</label>
+          <label xml:lang="es">29 puntos</label>
+        </item>
+        <item id="2012892">
+          <code>60</code>
+          <label>30 Points</label>
+          <label xml:lang="fr">30 Points</label>
+          <label xml:lang="pt">30  Pontos</label>
+          <label xml:lang="es">30 puntos</label>
+        </item>
+        <item id="2012893">
+          <code>62</code>
+          <label>31 Points</label>
+          <label xml:lang="fr">31 Points</label>
+          <label xml:lang="pt">31  Pontos</label>
+          <label xml:lang="es">31 puntos</label>
+        </item>
+        <item id="2012894">
+          <code>64</code>
+          <label>32 Points</label>
+          <label xml:lang="fr">32 Points</label>
+          <label xml:lang="pt">32  Pontos</label>
+          <label xml:lang="es">32 puntos</label>
+        </item>
+        <item id="2012895">
+          <code>66</code>
+          <label>33 Points</label>
+          <label xml:lang="fr">33 Points</label>
+          <label xml:lang="pt">33  Pontos</label>
+          <label xml:lang="es">33 puntos</label>
+        </item>
+        <item id="2012896">
+          <code>68</code>
+          <label>34 Points</label>
+          <label xml:lang="fr">34 Points</label>
+          <label xml:lang="pt">34  Pontos</label>
+          <label xml:lang="es">34 puntos</label>
+        </item>
+        <item id="2012897">
+          <code>70</code>
+          <label>35 Points</label>
+          <label xml:lang="fr">35 Points</label>
+          <label xml:lang="pt">35  Pontos</label>
+          <label xml:lang="es">35 puntos</label>
+        </item>
+        <item id="2012898">
+          <code>72</code>
+          <label>36 Points</label>
+          <label xml:lang="fr">36 Points</label>
+          <label xml:lang="pt">36  Pontos</label>
+          <label xml:lang="es">36 puntos</label>
+        </item>
+        <item id="2012899">
+          <code>74</code>
+          <label>37 Points</label>
+          <label xml:lang="fr">37 Points</label>
+          <label xml:lang="pt">37  Pontos</label>
+          <label xml:lang="es">37 puntos</label>
+        </item>
+        <item id="2012900">
+          <code>76</code>
+          <label>38 Points</label>
+          <label xml:lang="fr">38 Points</label>
+          <label xml:lang="pt">38  Pontos</label>
+          <label xml:lang="es">38 puntos</label>
+        </item>
+        <item id="2012901">
+          <code>78</code>
+          <label>39 Points</label>
+          <label xml:lang="fr">39 Points</label>
+          <label xml:lang="pt">39  Pontos</label>
+          <label xml:lang="es">39 puntos</label>
+        </item>
+        <item id="2012902">
+          <code>80</code>
+          <label>40 Points</label>
+          <label xml:lang="fr">40 Points</label>
+          <label xml:lang="pt">40  Pontos</label>
+          <label xml:lang="es">40 puntos</label>
+        </item>
+        <item id="2012903">
+          <code>82</code>
+          <label>41 Points</label>
+          <label xml:lang="fr">41 Points</label>
+          <label xml:lang="pt">41  Pontos</label>
+          <label xml:lang="es">41 puntos</label>
+        </item>
+        <item id="2012904">
+          <code>84</code>
+          <label>42 Points</label>
+          <label xml:lang="fr">42 Points</label>
+          <label xml:lang="pt">42  Pontos</label>
+          <label xml:lang="es">42 puntos</label>
+        </item>
+        <item id="2012905">
+          <code>86</code>
+          <label>43 Points</label>
+          <label xml:lang="fr">43 Points</label>
+          <label xml:lang="pt">43  Pontos</label>
+          <label xml:lang="es">43 puntos</label>
+        </item>
+        <item id="2012906">
+          <code>88</code>
+          <label>44 Points</label>
+          <label xml:lang="fr">44 Points</label>
+          <label xml:lang="pt">44  Pontos</label>
+          <label xml:lang="es">44 puntos</label>
+        </item>
+        <item id="2012907">
+          <code>90</code>
+          <label>45 Points</label>
+          <label xml:lang="fr">45 Points</label>
+          <label xml:lang="pt">45  Pontos</label>
+          <label xml:lang="es">45 puntos</label>
+        </item>
+        <item id="2012908">
+          <code>92</code>
+          <label>46 Points</label>
+          <label xml:lang="fr">46 Points</label>
+          <label xml:lang="pt">46  Pontos</label>
+          <label xml:lang="es">46 puntos</label>
+        </item>
+        <item id="2012909">
+          <code>94</code>
+          <label>47 Points</label>
+          <label xml:lang="fr">47 Points</label>
+          <label xml:lang="pt">47  Pontos</label>
+          <label xml:lang="es">47 puntos</label>
+        </item>
+        <item id="2012910">
+          <code>96</code>
+          <label>48 Points</label>
+          <label xml:lang="fr">48 Points</label>
+          <label xml:lang="pt">48  Pontos</label>
+          <label xml:lang="es">48 puntos</label>
+        </item>
+        <item id="2012911">
+          <code>98</code>
+          <label>49 Points</label>
+          <label xml:lang="fr">49 Points</label>
+          <label xml:lang="pt">49  Pontos</label>
+          <label xml:lang="es">49 puntos</label>
+        </item>
+      </items>
+    </list>
+    <list id="1539" name="elevation_ranges">
+      <label type="item">Elevation ranges</label>
+      <label type="item" xml:lang="fr">Gammes d'altitude</label>
+      <label type="item" xml:lang="es">Rangos de elevación</label>
+      <description>Ranges of elevation in 100 meters. Used to aggregate the plots into ranges for easier analysis.</description>
+      <description xml:lang="fr">Dénivelés à 100 mètres. Utilisé pour agréger les parcelles en plages pour une analyse plus facile.</description>
+      <description xml:lang="pt">Intervalos de elevação em 100 metros. Usado para agregar as parcelas em intervalos para facilitar a análise.</description>
+      <description xml:lang="es">Rangos de elevación en 100 metros. Se utiliza para agregar las parcelas en rangos para facilitar el análisis.</description>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2012394">
+          <code>1</code>
+          <label>0-100</label>
+          <label xml:lang="fr">0-100</label>
+          <label xml:lang="pt">0-100</label>
+          <label xml:lang="es">0-100</label>
+        </item>
+        <item id="2012395">
+          <code>2</code>
+          <label>101-200</label>
+          <label xml:lang="fr">101-200</label>
+          <label xml:lang="pt">101-200</label>
+          <label xml:lang="es">101-200</label>
+        </item>
+        <item id="2012396">
+          <code>3</code>
+          <label>201-300</label>
+          <label xml:lang="fr">201-300</label>
+          <label xml:lang="pt">201-300</label>
+          <label xml:lang="es">201-300</label>
+        </item>
+        <item id="2012397">
+          <code>4</code>
+          <label>301-400</label>
+          <label xml:lang="fr">301-400</label>
+          <label xml:lang="pt">301-400</label>
+          <label xml:lang="es">301-400</label>
+        </item>
+        <item id="2012398">
+          <code>5</code>
+          <label>401-500</label>
+          <label xml:lang="fr">401-500</label>
+          <label xml:lang="pt">401-500</label>
+          <label xml:lang="es">401-500</label>
+        </item>
+        <item id="2012399">
+          <code>6</code>
+          <label>501-600</label>
+          <label xml:lang="fr">501-600</label>
+          <label xml:lang="pt">501-600</label>
+          <label xml:lang="es">501-600</label>
+        </item>
+        <item id="2012400">
+          <code>7</code>
+          <label>601-700</label>
+          <label xml:lang="fr">601-700</label>
+          <label xml:lang="pt">601-700</label>
+          <label xml:lang="es">601-700</label>
+        </item>
+        <item id="2012401">
+          <code>8</code>
+          <label>701-800</label>
+          <label xml:lang="fr">701-800</label>
+          <label xml:lang="pt">701-800</label>
+          <label xml:lang="es">701-800</label>
+        </item>
+        <item id="2012402">
+          <code>9</code>
+          <label>801-900</label>
+          <label xml:lang="fr">801-900</label>
+          <label xml:lang="pt">801-900</label>
+          <label xml:lang="es">801-900</label>
+        </item>
+        <item id="2012403">
+          <code>10</code>
+          <label>901-1000</label>
+          <label xml:lang="fr">901-1000</label>
+          <label xml:lang="pt">901-1000</label>
+          <label xml:lang="es">901-1000</label>
+        </item>
+        <item id="2012404">
+          <code>11</code>
+          <label>1001-1100</label>
+          <label xml:lang="fr">1001-1100</label>
+          <label xml:lang="pt">1001-1100</label>
+          <label xml:lang="es">1001-1100</label>
+        </item>
+        <item id="2012405">
+          <code>12</code>
+          <label>1101-1200</label>
+          <label xml:lang="fr">1101-1200</label>
+          <label xml:lang="pt">1101-1200</label>
+          <label xml:lang="es">1101-1200</label>
+        </item>
+        <item id="2012406">
+          <code>13</code>
+          <label>1201-1300</label>
+          <label xml:lang="fr">1201-1300</label>
+          <label xml:lang="pt">1201-1300</label>
+          <label xml:lang="es">1201-1300</label>
+        </item>
+        <item id="2012407">
+          <code>14</code>
+          <label>1301-1400</label>
+          <label xml:lang="fr">1301-1400</label>
+          <label xml:lang="pt">1301-1400</label>
+          <label xml:lang="es">1301-1400</label>
+        </item>
+        <item id="2012408">
+          <code>15</code>
+          <label>1401-1500</label>
+          <label xml:lang="fr">1401-1500</label>
+          <label xml:lang="pt">1401-1500</label>
+          <label xml:lang="es">1401-1500</label>
+        </item>
+        <item id="2012409">
+          <code>16</code>
+          <label>1501-1600</label>
+          <label xml:lang="fr">1501-1600</label>
+          <label xml:lang="pt">1501-1600</label>
+          <label xml:lang="es">1501-1600</label>
+        </item>
+        <item id="2012410">
+          <code>17</code>
+          <label>1601-1700</label>
+          <label xml:lang="fr">1601-1700</label>
+          <label xml:lang="pt">1601-1700</label>
+          <label xml:lang="es">1601-1700</label>
+        </item>
+        <item id="2012411">
+          <code>18</code>
+          <label>1701-1800</label>
+          <label xml:lang="fr">1701-1800</label>
+          <label xml:lang="pt">1701-1800</label>
+          <label xml:lang="es">1701-1800</label>
+        </item>
+        <item id="2012412">
+          <code>19</code>
+          <label>1801-1900</label>
+          <label xml:lang="fr">1801-1900</label>
+          <label xml:lang="pt">1801-1900</label>
+          <label xml:lang="es">1801-1900</label>
+        </item>
+        <item id="2012413">
+          <code>20</code>
+          <label>1901-2000</label>
+          <label xml:lang="fr">1901-2000</label>
+          <label xml:lang="pt">1901-2000</label>
+          <label xml:lang="es">1901-2000</label>
+        </item>
+        <item id="2012414">
+          <code>21</code>
+          <label>2001-2100</label>
+          <label xml:lang="fr">2001-2100</label>
+          <label xml:lang="pt">2001-2100</label>
+          <label xml:lang="es">2001-2100</label>
+        </item>
+        <item id="2012415">
+          <code>22</code>
+          <label>2101-2200</label>
+          <label xml:lang="fr">2101-2200</label>
+          <label xml:lang="pt">2101-2200</label>
+          <label xml:lang="es">2101-2200</label>
+        </item>
+        <item id="2012416">
+          <code>23</code>
+          <label>2201-2300</label>
+          <label xml:lang="fr">2201-2300</label>
+          <label xml:lang="pt">2201-2300</label>
+          <label xml:lang="es">2201-2300</label>
+        </item>
+        <item id="2012417">
+          <code>24</code>
+          <label>2301-2400</label>
+          <label xml:lang="fr">2301-2400</label>
+          <label xml:lang="pt">2301-2400</label>
+          <label xml:lang="es">2301-2400</label>
+        </item>
+        <item id="2012418">
+          <code>25</code>
+          <label>2401-2500</label>
+          <label xml:lang="fr">2401-2500</label>
+          <label xml:lang="pt">2401-2500</label>
+          <label xml:lang="es">2401-2500</label>
+        </item>
+        <item id="2012419">
+          <code>26</code>
+          <label>2501-2600</label>
+          <label xml:lang="fr">2501-2600</label>
+          <label xml:lang="pt">2501-2600</label>
+          <label xml:lang="es">2501-2600</label>
+        </item>
+        <item id="2012420">
+          <code>27</code>
+          <label>2601-2700</label>
+          <label xml:lang="fr">2601-2700</label>
+          <label xml:lang="pt">2601-2700</label>
+          <label xml:lang="es">2601-2700</label>
+        </item>
+        <item id="2012421">
+          <code>28</code>
+          <label>2701-2800</label>
+          <label xml:lang="fr">2701-2800</label>
+          <label xml:lang="pt">2701-2800</label>
+          <label xml:lang="es">2701-2800</label>
+        </item>
+        <item id="2012422">
+          <code>29</code>
+          <label>2801-2900</label>
+          <label xml:lang="fr">2801-2900</label>
+          <label xml:lang="pt">2801-2900</label>
+          <label xml:lang="es">2801-2900</label>
+        </item>
+        <item id="2012423">
+          <code>30</code>
+          <label>2901-3000</label>
+          <label xml:lang="fr">2901-3000</label>
+          <label xml:lang="pt">2901-3000</label>
+          <label xml:lang="es">2901-3000</label>
+        </item>
+        <item id="2012424">
+          <code>31</code>
+          <label>3001-3100</label>
+          <label xml:lang="fr">3001-3100</label>
+          <label xml:lang="pt">3001-3100</label>
+          <label xml:lang="es">3001-3100</label>
+        </item>
+        <item id="2012425">
+          <code>32</code>
+          <label>3101-3200</label>
+          <label xml:lang="fr">3101-3200</label>
+          <label xml:lang="pt">3101-3200</label>
+          <label xml:lang="es">3101-3200</label>
+        </item>
+        <item id="2012426">
+          <code>33</code>
+          <label>3201-3300</label>
+          <label xml:lang="fr">3201-3300</label>
+          <label xml:lang="pt">3201-3300</label>
+          <label xml:lang="es">3201-3300</label>
+        </item>
+        <item id="2012427">
+          <code>34</code>
+          <label>3301-3400</label>
+          <label xml:lang="fr">3301-3400</label>
+          <label xml:lang="pt">3301-3400</label>
+          <label xml:lang="es">3301-3400</label>
+        </item>
+        <item id="2012428">
+          <code>35</code>
+          <label>3401-3500</label>
+          <label xml:lang="fr">3401-3500</label>
+          <label xml:lang="pt">3401-3500</label>
+          <label xml:lang="es">3401-3500</label>
+        </item>
+        <item id="2012429">
+          <code>36</code>
+          <label>3501-3600</label>
+          <label xml:lang="fr">3501-3600</label>
+          <label xml:lang="pt">3501-3600</label>
+          <label xml:lang="es">3501-3600</label>
+        </item>
+        <item id="2012430">
+          <code>37</code>
+          <label>3601-3700</label>
+          <label xml:lang="fr">3601-3700</label>
+          <label xml:lang="pt">3601-3700</label>
+          <label xml:lang="es">3601-3700</label>
+        </item>
+        <item id="2012431">
+          <code>38</code>
+          <label>3701-3800</label>
+          <label xml:lang="fr">3701-3800</label>
+          <label xml:lang="pt">3701-3800</label>
+          <label xml:lang="es">3701-3800</label>
+        </item>
+        <item id="2012432">
+          <code>39</code>
+          <label>3801-3900</label>
+          <label xml:lang="fr">3801-3900</label>
+          <label xml:lang="pt">3801-3900</label>
+          <label xml:lang="es">3801-3900</label>
+        </item>
+        <item id="2012433">
+          <code>40</code>
+          <label>3901-4000</label>
+          <label xml:lang="fr">3901-4000</label>
+          <label xml:lang="pt">3901-4000</label>
+          <label xml:lang="es">3901-4000</label>
+        </item>
+        <item id="2012434">
+          <code>41</code>
+          <label>4001-4100</label>
+          <label xml:lang="fr">4001-4100</label>
+          <label xml:lang="pt">4001-4100</label>
+          <label xml:lang="es">4001-4100</label>
+        </item>
+        <item id="2012435">
+          <code>42</code>
+          <label>4101-4200</label>
+          <label xml:lang="fr">4101-4200</label>
+          <label xml:lang="pt">4101-4200</label>
+          <label xml:lang="es">4101-4200</label>
+        </item>
+        <item id="2012436">
+          <code>43</code>
+          <label>4201-4300</label>
+          <label xml:lang="fr">4201-4300</label>
+          <label xml:lang="pt">4201-4300</label>
+          <label xml:lang="es">4201-4300</label>
+        </item>
+        <item id="2012437">
+          <code>44</code>
+          <label>4301-4400</label>
+          <label xml:lang="fr">4301-4400</label>
+          <label xml:lang="pt">4301-4400</label>
+          <label xml:lang="es">4301-4400</label>
+        </item>
+        <item id="2012438">
+          <code>45</code>
+          <label>4401-4500</label>
+          <label xml:lang="fr">4401-4500</label>
+          <label xml:lang="pt">4401-4500</label>
+          <label xml:lang="es">4401-4500</label>
+        </item>
+        <item id="2012439">
+          <code>46</code>
+          <label>4501-4600</label>
+          <label xml:lang="fr">4501-4600</label>
+          <label xml:lang="pt">4501-4600</label>
+          <label xml:lang="es">4501-4600</label>
+        </item>
+        <item id="2012440">
+          <code>47</code>
+          <label>4601-4700</label>
+          <label xml:lang="fr">4601-4700</label>
+          <label xml:lang="pt">4601-4700</label>
+          <label xml:lang="es">4601-4700</label>
+        </item>
+        <item id="2012441">
+          <code>48</code>
+          <label>4701-4800</label>
+          <label xml:lang="fr">4701-4800</label>
+          <label xml:lang="pt">4701-4800</label>
+          <label xml:lang="es">4701-4800</label>
+        </item>
+        <item id="2012442">
+          <code>49</code>
+          <label>4801-4900</label>
+          <label xml:lang="fr">4801-4900</label>
+          <label xml:lang="pt">4801-4900</label>
+          <label xml:lang="es">4801-4900</label>
+        </item>
+        <item id="2012443">
+          <code>50</code>
+          <label>4901-5000</label>
+          <label xml:lang="fr">4901-5000</label>
+          <label xml:lang="pt">4901-5000</label>
+          <label xml:lang="es">4901-5000</label>
+        </item>
+        <item id="2012444">
+          <code>51</code>
+          <label>5001-5100</label>
+          <label xml:lang="fr">5001-5100</label>
+          <label xml:lang="pt">5001-5100</label>
+          <label xml:lang="es">5001-5100</label>
+        </item>
+        <item id="2012445">
+          <code>52</code>
+          <label>5101-5200</label>
+          <label xml:lang="fr">5101-5200</label>
+          <label xml:lang="pt">5101-5200</label>
+          <label xml:lang="es">5101-5200</label>
+        </item>
+        <item id="2012446">
+          <code>53</code>
+          <label>5201-5300</label>
+          <label xml:lang="fr">5201-5300</label>
+          <label xml:lang="pt">5201-5300</label>
+          <label xml:lang="es">5201-5300</label>
+        </item>
+        <item id="2012447">
+          <code>54</code>
+          <label>5301-5400</label>
+          <label xml:lang="fr">5301-5400</label>
+          <label xml:lang="pt">5301-5400</label>
+          <label xml:lang="es">5301-5400</label>
+        </item>
+        <item id="2012448">
+          <code>55</code>
+          <label>5401-5500</label>
+          <label xml:lang="fr">5401-5500</label>
+          <label xml:lang="pt">5401-5500</label>
+          <label xml:lang="es">5401-5500</label>
+        </item>
+        <item id="2012449">
+          <code>56</code>
+          <label>5501-5600</label>
+          <label xml:lang="fr">5501-5600</label>
+          <label xml:lang="pt">5501-5600</label>
+          <label xml:lang="es">5501-5600</label>
+        </item>
+        <item id="2012450">
+          <code>57</code>
+          <label>5601-5700</label>
+          <label xml:lang="fr">5601-5700</label>
+          <label xml:lang="pt">5601-5700</label>
+          <label xml:lang="es">5601-5700</label>
+        </item>
+        <item id="2012451">
+          <code>58</code>
+          <label>5701-5800</label>
+          <label xml:lang="fr">5701-5800</label>
+          <label xml:lang="pt">5701-5800</label>
+          <label xml:lang="es">5701-5800</label>
+        </item>
+        <item id="2012452">
+          <code>59</code>
+          <label>5801-5900</label>
+          <label xml:lang="fr">5801-5900</label>
+          <label xml:lang="pt">5801-5900</label>
+          <label xml:lang="es">5801-5900</label>
+        </item>
+        <item id="2012453">
+          <code>60</code>
+          <label>5901-6000</label>
+          <label xml:lang="fr">5901-6000</label>
+          <label xml:lang="pt">5901-6000</label>
+          <label xml:lang="es">5901-6000</label>
+        </item>
+        <item id="2012454">
+          <code>61</code>
+          <label>6001-6100</label>
+          <label xml:lang="fr">6001-6100</label>
+          <label xml:lang="pt">6001-6100</label>
+          <label xml:lang="es">6001-6100</label>
+        </item>
+        <item id="2012455">
+          <code>62</code>
+          <label>6101-6200</label>
+          <label xml:lang="fr">6101-6200</label>
+          <label xml:lang="pt">6101-6200</label>
+          <label xml:lang="es">6101-6200</label>
+        </item>
+        <item id="2012456">
+          <code>63</code>
+          <label>6201-6300</label>
+          <label xml:lang="fr">6201-6300</label>
+          <label xml:lang="pt">6201-6300</label>
+          <label xml:lang="es">6201-6300</label>
+        </item>
+        <item id="2012457">
+          <code>0</code>
+          <label>-100 / 0</label>
+          <label xml:lang="fr">-100 / 0</label>
+          <label xml:lang="pt">-100 / 0</label>
+          <label xml:lang="es">-100 / 0</label>
+        </item>
+        <item id="2012458">
+          <code>-1</code>
+          <label>-200 / -100</label>
+          <label xml:lang="fr">-200 / -100</label>
+          <label xml:lang="pt">-200 / -100</label>
+          <label xml:lang="es">-200 / -100</label>
+        </item>
+      </items>
+    </list>
+    <list id="1604" name="orientation">
+      <label type="item">Orientation</label>
+      <label type="item" xml:lang="fr">Exposition</label>
+      <label type="item" xml:lang="es">Orientación</label>
+      <label type="item" xml:lang="pt">Orientação</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2012314">
+          <code>N</code>
+          <label>North</label>
+          <label xml:lang="fr">Nord</label>
+          <label xml:lang="pt">Norte</label>
+          <label xml:lang="es">Norte</label>
+        </item>
+        <item id="2012315">
+          <code>NE</code>
+          <label>North East</label>
+          <label xml:lang="fr">Nord Est</label>
+          <label xml:lang="pt">Nordeste</label>
+          <label xml:lang="es">Noreste</label>
+        </item>
+        <item id="2012316">
+          <code>E</code>
+          <label>East</label>
+          <label xml:lang="fr">Est</label>
+          <label xml:lang="pt">Leste</label>
+          <label xml:lang="es">Este</label>
+        </item>
+        <item id="2012317">
+          <code>SE</code>
+          <label>South East</label>
+          <label xml:lang="fr">Sud Est</label>
+          <label xml:lang="pt">Sudeste</label>
+          <label xml:lang="es">Sureste</label>
+        </item>
+        <item id="2012318">
+          <code>S</code>
+          <label>South</label>
+          <label xml:lang="fr">Sud</label>
+          <label xml:lang="pt">Sul</label>
+          <label xml:lang="es">Sur</label>
+        </item>
+        <item id="2012319">
+          <code>SW</code>
+          <label>South West</label>
+          <label xml:lang="fr">Sud Ouest</label>
+          <label xml:lang="pt">Sudoeste</label>
+          <label xml:lang="es">Sur oeste</label>
+        </item>
+        <item id="2012320">
+          <code>W</code>
+          <label>West</label>
+          <label xml:lang="fr">Ouest</label>
+          <label xml:lang="pt">Oeste</label>
+          <label xml:lang="es">Oeste</label>
+        </item>
+        <item id="2012321">
+          <code>NW</code>
+          <label>North West</label>
+          <label xml:lang="fr">Nord Ouest</label>
+          <label xml:lang="pt">Noroeste</label>
+          <label xml:lang="es">Noroeste</label>
+        </item>
+        <item id="2012322">
+          <code>na</code>
+          <label>N/A</label>
+          <label xml:lang="fr">N / A</label>
+          <label xml:lang="pt">N / D</label>
+          <label xml:lang="es">N / A</label>
+        </item>
+      </items>
+    </list>
+    <list id="1616" name="slope_classes">
+      <label type="item">Slope ranges</label>
+      <label type="item" xml:lang="fr">Gammes de pente</label>
+      <label type="item" xml:lang="es">Raixas de inclinação</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2012342">
+          <code>FLAT</code>
+          <label>0-5 °</label>
+          <label xml:lang="fr">0-5 °</label>
+          <label xml:lang="pt">0-5 °</label>
+          <label xml:lang="es">0-5 °</label>
+        </item>
+        <item id="2012343">
+          <code>SLIGHT</code>
+          <label>6-15 °</label>
+          <label xml:lang="fr">6-15 °</label>
+          <label xml:lang="pt">6-15 °</label>
+          <label xml:lang="es">6-15 °</label>
+        </item>
+        <item id="2012344">
+          <code>STEEP</code>
+          <label>16-30  °</label>
+          <label xml:lang="fr">16-30  °</label>
+          <label xml:lang="pt">16-30  °</label>
+          <label xml:lang="es">16-30  °</label>
+        </item>
+        <item id="2012345">
+          <code>VERY_STEEP</code>
+          <label>31-45  °</label>
+          <label xml:lang="fr">31-45  °</label>
+          <label xml:lang="pt">31-45  °</label>
+          <label xml:lang="es">31-45  °</label>
+        </item>
+        <item id="2012346">
+          <code>EXTREME</code>
+          <label>46-60  °</label>
+          <label xml:lang="fr">46-60  °</label>
+          <label xml:lang="pt">46-60  °</label>
+          <label xml:lang="es">46-60  °</label>
+        </item>
+        <item id="2012347">
+          <code>FALL</code>
+          <label>61-90 °</label>
+          <label xml:lang="fr">61-90 °</label>
+          <label xml:lang="pt">61-90 °</label>
+          <label xml:lang="es">61-90 °</label>
+        </item>
+      </items>
+    </list>
+    <list id="3001" name="sampling_design" lookup="ofc_sampling_design">
+      <hierarchy>
+        <level name="level1" />
+        <level name="level2" />
+        <level name="level3" />
+      </hierarchy>
+    </list>
+    <list id="10268" name="assessment_phases">
+      <label type="item">Assessment Phases</label>
+      <label type="item" xml:lang="fr">Phases d’évaluation</label>
+      <label type="item" xml:lang="es">Fases de evaluación</label>
+      <label type="item" xml:lang="pt">Fases de Avaliação</label>
+      <description>The assessment that the plot is part of. All plots should be assessed at least once, the second re-assessment should be done to check the operators interpretation error. If necesary more assessment phases can be added.
+Each plot can be assessed multiple times if the sampling-design is updated to mirror the changes (the plot in the database is identified by the combination of plot ID and assessment phase)</description>
+      <description xml:lang="es">The assessment that the plot is part of. All plots should be assessed at least once, the second re-assessment should be done to check the operators interpretation error. If necesary more assessment phases can be added.
+Each plot can be assessed multiple times if the sampling-design is updated to mirror the changes (the plot in the database is identified by the combination of plot ID and assessment phase)</description>
+      <description xml:lang="fr">The assessment that the plot is part of. All plots should be assessed at least once, the second re-assessment should be done to check the operators interpretation error. If necesary more assessment phases can be added.
+Each plot can be assessed multiple times if the sampling-design is updated to mirror the changes (the plot in the database is identified by the combination of plot ID and assessment phase)</description>
+      <description xml:lang="pt">The assessment that the plot is part of. All plots should be assessed at least once, the second re-assessment should be done to check the operators interpretation error. If necesary more assessment phases can be added.
+Each plot can be assessed multiple times if the sampling-design is updated to mirror the changes (the plot in the database is identified by the combination of plot ID and assessment phase)</description>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2012155">
+          <code>1</code>
+          <label>First assessment</label>
+          <label xml:lang="fr">Ordinaire</label>
+          <label xml:lang="pt">Primeira avaliação</label>
+          <label xml:lang="es">Primera Evaluación</label>
+        </item>
+        <item id="2012156">
+          <code>2</code>
+          <label>Re-Assessment</label>
+          <label xml:lang="fr">Re-evaluation</label>
+          <label xml:lang="pt">Segunda avaliação</label>
+          <label xml:lang="es">Segunda Evaluación</label>
+        </item>
+      </items>
+    </list>
+    <list id="10271" name="years">
+      <label type="item">Years</label>
+      <label type="item" xml:lang="fr">Annees</label>
+      <label type="item" xml:lang="es">Años</label>
+      <description>Values used when the user needs to specify the year of change of Land Use or the year of acquisition of the VHR imagery.</description>
+      <description xml:lang="es">Values used when the user needs to specify the year of change of Land Use or the year of acquisition of the VHR imagery.</description>
+      <description xml:lang="fr">Values used when the user needs to specify the year of change of Land Use or the year of acquisition of the VHR imagery.</description>
+      <description xml:lang="pt">Values used when the user needs to specify the year of change of Land Use or the year of acquisition of the VHR imagery.</description>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2012393">
+          <code>2025</code>
+          <label>2025</label>
+          <label xml:lang="fr">2000</label>
+          <label xml:lang="pt">2000</label>
+          <label xml:lang="es">2000</label>
+        </item>
+        <item id="2035532">
+          <code>2024</code>
+          <label>2024</label>
+        </item>
+        <item id="2035533">
+          <code>2023</code>
+          <label>2023</label>
+        </item>
+        <item id="2035534">
+          <code>2022</code>
+          <label>2022</label>
+        </item>
+        <item id="2035535">
+          <code>2021</code>
+          <label>2021</label>
+        </item>
+        <item id="2035536">
+          <code>2020</code>
+          <label>2020</label>
+        </item>
+        <item id="2035537">
+          <code>2019</code>
+          <label>2019</label>
+        </item>
+        <item id="2035538">
+          <code>2018</code>
+          <label>2018</label>
+        </item>
+        <item id="2035539">
+          <code>2017</code>
+          <label>2017</label>
+        </item>
+        <item id="2035540">
+          <code>2016</code>
+          <label>2016</label>
+        </item>
+        <item id="2035541">
+          <code>2015</code>
+          <label>2015</label>
+        </item>
+        <item id="2035542">
+          <code>2014</code>
+          <label>2014</label>
+        </item>
+        <item id="2035543">
+          <code>2013</code>
+          <label>2013</label>
+        </item>
+        <item id="2035544">
+          <code>2012</code>
+          <label>2012</label>
+        </item>
+        <item id="2035545">
+          <code>2011</code>
+          <label>2011</label>
+        </item>
+        <item id="2035546">
+          <code>2010</code>
+          <label>2010</label>
+        </item>
+        <item id="2035547">
+          <code>2009</code>
+          <label>2009</label>
+        </item>
+        <item id="2035548">
+          <code>2008</code>
+          <label>2008</label>
+        </item>
+        <item id="2035549">
+          <code>2007</code>
+          <label>2007</label>
+        </item>
+        <item id="2035550">
+          <code>2006</code>
+          <label>2006</label>
+        </item>
+        <item id="2035551">
+          <code>2005</code>
+          <label>2005</label>
+        </item>
+        <item id="2035552">
+          <code>2004</code>
+          <label>2004</label>
+        </item>
+        <item id="2035553">
+          <code>2003</code>
+          <label>2003</label>
+        </item>
+        <item id="2035554">
+          <code>2002</code>
+          <label>2002</label>
+        </item>
+        <item id="2035555">
+          <code>2001</code>
+          <label>2001</label>
+        </item>
+        <item id="2035556">
+          <code>2000</code>
+          <label>2000</label>
+        </item>
+      </items>
+    </list>
+    <list id="61400" name="soil_types">
+      <label type="item">Soil types</label>
+      <label type="item" xml:lang="fr">Types de sol</label>
+      <label type="item" xml:lang="es">Tipos de suelo</label>
+      <description>Soil Map From the JRC Support to Renewable Energy Directive
+
+http://esdac.jrc.ec.europa.eu/content/support-renewable-energy-directive#tabs-0-description=0
+
+See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/
+
+Legend value code label
+
+ 1 ORG Organic
+ 2 SAN Sandy Soils
+ 3 WET Wetland Soils  
+ 4 VOL Volcanic Soils  
+ 5 SPO Spodic Soils    
+ 6 HAC High Activity Clay Soils  
+ 7 LAC Low Activity Clay Soils  
+ 8 OtherAreas Other Areas  
+ 0 No Data The map contains no data for this plot
+
+
+Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+
+
+Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Asset ID : users/sanchezpaus/SOIL_TYPE_rst
+GEE Script code : 
+1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
+2. https://code.earthengine.google.com/?scriptPath=users%2Fsanc</description>
+      <description xml:lang="es">Soil Map From the JRC Support to Renewable Energy Directive
+
+http://esdac.jrc.ec.europa.eu/content/support-renewable-energy-directive#tabs-0-description=0
+
+See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/
+
+Legend value code label
+
+ 1 ORG Organic
+ 2 SAN Sandy Soils
+ 3 WET Wetland Soils  
+ 4 VOL Volcanic Soils  
+ 5 SPO Spodic Soils    
+ 6 HAC High Activity Clay Soils  
+ 7 LAC Low Activity Clay Soils  
+ 8 OtherAreas Other Areas  
+ 0 No Data The map contains no data for this plot
+
+
+Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+
+
+Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Asset ID : users/sanchezpaus/SOIL_TYPE_rst
+GEE Script code : 
+1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
+2. https://code.earthengine.google.com/?scriptPath=users%2Fsanc</description>
+      <description xml:lang="fr">Soil Map From the JRC Support to Renewable Energy Directive
+
+http://esdac.jrc.ec.europa.eu/content/support-renewable-energy-directive#tabs-0-description=0
+
+See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/
+
+Legend value code label
+
+ 1 ORG Organic
+ 2 SAN Sandy Soils
+ 3 WET Wetland Soils  
+ 4 VOL Volcanic Soils  
+ 5 SPO Spodic Soils    
+ 6 HAC High Activity Clay Soils  
+ 7 LAC Low Activity Clay Soils  
+ 8 OtherAreas Other Areas  
+ 0 No Data The map contains no data for this plot
+
+
+Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+
+
+Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Asset ID : users/sanchezpaus/SOIL_TYPE_rst
+GEE Script code : 
+1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
+2. https://code.earthengine.google.com/?scriptPath=users%2Fsanc</description>
+      <description xml:lang="pt">Soil Map From the JRC Support to Renewable Energy Directive
+
+http://esdac.jrc.ec.europa.eu/content/support-renewable-energy-directive#tabs-0-description=0
+
+See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/
+
+Legend value code label
+
+ 1 ORG Organic
+ 2 SAN Sandy Soils
+ 3 WET Wetland Soils  
+ 4 VOL Volcanic Soils  
+ 5 SPO Spodic Soils    
+ 6 HAC High Activity Clay Soils  
+ 7 LAC Low Activity Clay Soils  
+ 8 OtherAreas Other Areas  
+ 0 No Data The map contains no data for this plot
+
+
+Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+
+
+Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Asset ID : users/sanchezpaus/SOIL_TYPE_rst
+GEE Script code : 
+1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
+2. https://code.earthengine.google.com/?scriptPath=users%2Fsanc</description>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2012348">
+          <code>1</code>
+          <label>ORG</label>
+          <label xml:lang="fr">ORG</label>
+          <label xml:lang="pt">ORG</label>
+          <label xml:lang="es">ORG</label>
+          <description>Organic</description>
+          <description xml:lang="fr">Organique</description>
+          <description xml:lang="pt">Orgânico</description>
+          <description xml:lang="es">Orgánico</description>
+        </item>
+        <item id="2012349">
+          <code>2</code>
+          <label>SAN</label>
+          <label xml:lang="fr">SAN</label>
+          <label xml:lang="pt">SAN</label>
+          <label xml:lang="es">SAN</label>
+          <description>Sandy Soils</description>
+          <description xml:lang="fr">Sols sableux</description>
+          <description xml:lang="pt">Solos Arenosos</description>
+          <description xml:lang="es">Suelos Arenosos</description>
+        </item>
+        <item id="2012350">
+          <code>3</code>
+          <label>WET</label>
+          <label xml:lang="fr">WET</label>
+          <label xml:lang="pt">WET</label>
+          <label xml:lang="es">WET</label>
+          <description>Wetland Soils</description>
+          <description xml:lang="fr">Sols de terres humides</description>
+          <description xml:lang="pt">Solos de Zona Húmida</description>
+          <description xml:lang="es">Suelos de humedales</description>
+        </item>
+        <item id="2012351">
+          <code>4</code>
+          <label>VOL</label>
+          <label xml:lang="fr">VOL</label>
+          <label xml:lang="pt">VOL</label>
+          <label xml:lang="es">VOL</label>
+          <description>Volcanic Soils</description>
+          <description xml:lang="fr">Sols volcaniques</description>
+          <description xml:lang="pt">Solos vulcânicos</description>
+          <description xml:lang="es">Suelos volcánicos</description>
+        </item>
+        <item id="2012352">
+          <code>5</code>
+          <label>SPO</label>
+          <label xml:lang="fr">SPO</label>
+          <label xml:lang="pt">SPO</label>
+          <label xml:lang="es">SPO</label>
+          <description>Spodic Soils</description>
+          <description xml:lang="fr">Sols spodiques</description>
+          <description xml:lang="pt">Solos Espódicos</description>
+          <description xml:lang="es">Suelos espódicos</description>
+        </item>
+        <item id="2012353">
+          <code>6</code>
+          <label>HAC</label>
+          <label xml:lang="fr">HAC</label>
+          <label xml:lang="pt">HAC</label>
+          <label xml:lang="es">HAC</label>
+          <description>High Activity Clay Soils</description>
+          <description xml:lang="fr">Sols argileux à haute activité</description>
+          <description xml:lang="pt">Solos Argilosos de Alta Atividade</description>
+          <description xml:lang="es">Suelos arcillosos de alta actividad</description>
+        </item>
+        <item id="2012354">
+          <code>7</code>
+          <label>LAC</label>
+          <label xml:lang="fr">LAC</label>
+          <label xml:lang="pt">LAC</label>
+          <label xml:lang="es">LAC</label>
+          <description>Low Activity Clay Soils</description>
+          <description xml:lang="fr">Sols argileux à faible activité</description>
+          <description xml:lang="pt">Solos Argilosos de Baixa Atividade</description>
+          <description xml:lang="es">Suelos arcillosos de baja actividad</description>
+        </item>
+        <item id="2012355">
+          <code>8</code>
+          <label>OtherAreas</label>
+          <label xml:lang="fr">OtherAreas</label>
+          <label xml:lang="pt">OtherAreas</label>
+          <label xml:lang="es">OtherAreas</label>
+          <description>Other Areas</description>
+          <description xml:lang="fr">Autres</description>
+          <description xml:lang="pt">Outras áreas</description>
+          <description xml:lang="es">Otras areas</description>
+        </item>
+        <item id="2012356">
+          <code>0</code>
+          <label>No Data</label>
+          <label xml:lang="fr">No Data</label>
+          <label xml:lang="pt">No Data</label>
+          <label xml:lang="es">No Data</label>
+          <description>The map contains no data for this plot</description>
+          <description xml:lang="fr">La carte ne contient aucune donnée pour cette placette</description>
+          <description xml:lang="pt">O mapa não contém dados para este gráfico</description>
+          <description xml:lang="es">El mapa no contiene datos para esta parcela</description>
+        </item>
+      </items>
+    </list>
+    <list id="61410" name="climate_zones">
+      <label type="item">Climate zones</label>
+      <label type="item" xml:lang="fr">Zones climatiques</label>
+      <label type="item" xml:lang="es">Zonas climáticas</label>
+      <description>IPCC Climate Zones 1985-2015 Updated demonstration of the world climate zones described by IPCC in 2019. Download full dataset here : https://www.ipcc-nggip.iges.or.jp/faq/img/IPCC_Climate_Zones_Map_raster.zip
+
+1 WTM Warm Temperate Moist
+2 WTD Warm Temperate Dry
+3 CTM Cool Temperate Moist
+4 CTD Cool Temperate Dry 5 POM Polar Moist 6 POD Polar Dry
+7 BOM Boreal Moist
+8 BOD Boreal Dry
+9 TRMT Tropical Montane
+10 TRW Tropical Wet
+11 TMM Tropical Moist
+12 TRD Tropical Dry
+
+Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+
+
+Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Asset ID : users/collectearth/IPCC/ipcc_climate_1985-2015_remapped_for_surveys
+GEE Script code : 
+1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
+2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
+      <description xml:lang="es">IPCC Climate Zones 1985-2015 Updated demonstration of the world climate zones described by IPCC in 2019. Download full dataset here : https://www.ipcc-nggip.iges.or.jp/faq/img/IPCC_Climate_Zones_Map_raster.zip
+
+1 WTM Warm Temperate Moist
+2 WTD Warm Temperate Dry
+3 CTM Cool Temperate Moist
+4 CTD Cool Temperate Dry 5 POM Polar Moist 6 POD Polar Dry
+7 BOM Boreal Moist
+8 BOD Boreal Dry
+9 TRMT Tropical Montane
+10 TRW Tropical Wet
+11 TMM Tropical Moist
+12 TRD Tropical Dry
+
+Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+
+
+Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Asset ID : users/collectearth/IPCC/ipcc_climate_1985-2015_remapped_for_surveys
+GEE Script code : 
+1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
+2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
+      <description xml:lang="fr">IPCC Climate Zones 1985-2015 Updated demonstration of the world climate zones described by IPCC in 2019. Download full dataset here : https://www.ipcc-nggip.iges.or.jp/faq/img/IPCC_Climate_Zones_Map_raster.zip
+
+1 WTM Warm Temperate Moist
+2 WTD Warm Temperate Dry
+3 CTM Cool Temperate Moist
+4 CTD Cool Temperate Dry 5 POM Polar Moist 6 POD Polar Dry
+7 BOM Boreal Moist
+8 BOD Boreal Dry
+9 TRMT Tropical Montane
+10 TRW Tropical Wet
+11 TMM Tropical Moist
+12 TRD Tropical Dry
+
+Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+
+
+Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Asset ID : users/collectearth/IPCC/ipcc_climate_1985-2015_remapped_for_surveys
+GEE Script code : 
+1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
+2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
+      <description xml:lang="pt">IPCC Climate Zones 1985-2015 Updated demonstration of the world climate zones described by IPCC in 2019. Download full dataset here : https://www.ipcc-nggip.iges.or.jp/faq/img/IPCC_Climate_Zones_Map_raster.zip
+
+1 WTM Warm Temperate Moist
+2 WTD Warm Temperate Dry
+3 CTM Cool Temperate Moist
+4 CTD Cool Temperate Dry 5 POM Polar Moist 6 POD Polar Dry
+7 BOM Boreal Moist
+8 BOD Boreal Dry
+9 TRMT Tropical Montane
+10 TRW Tropical Wet
+11 TMM Tropical Moist
+12 TRD Tropical Dry
+
+Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+
+
+Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Asset ID : users/collectearth/IPCC/ipcc_climate_1985-2015_remapped_for_surveys
+GEE Script code : 
+1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
+2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2012472">
+          <code>1</code>
+          <label>WTM</label>
+          <label xml:lang="fr">WTM</label>
+          <label xml:lang="pt">WTM</label>
+          <label xml:lang="es">WTM</label>
+          <description>Warm Temperate Moist</description>
+          <description xml:lang="fr">Chaud tempéré humide</description>
+          <description xml:lang="pt">Quente Temperado Úmido</description>
+          <description xml:lang="es">Cálido templado húmedo</description>
+        </item>
+        <item id="2012473">
+          <code>2</code>
+          <label>WTD</label>
+          <label xml:lang="fr">WTD</label>
+          <label xml:lang="pt">WTD</label>
+          <label xml:lang="es">WTD</label>
+          <description>Warm Temperate Dry</description>
+          <description xml:lang="fr">Chaud tempéré sec</description>
+          <description xml:lang="pt">Quente Temperado Seco</description>
+          <description xml:lang="es">Cálido Templado Seco</description>
+        </item>
+        <item id="2012474">
+          <code>3</code>
+          <label>CTM</label>
+          <label xml:lang="fr">CTM</label>
+          <label xml:lang="pt">CTM</label>
+          <label xml:lang="es">CTM</label>
+          <description>Cool Temperate Moist</description>
+          <description xml:lang="fr">Cool tempéré humide</description>
+          <description xml:lang="pt">Frio Temperado Úmido</description>
+          <description xml:lang="es">Fresco Templado Húmedo</description>
+        </item>
+        <item id="2012475">
+          <code>4</code>
+          <label>CTD</label>
+          <label xml:lang="fr">CTD</label>
+          <label xml:lang="pt">CTD</label>
+          <label xml:lang="es">CTD</label>
+          <description>Cool Temperate Dry</description>
+          <description xml:lang="fr">Sec tempéré frais</description>
+          <description xml:lang="pt">Frio Temperado Seco</description>
+          <description xml:lang="es">Fresco Templado Seco</description>
+        </item>
+        <item id="2012476">
+          <code>5</code>
+          <label>POM</label>
+          <label xml:lang="fr">POM</label>
+          <label xml:lang="pt">POM</label>
+          <label xml:lang="es">POM</label>
+          <description>Polar Moist</description>
+          <description xml:lang="fr">Polaire moite</description>
+          <description xml:lang="pt">Polar úmido</description>
+          <description xml:lang="es">Húmedo polar</description>
+        </item>
+        <item id="2012477">
+          <code>6</code>
+          <label>POD</label>
+          <label xml:lang="fr">POD</label>
+          <label xml:lang="pt">POD</label>
+          <label xml:lang="es">POD</label>
+          <description>Polar Dry</description>
+          <description xml:lang="fr">Polaire sec</description>
+          <description xml:lang="pt">Polar seco</description>
+          <description xml:lang="es">Seco polar</description>
+        </item>
+        <item id="2012478">
+          <code>7</code>
+          <label>BOM</label>
+          <label xml:lang="fr">BOM</label>
+          <label xml:lang="pt">BOM</label>
+          <label xml:lang="es">BOM</label>
+          <description>Boreal Moist</description>
+          <description xml:lang="fr">Boreal Moist</description>
+          <description xml:lang="pt">Boreal úmido</description>
+          <description xml:lang="es">Húmedo boreal</description>
+        </item>
+        <item id="2012479">
+          <code>8</code>
+          <label>BOD</label>
+          <label xml:lang="fr">BOD</label>
+          <label xml:lang="pt">BOD</label>
+          <label xml:lang="es">BOD</label>
+          <description>Boreal Dry</description>
+          <description xml:lang="fr">Sec boréal</description>
+          <description xml:lang="pt">Boreal seco</description>
+          <description xml:lang="es">Seco boreal</description>
+        </item>
+        <item id="2012480">
+          <code>9</code>
+          <label>TRMT</label>
+          <label xml:lang="fr">TRMT</label>
+          <label xml:lang="pt">TRMT</label>
+          <label xml:lang="es">TRMT</label>
+          <description>Tropical Montane</description>
+          <description xml:lang="fr">Montagne tropicale</description>
+          <description xml:lang="pt">Tropical Montano</description>
+          <description xml:lang="es">Montano tropical</description>
+        </item>
+        <item id="2012481">
+          <code>10</code>
+          <label>TRW</label>
+          <label xml:lang="fr">TRW</label>
+          <label xml:lang="pt">TRW</label>
+          <label xml:lang="es">TRW</label>
+          <description>Tropical Wet</description>
+          <description xml:lang="fr">Tropicale humide</description>
+          <description xml:lang="pt">Tropical Molhado</description>
+          <description xml:lang="es">Húmedo tropical</description>
+        </item>
+        <item id="2012482">
+          <code>11</code>
+          <label>TMM</label>
+          <label xml:lang="fr">TMM</label>
+          <label xml:lang="pt">TMM</label>
+          <label xml:lang="es">TMM</label>
+          <description>Tropical Moist</description>
+          <description xml:lang="fr">Tropical humide</description>
+          <description xml:lang="pt">Tropical Úmido</description>
+          <description xml:lang="es">Húmedo tropical</description>
+        </item>
+        <item id="2012483">
+          <code>12</code>
+          <label>TRD</label>
+          <label xml:lang="fr">TRD</label>
+          <label xml:lang="pt">TRD</label>
+          <label xml:lang="es">TRD</label>
+          <description>Tropical Dry</description>
+          <description xml:lang="fr">Tropical sec</description>
+          <description xml:lang="pt">Tropical seco</description>
+          <description xml:lang="es">Tropical Seco</description>
+        </item>
+        <item id="2012484">
+          <code>0</code>
+          <label>NO INFO</label>
+          <label xml:lang="fr">NO INFO</label>
+          <label xml:lang="pt">NO INFO</label>
+          <label xml:lang="es">NO INFO</label>
+        </item>
+      </items>
+    </list>
+    <list id="2035278" name="cyclical_system">
+      <label type="item">cyclical_system</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2035279">
+          <code>1</code>
+          <label>&lt; period I&gt;</label>
+        </item>
+        <item id="2035280">
+          <code>2</code>
+          <label>&lt; period II&gt;</label>
+        </item>
+        <item id="2035281">
+          <code>3</code>
+          <label>Not cyclical</label>
+        </item>
+      </items>
+    </list>
+    <list id="2035525" name="disturbances">
+      <label type="item">disturbances</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2035526">
+          <code>logging</code>
+          <label>Selective logging</label>
+        </item>
+        <item id="2035527">
+          <code>fire</code>
+          <label>Human induced fire</label>
+        </item>
+        <item id="2035529">
+          <code>charcoal</code>
+          <label>Charcoal burning</label>
+        </item>
+        <item id="2060913">
+          <code>timber</code>
+          <label>Timber harvesting</label>
+        </item>
+        <item id="2035528">
+          <code>mining</code>
+          <label>Mining</label>
+        </item>
+        <item id="2047322">
+          <code>agriculture</code>
+          <label>Agriculture</label>
+        </item>
+        <item id="2060914">
+          <code>natural</code>
+          <label>Natural</label>
+        </item>
+        <item id="2035530">
+          <code>unknown</code>
+          <label>Unknown</label>
+        </item>
+        <item id="2035531">
+          <code>none</code>
+          <label>None</label>
+        </item>
+        <item id="2048435">
+          <code>other</code>
+          <label>Other</label>
+        </item>
+      </items>
+    </list>
+    <list id="2047371" name="five">
+      <label type="item">five</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2047372">
+          <code>more</code>
+          <label>=&gt; 5 years</label>
+        </item>
+        <item id="2047373">
+          <code>less</code>
+          <label>&lt; 5 years</label>
+        </item>
+      </items>
+    </list>
+    <list id="2070696" name="grassland_management">
+      <label type="item">grassland management</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2070697">
+          <code>grazing</code>
+          <label>Grazing</label>
+          <label xml:lang="fr">Pâturage</label>
+          <description xml:lang="fr">Zone pâturée a croissance naturelle</description>
+        </item>
+        <item id="2070698">
+          <code>no_grazing</code>
+          <label>No Grazing</label>
+          <label xml:lang="fr">Pas de pâturage</label>
+        </item>
+      </items>
+    </list>
+    <list id="2079270" name="patch_size">
+      <label type="item">Patch size</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2079271">
+          <code>less_XX</code>
+          <label>&lt; &lt; XX ha&gt;</label>
+        </item>
+        <item id="2079272">
+          <code>more_XX</code>
+          <label>&lt; &gt; XX ha&gt;</label>
+        </item>
+      </items>
+    </list>
+    <list id="2079806" name="canopy_cover">
+      <label type="item">Canopy cover</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2079807">
+          <code>10</code>
+          <label>10</label>
+        </item>
+        <item id="2079808">
+          <code>20</code>
+          <label>20</label>
+        </item>
+        <item id="2079809">
+          <code>30</code>
+          <label>30</label>
+        </item>
+        <item id="2079810">
+          <code>40</code>
+          <label>40</label>
+        </item>
+        <item id="2079811">
+          <code>50</code>
+          <label>50</label>
+        </item>
+        <item id="2079812">
+          <code>60</code>
+          <label>60</label>
+        </item>
+        <item id="2079813">
+          <code>70</code>
+          <label>70</label>
+        </item>
+        <item id="2079814">
+          <code>80</code>
+          <label>80</label>
+        </item>
+        <item id="2079815">
+          <code>90</code>
+          <label>90</label>
+        </item>
+        <item id="2079816">
+          <code>100</code>
+          <label>100</label>
+        </item>
+      </items>
+    </list>
+    <list id="2089107" name="anthropogenic_driver">
+      <label type="item">Anthropogenic driver</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2089108">
+          <code>driver_1</code>
+          <label>&lt;driver I&gt;</label>
+        </item>
+        <item id="2089109">
+          <code>driver_2</code>
+          <label>&lt;driver II&gt;</label>
+        </item>
+        <item id="2089110">
+          <code>driver_3</code>
+          <label>&lt;driver III&gt;</label>
+        </item>
+        <item id="2089111">
+          <code>fire</code>
+          <label>fire</label>
+        </item>
+        <item id="2089346">
+          <code>unknown</code>
+          <label>Unknown</label>
+        </item>
+      </items>
+    </list>
+    <list id="2089188" name="natural_driver">
+      <label type="item">Natural driver</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2089189">
+          <code>driver_1</code>
+          <label>&lt;driver I&gt;</label>
+        </item>
+        <item id="2089190">
+          <code>driver_2</code>
+          <label>&lt;driver II&gt;</label>
+        </item>
+        <item id="2089191">
+          <code>driver_3</code>
+          <label>&lt;driver III&gt;</label>
+        </item>
+        <item id="2089192">
+          <code>fire</code>
+          <label>fire</label>
+        </item>
+        <item id="2089345">
+          <code>unknown</code>
+          <label>Unknown</label>
+        </item>
+      </items>
+    </list>
+    <list id="2094909" name="lu_change_type">
+      <label type="item">lu_change_type</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2094910">
+          <code>lu_change</code>
+          <label>LU or Subdivision change</label>
+        </item>
+        <item id="2094911">
+          <code>disturbance</code>
+          <label>Forest disturbance</label>
+        </item>
+        <item id="2094912">
+          <code>recovery</code>
+          <label>Forest recovery</label>
+        </item>
+      </items>
+    </list>
+    <list id="2101531" name="difficulty_interpretation">
+      <label type="item">difficulty_interpretation</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2101532">
+          <code>easy</code>
+          <label>Easy</label>
+        </item>
+        <item id="2101533">
+          <code>medium</code>
+          <label>Medium</label>
+        </item>
+        <item id="2101534">
+          <code>hard</code>
+          <label>Hard</label>
+        </item>
+      </items>
+    </list>
+    <list id="2102144" name="reason_difficulty">
+      <label type="item">reason_difficulty</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2102145">
+          <code>Heterogeneous</code>
+          <label>Heterogenous landscape</label>
+        </item>
+        <item id="2102146">
+          <code>Missing_imagery</code>
+          <label>Missing imagery</label>
+        </item>
+        <item id="2102147">
+          <code>Mixed_lu</code>
+          <label>Mixed LU over sample</label>
+        </item>
+        <item id="2102148">
+          <code>year</code>
+          <label>Year(s) reported</label>
+        </item>
+        <item id="2102301">
+          <code>other</code>
+          <label>Other</label>
+        </item>
+      </items>
+    </list>
+    <list id="2102835" name="useful_imagery">
+      <label type="item">useful_imagery</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2102836">
+          <code>GE_kml</code>
+          <label>GE KML</label>
+        </item>
+        <item id="2102837">
+          <code>Planet</code>
+          <label>Planet</label>
+        </item>
+        <item id="2102838">
+          <code>Landsat_sentinel</code>
+          <label>Landsat/Sentinel</label>
+        </item>
+        <item id="2102839">
+          <code>CEO_Mapbox</code>
+          <label>CEO Mapbox</label>
+        </item>
+      </items>
+    </list>
+    <list id="2104664" name="landscape">
+      <label type="item">Landscape</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2104665">
+          <code>homogeneous</code>
+          <label>Homogeneous</label>
+        </item>
+        <item id="2104666">
+          <code>heterogeneous</code>
+          <label>Heterogeneous</label>
+        </item>
+      </items>
+    </list>
+    <list id="2104896" name="sample_location">
+      <label type="item">Sample location</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="2104897">
+          <code>borders</code>
+          <label>Nearby LU borders</label>
+        </item>
+        <item id="2104898">
+          <code>center</code>
+          <label>Center of LU unit</label>
+        </item>
+      </items>
+    </list>
+  </codeLists>
+  <spatialReferenceSystems>
+    <spatialReferenceSystem srid="EPSG:4326">
+      <label xml:lang="en">EPSG:4326</label>
+      <description xml:lang="en">EPSG:World Geodetic System 1984 Horizontal component of 3D system. Used by the GPS satellite navigation system and for NATO military geodetic surveying.</description>
+      <wkt><![CDATA[GEOGCS["WGS 84", 
+		  DATUM["World Geodetic System 1984", 
+		    SPHEROID["WGS 84", 6378137.0, 298.257223563, AUTHORITY["EPSG","7030"]], 
+		    AUTHORITY["EPSG","6326"]], 
+		  PRIMEM["Greenwich", 0.0, AUTHORITY["EPSG","8901"]], 
+		  UNIT["degree", 0.017453292519943295], 
+		  AXIS["Geodetic longitude", EAST], 
+		  AXIS["Geodetic latitude", NORTH], 
+		  AUTHORITY["EPSG","4326"]]]]>
+      </wkt>
+    </spatialReferenceSystem>
+  </spatialReferenceSystems>
+  <referenceDataSchema>
+    <samplingPoint />
+  </referenceDataSchema>
+  <schema>
+    <entity id="1" name="plot" ui:tab="plot_tab" ui:tabSet="plot_tab_set">
+      <label type="instance">Plot</label>
+      <text id="2" name="id" required="true" ui:tab="tab_10007" key="true" type="short">
+        <label type="instance">Plot - ID</label>
+        <label type="instance" xml:lang="fr">Placette - ID</label>
+        <label type="reporting">Plot - Id</label>
+        <label type="instance" xml:lang="es">Parcela - ID</label>
+        <label type="instance" xml:lang="pt">Parcela - ID</label>
+        <description>Together with the "round" forms the unique identifier of the plot.
+This values comes from the CSV file with the frid of plots (sampling desing). DO NOT REMOVE!</description>
+        <description xml:lang="es">Junto con "round" forma el identificador único de la parcela.
+Estos valores provienen del archivo CSV con la malla de parcelas (diseño de muestreo). ¡NO QUITAR!</description>
+        <description xml:lang="fr">Avec "round" forme l'identifiant unique de la parcelle. Ces valeurs proviennent du fichier CSV avec la grille des placettes (plan d'échantillonnage). NE PAS ENLEVER!</description>
+        <description xml:lang="pt">Juntamente com "round" forma o identificador único da parcela. Esses valores vêm do arquivo CSV com a grade de plotagens (desenho amostral). NÃO REMOVA!</description>
+      </text>
+      <code id="4614" name="round" required="true" ui:tab="tab_10007" collect:measurement="true" key="true" list="assessment_phases">
+        <label type="instance">Plot - Assessment phase</label>
+        <label type="instance" xml:lang="fr">Placette - Phase d’évaluation</label>
+        <label type="instance" xml:lang="es">Parcela - Ronda de evaluación</label>
+        <label type="instance" xml:lang="pt">Parcela- Fase de avaliação</label>
+        <description>Combined with the plot ID generates the Unique Identifier of the plot. The value of this attribute comes from the CSV with the plot grids (sampling design).
+Use the value 1 "First asessment" for the first time that the plot is assessed. The value 2 "Second assessment" is reserved for the plots that will be revisited and used as a measurement of the operator/interpreter error.</description>
+        <description xml:lang="pt">Combinado com o ID da parcela, gera o Identificador Único da parcela. O valor desse atributo vem do CSV com as grades de plotagem (desenho amostral).
+Use o valor 1 "Primeira avaliação" para a primeira vez que a parcela é avaliada. O valor 2 "Segunda avaliação" é reservado para as parcelas que serão revisitadas e utilizadas como medida de erro do operador/intérprete.</description>
+        <description xml:lang="fr">Combiné avec l'ID de parcelle génère l'identifiant unique de la parcelle. La valeur de cet attribut provient du CSV avec les grilles de tracé (plan d'échantillonnage).
+Utilisez la valeur 1 "Première évaluation" pour la première fois que la parcelle est évaluée. La valeur 2 "Deuxième évaluation" est réservée aux parcelles qui seront revisitées et utilisées comme mesure de l'erreur opérateur/interprète.</description>
+        <description xml:lang="es">Combinado con el ID de parcela genera el Identificador Único de la parcela. El valor de este atributo proviene del CSV con las mallas de las parcelas (diseño de muestreo).
+Utilizar el valor 1 "Primera evaluación" para la primera vez que se evalúa la parcela. El valor 2 "Segunda evaluación" está reservado para las parcelas que serán revisadas y utilizadas como medida del error del operador/intérprete.</description>
+      </code>
+      <coordinate id="3" name="location" ui:tab="tab_10007">
+        <label type="instance">Plot - Central point coordinates</label>
+        <label type="instance" xml:lang="fr">Placette - Coordonnées du point central</label>
+        <label type="instance" xml:lang="es">Parcela - Coordenadas punto central</label>
+        <label type="instance" xml:lang="pt">Parcela - Coordenadas do ponto central</label>
+        <description>Location of the center point of the plot. This value comes from the CSV with the sampling design. DO NOT REMOVE!
+In the CSV file the coordinates are divided in two columns (in this order) : YCoordinate, XCoordinate</description>
+        <description xml:lang="pt">Localização do ponto central do terreno. Esse valor vem do CSV com o desenho amostral. NÃO REMOVA!</description>
+        <description xml:lang="fr">Emplacement du point central de la parcelle. Cette valeur provient du CSV avec le plan d'échantillonnage. NE PAS ENLEVER!</description>
+        <description xml:lang="es">Ubicación del punto central de la parcela. Este valor proviene del CSV con el diseño de la muestra. ¡NO QUITAR!</description>
+      </coordinate>
+      <text id="4" name="operator" required="true" ui:tab="tab_2012574" type="short">
+        <label type="instance">Plot - Operator</label>
+        <label type="instance" xml:lang="fr">Placette - Opérateur</label>
+        <label type="instance" xml:lang="es">Parcela - Operador que realizó evaluación</label>
+        <label type="instance" xml:lang="pt">Parcela - Operador</label>
+        <description>Name of the operator/interpreter that assessed the plot. 
+This name comes from Collect Earth's main window where the user needs to fill a name when the program starts.
+DO NOT REMOVE!</description>
+        <description xml:lang="es">Nombre del operador/intérprete que evaluó la parcela.
+Este nombre proviene de la ventana principal de Collect Earth, donde el usuario debe ingresar un nombre cuando se inicia el programa.
+¡NO QUITAR!</description>
+        <description xml:lang="fr">Nom de l'opérateur/interprète qui a évalué la placette.
+Ce nom provient de la fenêtre principale de Collect Earth où l'utilisateur doit saisir un nom au démarrage du programme.
+NE PAS ENLEVER!</description>
+        <description xml:lang="pt">Nome do operador/intérprete que avaliou a parcela.
+Este nome vem da janela principal do Collect Earth onde o usuário deve preencher um nome quando o programa iniciar.
+NÃO REMOVA!</description>
+      </text>
+      <boolean id="31" name="actively_saved" ui:tab="tab_2012574">
+        <label type="instance">Plot - Actively saved by user</label>
+        <label type="instance" xml:lang="fr">Placette - activement enregistrée par l'utilisateur</label>
+        <label type="instance" xml:lang="pt">Parcela - salva ativamente pelo usuário</label>
+        <label type="instance" xml:lang="es">Parcela - guardada activamente por el usuario</label>
+        <description>This attribute is set directly by Collect Earth when the super finishes filling the data for a plot, clicks on the Submit button and the plot icon becomes a green tick on the Google Earth list of plots (meaning that the plot has been fully filled without validation errors)
+
+DO NOT REMOVE. Internal attribute used by the CE Survey.</description>
+      </boolean>
+      <date id="32" name="actively_saved_on" relevant="false()" ui:tab="tab_2012574">
+        <label type="instance">Plot - Date of last saved</label>
+        <label type="instance" xml:lang="fr">Placette - dernier enregistrement le</label>
+        <label type="instance" xml:lang="es">Parcela - fecha de la última vez que se guardó</label>
+        <label type="instance" xml:lang="pt">Parcela - Data do último salvamento</label>
+        <description>When was the plot last changed.
+
+DO NOT REMOVE. Internal attribute used by the CE Survey.</description>
+      </date>
+      <text id="33" name="plot_file" relevant="false()" ui:tab="tab_2012574" type="short">
+        <label type="instance">Plot - CSV file that contains the plot</label>
+        <label type="instance" xml:lang="fr">Placette - Fichier CSV qui contient la placette</label>
+        <label type="instance" xml:lang="pt">Parcela - arquivo CSV que contém a parcela</label>
+        <label type="instance" xml:lang="es">Parcela - archivo CSV que contiene la parcela</label>
+        <description>This attribute stores the name of the CSV file that this plot comes from (the sampling design file). This is useful to understand where the original data from the plot location and so on comes from.
+
+DO NOT REMOVE. Internal attribute used by the CE Survey.</description>
+        <description xml:lang="es">Este atributo almacena el nombre del archivo CSV del que proviene esta parcela (el archivo de diseño de muestreo). Esto es útil para comprender de dónde provienen los datos originales de la ubicación de la parcela, etc.
+
+NO QUITAR. Atributo interno utilizado por la encuesta de CE.</description>
+      </text>
+      <number id="28" name="elevation" ui:tab="tab_10007" collectearth:fromcsv="true" type="integer">
+        <label type="instance">DEM - Elevation</label>
+        <label type="instance" xml:lang="fr">DEM - Altitude (modèle numérique d'élévation)</label>
+        <label type="instance" xml:lang="es">DEM - Altitud - modelo digital de elevación</label>
+        <label type="instance" xml:lang="pt">DEM - Altitude (modelo digital de elevação)</label>
+        <description>Comes from the CSV. Obtained for the SRTM Digital Elevation Model. The column is generated by the Grid Generator GEE Tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator.
+
+This field is NOT necessary for the CE survey to work but we recommend you keep it to allow for data cleansing and analysis of LU and LC distribution by elevation.</description>
+      </number>
+      <number id="30" name="slope" ui:tab="tab_10007" collectearth:fromcsv="true" type="real">
+        <label type="instance">DEM - Slope</label>
+        <label type="instance" xml:lang="fr">MNT - Pente (modèle numérique d'élévation)</label>
+        <label type="instance" xml:lang="es">DEM - Pendiente - modelo digital de elevación</label>
+        <label type="instance" xml:lang="pt">DEM - Inclinação (modelo digital de elevação)</label>
+        <description>Comes from the CSV. Obtained for the SRTM Digital Elevation Model. The column is generated by the Grid Generator GEE Tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator.
+
+This field is NOT necessary for the CE survey to work but we recommend you keep it to allow for data cleansing and analysis of LU and LC distribution by elevation.</description>
+      </number>
+      <number id="29" name="aspect" ui:tab="tab_10007" collectearth:fromcsv="true" type="real">
+        <label type="instance">DEM - Aspect</label>
+        <label type="instance" xml:lang="fr">MNT - Esposition (modèle numérique d'élévation)</label>
+        <label type="instance" xml:lang="es">DEM - Aspecto - modelo digital de elevación</label>
+        <label type="instance" xml:lang="pt">DEM - Exposição (modelo digital de elevação)</label>
+        <description>Comes from the CSV. Obtained for the SRTM Digital Elevation Model. The column is generated by the Grid Generator GEE Tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator.
+
+This field is NOT necessary for the CE survey to work but we recommend you keep it to allow for data cleansing and analysis of LU and LC distribution by elevation.</description>
+      </number>
+      <code id="2538" name="calculated_elevation_range" ui:hide="true" ui:tab="tab_10007" calculated="true" list="elevation_ranges">
+        <label type="instance">DEM - Elevation - range</label>
+        <label type="instance" xml:lang="es">DEM - Elevación (por rangos) - modelo digital de elevación</label>
+        <label type="instance" xml:lang="fr">DEM - Gamme d'altitude (modèle numérique d'élévation)</label>
+        <label type="instance" xml:lang="pt">DEM - Faixa de elevação (modelo digital de elevação)</label>
+        <default expr=" format-number(ceiling(elevation div 100 ), '#')" />
+      </code>
+      <code id="2614" name="calculated_aspect" ui:hide="true" ui:tab="tab_10007" calculated="true" list="orientation">
+        <label type="instance">DEM - Aspect - ranges</label>
+        <label type="instance" xml:lang="es">DEM - Aspecto (por rangos) - modelo digital de elevación</label>
+        <label type="instance" xml:lang="fr">DEM - Gamme d'exposition (modèle numérique d'élévation)</label>
+        <label type="instance" xml:lang="pt">DEM - Faixa de exposição (modelo digital de elevação)</label>
+        <default value="na" if="aspect=0 and slope=0" />
+        <default value="N" if="aspect&gt;337.5 or aspect&lt;=22.5" />
+        <default value="NE" if="aspect&gt;22.5 and aspect&lt;=67.5" />
+        <default value="E" if="aspect&gt;67.5 and aspect&lt;=112.5" />
+        <default value="SE" if="aspect&gt;112.5 and aspect&lt;=157.5" />
+        <default value="S" if="aspect&gt;157.5 and aspect&lt;=202.5" />
+        <default value="SW" if="aspect&gt;202.5 and aspect&lt;=247.5" />
+        <default value="W" if="aspect&gt;247.5 and aspect&lt;=292.5" />
+        <default value="NW" if="aspect&gt;292.5 and aspect&lt;=337.5" />
+      </code>
+      <code id="2615" name="calculated_slope" ui:hide="true" ui:tab="tab_10007" calculated="true" list="slope_classes">
+        <label type="instance">DEM - Slope - ranges</label>
+        <label type="instance" xml:lang="es">DEM - Pendiente (por rangos) - modelo digital de elevación</label>
+        <label type="instance" xml:lang="fr">DEM - Gamme de pente (modèle numérique d'élévation)</label>
+        <label type="instance" xml:lang="pt">DEM - Faixa de inclinação (modelo digital de elevação)</label>
+        <default value="FLAT" if="slope&gt;=0 and slope&lt;6" />
+        <default value="SLIGHT" if="slope&gt;=6 and slope&lt;16" />
+        <default value="STEEP" if="slope&gt;=16 and slope&lt;31" />
+        <default value="VERY_STEEP" if="slope&gt;=31 and slope&lt;45" />
+        <default value="EXTREME" if="slope&gt;=46 and slope&lt;61" />
+        <default value="FALL" if="slope&gt;=60" />
+        <default value="NA" if="idm:blank(aspect)" />
+      </code>
+      <code id="61480" name="climate" ui:tab="tab_10007" collectearth:fromcsv="true" list="climate_zones">
+        <label type="instance">IPCC - Climate</label>
+        <label type="instance" xml:lang="fr">Climat GIEC</label>
+        <label type="instance" xml:lang="es">IPCC - Clima</label>
+        <description>Attribute that will allow you to produce disaggregated on Land Use by Climate (Using the IPCC standard climate zones)
+
+The emission factors for certain types of forest or crops will change depending on the type of climate that they are located.
+
+Keep this attribute if you are going to use the data on Green House Gas inventories or FRELs. This attribute is NOT necessary for the Collect Earth survey to work (in case it is not needed in your survey and you do not want to add it to the CSV files)
+
+IPCC Climate Zones 1985-2015 Updated demonstration of the world climate zones described by IPCC in 2019. Download full dataset here : https://www.ipcc-nggip.iges.or.jp/faq/img/IPCC_Climate_Zones_Map_raster.zip
+
+Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+
+
+Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Asset ID : users/collectearth/IPCC/ipcc_climate_1985-2015_remapped_for_surveys
+GEE Script code : 
+1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
+2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
+      </code>
+      <code id="61481" name="soil" ui:tab="tab_10007" collectearth:fromcsv="true" list="soil_types">
+        <label type="instance">IPCC - Soil</label>
+        <label type="instance" xml:lang="fr">Sol GIEC</label>
+        <label type="instance" xml:lang="es">IPCC - Suelo</label>
+        <description>Attribute that will allow you to produce disaggregated on Land Use by Climate (Using the IPCC standard soil types)
+
+The emission factors for certain types of forest or crops will change depending on the type of soil that they are located.
+
+Keep this attribute if you are going to use the data on Green House Gas inventories or FRELs. This attribute is NOT necessary for the Collect Earth survey to work (in case it is not needed in your survey and you do not want to add it to the CSV files)
+
+Soil Map From the JRC Support to Renewable Energy Directive
+
+http://esdac.jrc.ec.europa.eu/content/support-renewable-energy-directive#tabs-0-description=0
+
+See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/
+
+Legend value code label
+
+ 1 ORG Organic
+ 2 SAN Sandy Soils
+ 3 WET Wetland Soils  
+ 4 VOL Volcanic Soils  
+ 5 SPO Spodic Soils    
+ 6 HAC High Activity Clay Soils  
+ 7 LAC Low Activity Clay Soils  
+ 8 OtherAreas Other Areas  
+ 0 No Data The map contains no data for this plot
+
+
+Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+
+
+Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Asset ID : users/sanchezpaus/SOIL_TYPE_rst
+GEE Script code : 
+1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
+2. https://code.earthengine.google.com/?scriptPath=users%2Fsanc</description>
+      </code>
+      <code id="61482" name="gez" ui:tab="tab_10007" collectearth:fromcsv="true" list="ecological_zones">
+        <label type="instance">IPCC - Global Ecologic Zone</label>
+        <label type="instance" xml:lang="fr">Zone Ecologique Globale - GIEC</label>
+        <label type="instance" xml:lang="es">IPCC - Zona Ecológica</label>
+        <description>Attribute that will allow you to produce disaggregated on Land Use by Global Ecological Zones (Using the FAO Global Ecologic Zones)
+
+The emission factors for certain types of forest or crops will change depending on the GEZ that they are located on.
+
+Keep this attribute if you are going to use the data on Green House Gas inventories or FRELs. This attribute is NOT necessary for the Collect Earth survey to work (in case it is not needed in your survey and you do not want to add it to the CSV files)
+
+Global Ecological Zones (GEZ)
+See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/
+
+Source FAO geonetwork https://data.apps.fao.org/map/catalog/srv/eng/catalog.search?id=47105&amp;fname=gez2010.zip&amp;access=private#/metadata/2fb209d0-fd34-4e5e-a3d8-a13c241eb61b
+
+
+Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+
+Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Asset ID : users/sanchezpaus/gez_2010_wgs84
+GEE Script code : 
+1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid</description>
+      </code>
+      <text id="61484" name="country" required="true" ui:tab="tab_10007" collectearth:fromcsv="true" type="short">
+        <label type="instance">GAUL - Adm. Level 0 (Country)</label>
+        <label type="instance" xml:lang="fr">GAUL - Adm. Level 0 (Pays)</label>
+        <label type="instance" xml:lang="es">GAUL - Adm. Level 0 (Pais)</label>
+        <label type="instance" xml:lang="pt">GAUL - Adm. Level 0 (Pais)</label>
+        <description>Country where the plot is located. Usually obtained from FAOs Global Administrative Units Layer (GAUL) 2014.
+
+Keep this attribute if you want to disaggregate the data by country. This attribute is NOT necessary for the Collect Earth survey to work (in case it is not needed in your survey and you do not want to add it to the CSV files)
+
+About GAUL Level 0 (countries ) : https://developers.google.com/earth-engine/datasets/catalog/FAO_GAUL_SIMPLIFIED_500m_2015_level0
+
+Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+
+Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+The GAUL data might be inadequate if the Administrative Units of the country have changed. We recommend you to use your official country/province/district boundaries.</description>
+      </text>
+      <text id="61387" name="province" required="true" ui:tab="tab_10007" collectearth:fromcsv="true" type="short">
+        <label type="instance">GAUL - Adm. Level 1 ( Province/Region)</label>
+        <label type="instance" xml:lang="fr">GAUL - Adm. Level 1 ( Province/Region )</label>
+        <label type="instance" xml:lang="es">GAUL - Adm. Level 1 ( Province/Region)</label>
+        <label type="instance" xml:lang="pt">GAUL - Adm. Level 1 ( Província/Region)</label>
+        <description>Province where the plot is located. Usually obtained from FAOs Global Administrative Units Layer (GAUL) 2014.
+
+Keep this attribute if you want to disaggregate the data by province. This attribute is NOT necessary for the Collect Earth survey to work (in case it is not needed in your survey and you do not want to add it to the CSV files)
+
+About GAUL Level 0 (countries ) : https://developers.google.com/earth-engine/datasets/catalog/FAO_GAUL_SIMPLIFIED_500m_2015_level1
+
+Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+
+Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+The GAUL data might be inadequate if the Administrative Units of the country have changed. We recommend you to use your official country/province/district boundaries.</description>
+      </text>
+      <text id="61483" name="district" required="true" ui:tab="tab_10007" collectearth:fromcsv="true" type="short">
+        <label type="instance">GAUL - Adm. Level 2 (District/Commune)</label>
+        <label type="instance" xml:lang="fr">GAUL - Adm. Level 2 (District/Commune)</label>
+        <label type="instance" xml:lang="es">GAUL - Adm. Level 2 (Distrito/Municipio/Comuna)</label>
+        <label type="instance" xml:lang="pt">GAUL - Adm. Level 2 (Distrito/Comuna)</label>
+        <description>District where the plot is located. Usually obtained from FAOs Global Administrative Units Layer (GAUL) 2014.
+
+Keep this attribute if you want to disaggregate the data by district. This attribute is NOT necessary for the Collect Earth survey to work (in case it is not needed in your survey and you do not want to add it to the CSV files)
+
+About GAUL Level 0 (countries ) : https://developers.google.com/earth-engine/datasets/catalog/FAO_GAUL_SIMPLIFIED_500m_2015_level2
+
+Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+
+Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+The GAUL data might be inadequate if the Administrative Units of the country have changed. We recommend you to use your official country/province/district boundaries.</description>
+      </text>
+      <entity id="63366" name="land_use" multiple="true" ui:layout="table" collect:enumerate="true" ui:tab="tab_63365">
+        <label type="instance">LU </label>
+        <label type="instance" xml:lang="fr">Utilisation des terres dans la placette 2023</label>
+        <label type="instance" xml:lang="es">Usos de la tierra en la parcela 2023</label>
+        <label type="instance" xml:lang="pt">Usos do solo no lote 2023</label>
+        <description>Interpretation with Context:  the interpreter examines the LC patterns within and without the SU and mentally delineates boundaries around the different assumed land uses, while applying their respective definitions (e.g., minimum area, % element cover). 
+
+CENTROID 
+The land use in the centroid is considered after the identification of the Land Use (s) in the landscape surrounding the point.
+
+DOMINANT
+The dominant LU in the yellow sampling frame should be considered. Apply a majority rule to assign a single class to the point.</description>
+        <code id="63367" name="lu" required="true" key="true" list="land_uses">
+          <label type="instance">LU</label>
+          <label type="instance" xml:lang="fr">UT</label>
+          <label type="reporting">LU within plot - Land Use</label>
+          <label type="instance" xml:lang="es">UT</label>
+          <label type="instance" xml:lang="pt">UT</label>
+        </code>
+      </entity>
+      <code id="2022309" name="lu_t2" required="true" ui:tab="tab_63365" list="land_uses">
+        <label type="instance">Land use</label>
+        <description>After having 'mentally' classified the landscape and the land use around the point, select the LU falling over the point (in case of sample size is a point) or the dominant (or majority), in case of sample size is an area.</description>
+      </code>
+      <code id="2012667" name="sub_t2" required="true" ui:tab="tab_63365" ui:layoutType="radio" list="land_uses" parent="lu_t2">
+        <label type="instance">LU subdivision </label>
+      </code>
+      <code id="2035331" name="cyclical_system" relevant="sub_t2 = 'Plantation'" required="true" ui:tab="tab_63365" ui:layoutType="dropdown" list="cyclical_system">
+        <label type="instance">Cyclical system</label>
+      </code>
+      <boolean id="2070985" name="grassland_management" relevant="lu_t2 = 'G'" required="true" ui:tab="tab_63365">
+        <label type="instance">Grassland Management</label>
+      </boolean>
+      <code id="2062509" name="base_year" ui:hide="true" collect:includeInDataExport="false" ui:tab="tab_63365" calculated="true" list="years">
+        <label type="instance">Base Year of the assessment</label>
+        <default value="2025" />
+      </code>
+      <code id="2101454" name="difficulty_interpretation" required="true" ui:tab="tab_2065254" list="difficulty_interpretation">
+        <label type="instance">Difficulty in interpretation</label>
+        <description>Assessment of the quality of the visual interpretation for this specific sample</description>
+      </code>
+      <entity id="2066550" name="change" multiple="true" ui:layout="form" collect:enumerate="true" ui:tab="tab_2066549">
+        <label type="instance">Change</label>
+        <number id="2066551" name="change_num" required="true" key="true" type="integer">
+          <label type="instance">Change Num</label>
+          <default expr="idm:position($context)" />
+        </number>
+        <code id="2066690" name="to_lu" ui:hide="true" collect:includeInDataExport="false" calculated="true" list="land_uses">
+          <label type="instance">Land Use (recent year)</label>
+          <label type="instance" xml:lang="fr">Utilisation des terres 2023</label>
+          <label type="reporting">LU - Land Use 2023</label>
+          <label type="reporting" xml:lang="fr">UT - Land Use 2023</label>
+          <label type="reporting" xml:lang="pt">UT - Uso da terra 2023</label>
+          <label type="reporting" xml:lang="es">UT - Uso de la tierra 2023</label>
+          <label type="instance" xml:lang="es">Uso de la tierra 2023</label>
+          <label type="instance" xml:lang="pt">Uso da terra 2023</label>
+          <description xml:lang="pt">Calculado automaticamente por Collect usando as percentagens dos diferentes Usos do Solo na parcela (no caso de múltiplos LU).
+Verifique o "Calculate Value Expressions" para a lógica do cálculo.</description>
+          <description xml:lang="fr">Calculé automatiquement par Collect en utilisant les pourcentages des différentes utilisations du sol dans la parcelle (en cas d'UG multiples).
+Vérifiez les "Calculate Value Expressions" pour la logique du calcul.</description>
+          <description xml:lang="es">Calculado automáticamente por Collect utilizando los porcentajes de los diferentes Usos del Suelo en la parcela (en caso de múltiples LU).
+Verifique "Calculate Value Expressions" para conocer la lógica del cálculo.</description>
+          <default expr="parent()/lu_t2" if="change_num = 1" />
+          <default expr="parent()/change[idm:position($context) - 1]/from_lu_actual" />
+        </code>
+        <text id="2073303" name="to_lu_label" ui:hide="true" collect:includeInDataExport="false" calculated="true" type="short">
+          <label type="instance">To Lu Label</label>
+          <default value="Forest" if="to_lu = 'F'" />
+          <default value="Grassland" if="to_lu = 'G'" />
+          <default value="Cropland" if="to_lu = 'C'" />
+          <default value="Settlement" if="to_lu = 'S'" />
+          <default value="Wetland" if="to_lu = 'W'" />
+          <default value="Otherland" if="to_lu = 'O'" />
+        </text>
+        <code id="2067577" name="to_sub" ui:hide="true" collect:includeInDataExport="false" calculated="true" list="land_uses">
+          <label type="instance">LU subdivision (recent year)</label>
+          <label type="instance" xml:lang="fr">Utilisation des terres 2023</label>
+          <label type="reporting">LU - Land Use 2023</label>
+          <label type="reporting" xml:lang="fr">UT - Land Use 2023</label>
+          <label type="reporting" xml:lang="pt">UT - Uso da terra 2023</label>
+          <label type="reporting" xml:lang="es">UT - Uso de la tierra 2023</label>
+          <label type="instance" xml:lang="es">Uso de la tierra 2023</label>
+          <label type="instance" xml:lang="pt">Uso da terra 2023</label>
+          <description xml:lang="pt">Calculado automaticamente por Collect usando as percentagens dos diferentes Usos do Solo na parcela (no caso de múltiplos LU).
+Verifique o "Calculate Value Expressions" para a lógica do cálculo.</description>
+          <description xml:lang="fr">Calculé automatiquement par Collect en utilisant les pourcentages des différentes utilisations du sol dans la parcelle (en cas d'UG multiples).
+Vérifiez les "Calculate Value Expressions" pour la logique du calcul.</description>
+          <description xml:lang="es">Calculado automáticamente por Collect utilizando los porcentajes de los diferentes Usos del Suelo en la parcela (en caso de múltiples LU).
+Verifique "Calculate Value Expressions" para conocer la lógica del cálculo.</description>
+          <default expr="parent()/sub_t2" if="change_num = 1" />
+          <default expr="parent()/change[idm:position($context) - 1]/from_sub_actual" />
+        </code>
+        <text id="2073372" name="to_sub_label" ui:hide="true" collect:includeInDataExport="false" calculated="true" type="short">
+          <label type="instance">To Sub Label</label>
+          <default value="type I" if="to_sub = 'Forest_type1'" />
+          <default value="type II" if="to_sub = 'Forest_type2'" />
+          <default value="Plantation" if="to_sub = 'Plantation'" />
+          <default value="Annual Crop" if="to_sub = 'Annual_crop'" />
+          <default value="Perennial crop" if="to_sub = 'Perennial_crop'" />
+          <default value="type I" if="to_sub = 'Grassland_type1'" />
+          <default value="type II" if="to_sub = 'Grassland_type2'" />
+          <default value="type III" if="to_sub = 'Grassland_type3'" />
+          <default value="type I" if="to_sub = 'Settlement_type1'" />
+          <default value="type II" if="to_sub = 'Settlement_type2'" />
+          <default value="Other" if="to_sub = 'Settlement_other'" />
+          <default value="Water body" if="to_sub = 'Water_body'" />
+          <default value="type I" if="to_sub = 'Wetland_type1'" />
+          <default value="type II" if="to_sub = 'Wetland_type2'" />
+          <default value="type III" if="to_sub = 'Wetland_type3'" />
+          <default value="type I" if="to_sub = 'Other_land_type1'" />
+          <default value="type II" if="to_sub= 'Other_land_type2&gt;'" />
+          <default value="type III" if="to_sub = 'Other_land_type3'" />
+        </text>
+        <code id="2071534" name="previous_label" collect:includeInDataExport="false" calculated="true" list="land_uses">
+          <label type="instance">Land Use (recent year)</label>
+          <label type="instance" xml:lang="fr">Utilisation des terres 2023</label>
+          <label type="reporting">LU - Land Use 2023</label>
+          <label type="reporting" xml:lang="fr">UT - Land Use 2023</label>
+          <label type="reporting" xml:lang="pt">UT - Uso da terra 2023</label>
+          <label type="reporting" xml:lang="es">UT - Uso de la tierra 2023</label>
+          <label type="instance" xml:lang="es">Uso de la tierra 2023</label>
+          <label type="instance" xml:lang="pt">Uso da terra 2023</label>
+          <description xml:lang="pt">Calculado automaticamente por Collect usando as percentagens dos diferentes Usos do Solo na parcela (no caso de múltiplos LU).
+Verifique o "Calculate Value Expressions" para a lógica do cálculo.</description>
+          <description xml:lang="fr">Calculé automatiquement par Collect en utilisant les pourcentages des différentes utilisations du sol dans la parcelle (en cas d'UG multiples).
+Vérifiez les "Calculate Value Expressions" pour la logique du calcul.</description>
+          <description xml:lang="es">Calculado automáticamente por Collect utilizando los porcentajes de los diferentes Usos del Suelo en la parcela (en caso de múltiples LU).
+Verifique "Calculate Value Expressions" para conocer la lógica del cálculo.</description>
+          <default expr='concat(to_lu_label, ": ", to_sub_label)' />
+        </code>
+        <code id="2066620" name="change_yr" required="true" ui:layoutType="dropdown" list="years">
+          <label type="instance">Year of change</label>
+          <description>After having identified the LU class observe and report any change observed over time, starting from the most recent backward.</description>
+          <check flag="error" expr="change_yr &lt; parent()/base_year">
+            <message>The year of the change is out of range</message>
+          </check>
+          <check flag="error" if="change_num &gt; 1" expr="$this &lt; parent()/change[idm:position($context) - 1]/change_yr">
+            <message>The year of the change must be less then the year of the previous one</message>
+          </check>
+        </code>
+        <code id="2094989" name="lu_change_type" required="true" list="lu_change_type">
+          <label type="instance">Change</label>
+          <check flag="error" if="to_lu != 'F'" expr="lu_change_type != 'disturbance' and lu_change_type != 'recovery'">
+            <message>Previously selected land use must be forest</message>
+          </check>
+        </code>
+        <code id="2093388" name="from_lu_no_lu_change" relevant="lu_change_type != 'lu_change'" ui:hide="true" collect:includeInDataExport="false" calculated="true" list="land_uses">
+          <label type="instance">From LU (no LU change)</label>
+          <default expr="parent()/lu_t2" if="idm:position($context) = 1" />
+          <default expr="parent()/change[idm:position($context) - 1]/from_lu_actual" />
+        </code>
+        <code id="2067371" name="from_lu" relevant="lu_change_type = 'lu_change'" required="true" list="land_uses">
+          <label type="instance">From LU</label>
+          <default expr="from_lu_no_lu_change" />
+        </code>
+        <boolean id="2106498" name="disturbance_within" relevant="lu_change_type = 'disturbance'" required="true">
+          <label type="instance">Disturbance within &lt;DISTANCE&gt; buffer</label>
+          <default expr="from_lu_no_lu_change" />
+        </boolean>
+        <code id="2073917" name="from_lu_actual" ui:hide="true" collect:includeInDataExport="false" calculated="true" list="land_uses">
+          <label type="instance">From LU Actual</label>
+          <default expr="from_lu" if="lu_change_type = 'lu_change'" />
+          <default expr="from_lu_no_lu_change" />
+        </code>
+        <code id="2108704" name="from_sub_no_change" ui:hide="true" collect:includeInDataExport="false" ui:layoutType="dropdown" calculated="true" list="land_uses" parent="from_lu_actual">
+          <label type="instance">From LU subdivision (no change)</label>
+          <default expr="parent()/sub_t2" if="change_num = 1" />
+          <default expr="parent()/change[idm:position($context) - 1]/from_sub_actual" />
+        </code>
+        <code id="2067646" name="from_sub" relevant="lu_change_type = 'lu_change'" required="true" ui:layoutType="dropdown" list="land_uses" parent="from_lu_actual">
+          <label type="instance">From LU subdivision</label>
+          <default expr="from_sub_no_change" />
+          <check flag="error" if="lu_change_type= 'lu_change'" expr="from_sub != to_sub">
+            <message>Subdivision cannot be equal to the one previously selected</message>
+          </check>
+        </code>
+        <code id="2108933" name="from_sub_actual" ui:hide="true" collect:includeInDataExport="false" calculated="true" list="land_uses" parent="from_lu_actual">
+          <label type="instance">From sub actual</label>
+          <default expr="from_sub" if="lu_change_type = 'lu_change'" />
+          <default expr="from_sub_no_change" />
+        </code>
+        <boolean id="2087963" name="native_spss" relevant="from_lu_actual = 'F'" required="true">
+          <label type="instance">Native species</label>
+        </boolean>
+        <boolean id="2087885" name="commercial_use" relevant="from_lu_actual = 'F'" required="true">
+          <label type="instance">Commercial use</label>
+        </boolean>
+        <boolean id="2105508" name="temporary_lu" relevant="lu_change_type = 'lu_change'" required="true">
+          <label type="instance">Temporary change (cyclical system)</label>
+          <default expr="from_lu_no_lu_change" />
+        </boolean>
+        <code id="2090263" name="canopy_cover" relevant="from_lu_actual = 'F'" required="true" ui:layoutType="dropdown" list="canopy_cover">
+          <label type="instance">Canopy cover before</label>
+        </code>
+        <code id="2090796" name="forest_size" relevant="from_lu_actual = 'F'" required="true" ui:layoutType="dropdown" list="patch_size">
+          <label type="instance">Forest patch size</label>
+        </code>
+        <code id="2091025" name="change_size" relevant="from_lu_actual = 'F'" required="true" ui:layoutType="dropdown" list="patch_size">
+          <label type="instance">Change size</label>
+        </code>
+        <boolean id="2091178" name="extension" relevant="from_lu_actual = 'F'" required="true" ui:layoutType="radio">
+          <label type="instance">Extension of a previous change</label>
+          <description>The change is treated as an extension of a prior (older) disturbance</description>
+        </boolean>
+        <code id="2067785" name="how_long_was_non_forest_before" relevant="from_lu != 'F' and to_lu = 'F'" required="true" ui:layoutType="radio" list="five">
+          <label type="instance">How long was non forest before?</label>
+        </code>
+        <boolean id="2098793" name="was_forest" relevant="how_long_was_non_forest_before = 'more'" required="true" ui:layoutType="radio">
+          <label type="instance">Was forest before the NF period?</label>
+        </boolean>
+        <code id="2067854" name="cyclical_system" relevant="starts-with(from_sub_actual, 'Plantation')" required="true" ui:layoutType="dropdown" list="cyclical_system">
+          <label type="instance">Cyclical system</label>
+        </code>
+        <boolean id="2088116" name="temporarily_unstocked" relevant="starts-with(from_sub_actual, 'Plantation')" required="true">
+          <label type="instance">Temporarily Unstocked</label>
+        </boolean>
+        <boolean id="2070916" name="grassland_management" relevant="from_lu_actual = 'G'" required="true">
+          <label type="instance">Grassland Management</label>
+        </boolean>
+        <boolean id="2089423" name="anthropogenic_cause" required="true" ui:layoutType="radio">
+          <label type="instance">Anthropogenic cause</label>
+        </boolean>
+        <code id="2089424" name="antro_driver" relevant="anthropogenic_cause = true()" required="true" list="anthropogenic_driver">
+          <label type="instance">Driver</label>
+        </code>
+        <code id="2089653" name="nat_driver" relevant="anthropogenic_cause = false()" required="true" list="natural_driver">
+          <label type="instance">Driver</label>
+        </code>
+      </entity>
+      <boolean id="2078202" name="temporarily_unstocked" relevant="sub_t2='Plantation'" required="true" ui:tab="tab_63365">
+        <label type="instance">Temporarily Unstocked</label>
+      </boolean>
+      <code id="2079893" name="canopy_cover" relevant="lu_t2 = 'F'" required="true" ui:tab="tab_63365" ui:layoutType="dropdown" list="canopy_cover">
+        <label type="instance">Canopy cover</label>
+      </code>
+      <code id="2079501" name="patch_size" relevant="lu_t2 = 'F'" required="true" ui:tab="tab_63365" ui:layoutType="dropdown" list="patch_size">
+        <label type="instance">Forest patch size</label>
+        <description>It refers to the patch intersecting/falling over the sample.</description>
+      </code>
+      <boolean id="2080275" name="presence_trees" relevant="lu_t2 != 'F'" required="true" ui:tab="tab_63365">
+        <label type="instance">Presence of trees</label>
+      </boolean>
+      <code id="2079970" name="trees_outside" relevant="presence_trees" required="true" ui:tab="tab_63365" ui:layoutType="dropdown" list="canopy_cover">
+        <label type="instance">Canopy cover (Trees outside forest)</label>
+      </code>
+      <boolean id="2080580" name="native_spss" relevant="lu_t2 = 'F'" required="true" ui:tab="tab_63365">
+        <label type="instance">Native species</label>
+      </boolean>
+      <boolean id="2080657" name="commercial_use" relevant="lu_t2 = 'F'" required="true" ui:tab="tab_63365">
+        <label type="instance">Commercial use</label>
+      </boolean>
+      <code id="2102067" name="reason_for_difficulty" relevant="difficulty_interpretation = 'hard' or difficulty_interpretation= 'medium'" required="true" ui:tab="tab_2065254" list="reason_difficulty">
+        <label type="instance">Reason for Difficulty</label>
+      </code>
+      <code id="2102758" name="most_useful_imagery" required="true" ui:tab="tab_2065254" list="useful_imagery">
+        <label type="instance">Most Useful Imagery</label>
+      </code>
+      <text id="2028433" name="further_comments" ui:tab="tab_2065254" type="memo">
+        <label type="instance">Comments</label>
+        <label type="instance" xml:lang="fr">Commentaires</label>
+        <label type="instance" xml:lang="es">Comentarios</label>
+        <label type="instance" xml:lang="pt">Comentários</label>
+        <description xml:lang="fr">Si cette parcelle était difficile à évaluer, vous devez laisser un commentaire ici afin que les examinateurs puissent comprendre le raisonnement de la classification.</description>
+        <description xml:lang="pt">Se esta parcela foi difícil de avaliar, você deve deixar um comentário aqui para que os revisores possam entender o raciocínio da classificação.</description>
+        <description xml:lang="es">Si esta parcela fue difícil de evaluar, debe dejar un comentario aquí para que los revisores puedan entender el razonamiento de la clasificación.</description>
+      </text>
+      <code id="2104743" name="landscape" required="true" ui:tab="tab_2065254" list="landscape">
+        <label type="instance">Landscape</label>
+      </code>
+      <code id="2104975" name="sample_location" required="true" ui:tab="tab_2065254" list="sample_location">
+        <label type="instance">Sample location</label>
+      </code>
+    </entity>
+  </schema>
+</survey>
