@@ -2211,9 +2211,6 @@
 				<item id="2012393">
 					<code>2025</code>
 					<label>2025</label>
-					<label xml:lang="fr">2000</label>
-					<label xml:lang="pt">2000</label>
-					<label xml:lang="es">2000</label>
 				</item>
 				<item id="2035532">
 					<code>2024</code>
@@ -3682,7 +3679,7 @@
 					<default value="type III" if="to_sub = 'Wetland_type3'" />
 					<default value="type I" if="to_sub = 'Other_land_type1'" />
 					<default value="type II"
-						if="to_sub= 'Other_land_type2&gt;'" />
+						if="to_sub = 'Other_land_type2'" />
 					<default value="type III" if="to_sub = 'Other_land_type3'" />
 				</text>
 				<code id="2071534" name="previous_label"
@@ -3727,7 +3724,7 @@
 					</check>
 					<check flag="error" if="change_num &gt; 1"
 						expr="$this &lt; parent()/change[idm:position($context) - 1]/change_yr">
-						<message>The year of the change must be less then the year of the
+						<message>The year of the change must be less than the year of the
 							previous one</message>
 					</check>
 				</code>
