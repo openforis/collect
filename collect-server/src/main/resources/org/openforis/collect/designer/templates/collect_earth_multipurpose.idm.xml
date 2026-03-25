@@ -43,9 +43,9 @@ Any change should be documented and justified, considering national circumstance
 <n0:tabSet name="plot_tab_set" xmlns:n0="http://www.openforis.org/collect/3.0/ui">
   <n0:tab name="tab_63365">
     <n0:label>LU &lt;END YEAR&gt;</n0:label>
-    <n0:label xml:lang="fr">UT 2022</n0:label>
-    <n0:label xml:lang="es">UT 2023</n0:label>
-    <n0:label xml:lang="pt">UT 2023</n0:label>
+	<n0:label xml:lang="fr">LU &lt;ANNÉE DE FIN&gt;</n0:label>
+	<n0:label xml:lang="es">LU &lt;AÑO FINAL&gt;</n0:label>
+	<n0:label xml:lang="pt">LU &lt;ANO FINAL&gt;</n0:label>
   </n0:tab>
   <n0:tab name="tab_2066549">
     <n0:label>Change</n0:label>
