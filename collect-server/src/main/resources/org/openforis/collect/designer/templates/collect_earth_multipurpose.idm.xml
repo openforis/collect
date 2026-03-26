@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
-<survey lastId="2111206" created="2026-03-25T18:10:48.690+01:00"
-	modified="2026-03-25T18:34:33.812+01:00"
+<survey lastId="2111206" created="2026-03-26T14:04:19.173+01:00"
+	modified="2026-03-26T14:06:33.774+01:00"
 	collectearth:bingKey="AjVg2KjkXqNtIcnLTZfIwahJATb-LGJigDTj1eCHBah5BTTgWU8rBQD0cTC8-6IA"
 	collectearth:openEarthMap="true" collectearth:plotarea="0.1"
 	collectearth:openBingMaps="true" collectearth:samplepoints="1"
-	collect:target="CE" collect:collectVersion="4.0.104"
+	collect:target="CE" collect:collectVersion="4.0.105"
 	xsi:schemaLocation="https://www.openforis.org/idml/3.0  &#9;&#9;https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3.xsd       &#9;&#9;https://www.openforis.org/collect/3.0/ui  &#9;&#9;https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd"
 	xmlns="http://www.openforis.org/idml/3.0"
 	xmlns:collect="http://www.openforis.org/collect/3.0/collect"
@@ -12,13 +12,15 @@
 	xmlns:collectearth="http://www.openforis.org/collect/3.0/collectearth"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<project xml:lang="es">PLANTILLA - IPCC AFOLU 2000-2023 (cambiar
-		nombre)</project>
+		nombre)
+	</project>
 	<project xml:lang="pt">MODELO - IPCC AFOLU 2000-2023 (alterar nome)
 	</project>
 	<project xml:lang="fr">MODÈLE - IPCC AFOLU 2000-2023 (changer le
-		nom)</project>
+		nom)
+	</project>
 	<project>Template - ART-TREES + UNFCCC RL + IPCC AFOLU</project>
-	<uri>http://www.openforis.org/idm/multipurpose_survey_template_v1</uri>
+	<uri>http://www.openforis.org/idm/multipurpose_template_v1</uri>
 	<description xml:lang="fr">Il s'agit de l'enquête standard qui
 		devrait être utilisée pour les évaluations des données d'activité afin
 		de se conformer aux lignes directrices proposées par le GIEC pour la
@@ -82,8 +84,8 @@
 				xmlns:n0="http://www.openforis.org/collect/3.0/ui">
 				<n0:tab name="tab_63365">
 					<n0:label>LU &lt;END YEAR&gt;</n0:label>
-					<n0:label xml:lang="fr">LU &lt;ANNÉE DE FIN&gt;</n0:label>
-					<n0:label xml:lang="es">LU &lt;AÑO FINAL&gt;</n0:label>
+					<n0:label xml:lang="fr">LU &lt;ANN&#201;E DE FIN&gt;</n0:label>
+					<n0:label xml:lang="es">LU &lt;A&#209;O FINAL&gt;</n0:label>
 					<n0:label xml:lang="pt">LU &lt;ANO FINAL&gt;</n0:label>
 				</n0:tab>
 				<n0:tab name="tab_2066549">
@@ -113,7 +115,8 @@
 			<label type="list">Land Uses</label>
 			<label type="item" xml:lang="es">Usos de la tierra</label>
 			<label type="item">IPCC Land Use representation
-				Categories/Subdivisions</label>
+				Categories/Subdivisions
+			</label>
 			<description>Two-level codelist compliant with the IPCC Consistent
 				Land Representation guidelines. This codelist represents the
 				Categories and Subdivisions (the conversions are defined in the
@@ -268,7 +271,8 @@
 						<label>&lt;Settlement type II&gt;</label>
 						<label xml:lang="fr">Infrastructure</label>
 						<description xml:lang="fr">réseau routier, aéroport,
-							marches, etc.</description>
+							marches, etc.
+						</description>
 					</item>
 					<item id="2070620">
 						<code>Settlement_other</code>
@@ -285,14 +289,16 @@
 						<label>Water body</label>
 						<label xml:lang="fr">Plan d’eau fermé</label>
 						<description xml:lang="fr">Mares, barrages, lacs, toute
-							retenue d’eau fermee ou l’eau ne coule pas</description>
+							retenue d’eau fermee ou l’eau ne coule pas
+						</description>
 					</item>
 					<item id="2070623">
 						<code>Wetland_type1</code>
 						<label>&lt;Wetland Type I&gt;</label>
 						<label xml:lang="fr">Cours d’eau</label>
 						<description xml:lang="fr">Cours d’eau/rivieres saisonniers
-							ou permanents</description>
+							ou permanents
+						</description>
 					</item>
 					<item id="2079117">
 						<code>Wetland_type2</code>
@@ -591,541 +597,6 @@
 					<label xml:lang="es">Sin datos</label>
 					<description>No data</description>
 					<description xml:lang="fr">Pas de données</description>
-				</item>
-			</items>
-		</list>
-		<list id="222129" name="land_use_conversions">
-			<label type="item">IPCC Land Use representation Categories/Conversions
-			</label>
-			<label type="list">Sub-Categories</label>
-			<description>Two-level codelist compliant with the IPCC Consistent
-				Land Representation guidelines. This codelist represents the
-				Categories and Conversions (the land uses are defined in the
-				land_uses codelist ) necessary to classify the LU transitions. Both
-				category and conversion level are fixed, every survey should use the
-				six IPCC categories and 36 conversions classes without modifying
-				them. For each category there is one remaining (Forest remaining
-				Forest) and five changing conversions (Grassland becoming Forest,
-				Cropland becoming Forest, etc...). DO NOT MODIFY THE
-				CATEGORY/CONVERIOSN structure as this is key for the rest of the
-				survey to be consistent with the IPCC guidelines!!! If you do, the
-				calculations of the yearly changes will not work. SEE:
-				https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representatio
-			</description>
-			<description xml:lang="es">Two-level codelist compliant with
-				the IPCC Consistent Land Representation guidelines. This codelist
-				represents the Categories and Conversions (the land uses are defined
-				in the land_uses codelist ) necessary to classify the LU
-				transitions. Both category and conversion level are fixed, every
-				survey should use the six IPCC categories and 36 conversions classes
-				without modifying them. For each category there is one remaining
-				(Forest remaining Forest) and five changing conversions (Grassland
-				becoming Forest, Cropland becoming Forest, etc...). DO NOT MODIFY
-				THE CATEGORY/CONVERIOSN structure as this is key for the rest of the
-				survey to be consistent with the IPCC guidelines!!! If you do, the
-				calculations of the yearly changes will not work. SEE:
-				https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representatio
-			</description>
-			<description xml:lang="fr">Two-level codelist compliant with
-				the IPCC Consistent Land Representation guidelines. This codelist
-				represents the Categories and Conversions (the land uses are defined
-				in the land_uses codelist ) necessary to classify the LU
-				transitions. Both category and conversion level are fixed, every
-				survey should use the six IPCC categories and 36 conversions classes
-				without modifying them. For each category there is one remaining
-				(Forest remaining Forest) and five changing conversions (Grassland
-				becoming Forest, Cropland becoming Forest, etc...). DO NOT MODIFY
-				THE CATEGORY/CONVERIOSN structure as this is key for the rest of the
-				survey to be consistent with the IPCC guidelines!!! If you do, the
-				calculations of the yearly changes will not work. SEE:
-				https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representatio
-			</description>
-			<description xml:lang="pt">Two-level codelist compliant with
-				the IPCC Consistent Land Representation guidelines. This codelist
-				represents the Categories and Conversions (the land uses are defined
-				in the land_uses codelist ) necessary to classify the LU
-				transitions. Both category and conversion level are fixed, every
-				survey should use the six IPCC categories and 36 conversions classes
-				without modifying them. For each category there is one remaining
-				(Forest remaining Forest) and five changing conversions (Grassland
-				becoming Forest, Cropland becoming Forest, etc...). DO NOT MODIFY
-				THE CATEGORY/CONVERIOSN structure as this is key for the rest of the
-				survey to be consistent with the IPCC guidelines!!! If you do, the
-				calculations of the yearly changes will not work. SEE:
-				https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representatio
-			</description>
-			<hierarchy>
-				<level name="category" />
-				<level name="conversion" />
-			</hierarchy>
-			<items>
-				<item id="2012272">
-					<code>S</code>
-					<label>Settlement</label>
-					<label xml:lang="fr">Établissement</label>
-					<label xml:lang="es">Asentamientos</label>
-					<item id="2012273">
-						<code>SS</code>
-						<label>S &gt; S</label>
-						<label xml:lang="fr">E &gt; E</label>
-						<label xml:lang="pt">A &gt; A</label>
-						<label xml:lang="es">A &gt; A</label>
-						<description>Settlement remaining Settlement</description>
-						<description xml:lang="fr">Établissements restants
-							Établissements</description>
-						<description xml:lang="es">Asentamiento que se mantiene
-							como Asentamiento</description>
-					</item>
-					<item id="2012274">
-						<code>CS</code>
-						<label>C &gt; S</label>
-						<label xml:lang="fr">TC &gt; E</label>
-						<label xml:lang="pt">TA &gt; A</label>
-						<label xml:lang="es">C &gt; A</label>
-						<description>Cropland becoming Settlement</description>
-						<description xml:lang="fr">Terres cultivees devenues
-							Établissements</description>
-						<description xml:lang="es">Tierra de cultivo convertida a
-							Asentamiento</description>
-					</item>
-					<item id="2012275">
-						<code>FS</code>
-						<label>F &gt; S</label>
-						<label xml:lang="fr">TF &gt; E</label>
-						<label xml:lang="pt">F &gt; A</label>
-						<label xml:lang="es">F &gt; A</label>
-						<description>Forest becoming Settlement</description>
-						<description xml:lang="fr">Terres forestieres devenues
-							Établissements</description>
-						<description xml:lang="es">Tierra forestal convertida a
-							Asentamiento</description>
-					</item>
-					<item id="2012276">
-						<code>GS</code>
-						<label>G &gt; S</label>
-						<label xml:lang="fr">P &gt; E</label>
-						<label xml:lang="pt">P &gt; A</label>
-						<label xml:lang="es">P &gt; A</label>
-						<description>Grassland becoming Settlement</description>
-						<description xml:lang="fr">Prairies devenues Établissements
-						</description>
-						<description xml:lang="es">Pastizal convertido a
-							Asentamiento</description>
-					</item>
-					<item id="2012277">
-						<code>WS</code>
-						<label>W &gt; S</label>
-						<label xml:lang="fr">TH &gt; E</label>
-						<label xml:lang="pt">U &gt; A</label>
-						<label xml:lang="es">H &gt; A</label>
-						<description>Wetland becoming Settlement</description>
-						<description xml:lang="fr">Terres humides devenues
-							Établissements</description>
-						<description xml:lang="es">Humedal convertido a
-							Asentamiento</description>
-					</item>
-					<item id="2012278">
-						<code>OS</code>
-						<label>O &gt; S</label>
-						<label xml:lang="fr">AT &gt; E</label>
-						<label xml:lang="pt">O &gt; A</label>
-						<label xml:lang="es">O &gt; A</label>
-						<description>Otherland becoming Settlement</description>
-						<description xml:lang="fr">Autres terres devenues
-							Établissements</description>
-						<description xml:lang="es">Otra tierra convertida a
-							Asentamiento</description>
-					</item>
-				</item>
-				<item id="2012279">
-					<code>C</code>
-					<label>Cropland</label>
-					<label xml:lang="fr">Terre cultivéee</label>
-					<label xml:lang="es">Tierras de cultivo</label>
-					<item id="2012280">
-						<code>CC</code>
-						<label>C &gt; C</label>
-						<label xml:lang="fr">TC &gt; TC</label>
-						<label xml:lang="pt">TA &gt; TA</label>
-						<label xml:lang="es">C &gt; C</label>
-						<description>Cropland remaining Cropland</description>
-						<description xml:lang="fr">Terres cultivées terres
-							restantes terres cultivées</description>
-						<description xml:lang="es">Tierra de cultivo que se
-							mantiene como Tierra de cultivo</description>
-					</item>
-					<item id="2012281">
-						<code>SC</code>
-						<label>S &gt; C</label>
-						<label xml:lang="fr">E &gt; TC</label>
-						<label xml:lang="pt">A &gt; TA</label>
-						<label xml:lang="es">A &gt; C</label>
-						<description>Settlement becoming Cropland</description>
-						<description xml:lang="fr">Établissements devenus des
-							terres cultivées</description>
-						<description xml:lang="es">Asentamiento convertido a Tierra
-							de cultivo</description>
-					</item>
-					<item id="2012282">
-						<code>FC</code>
-						<label>F &gt; C</label>
-						<label xml:lang="fr">TF &gt; TC</label>
-						<label xml:lang="pt">F &gt; TA</label>
-						<label xml:lang="es">F &gt; C</label>
-						<description>Forest becoming Cropland</description>
-						<description xml:lang="fr">Terres forestières devenues des
-							terres cultivées</description>
-						<description xml:lang="es">Tierra forestal convertida a
-							Tierra de cultivo</description>
-					</item>
-					<item id="2012283">
-						<code>GC</code>
-						<label>G &gt; C</label>
-						<label xml:lang="fr">P &gt; TC</label>
-						<label xml:lang="pt">P &gt; TA</label>
-						<label xml:lang="es">P &gt; C</label>
-						<description>Grassland becoming Cropland</description>
-						<description xml:lang="fr">Prairies devenues des terres
-							cultivées</description>
-						<description xml:lang="es">Pastizal convertido a Tierra de
-							cultivo</description>
-					</item>
-					<item id="2012284">
-						<code>WC</code>
-						<label>W &gt; C</label>
-						<label xml:lang="fr">TH &gt; TC</label>
-						<label xml:lang="pt">U &gt; TA</label>
-						<label xml:lang="es">H &gt; C</label>
-						<description>Wetland becoming Cropland</description>
-						<description xml:lang="fr">Terres humides devenues des
-							terres cultivées</description>
-						<description xml:lang="es">Humedal convertido a Tierra de
-							cultivo</description>
-					</item>
-					<item id="2012285">
-						<code>OC</code>
-						<label>O &gt; C</label>
-						<label xml:lang="fr">AT &gt; TC</label>
-						<label xml:lang="pt">O &gt; TA</label>
-						<label xml:lang="es">O &gt; C</label>
-						<description>Otherland becoming Cropland</description>
-						<description xml:lang="fr">Autres terres devenues des
-							terres cultivées</description>
-						<description xml:lang="es">Otra tierra convertida a Tierra
-							de cultivo</description>
-					</item>
-				</item>
-				<item id="2012286">
-					<code>F</code>
-					<label>Forest land</label>
-					<label xml:lang="fr">Terre forestière</label>
-					<label xml:lang="es">Tierras forestales</label>
-					<item id="2012287">
-						<code>FF</code>
-						<label>F &gt; F</label>
-						<label xml:lang="fr">TF &gt; TF</label>
-						<label xml:lang="pt">F &gt; F</label>
-						<label xml:lang="es">F &gt; F</label>
-						<description>Forest remaining Forest</description>
-						<description xml:lang="fr">Terres forestières restantes
-							terres forestières</description>
-						<description xml:lang="es">Tierra forestal que se mantiene
-							como Tierra Forestal</description>
-					</item>
-					<item id="2012288">
-						<code>SF</code>
-						<label>S &gt; F</label>
-						<label xml:lang="fr">E &gt; TF</label>
-						<label xml:lang="pt">A &gt; F</label>
-						<label xml:lang="es">A &gt; F</label>
-						<description>Settlement becoming Forest</description>
-						<description xml:lang="fr">Établissements devenus des
-							terres forestières</description>
-						<description xml:lang="es">Asentamiento convertido a Tierra
-							Forestal</description>
-					</item>
-					<item id="2012289">
-						<code>CF</code>
-						<label>C &gt; F</label>
-						<label xml:lang="fr">TC &gt; TF</label>
-						<label xml:lang="pt">TA &gt; F</label>
-						<label xml:lang="es">C &gt; F</label>
-						<description>Cropland becoming Forest</description>
-						<description xml:lang="fr">Terres cultivées devenues terres
-							forestières</description>
-						<description xml:lang="es">Tierra de cultivo convertida a
-							Tierra Forestal</description>
-					</item>
-					<item id="2012290">
-						<code>GF</code>
-						<label>G &gt; F</label>
-						<label xml:lang="fr">P &gt; TF</label>
-						<label xml:lang="pt">P &gt; F</label>
-						<label xml:lang="es">P &gt; F</label>
-						<description>Grassland becoming Forest</description>
-						<description xml:lang="fr">Prairies devenues des terres
-							forestières</description>
-						<description xml:lang="es">Pastizal convertida a Tierra
-							Forestal</description>
-					</item>
-					<item id="2012291">
-						<code>WF</code>
-						<label>W &gt; F</label>
-						<label xml:lang="fr">TH &gt; TF</label>
-						<label xml:lang="pt">U &gt; F</label>
-						<label xml:lang="es">H &gt; F</label>
-						<description>Wetland becoming Forest</description>
-						<description xml:lang="fr">Terres humides devenues des
-							terres forestières</description>
-						<description xml:lang="es">Humedal convertido a Tierra
-							Forestal</description>
-					</item>
-					<item id="2012292">
-						<code>OF</code>
-						<label>O &gt; F</label>
-						<label xml:lang="fr">AT &gt; TF</label>
-						<label xml:lang="pt">O &gt; F</label>
-						<label xml:lang="es">O &gt; F</label>
-						<description>Otherland becoming Forest</description>
-						<description xml:lang="fr">Autres terres devenues terres
-							forestières</description>
-						<description xml:lang="es">Otras tierras convertida a
-							Tierra Forestal</description>
-					</item>
-				</item>
-				<item id="2012293">
-					<code>G</code>
-					<label>Grassland</label>
-					<label xml:lang="fr">Prairie</label>
-					<label xml:lang="es">Pastizales</label>
-					<item id="2012294">
-						<code>GG</code>
-						<label>G &gt; G</label>
-						<label xml:lang="fr">P &gt; P</label>
-						<label xml:lang="pt">P &gt; P</label>
-						<label xml:lang="es">P &gt; P</label>
-						<description>Grassland remaining Grassland</description>
-						<description xml:lang="fr">Prairies restantes prairies
-						</description>
-						<description xml:lang="es">Pastizal que se mantiene como
-							Pastizal</description>
-					</item>
-					<item id="2012295">
-						<code>SG</code>
-						<label>S &gt; G</label>
-						<label xml:lang="fr">E &gt; P</label>
-						<label xml:lang="pt">A &gt; P</label>
-						<label xml:lang="es">A &gt; P</label>
-						<description>Settlement becoming Grassland</description>
-						<description xml:lang="fr">Établissements devenus prairies
-						</description>
-						<description xml:lang="es">Asentamiento convertido a
-							Pastizal</description>
-					</item>
-					<item id="2012296">
-						<code>CG</code>
-						<label>C &gt; G</label>
-						<label xml:lang="fr">TC &gt; P</label>
-						<label xml:lang="pt">TA &gt; P</label>
-						<label xml:lang="es">C &gt; P</label>
-						<description>Cropland becoming Grassland</description>
-						<description xml:lang="fr">Terres cultivees devenues
-							prairies</description>
-						<description xml:lang="es">Tierra de cultivo convertida a
-							Pastizal</description>
-					</item>
-					<item id="2012297">
-						<code>FG</code>
-						<label>F &gt; G</label>
-						<label xml:lang="fr">TF &gt; P</label>
-						<label xml:lang="pt">F &gt; P</label>
-						<label xml:lang="es">F &gt; P</label>
-						<description>Forest becoming Grassland</description>
-						<description xml:lang="fr">Terres forestieres devenues
-							prairies</description>
-						<description xml:lang="es">Tierra forestal convertida a
-							Pastizal</description>
-					</item>
-					<item id="2012298">
-						<code>WG</code>
-						<label>W &gt; G</label>
-						<label xml:lang="fr">TH &gt; P</label>
-						<label xml:lang="pt">U &gt; P</label>
-						<label xml:lang="es">H &gt; P</label>
-						<description>Wetland becoming Grassland</description>
-						<description xml:lang="fr">Terres humides devenues prairies
-						</description>
-						<description xml:lang="es">Humedal convertido a Pastizal
-						</description>
-					</item>
-					<item id="2012299">
-						<code>OG</code>
-						<label>O &gt; G</label>
-						<label xml:lang="fr">AT &gt; P</label>
-						<label xml:lang="pt">O &gt; P</label>
-						<label xml:lang="es">O &gt; P</label>
-						<description>Otherland becoming Grassland</description>
-						<description xml:lang="fr">Autres terres devenues prairies
-						</description>
-						<description xml:lang="es">Otra tierra convertida a
-							Pastizal</description>
-					</item>
-				</item>
-				<item id="2012300">
-					<code>W</code>
-					<label>Wetland</label>
-					<label xml:lang="fr">Terre humide</label>
-					<label xml:lang="es">Humedales</label>
-					<item id="2012301">
-						<code>WW</code>
-						<label>W &gt; W</label>
-						<label xml:lang="fr">TH &gt; TH</label>
-						<label xml:lang="pt">U &gt; U</label>
-						<label xml:lang="es">H &gt; H</label>
-						<description>Wetland remaining Wetland</description>
-						<description xml:lang="fr">Terres humides restantes terres
-							humides</description>
-						<description xml:lang="es">Humedal que se mantiene como
-							Humedal</description>
-					</item>
-					<item id="2012302">
-						<code>SW</code>
-						<label>S &gt; W</label>
-						<label xml:lang="fr">E &gt; TH</label>
-						<label xml:lang="pt">A &gt; U</label>
-						<label xml:lang="es">A &gt; H</label>
-						<description>Settlement becoming Wetland</description>
-						<description xml:lang="fr">Établissements devenus terres
-							humides</description>
-						<description xml:lang="es">Asentamiento convertido a
-							Humedal</description>
-					</item>
-					<item id="2012303">
-						<code>CW</code>
-						<label>C &gt; W</label>
-						<label xml:lang="fr">TC &gt; TH</label>
-						<label xml:lang="pt">TA &gt; U</label>
-						<label xml:lang="es">C &gt; H</label>
-						<description>Cropland becoming Wetland</description>
-						<description xml:lang="fr">Terres cultivees devenues terres
-							humides</description>
-						<description xml:lang="es">Tierra de cultivo convertida a
-							Humedal</description>
-					</item>
-					<item id="2012304">
-						<code>FW</code>
-						<label>F &gt; W</label>
-						<label xml:lang="fr">TF &gt; TH</label>
-						<label xml:lang="pt">F &gt; U</label>
-						<label xml:lang="es">F &gt; H</label>
-						<description>Forest becoming Wetland</description>
-						<description xml:lang="fr">Terres forestieres devenues
-							terres humides</description>
-						<description xml:lang="es">Tierra forestal convertida a
-							Humedal</description>
-					</item>
-					<item id="2012305">
-						<code>GW</code>
-						<label>G &gt; W</label>
-						<label xml:lang="fr">P &gt; TH</label>
-						<label xml:lang="pt">P &gt; U</label>
-						<label xml:lang="es">P &gt; H</label>
-						<description>Grassland becoming Wetland</description>
-						<description xml:lang="fr">Prairies devenues terres humides
-						</description>
-						<description xml:lang="es">Pastizal convertido a Humedal
-						</description>
-					</item>
-					<item id="2012306">
-						<code>OW</code>
-						<label>O &gt; W</label>
-						<label xml:lang="fr">AT &gt; TH</label>
-						<label xml:lang="pt">O &gt; P</label>
-						<label xml:lang="es">O &gt; P</label>
-						<description>Otherland becoming Wetland</description>
-						<description xml:lang="fr">Autres terres devenues terres
-							humides</description>
-						<description xml:lang="es">Otra tierra convertida a Humedal
-						</description>
-					</item>
-				</item>
-				<item id="2012307">
-					<code>O</code>
-					<label>Other land</label>
-					<label xml:lang="fr">Autre terre</label>
-					<label xml:lang="es">Otras tierras</label>
-					<item id="2012308">
-						<code>OO</code>
-						<label>O &gt; O</label>
-						<label xml:lang="fr">AT &gt; AT</label>
-						<label xml:lang="pt">O &gt; O</label>
-						<label xml:lang="es">O &gt; O</label>
-						<description>Otherland remaining Otherland</description>
-						<description xml:lang="fr">Autres terres restantes Autres
-							terres</description>
-						<description xml:lang="es">Otra tierra que se mantiene como
-							Otra tierra</description>
-					</item>
-					<item id="2012309">
-						<code>SO</code>
-						<label>S &gt; O</label>
-						<label xml:lang="fr">E &gt; AT</label>
-						<label xml:lang="pt">A &gt; O</label>
-						<label xml:lang="es">A &gt; O</label>
-						<description>Settlement becoming Otherland</description>
-						<description xml:lang="fr">Établissements devenus d'autres
-							terres</description>
-						<description xml:lang="es">Asentamiento convertido a Otra
-							tierra</description>
-					</item>
-					<item id="2012310">
-						<code>CO</code>
-						<label>C &gt; O</label>
-						<label xml:lang="fr">TC &gt; AT</label>
-						<label xml:lang="pt">TA &gt; O</label>
-						<label xml:lang="es">C &gt; O</label>
-						<description>Cropland becoming Otherland</description>
-						<description xml:lang="fr">Terres cultivées devenues
-							d'autres terres</description>
-						<description xml:lang="es">Tierra de cultivo convertida a
-							Otra tierra</description>
-					</item>
-					<item id="2012311">
-						<code>FO</code>
-						<label>F &gt; O</label>
-						<label xml:lang="fr">TF &gt; AT</label>
-						<label xml:lang="pt">F &gt; O</label>
-						<label xml:lang="es">F &gt; O</label>
-						<description>Forest becoming Otherland</description>
-						<description xml:lang="fr">Forest devenues d'autres terres
-						</description>
-						<description xml:lang="es">Tierra forestal convertida a
-							Otra tierra</description>
-					</item>
-					<item id="2012312">
-						<code>GO</code>
-						<label>G &gt; O</label>
-						<label xml:lang="fr">P &gt; AT</label>
-						<label xml:lang="pt">P &gt; O</label>
-						<label xml:lang="es">P &gt; O</label>
-						<description>Grassland becoming Otherland</description>
-						<description xml:lang="fr">Prairies devenues d'autres
-							terres</description>
-						<description xml:lang="es">Pastizal convertido a Otra
-							tierra</description>
-					</item>
-					<item id="2012313">
-						<code>WO</code>
-						<label>W &gt; O</label>
-						<label xml:lang="fr">TH &gt; AT</label>
-						<label xml:lang="pt">U &gt; O</label>
-						<label xml:lang="es">H &gt; O</label>
-						<description>Wetland becoming Otherland</description>
-						<description xml:lang="fr">Terres humides devenues d'autres
-							terres</description>
-						<description xml:lang="es">Humedal convertido a Otra tierra
-						</description>
-					</item>
 				</item>
 			</items>
 		</list>
@@ -1536,16 +1007,19 @@
 			<label type="item" xml:lang="fr">Gammes d'altitude</label>
 			<label type="item" xml:lang="es">Rangos de elevación</label>
 			<description>Ranges of elevation in 100 meters. Used to aggregate the
-				plots into ranges for easier analysis.</description>
+				plots into ranges for easier analysis.
+			</description>
 			<description xml:lang="fr">Dénivelés à 100 mètres. Utilisé
 				pour agréger les parcelles en plages pour une analyse plus facile.
 			</description>
 			<description xml:lang="pt">Intervalos de elevação em 100
 				metros. Usado para agregar as parcelas em intervalos para facilitar
-				a análise.</description>
+				a análise.
+			</description>
 			<description xml:lang="es">Rangos de elevación en 100 metros.
 				Se utiliza para agregar las parcelas en rangos para facilitar el
-				análisis.</description>
+				análisis.
+			</description>
 			<codingScheme scope="local" />
 			<items>
 				<item id="2012394">
@@ -2199,13 +1673,16 @@
 			</description>
 			<description xml:lang="es">Values used when the user needs to
 				specify the year of change of Land Use or the year of acquisition of
-				the VHR imagery.</description>
+				the VHR imagery.
+			</description>
 			<description xml:lang="fr">Values used when the user needs to
 				specify the year of change of Land Use or the year of acquisition of
-				the VHR imagery.</description>
+				the VHR imagery.
+			</description>
 			<description xml:lang="pt">Values used when the user needs to
 				specify the year of change of Land Use or the year of acquisition of
-				the VHR imagery.</description>
+				the VHR imagery.
+			</description>
 			<codingScheme scope="local" />
 			<items>
 				<item id="2012393">
@@ -2457,7 +1934,8 @@
 					<description xml:lang="pt">Solos Argilosos de Alta Atividade
 					</description>
 					<description xml:lang="es">Suelos arcillosos de alta
-						actividad</description>
+						actividad
+					</description>
 				</item>
 				<item id="2012354">
 					<code>7</code>
@@ -2469,9 +1947,11 @@
 					<description xml:lang="fr">Sols argileux à faible activité
 					</description>
 					<description xml:lang="pt">Solos Argilosos de Baixa
-						Atividade</description>
+						Atividade
+					</description>
 					<description xml:lang="es">Suelos arcillosos de baja
-						actividad</description>
+						actividad
+					</description>
 				</item>
 				<item id="2012355">
 					<code>8</code>
@@ -2492,11 +1972,14 @@
 					<label xml:lang="es">No Data</label>
 					<description>The map contains no data for this plot</description>
 					<description xml:lang="fr">La carte ne contient aucune
-						donnée pour cette placette</description>
+						donnée pour cette placette
+					</description>
 					<description xml:lang="pt">O mapa não contém dados para este
-						gráfico</description>
+						gráfico
+					</description>
 					<description xml:lang="es">El mapa no contiene datos para
-						esta parcela</description>
+						esta parcela
+					</description>
 				</item>
 			</items>
 		</list>
@@ -2818,7 +2301,8 @@
 					<label>Grazing</label>
 					<label xml:lang="fr">Pâturage</label>
 					<description xml:lang="fr">Zone pâturée a croissance
-						naturelle</description>
+						naturelle
+					</description>
 				</item>
 				<item id="2070698">
 					<code>no_grazing</code>
@@ -3148,11 +2632,14 @@
 			<coordinate id="3" name="location" ui:tab="tab_10007">
 				<label type="instance">Plot - Central point coordinates</label>
 				<label type="instance" xml:lang="fr">Placette - Coordonnées du
-					point central</label>
+					point central
+				</label>
 				<label type="instance" xml:lang="es">Parcela - Coordenadas punto
-					central</label>
+					central
+				</label>
 				<label type="instance" xml:lang="pt">Parcela - Coordenadas do ponto
-					central</label>
+					central
+				</label>
 				<description>Location of the center point of the plot. This value
 					comes from the CSV with the sampling design. DO NOT REMOVE! In the
 					CSV file the coordinates are divided in two columns (in this order)
@@ -3163,17 +2650,20 @@
 				</description>
 				<description xml:lang="fr">Emplacement du point central de la
 					parcelle. Cette valeur provient du CSV avec le plan
-					d'échantillonnage. NE PAS ENLEVER!</description>
+					d'échantillonnage. NE PAS ENLEVER!
+				</description>
 				<description xml:lang="es">Ubicación del punto central de la
 					parcela. Este valor proviene del CSV con el diseño de la muestra.
-					¡NO QUITAR!</description>
+					¡NO QUITAR!
+				</description>
 			</coordinate>
 			<text id="4" name="operator" required="true"
 				ui:tab="tab_2012574" type="short">
 				<label type="instance">Plot - Operator</label>
 				<label type="instance" xml:lang="fr">Placette - Opérateur</label>
 				<label type="instance" xml:lang="es">Parcela - Operador que realizó
-					evaluación</label>
+					evaluación
+				</label>
 				<label type="instance" xml:lang="pt">Parcela - Operador</label>
 				<description>Name of the operator/interpreter that assessed the
 					plot. This name comes from Collect Earth's main window where the
@@ -3198,11 +2688,14 @@
 			<boolean id="31" name="actively_saved" ui:tab="tab_2012574">
 				<label type="instance">Plot - Actively saved by user</label>
 				<label type="instance" xml:lang="fr">Placette - activement
-					enregistrée par l'utilisateur</label>
+					enregistrée par l'utilisateur
+				</label>
 				<label type="instance" xml:lang="pt">Parcela - salva ativamente
-					pelo usuário</label>
+					pelo usuário
+				</label>
 				<label type="instance" xml:lang="es">Parcela - guardada activamente
-					por el usuario</label>
+					por el usuario
+				</label>
 				<description>This attribute is set directly by Collect Earth when
 					the super finishes filling the data for a plot, clicks on the
 					Submit button and the plot icon becomes a green tick on the Google
@@ -3215,11 +2708,14 @@
 				ui:tab="tab_2012574">
 				<label type="instance">Plot - Date of last saved</label>
 				<label type="instance" xml:lang="fr">Placette - dernier
-					enregistrement le</label>
+					enregistrement le
+				</label>
 				<label type="instance" xml:lang="es">Parcela - fecha de la última
-					vez que se guardó</label>
+					vez que se guardó
+				</label>
 				<label type="instance" xml:lang="pt">Parcela - Data do último
-					salvamento</label>
+					salvamento
+				</label>
 				<description>When was the plot last changed. DO NOT REMOVE. Internal
 					attribute used by the CE Survey.
 				</description>
@@ -3228,11 +2724,14 @@
 				ui:tab="tab_2012574" type="short">
 				<label type="instance">Plot - CSV file that contains the plot</label>
 				<label type="instance" xml:lang="fr">Placette - Fichier CSV qui
-					contient la placette</label>
+					contient la placette
+				</label>
 				<label type="instance" xml:lang="pt">Parcela - arquivo CSV que
-					contém a parcela</label>
+					contém a parcela
+				</label>
 				<label type="instance" xml:lang="es">Parcela - archivo CSV que
-					contiene la parcela</label>
+					contiene la parcela
+				</label>
 				<description>This attribute stores the name of the CSV file that
 					this plot comes from (the sampling design file). This is useful to
 					understand where the original data from the plot location and so on
@@ -3250,11 +2749,14 @@
 				collectearth:fromcsv="true" type="integer">
 				<label type="instance">DEM - Elevation</label>
 				<label type="instance" xml:lang="fr">DEM - Altitude (modèle
-					numérique d'élévation)</label>
+					numérique d'élévation)
+				</label>
 				<label type="instance" xml:lang="es">DEM - Altitud - modelo digital
-					de elevación</label>
+					de elevación
+				</label>
 				<label type="instance" xml:lang="pt">DEM - Altitude (modelo digital
-					de elevação)</label>
+					de elevação)
+				</label>
 				<description>Comes from the CSV. Obtained for the SRTM Digital
 					Elevation Model. The column is generated by the Grid Generator GEE
 					Tool :
@@ -3268,11 +2770,14 @@
 				collectearth:fromcsv="true" type="real">
 				<label type="instance">DEM - Slope</label>
 				<label type="instance" xml:lang="fr">MNT - Pente (modèle numérique
-					d'élévation)</label>
+					d'élévation)
+				</label>
 				<label type="instance" xml:lang="es">DEM - Pendiente - modelo
-					digital de elevación</label>
+					digital de elevación
+				</label>
 				<label type="instance" xml:lang="pt">DEM - Inclinação (modelo
-					digital de elevação)</label>
+					digital de elevação)
+				</label>
 				<description>Comes from the CSV. Obtained for the SRTM Digital
 					Elevation Model. The column is generated by the Grid Generator GEE
 					Tool :
@@ -3286,11 +2791,14 @@
 				collectearth:fromcsv="true" type="real">
 				<label type="instance">DEM - Aspect</label>
 				<label type="instance" xml:lang="fr">MNT - Esposition (modèle
-					numérique d'élévation)</label>
+					numérique d'élévation)
+				</label>
 				<label type="instance" xml:lang="es">DEM - Aspecto - modelo digital
-					de elevación</label>
+					de elevación
+				</label>
 				<label type="instance" xml:lang="pt">DEM - Exposição (modelo
-					digital de elevação)</label>
+					digital de elevação)
+				</label>
 				<description>Comes from the CSV. Obtained for the SRTM Digital
 					Elevation Model. The column is generated by the Grid Generator GEE
 					Tool :
@@ -3304,11 +2812,14 @@
 				ui:tab="tab_10007" calculated="true" list="elevation_ranges">
 				<label type="instance">DEM - Elevation - range</label>
 				<label type="instance" xml:lang="es">DEM - Elevación (por rangos) -
-					modelo digital de elevación</label>
+					modelo digital de elevación
+				</label>
 				<label type="instance" xml:lang="fr">DEM - Gamme d'altitude (modèle
-					numérique d'élévation)</label>
+					numérique d'élévation)
+				</label>
 				<label type="instance" xml:lang="pt">DEM - Faixa de elevação
-					(modelo digital de elevação)</label>
+					(modelo digital de elevação)
+				</label>
 				<default
 					expr=" format-number(ceiling(elevation div 100 ), '#')" />
 			</code>
@@ -3316,11 +2827,14 @@
 				ui:tab="tab_10007" calculated="true" list="orientation">
 				<label type="instance">DEM - Aspect - ranges</label>
 				<label type="instance" xml:lang="es">DEM - Aspecto (por rangos) -
-					modelo digital de elevación</label>
+					modelo digital de elevación
+				</label>
 				<label type="instance" xml:lang="fr">DEM - Gamme d'exposition
-					(modèle numérique d'élévation)</label>
+					(modèle numérique d'élévation)
+				</label>
 				<label type="instance" xml:lang="pt">DEM - Faixa de exposição
-					(modelo digital de elevação)</label>
+					(modelo digital de elevação)
+				</label>
 				<default value="na" if="aspect=0 and slope=0" />
 				<default value="N" if="aspect&gt;337.5 or aspect&lt;=22.5" />
 				<default value="NE" if="aspect&gt;22.5 and aspect&lt;=67.5" />
@@ -3338,11 +2852,14 @@
 				ui:tab="tab_10007" calculated="true" list="slope_classes">
 				<label type="instance">DEM - Slope - ranges</label>
 				<label type="instance" xml:lang="es">DEM - Pendiente (por rangos) -
-					modelo digital de elevación</label>
+					modelo digital de elevación
+				</label>
 				<label type="instance" xml:lang="fr">DEM - Gamme de pente (modèle
-					numérique d'élévation)</label>
+					numérique d'élévation)
+				</label>
 				<label type="instance" xml:lang="pt">DEM - Faixa de inclinação
-					(modelo digital de elevação)</label>
+					(modelo digital de elevação)
+				</label>
 				<default value="FLAT" if="slope&gt;=0 and slope&lt;6" />
 				<default value="SLIGHT" if="slope&gt;=6 and slope&lt;16" />
 				<default value="STEEP" if="slope&gt;=16 and slope&lt;31" />
@@ -3465,11 +2982,14 @@
 				ui:tab="tab_10007" collectearth:fromcsv="true" type="short">
 				<label type="instance">GAUL - Adm. Level 1 ( Province/Region)</label>
 				<label type="instance" xml:lang="fr">GAUL - Adm. Level 1 (
-					Province/Region )</label>
+					Province/Region )
+				</label>
 				<label type="instance" xml:lang="es">GAUL - Adm. Level 1 (
-					Province/Region)</label>
+					Province/Region)
+				</label>
 				<label type="instance" xml:lang="pt">GAUL - Adm. Level 1 (
-					Província/Region)</label>
+					Província/Region)
+				</label>
 				<description>Province where the plot is located. Usually obtained
 					from FAOs Global Administrative Units Layer (GAUL) 2014. Keep this
 					attribute if you want to disaggregate the data by province. This
@@ -3490,11 +3010,14 @@
 				ui:tab="tab_10007" collectearth:fromcsv="true" type="short">
 				<label type="instance">GAUL - Adm. Level 2 (District/Commune)</label>
 				<label type="instance" xml:lang="fr">GAUL - Adm. Level 2
-					(District/Commune)</label>
+					(District/Commune)
+				</label>
 				<label type="instance" xml:lang="es">GAUL - Adm. Level 2
-					(Distrito/Municipio/Comuna)</label>
+					(Distrito/Municipio/Comuna)
+				</label>
 				<label type="instance" xml:lang="pt">GAUL - Adm. Level 2
-					(Distrito/Comuna)</label>
+					(Distrito/Comuna)
+				</label>
 				<description>District where the plot is located. Usually obtained
 					from FAOs Global Administrative Units Layer (GAUL) 2014. Keep this
 					attribute if you want to disaggregate the data by district. This
@@ -3515,21 +3038,20 @@
 				ui:layout="table" collect:enumerate="true" ui:tab="tab_63365">
 				<label type="instance">LU </label>
 				<label type="instance" xml:lang="fr">Utilisation des terres dans la
-					placette 2023</label>
+					placette 2023
+				</label>
 				<label type="instance" xml:lang="es">Usos de la tierra en la
-					parcela 2023</label>
+					parcela 2023
+				</label>
 				<label type="instance" xml:lang="pt">Usos do solo no lote 2023
 				</label>
-				<description>Interpretation with Context: the interpreter examines
-					the LC patterns within and without the SU and mentally delineates
-					boundaries around the different assumed land uses, while applying
-					their respective definitions (e.g., minimum area, % element cover).
-					CENTROID The land use in the centroid is considered after the
-					identification of the Land Use (s) in the landscape surrounding the
-					point. DOMINANT The dominant LU in the yellow sampling frame should
-					be considered. Apply a majority rule to assign a single class to
-					the point.
-				</description>
+				<description>Interpretation with context: The interpreter examines
+					the landscape surrounding the sample and mentally delineates a
+					homogeneous area that intersects the sample. They then apply the
+					operational definition at this level to classify the outlined area.
+					Next, the labeling protocol is used to assign a label to the sample
+					and report this information here (e.g., for a point sample, the
+					land-use class intersecting the sample).</description>
 				<code id="63367" name="lu" required="true" key="true"
 					list="land_uses">
 					<label type="instance">LU</label>
@@ -3542,10 +3064,6 @@
 			<code id="2022309" name="lu_t2" required="true"
 				ui:tab="tab_63365" list="land_uses">
 				<label type="instance">Land use</label>
-				<description>After having 'mentally' classified the landscape and
-					the land use around the point, select the LU falling over the point
-					(in case of sample size is a point) or the dominant (or majority),
-					in case of sample size is an area.</description>
 			</code>
 			<code id="2012667" name="sub_t2" required="true"
 				ui:tab="tab_63365" ui:layoutType="radio" list="land_uses"
@@ -3572,7 +3090,8 @@
 				list="difficulty_interpretation">
 				<label type="instance">Difficulty in interpretation</label>
 				<description>Assessment of the quality of the visual interpretation
-					for this specific sample</description>
+					for this specific sample
+				</description>
 			</code>
 			<entity id="2066550" name="change" multiple="true"
 				ui:layout="form" collect:enumerate="true" ui:tab="tab_2066549">
@@ -3678,8 +3197,7 @@
 					<default value="type II" if="to_sub = 'Wetland_type2'" />
 					<default value="type III" if="to_sub = 'Wetland_type3'" />
 					<default value="type I" if="to_sub = 'Other_land_type1'" />
-					<default value="type II"
-						if="to_sub = 'Other_land_type2'" />
+					<default value="type II" if="to_sub = 'Other_land_type2'" />
 					<default value="type III" if="to_sub = 'Other_land_type3'" />
 				</text>
 				<code id="2071534" name="previous_label"
@@ -3718,14 +3236,16 @@
 					<label type="instance">Year of change</label>
 					<description>After having identified the LU class observe and
 						report any change observed over time, starting from the most
-						recent backward.</description>
+						recent backward.
+					</description>
 					<check flag="error" expr="change_yr &lt; parent()/base_year">
 						<message>The year of the change is out of range</message>
 					</check>
 					<check flag="error" if="change_num &gt; 1"
 						expr="$this &lt; parent()/change[idm:position($context) - 1]/change_yr">
 						<message>The year of the change must be less than the year of the
-							previous one</message>
+							previous one
+						</message>
 					</check>
 				</code>
 				<code id="2094989" name="lu_change_type" required="true"
@@ -3781,7 +3301,8 @@
 					<check flag="error" if="lu_change_type= 'lu_change'"
 						expr="from_sub != to_sub">
 						<message>Subdivision cannot be equal to the one previously
-							selected</message>
+							selected
+						</message>
 					</check>
 				</code>
 				<code id="2108933" name="from_sub_actual" ui:hide="true"
@@ -3824,7 +3345,8 @@
 					ui:layoutType="radio">
 					<label type="instance">Extension of a previous change</label>
 					<description>The change is treated as an extension of a prior
-						(older) disturbance</description>
+						(older) disturbance
+					</description>
 				</boolean>
 				<code id="2067785" name="how_long_was_non_forest_before"
 					relevant="from_lu != 'F' and to_lu = 'F'" required="true"
@@ -3879,7 +3401,8 @@
 				list="patch_size">
 				<label type="instance">Forest patch size</label>
 				<description>It refers to the patch intersecting/falling over the
-					sample.</description>
+					sample.
+				</description>
 			</code>
 			<boolean id="2080275" name="presence_trees"
 				relevant="lu_t2 != 'F'" required="true" ui:tab="tab_63365">
@@ -3916,13 +3439,16 @@
 				<description xml:lang="fr">Si cette parcelle était difficile
 					à évaluer, vous devez laisser un commentaire ici afin que les
 					examinateurs puissent comprendre le raisonnement de la
-					classification.</description>
+					classification.
+				</description>
 				<description xml:lang="pt">Se esta parcela foi difícil de
 					avaliar, você deve deixar um comentário aqui para que os revisores
-					possam entender o raciocínio da classificação.</description>
+					possam entender o raciocínio da classificação.
+				</description>
 				<description xml:lang="es">Si esta parcela fue difícil de
 					evaluar, debe dejar un comentario aquí para que los revisores
-					puedan entender el razonamiento de la clasificación.</description>
+					puedan entender el razonamiento de la clasificación.
+				</description>
 			</text>
 			<code id="2104743" name="landscape" required="true"
 				ui:tab="tab_2065254" list="landscape">
