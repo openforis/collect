@@ -5,17 +5,17 @@
 	collectearth:openEarthMap="true" collectearth:plotarea="0.1"
 	collectearth:openBingMaps="true" collectearth:samplepoints="1"
 	collect:target="CE" collect:collectVersion="4.0.105"
-	xsi:schemaLocation="https://www.openforis.org/idml/3.0  &#9;&#9;https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3.xsd       &#9;&#9;https://www.openforis.org/collect/3.0/ui  &#9;&#9;https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd"
-	xmlns="https://www.openforis.org/idml/3.0"
-	xmlns:collect="https://www.openforis.org/collect/3.0/collect"
-	xmlns:ui="https://www.openforis.org/collect/3.0/ui"
-	xmlns:collectearth="https://www.openforis.org/collect/3.0/collectearth"
+	xsi:schemaLocation="http://www.openforis.org/idml/3.0  &#9;&#9;https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3.xsd       &#9;&#9;http://www.openforis.org/collect/3.0/ui  &#9;&#9;https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd"
+	xmlns="http://www.openforis.org/idml/3.0"
+	xmlns:collect="http://www.openforis.org/collect/3.0/collect"
+	xmlns:ui="http://www.openforis.org/collect/3.0/ui"
+	xmlns:collectearth="http://www.openforis.org/collect/3.0/collectearth"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<project>Template - ART-TREES + UNFCCC RL + IPCC AFOLU</project>
 	<project xml:lang="fr">Modèle - ART-TREES + UNFCCC RL + IPCC AFOLU</project>
 	<project xml:lang="es">Plantilla - ART-TREES + UNFCCC RL + IPCC AFOLU</project>
 	<project xml:lang="pt">Modelo - ART-TREES + UNFCCC RL + IPCC AFOLU</project>
-	<uri>https://www.openforis.org/idm/multipurpose_template_v1</uri>
+	<uri>http://www.openforis.org/idm/multipurpose_template_v1</uri>
 	<description xml:lang="fr">Il s'agit de l'enquête standard qui
 		devrait être utilisée pour les évaluations des données d'activité afin
 		de se conformer aux lignes directrices proposées par le GIEC pour la
@@ -76,7 +76,7 @@
 	<applicationOptions>
 		<options type="ui">
 			<n0:tabSet name="plot_tab_set"
-				xmlns:n0="https://www.openforis.org/collect/3.0/ui">
+				xmlns:n0="http://www.openforis.org/collect/3.0/ui">
 				<n0:tab name="tab_63365">
 					<n0:label>LU &lt;END YEAR&gt;</n0:label>
 					<n0:label xml:lang="fr">LU &lt;ANN&#201;E DE FIN&gt;</n0:label>
@@ -1680,7 +1680,7 @@
 			</description>
 			<description xml:lang="es">Valores utilizados cuando el usuario
 				necesita especificar el año de cambio de uso del suelo o el año de
-				adquisición de la imagenería VHR.
+				adquisición de la imaginería VHR.
 			</description>
 			<description xml:lang="pt">Valores usados quando o utilizador
 				precisa especificar o ano de mudança de uso da terra ou o ano de
