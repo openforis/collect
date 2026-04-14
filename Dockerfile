@@ -1,4 +1,4 @@
-FROM maven:3.6.3-openjdk-11-slim as build
+FROM maven:3.8.8-eclipse-temurin-11 as build
 
 LABEL COMPANY="Open Foris"
 LABEL MAINTAINER="openforisinitiative@gmail.com"
