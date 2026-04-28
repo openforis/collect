@@ -98,7 +98,9 @@
 						<comboitem label="0.25 ha" value="0_25" />
 						<comboitem label="0.50 ha" value="0_5" />
 						<comboitem label="1 ha" value="1" />
+						<comboitem label="3 ha" value="3" />
 						<comboitem label="5 ha" value="5" />
+						<comboitem label="6 ha" value="6" />
 						<comboitem label="10 ha" value="10" />
 					</combobox>
 				</fieldErrorHandler>
