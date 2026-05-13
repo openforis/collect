@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
-<survey lastId="2013037" created="2025-06-15T12:31:56.251+02:00" modified="2025-06-15T13:56:40.660+02:00" collectearth:bingKey="AjVg2KjkXqNtIcnLTZfIwahJATb-LGJigDTj1eCHBah5BTTgWU8rBQD0cTC8-6IA" collectearth:openEarthMap="true" collectearth:plotarea="0.5" collectearth:samplepoints="49" collectearth:openBingMaps="true" collect:target="CE" collectearth:extraMapUrl="http://openforis.org/fileadmin/docs/collectEarth/presentation/Collect_Earth_-_Training_Plots.html#PLOT_ID" collect:collectVersion="4.0.101" xsi:schemaLocation="http://www.openforis.org/idml/3.0  &#9;&#9;https://raw.github.com/openforis/ollect/master/collect-core/src/main/resources/idml3.xsd       &#9;&#9;http://www.openforis.org/collect/3.0/ui  &#9;&#9;https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd" xmlns="http://www.openforis.org/idml/3.0" xmlns:collect="http://www.openforis.org/collect/3.0/collect" xmlns:ui="http://www.openforis.org/collect/3.0/ui" xmlns:collectearth="http://www.openforis.org/collect/3.0/collectearth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <project xml:lang="es">IPCC AFOLU 2000-2025</project>
-  <project xml:lang="pt">IPCC AFOLU 2000-2025</project>
-  <project xml:lang="fr">IPCC AFOLU 2000-2025</project>
-  <project xml:lang="en">IPCC AFOLU 2000-2025</project>
+<survey lastId="2013041" created="2025-06-15T12:31:56.251+02:00" modified="2025-06-15T13:56:40.660+02:00" collectearth:bingKey="AjVg2KjkXqNtIcnLTZfIwahJATb-LGJigDTj1eCHBah5BTTgWU8rBQD0cTC8-6IA" collectearth:openEarthMap="true" collectearth:plotarea="0.5" collectearth:samplepoints="49" collectearth:openBingMaps="true" collect:target="CE" collectearth:extraMapUrl="http://openforis.org/fileadmin/docs/collectEarth/presentation/Collect_Earth_-_Training_Plots.html#PLOT_ID" collect:collectVersion="4.0.101" xsi:schemaLocation="http://www.openforis.org/idml/3.0  &#9;&#9;https://raw.github.com/openforis/ollect/master/collect-core/src/main/resources/idml3.xsd       &#9;&#9;http://www.openforis.org/collect/3.0/ui  &#9;&#9;https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd" xmlns="http://www.openforis.org/idml/3.0" xmlns:collect="http://www.openforis.org/collect/3.0/collect" xmlns:ui="http://www.openforis.org/collect/3.0/ui" xmlns:collectearth="http://www.openforis.org/collect/3.0/collectearth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <project xml:lang="es">IPCC AFOLU 2000-2026</project>
+  <project xml:lang="pt">IPCC AFOLU 2000-2026</project>
+  <project xml:lang="fr">IPCC AFOLU 2000-2026</project>
+  <project xml:lang="en">IPCC AFOLU 2000-2026</project>
   <uri>http://www.openforis.org/idm/test_update_collect</uri>
   <description xml:lang="fr">Il s'agit de l'enquête standard qui devrait être utilisée pour les évaluations des données d'activité afin de se conformer aux lignes directrices proposées par le GIEC pour la représentation cohérente des terres. Vous pouvez ajouter d'autres questions à l'enquête ou modifier les codes des questions à choix multiples (à l'exception des catégories d'utilisation des terres et des conversions qui ne doivent pas être modifiées. Vous devez adapter les subdivisions d'utilisation des terres à votre situation nationale). Cette enquête comprend des attributs calculés (qui sont traités par Collect au fur et à mesure que vous remplissez les données du questionnaire) qui vous aident à reconstruire la série temporelle complète d'utilisation des terres de chaque parcelle. Le résultat de cette enquête est directement exportable vers l'outil d'inventaire des gaz à effet de serre du GIEC. En savoir plus sur les Lignes directrices du GIEC : https://www.ipcc-nggip.iges.or.jp/public/2006gl/french/pdf/4_Volume4/V4_03_Ch3_Representation.pdf</description>
   <description xml:lang="pt">Este é o levantamento padrão que deve ser usado para avaliações de dados de atividades para cumprir com as diretrizes propostas do IPCC para a Representação Consistente de Terras. Você pode adicionar mais perguntas à questionário ou modificar os códigos nas perguntas de múltipla escolha (exceto para as categorias de Uso do Solo e conversões que não devem ser alteradas. Você deve adaptar as Subdivisões de Uso do Solo às suas circunstâncias nacionais). Este questionário inclui atributos calculados (que são processados ​​pelo Collect à medida que você preenche os dados no questionário) que ajudam a reconstruir a Série Temporal de Uso da Terra completa de cada parcela. O resultado deste questionário pode ser exportado diretamente para o IPCC Green House Gas Inventory Tool. Mais sobre as Diretrizes do IPCC: https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/4_Volume4/V4_03_Ch3_Representation.pdf</description>
@@ -35,10 +35,10 @@ The output of this survey is directly exportable to the IPCC Green House Gas Inv
     <n0:label xml:lang="pt">Cobertura da terra</n0:label>
   </n0:tab>
   <n0:tab name="tab_63365">
-    <n0:label xml:lang="en">LU 2025</n0:label>
-    <n0:label xml:lang="fr">UT 2025</n0:label>
-    <n0:label xml:lang="es">UT 2025</n0:label>
-    <n0:label xml:lang="pt">UT 2025</n0:label>
+    <n0:label xml:lang="en">LU 2026</n0:label>
+    <n0:label xml:lang="fr">UT 2026</n0:label>
+    <n0:label xml:lang="es">UT 2026</n0:label>
+    <n0:label xml:lang="pt">UT 2026</n0:label>
   </n0:tab>
   <n0:tab name="plot_tab">
     <n0:label xml:lang="en">LULUC</n0:label>
@@ -84,6 +84,7 @@ The output of this survey is directly exportable to the IPCC Green House Gas Inv
       <label type="item" xml:lang="fr">Utilisation des terres</label>
       <label type="list" xml:lang="en">Land Uses</label>
       <label type="item" xml:lang="es">Usos de la tierra</label>
+      <label type="item" xml:lang="pt">Usos da terra</label>
       <label type="item" xml:lang="en">IPCC Land Use representation Categories/Subdivisions</label>
       <description xml:lang="en">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. 
 This codelist represents the Categories and Subdivisions (the conversions are defined in the land_use_conversions codelist ) necessary to classify each of the plots. The category level is fixed, every survey should use the six IPCC categories without modifying them. The second level, subdivisions, should be adapted to the specific land-uses of each country. 
@@ -91,9 +92,9 @@ This codelist represents the Categories and Subdivisions (the conversions are de
 The categories (Forest/Settlement/Cropland/Grassland/Wetland/Other) are FIXED AND SHOULD NOT BE MODIFIED. DO NOT MODIFY THE CODES EITHER (F/C/G/S/W/O as this is important to calculate the conversion classes). 
 
 You can modify the labels if they do not fit your language. DO NOT MODIFY THE CATEGORY/SUBDIVISON structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do the calculations of the yearly changes will not work. SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representation</description>
-      <description xml:lang="fr">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. This codelist represents the Categories and Subdivisions (the conversions are defined in the land_use_conversions codelist ) necessary to classify each of the plots. The category level is fixed, every survey should use the six IPCC categories without modifying them. The second level, subdivisions, should be adapted to the specific land-uses of each country. The categories (Forest/Settlement/Cropland/Grassland/Wetland/Other) are FIXED AND SHOULD NOT BE MODIFIED. DO NOT MODIFY THE CODES EITHER (F/C/G/S/W/O as this is important to calculate the conversion classes). You can modify the labels if they do not fit your language. DO NOT MODIFY THE CATEGORY/SUBDIVISON structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do the calculations of the yearly changes will not work. SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representation</description>
-      <description xml:lang="pt">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. This codelist represents the Categories and Subdivisions (the conversions are defined in the land_use_conversions codelist ) necessary to classify each of the plots. The category level is fixed, every survey should use the six IPCC categories without modifying them. The second level, subdivisions, should be adapted to the specific land-uses of each country. The categories (Forest/Settlement/Cropland/Grassland/Wetland/Other) are FIXED AND SHOULD NOT BE MODIFIED. DO NOT MODIFY THE CODES EITHER (F/C/G/S/W/O as this is important to calculate the conversion classes). You can modify the labels if they do not fit your language. DO NOT MODIFY THE CATEGORY/SUBDIVISON structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do the calculations of the yearly changes will not work. SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representation</description>
-      <description xml:lang="es">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. This codelist represents the Categories and Subdivisions (the conversions are defined in the land_use_conversions codelist ) necessary to classify each of the plots. The category level is fixed, every survey should use the six IPCC categories without modifying them. The second level, subdivisions, should be adapted to the specific land-uses of each country. The categories (Forest/Settlement/Cropland/Grassland/Wetland/Other) are FIXED AND SHOULD NOT BE MODIFIED. DO NOT MODIFY THE CODES EITHER (F/C/G/S/W/O as this is important to calculate the conversion classes). You can modify the labels if they do not fit your language. DO NOT MODIFY THE CATEGORY/SUBDIVISON structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do the calculations of the yearly changes will not work. SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representation</description>
+      <description xml:lang="fr">Liste de codes à deux niveaux conforme aux directives du GIEC sur la Représentation Cohérente des Terres. Cette liste représente les Catégories et Subdivisions (les conversions sont définies dans la liste land_use_conversions) nécessaires pour classer chacune des parcelles. Le niveau de catégorie est fixe ; chaque enquête doit utiliser les six catégories du GIEC sans les modifier. Le second niveau, les subdivisions, doit être adapté aux usages des terres spécifiques de chaque pays. Les catégories (Forêt/Établissement/Culture/Prairie/Zone humide/Autre) sont FIXES ET NE DOIVENT PAS ÊTRE MODIFIÉES. NE MODIFIEZ PAS NON PLUS LES CODES (F/C/G/S/W/O, car ils sont importants pour calculer les classes de conversion). Vous pouvez modifier les étiquettes si elles ne conviennent pas à votre langue. NE MODIFIEZ PAS LA STRUCTURE CATÉGORIE/SUBDIVISION, car elle est essentielle pour que le reste de l'enquête soit cohérent avec les directives du GIEC ! Sinon, les calculs des changements annuels ne fonctionneront pas. VOIR : https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representation</description>
+      <description xml:lang="pt">Lista de códigos de dois níveis conforme as diretrizes do IPCC sobre Representação Consistente das Terras. Esta lista representa as Categorias e Subdivisões (as conversões são definidas na lista land_use_conversions) necessárias para classificar cada uma das parcelas. O nível de categoria é fixo; todo levantamento deve usar as seis categorias do IPCC sem modificá-las. O segundo nível, subdivisões, deve ser adaptado aos usos da terra específicos de cada país. As categorias (Floresta/Assentamento/Cultivo/Pastagem/Área úmida/Outro) são FIXAS E NÃO DEVEM SER MODIFICADAS. TAMBÉM NÃO MODIFIQUE OS CÓDIGOS (F/C/G/S/W/O, pois são importantes para calcular as classes de conversão). Você pode modificar os rótulos se não se adequarem ao seu idioma. NÃO MODIFIQUE A ESTRUTURA CATEGORIA/SUBDIVISÃO, pois é fundamental para que o restante do levantamento seja consistente com as diretrizes do IPCC! Se modificar, os cálculos das mudanças anuais não funcionarão. VEJA: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representation</description>
+      <description xml:lang="es">Lista de códigos de dos niveles conforme a las directrices del IPCC sobre Representación Coherente de las Tierras. Esta lista representa las Categorías y Subdivisiones (las conversiones se definen en la lista land_use_conversions) necesarias para clasificar cada una de las parcelas. El nivel de categoría es fijo; toda encuesta debe utilizar las seis categorías del IPCC sin modificarlas. El segundo nivel, las subdivisiones, debe adaptarse a los usos de la tierra específicos de cada país. Las categorías (Bosque/Asentamiento/Cultivo/Pastizal/Humedal/Otro) son FIJAS Y NO DEBEN MODIFICARSE. TAMPOCO MODIFIQUE LOS CÓDIGOS (F/C/G/S/W/O, ya que es importante para calcular las clases de conversión). Puede modificar las etiquetas si no se adaptan a su idioma. ¡NO MODIFIQUE LA ESTRUCTURA CATEGORÍA/SUBDIVISIÓN ya que es clave para que el resto de la encuesta sea coherente con las directrices del IPCC! Si lo hace, los cálculos de los cambios anuales no funcionarán. VER: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representation</description>
       <codingScheme scope="local" />
       <hierarchy>
         <level name="use" />
@@ -303,9 +304,10 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
             <label xml:lang="fr">Jardin</label>
             <label xml:lang="pt">Jardim</label>
             <label xml:lang="es">Jardín</label>
-            <description xml:lang="en">Cultivo de pequena escala junto a habitação, principalmente para subsistência.</description>
-            <description xml:lang="fr">Cultivo de pequeña escala junto a viviendas, principalmente para subsistencia.</description>
-            <description xml:lang="pt">Cultures de petite échelle près des habitations, principalement pour subsistance.</description>
+            <description xml:lang="en">Small-scale cultivation near habitation, mainly for subsistence.</description>
+            <description xml:lang="fr">Cultures de petite échelle près des habitations, principalement pour subsistance.</description>
+            <description xml:lang="es">Cultivo de pequeña escala junto a viviendas, principalmente para subsistencia.</description>
+            <description xml:lang="pt">Cultivo de pequena escala junto a habitação, principalmente para subsistência.</description>
           </item>
           <item id="2012999">
             <code xml:lang="en">rice</code>
@@ -357,8 +359,10 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
             <label xml:lang="fr">Prairie</label>
             <label xml:lang="pt">Pastagem</label>
             <label xml:lang="es">Pradera</label>
+            <description xml:lang="en">Lands covered with herbaceous vegetation, &lt;10% tree or shrub cover.</description>
             <description xml:lang="fr">Terres couvertes de végétation herbacée, &lt;10 % de couverture arborée ou arbustive.</description>
             <description xml:lang="es">Tierras cubiertas de vegetación herbácea, &lt;10 % de cobertura arbórea o arbustiva.</description>
+            <description xml:lang="pt">Terras cobertas por vegetação herbácea, &lt;10 % de cobertura arbórea ou arbustiva.</description>
           </item>
           <item id="2013004">
             <code xml:lang="en">grassland_trees</code>
@@ -608,9 +612,10 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
             <label xml:lang="fr">Autre</label>
             <label xml:lang="pt">Outro</label>
             <label xml:lang="es">Otro</label>
-            <description xml:lang="en">Terras não classificadas em outras categorias.</description>
-            <description xml:lang="fr">Tierras no clasificadas en otras categorías.</description>
-            <description xml:lang="pt">Terres non classées ailleurs.</description>
+            <description xml:lang="en">Lands not classified in other categories.</description>
+            <description xml:lang="fr">Terres non classées ailleurs.</description>
+            <description xml:lang="es">Tierras no clasificadas en otras categorías.</description>
+            <description xml:lang="pt">Terras não classificadas em outras categorias.</description>
           </item>
           <item id="2013027">
             <code xml:lang="en">art_water_body</code>
@@ -693,10 +698,11 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
       <label type="list" xml:lang="en">Ecological zones</label>
       <label type="item" xml:lang="fr">Zones Ecologiques</label>
       <label type="item" xml:lang="es">Zonas ecológicas</label>
+      <label type="item" xml:lang="pt">Zona ecológica</label>
       <description xml:lang="en">Global Ecological Zones (GEZ) See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/ Source FAO geonetwork https://data.apps.fao.org/map/catalog/srv/eng/catalog.search?id=47105&amp;fname=gez2010.zip&amp;access=private#/metadata/2fb209d0-fd34-4e5e-a3d8-a13c241eb61b Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design. Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator Asset ID : users/sanchezpaus/gez_2010_wgs84 GEE Script code : 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
-      <description xml:lang="fr">Global Ecological Zones (GEZ) See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/ Source FAO geonetwork https://data.apps.fao.org/map/catalog/srv/eng/catalog.search?id=47105&amp;fname=gez2010.zip&amp;access=private#/metadata/2fb209d0-fd34-4e5e-a3d8-a13c241eb61b Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design. Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator Asset ID : users/sanchezpaus/gez_2010_wgs84 GEE Script code : 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
-      <description xml:lang="es">Global Ecological Zones (GEZ) See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/ Source FAO geonetwork https://data.apps.fao.org/map/catalog/srv/eng/catalog.search?id=47105&amp;fname=gez2010.zip&amp;access=private#/metadata/2fb209d0-fd34-4e5e-a3d8-a13c241eb61b Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design. Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator Asset ID : users/sanchezpaus/gez_2010_wgs84 GEE Script code : 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
-      <description xml:lang="pt">Global Ecological Zones (GEZ) See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/ Source FAO geonetwork https://data.apps.fao.org/map/catalog/srv/eng/catalog.search?id=47105&amp;fname=gez2010.zip&amp;access=private#/metadata/2fb209d0-fd34-4e5e-a3d8-a13c241eb61b Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design. Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator Asset ID : users/sanchezpaus/gez_2010_wgs84 GEE Script code : 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
+      <description xml:lang="fr">Zones Écologiques Globales (GEZ). Voir http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/ Source : geonetwork de la FAO https://data.apps.fao.org/map/catalog/srv/eng/catalog.search?id=47105&amp;fname=gez2010.zip&amp;access=private#/metadata/2fb209d0-fd34-4e5e-a3d8-a13c241eb61b Obtenu à partir de l'outil Collect Earth Grid Generator. Chaque parcelle a cette information ajoutée comme colonne dans le CSV du plan d'échantillonnage. Outil Collect Earth grid generator : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator Asset ID : users/sanchezpaus/gez_2010_wgs84 Code script GEE : 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
+      <description xml:lang="es">Zonas Ecológicas Globales (GEZ). Ver http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/ Fuente: geonetwork de la FAO https://data.apps.fao.org/map/catalog/srv/eng/catalog.search?id=47105&amp;fname=gez2010.zip&amp;access=private#/metadata/2fb209d0-fd34-4e5e-a3d8-a13c241eb61b Obtenido con la herramienta Collect Earth Grid Generator. Cada parcela tiene esta información añadida como columna en el CSV del diseño de muestreo. Herramienta Collect Earth grid generator: https://collectearth.users.earthengine.app/view/collect-earth-grid-generator Asset ID: users/sanchezpaus/gez_2010_wgs84 Código script GEE: 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
+      <description xml:lang="pt">Zonas Ecológicas Globais (GEZ). Ver http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/ Fonte: geonetwork da FAO https://data.apps.fao.org/map/catalog/srv/eng/catalog.search?id=47105&amp;fname=gez2010.zip&amp;access=private#/metadata/2fb209d0-fd34-4e5e-a3d8-a13c241eb61b Obtido com a ferramenta Collect Earth Grid Generator. Cada parcela tem esta informação adicionada como uma coluna no CSV do desenho amostral. Ferramenta Collect Earth grid generator: https://collectearth.users.earthengine.app/view/collect-earth-grid-generator Asset ID: users/sanchezpaus/gez_2010_wgs84 Código script GEE: 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
       <codingScheme scope="local" />
       <items>
         <item id="2012178">
@@ -707,6 +713,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Bosque de coníferas boreales</label>
           <description xml:lang="en">Boreal coniferous forest</description>
           <description xml:lang="fr">Forêt de conifères boréale</description>
+          <description xml:lang="es">Bosque de coníferas boreales</description>
+          <description xml:lang="pt">Floresta boreal de coníferas</description>
         </item>
         <item id="2012179">
           <code xml:lang="en">43</code>
@@ -716,6 +724,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Sistema montañoso boreal</label>
           <description xml:lang="en">Boreal mountain system</description>
           <description xml:lang="fr">Système de montagne boréal</description>
+          <description xml:lang="es">Sistema montañoso boreal</description>
+          <description xml:lang="pt">Sistema montanhoso boreal</description>
         </item>
         <item id="2012180">
           <code xml:lang="en">42</code>
@@ -725,6 +735,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Bosque de tundra boreal</label>
           <description xml:lang="en">Boreal tundra woodland</description>
           <description xml:lang="fr">Forêt de toundra boréale</description>
+          <description xml:lang="es">Bosque de tundra boreal</description>
+          <description xml:lang="pt">Floresta de tundra boreal</description>
         </item>
         <item id="2012181">
           <code xml:lang="en">50</code>
@@ -734,6 +746,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Polar</label>
           <description xml:lang="en">Polar</description>
           <description xml:lang="fr">Polaire</description>
+          <description xml:lang="es">Polar</description>
+          <description xml:lang="pt">Polar</description>
         </item>
         <item id="2012182">
           <code xml:lang="en">24</code>
@@ -743,6 +757,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Desierto subtropical</label>
           <description xml:lang="en">Subtropical desert</description>
           <description xml:lang="fr">Désert subtropical</description>
+          <description xml:lang="es">Desierto subtropical</description>
+          <description xml:lang="pt">Deserto subtropical</description>
         </item>
         <item id="2012183">
           <code xml:lang="en">22</code>
@@ -752,6 +768,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Bosque seco subtropical</label>
           <description xml:lang="en">Subtropical dry forest</description>
           <description xml:lang="fr">Forêt sèche subtropicale</description>
+          <description xml:lang="es">Bosque seco subtropical</description>
+          <description xml:lang="pt">Floresta seca subtropical</description>
         </item>
         <item id="2012184">
           <code xml:lang="en">21</code>
@@ -761,6 +779,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Bosque húmedo subtropical</label>
           <description xml:lang="en">Subtropical humid forest</description>
           <description xml:lang="fr">Forêt humide subtropicale</description>
+          <description xml:lang="es">Bosque húmedo subtropical</description>
+          <description xml:lang="pt">Floresta úmida subtropical</description>
         </item>
         <item id="2012185">
           <code xml:lang="en">25</code>
@@ -770,6 +790,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Sistema montañoso subtropical</label>
           <description xml:lang="en">Subtropical mountain system</description>
           <description xml:lang="fr">Système de montagne subtropical</description>
+          <description xml:lang="es">Sistema montañoso subtropical</description>
+          <description xml:lang="pt">Sistema montanhoso subtropical</description>
         </item>
         <item id="2012186">
           <code xml:lang="en">23</code>
@@ -779,6 +801,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Estepa subtropical</label>
           <description xml:lang="en">Subtropical steppe</description>
           <description xml:lang="fr">Steppe subtropicale</description>
+          <description xml:lang="es">Estepa subtropical</description>
+          <description xml:lang="pt">Estepe subtropical</description>
         </item>
         <item id="2012187">
           <code xml:lang="en">32</code>
@@ -788,6 +812,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Bosque continental templado</label>
           <description xml:lang="en">Temperate continental forest</description>
           <description xml:lang="fr">Forêt continentale tempérée</description>
+          <description xml:lang="es">Bosque continental templado</description>
+          <description xml:lang="pt">Floresta continental temperada</description>
         </item>
         <item id="2012188">
           <code xml:lang="en">34</code>
@@ -797,6 +823,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Desierto templado</label>
           <description xml:lang="en">Temperate desert</description>
           <description xml:lang="fr">Désert tempéré</description>
+          <description xml:lang="es">Desierto templado</description>
+          <description xml:lang="pt">Deserto temperado</description>
         </item>
         <item id="2012189">
           <code xml:lang="en">35</code>
@@ -806,6 +834,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Sistema montañoso templado</label>
           <description xml:lang="en">Temperate mountain system</description>
           <description xml:lang="fr">Système de montagne tempéré</description>
+          <description xml:lang="es">Sistema montañoso templado</description>
+          <description xml:lang="pt">Sistema montanhoso temperado</description>
         </item>
         <item id="2012190">
           <code xml:lang="en">31</code>
@@ -815,6 +845,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Bosque oceánico templado</label>
           <description xml:lang="en">Temperate oceanic forest</description>
           <description xml:lang="fr">Forêt océanique tempérée</description>
+          <description xml:lang="es">Bosque oceánico templado</description>
+          <description xml:lang="pt">Floresta oceânica temperada</description>
         </item>
         <item id="2012191">
           <code xml:lang="en">33</code>
@@ -824,6 +856,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Estepa templada</label>
           <description xml:lang="en">Temperate steppe</description>
           <description xml:lang="fr">Steppe tempérée</description>
+          <description xml:lang="es">Estepa templada</description>
+          <description xml:lang="pt">Estepe temperada</description>
         </item>
         <item id="2012192">
           <code xml:lang="en">15</code>
@@ -833,6 +867,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Desierto tropical</label>
           <description xml:lang="en">Tropical desert</description>
           <description xml:lang="fr">Désert tropical</description>
+          <description xml:lang="es">Desierto tropical</description>
+          <description xml:lang="pt">Deserto tropical</description>
         </item>
         <item id="2012193">
           <code xml:lang="en">13</code>
@@ -842,6 +878,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Bosque seco tropical</label>
           <description xml:lang="en">Tropical dry forest</description>
           <description xml:lang="fr">Forêt tropicale sèche</description>
+          <description xml:lang="es">Bosque seco tropical</description>
+          <description xml:lang="pt">Floresta tropical seca</description>
         </item>
         <item id="2012194">
           <code xml:lang="en">12</code>
@@ -851,6 +889,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Bosque húmedo tropical</label>
           <description xml:lang="en">Tropical moist forest</description>
           <description xml:lang="fr">Forêt tropicale humide</description>
+          <description xml:lang="es">Bosque húmedo tropical</description>
+          <description xml:lang="pt">Floresta tropical úmida</description>
         </item>
         <item id="2012195">
           <code xml:lang="en">16</code>
@@ -860,6 +900,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Sistema montañoso tropical</label>
           <description xml:lang="en">Tropical mountain system</description>
           <description xml:lang="fr">Système de montagne tropical</description>
+          <description xml:lang="es">Sistema montañoso tropical</description>
+          <description xml:lang="pt">Sistema montanhoso tropical</description>
         </item>
         <item id="2012196">
           <code xml:lang="en">11</code>
@@ -868,7 +910,9 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="pt">Floresta tropical</label>
           <label xml:lang="es">Bosque tropical</label>
           <description xml:lang="en">Tropical rainforest</description>
-          <description xml:lang="fr">Pluie de forêt tropicale</description>
+          <description xml:lang="fr">Forêt tropicale humide</description>
+          <description xml:lang="es">Bosque pluvial tropical</description>
+          <description xml:lang="pt">Floresta tropical pluvial</description>
         </item>
         <item id="2012197">
           <code xml:lang="en">14</code>
@@ -877,7 +921,9 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="pt">Matagal tropical</label>
           <label xml:lang="es">Matorral tropical</label>
           <description xml:lang="en">Tropical shrubland</description>
-          <description xml:lang="fr">Arbuste Tropical</description>
+          <description xml:lang="fr">Arbustes tropicaux</description>
+          <description xml:lang="es">Matorral tropical</description>
+          <description xml:lang="pt">Matagal tropical</description>
         </item>
         <item id="2012198">
           <code xml:lang="en">90</code>
@@ -887,6 +933,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Agua</label>
           <description xml:lang="en">Water</description>
           <description xml:lang="fr">Eau</description>
+          <description xml:lang="es">Agua</description>
+          <description xml:lang="pt">Água</description>
         </item>
         <item id="2012199">
           <code xml:lang="en">0</code>
@@ -896,6 +944,8 @@ You can modify the labels if they do not fit your language. DO NOT MODIFY THE CA
           <label xml:lang="es">Sin datos</label>
           <description xml:lang="en">No data</description>
           <description xml:lang="fr">Pas de données</description>
+          <description xml:lang="es">Sin datos</description>
+          <description xml:lang="pt">Sem dados</description>
         </item>
       </items>
     </list>
@@ -909,9 +959,9 @@ This codelist represents the Categories and Conversions (the land uses are defin
 Both category and conversion level are fixed, every survey should use the six IPCC categories and 36 conversions classes without modifying them. For each category there is one remaining (Forest remaining Forest) and five changing conversions (Grassland becoming Forest, Cropland becoming Forest, etc...). 
 
 DO NOT MODIFY THE CATEGORY/CONVERSION structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do, the calculations of the yearly changes will not work. SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representation</description>
-      <description xml:lang="es">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. This codelist represents the Categories and Conversions (the land uses are defined in the land_uses codelist ) necessary to classify the LU transitions. Both category and conversion level are fixed, every survey should use the six IPCC categories and 36 conversions classes without modifying them. For each category there is one remaining (Forest remaining Forest) and five changing conversions (Grassland becoming Forest, Cropland becoming Forest, etc...). DO NOT MODIFY THE CATEGORY/CONVERIOSN structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do, the calculations of the yearly changes will not work. SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representatio</description>
-      <description xml:lang="fr">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. This codelist represents the Categories and Conversions (the land uses are defined in the land_uses codelist ) necessary to classify the LU transitions. Both category and conversion level are fixed, every survey should use the six IPCC categories and 36 conversions classes without modifying them. For each category there is one remaining (Forest remaining Forest) and five changing conversions (Grassland becoming Forest, Cropland becoming Forest, etc...). DO NOT MODIFY THE CATEGORY/CONVERIOSN structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do, the calculations of the yearly changes will not work. SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representatio</description>
-      <description xml:lang="pt">Two-level codelist compliant with the IPCC Consistent Land Representation guidelines. This codelist represents the Categories and Conversions (the land uses are defined in the land_uses codelist ) necessary to classify the LU transitions. Both category and conversion level are fixed, every survey should use the six IPCC categories and 36 conversions classes without modifying them. For each category there is one remaining (Forest remaining Forest) and five changing conversions (Grassland becoming Forest, Cropland becoming Forest, etc...). DO NOT MODIFY THE CATEGORY/CONVERIOSN structure as this is key for the rest of the survey to be consistent with the IPCC guidelines!!! If you do, the calculations of the yearly changes will not work. SEE: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representatio</description>
+      <description xml:lang="es">Lista de códigos de dos niveles conforme a las directrices del IPCC sobre Representación Coherente de las Tierras. Esta lista representa las Categorías y Conversiones (los usos de la tierra se definen en la lista land_uses) necesarias para clasificar las transiciones de UT. Tanto el nivel de categoría como el de conversión son fijos; toda encuesta debe utilizar las seis categorías del IPCC y las 36 clases de conversión sin modificarlas. Para cada categoría hay una conversión que permanece (Bosque que sigue siendo Bosque) y cinco conversiones cambiantes (Pastizal convertido en Bosque, Cultivo convertido en Bosque, etc.). ¡NO MODIFIQUE LA ESTRUCTURA CATEGORÍA/CONVERSIÓN ya que es clave para que el resto de la encuesta sea coherente con las directrices del IPCC! Si lo hace, los cálculos de los cambios anuales no funcionarán. VER: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representation</description>
+      <description xml:lang="fr">Liste de codes à deux niveaux conforme aux directives du GIEC sur la Représentation Cohérente des Terres. Cette liste représente les Catégories et Conversions (les utilisations des terres sont définies dans la liste land_uses) nécessaires pour classer les transitions d'UT. Les niveaux catégorie et conversion sont tous deux fixes ; chaque enquête doit utiliser les six catégories du GIEC et les 36 classes de conversion sans les modifier. Pour chaque catégorie, il existe une conversion qui demeure (Forêt restant Forêt) et cinq conversions changeantes (Prairie devenant Forêt, Culture devenant Forêt, etc.). NE MODIFIEZ PAS LA STRUCTURE CATÉGORIE/CONVERSION, car elle est essentielle pour que le reste de l'enquête soit cohérent avec les directives du GIEC ! Sinon, les calculs des changements annuels ne fonctionneront pas. VOIR : https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representation</description>
+      <description xml:lang="pt">Lista de códigos de dois níveis conforme as diretrizes do IPCC sobre Representação Consistente das Terras. Esta lista representa as Categorias e Conversões (os usos da terra são definidos na lista land_uses) necessárias para classificar as transições de UT. Tanto o nível de categoria quanto o de conversão são fixos; todo levantamento deve usar as seis categorias do IPCC e as 36 classes de conversão sem modificá-las. Para cada categoria há uma conversão que permanece (Floresta permanecendo Floresta) e cinco conversões com mudança (Pastagem se tornando Floresta, Cultivo se tornando Floresta, etc.). NÃO MODIFIQUE A ESTRUTURA CATEGORIA/CONVERSÃO, pois é fundamental para que o restante do levantamento seja consistente com as diretrizes do IPCC! Se modificar, os cálculos das mudanças anuais não funcionarão. VEJA: https://www.ipcc-nggip.iges.or.jp/public/2019rf/pdf/4_Volume4/19R_V4_Ch03_Land%20Representation</description>
       <hierarchy>
         <level name="category" />
         <level name="conversion" />
@@ -1362,6 +1412,7 @@ DO NOT MODIFY THE CATEGORY/CONVERSION structure as this is key for the rest of t
       <label type="list" xml:lang="en">Elements</label>
       <label type="item" xml:lang="fr">Elements</label>
       <label type="item" xml:lang="es">Elementos de cobertura</label>
+      <label type="item" xml:lang="pt">Elementos de cobertura</label>
       <items>
         <item id="2012733">
           <code xml:lang="en">trees</code>
@@ -1463,15 +1514,15 @@ DO NOT MODIFY THE CATEGORY/CONVERSION structure as this is key for the rest of t
       <label type="item" xml:lang="es">Puntos de control</label>
       <label type="item" xml:lang="pt">Pontos de controle</label>
       <description xml:lang="en">Classes of cover within the plot. The user counts the number of dots that fall within certain land use/land cover/element to classify the plot. For plots with 49 dots (7x7). In case of using other type of plots like 5x5 (25 dots) modify the codelist accordingly. In the case of 49 dots plots, the user is asked to specify the number of plots if less than 5 fall within a land use/cover. Otherwise the user chooses between ranges. The reasoning for this is to improve the speed of the assessment. If other approach is preferred you should change the codelist accordingly.</description>
-      <description xml:lang="es">Classes of cover within the plot. The user counts the number of dots that fall within certain land use/land cover/element to classify the plot. For plots with 49 dots (7x7). In case of using other type of plots like 5x5 (25 dots) modify the codelist accordingly. In the case of 49 dots plots, the user is asked to specify the number of plots if less than 5 fall within a land use/cover. Otherwise the user chooses between ranges. The reasoning for this is to improve the speed of the assessment. If other approach is preferred you should change the codelist accordingly.</description>
-      <description xml:lang="fr">Classes of cover within the plot. The user counts the number of dots that fall within certain land use/land cover/element to classify the plot. For plots with 49 dots (7x7). In case of using other type of plots like 5x5 (25 dots) modify the codelist accordingly. In the case of 49 dots plots, the user is asked to specify the number of plots if less than 5 fall within a land use/cover. Otherwise the user chooses between ranges. The reasoning for this is to improve the speed of the assessment. If other approach is preferred you should change the codelist accordingly.</description>
-      <description xml:lang="pt">Classes of cover within the plot. The user counts the number of dots that fall within certain land use/land cover/element to classify the plot. For plots with 49 dots (7x7). In case of using other type of plots like 5x5 (25 dots) modify the codelist accordingly. In the case of 49 dots plots, the user is asked to specify the number of plots if less than 5 fall within a land use/cover. Otherwise the user chooses between ranges. The reasoning for this is to improve the speed of the assessment. If other approach is preferred you should change the codelist accordingly.</description>
+      <description xml:lang="es">Clases de cobertura dentro de la parcela. El usuario cuenta el número de puntos que caen dentro de un determinado uso del suelo/cobertura/elemento para clasificar la parcela. Para parcelas con 49 puntos (7x7). En caso de usar otro tipo de parcelas como 5x5 (25 puntos), modifique la lista de códigos en consecuencia. En el caso de parcelas con 49 puntos, se pide al usuario que especifique el número de puntos si menos de 5 caen dentro de un uso/cobertura. De lo contrario, el usuario elige entre rangos. La razón es mejorar la velocidad de la evaluación. Si prefiere otro enfoque, debe modificar la lista de códigos en consecuencia.</description>
+      <description xml:lang="fr">Classes de couverture dans la parcelle. L'utilisateur compte le nombre de points qui tombent dans une certaine utilisation du sol/couverture/élément pour classer la parcelle. Pour des parcelles à 49 points (7x7). En cas d'utilisation d'un autre type de parcelle comme 5x5 (25 points), modifiez la liste de codes en conséquence. Pour les parcelles à 49 points, l'utilisateur doit indiquer le nombre de points si moins de 5 tombent dans une utilisation/couverture. Sinon, l'utilisateur choisit entre des plages. L'objectif est d'améliorer la rapidité de l'évaluation. Si une autre approche est préférée, modifiez la liste de codes en conséquence.</description>
+      <description xml:lang="pt">Classes de cobertura dentro da parcela. O usuário conta o número de pontos que caem dentro de determinado uso da terra/cobertura/elemento para classificar a parcela. Para parcelas com 49 pontos (7x7). No caso de usar outro tipo de parcela como 5x5 (25 pontos), modifique a lista de códigos conforme necessário. No caso de parcelas com 49 pontos, é solicitado ao usuário que especifique o número de pontos se menos de 5 caírem dentro de um uso/cobertura. Caso contrário, o usuário escolhe entre faixas. O objetivo é melhorar a velocidade da avaliação. Se preferir outra abordagem, modifique a lista de códigos conforme necessário.</description>
       <items>
         <item id="2012323">
           <code xml:lang="en">na</code>
           <label xml:lang="en">0 Points – No Coverage</label>
-          <label xml:lang="fr">0 Points – No Coverage</label>
-          <label xml:lang="pt">0 Pontos – No Coverage</label>
+          <label xml:lang="fr">0 Points – Aucune couverture</label>
+          <label xml:lang="pt">0 Pontos – Sem cobertura</label>
           <label xml:lang="es">0 Puntos – Sin Cobertura</label>
         </item>
         <item id="2012324">
@@ -1571,6 +1622,7 @@ DO NOT MODIFY THE CATEGORY/CONVERSION structure as this is key for the rest of t
       <label type="item" xml:lang="en">Elevation ranges</label>
       <label type="item" xml:lang="fr">Gammes d'altitude</label>
       <label type="item" xml:lang="es">Rangos de elevación</label>
+      <label type="item" xml:lang="pt">Faixas de elevação</label>
       <description xml:lang="en">Ranges of elevation in 100 meters. Used to aggregate the plots into ranges for easier analysis.</description>
       <description xml:lang="fr">Dénivelés à 100 mètres. Utilisé pour agréger les parcelles en plages pour une analyse plus facile.</description>
       <description xml:lang="pt">Intervalos de elevação em 100 metros. Usado para agregar as parcelas em intervalos para facilitar a análise.</description>
@@ -2109,7 +2161,8 @@ DO NOT MODIFY THE CATEGORY/CONVERSION structure as this is key for the rest of t
     <list id="1616" name="slope_classes">
       <label type="item" xml:lang="en">Slope ranges</label>
       <label type="item" xml:lang="fr">Gammes de pente</label>
-      <label type="item" xml:lang="es">Raixas de inclinação</label>
+      <label type="item" xml:lang="es">Rangos de pendiente</label>
+      <label type="item" xml:lang="pt">Faixas de inclinação</label>
       <codingScheme scope="local" />
       <items>
         <item id="2012342">
@@ -2192,14 +2245,22 @@ DO NOT MODIFY THE CATEGORY/CONVERSION structure as this is key for the rest of t
     </list>
     <list id="10271" name="years">
       <label type="item" xml:lang="en">Years</label>
-      <label type="item" xml:lang="fr">Annees</label>
+      <label type="item" xml:lang="fr">Années</label>
       <label type="item" xml:lang="es">Años</label>
+      <label type="item" xml:lang="pt">Anos</label>
       <description xml:lang="en">Values used when the user needs to specify the year of change of Land Use or the year of acquisition of the VHR imagery.</description>
-      <description xml:lang="es">Values used when the user needs to specify the year of change of Land Use or the year of acquisition of the VHR imagery.</description>
-      <description xml:lang="fr">Values used when the user needs to specify the year of change of Land Use or the year of acquisition of the VHR imagery.</description>
-      <description xml:lang="pt">Values used when the user needs to specify the year of change of Land Use or the year of acquisition of the VHR imagery.</description>
+      <description xml:lang="es">Valores utilizados cuando el usuario necesita especificar el año del cambio de Uso de la Tierra o el año de adquisición de las imágenes VHR.</description>
+      <description xml:lang="fr">Valeurs utilisées lorsque l'utilisateur doit préciser l'année du changement d'utilisation des terres ou l'année d'acquisition de l'imagerie VHR.</description>
+      <description xml:lang="pt">Valores utilizados quando o usuário precisa especificar o ano de mudança do uso da terra ou o ano de aquisição da imagem VHR.</description>
       <codingScheme scope="local" />
       <items>
+        <item id="2013038">
+          <code xml:lang="en">2026</code>
+          <label xml:lang="en">2026</label>
+          <label xml:lang="fr">2026</label>
+          <label xml:lang="pt">2026</label>
+          <label xml:lang="es">2026</label>
+        </item>
         <item id="2012624">
           <code xml:lang="en">2025</code>
           <label xml:lang="en">2025</label>
@@ -2388,6 +2449,7 @@ DO NOT MODIFY THE CATEGORY/CONVERSION structure as this is key for the rest of t
       <label type="item" xml:lang="en">Soil types</label>
       <label type="item" xml:lang="fr">Types de sol</label>
       <label type="item" xml:lang="es">Tipos de suelo</label>
+      <label type="item" xml:lang="pt">Tipos de solo</label>
       <description xml:lang="en">Soil Map From the JRC Support to Renewable Energy Directive
 
 http://esdac.jrc.ec.europa.eu/content/support-renewable-energy-directive#tabs-0-description=0
@@ -2416,88 +2478,88 @@ Asset ID : users/sanchezpaus/SOIL_TYPE_rst
 GEE Script code : 
 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanc</description>
-      <description xml:lang="es">Soil Map From the JRC Support to Renewable Energy Directive
+      <description xml:lang="es">Mapa de Suelos del Apoyo del JRC a la Directiva sobre Energías Renovables
 
 http://esdac.jrc.ec.europa.eu/content/support-renewable-energy-directive#tabs-0-description=0
 
-See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/
+Ver http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/
 
-Legend value code label
+Valor de leyenda código etiqueta
 
- 1 ORG Organic
- 2 SAN Sandy Soils
- 3 WET Wetland Soils  
- 4 VOL Volcanic Soils  
- 5 SPO Spodic Soils    
- 6 HAC High Activity Clay Soils  
- 7 LAC Low Activity Clay Soils  
- 8 OtherAreas Other Areas  
- 0 No Data The map contains no data for this plot
-
-
-Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+ 1 ORG Orgánico
+ 2 SAN Suelos arenosos
+ 3 WET Suelos de humedales
+ 4 VOL Suelos volcánicos
+ 5 SPO Suelos espódicos
+ 6 HAC Suelos arcillosos de alta actividad
+ 7 LAC Suelos arcillosos de baja actividad
+ 8 OtherAreas Otras áreas
+ 0 No Data El mapa no contiene datos para esta parcela
 
 
-Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+Obtenido con la herramienta Collect Earth Grid Generator. Cada parcela tiene esta información añadida como columna en el CSV del diseño de muestreo.
 
-Asset ID : users/sanchezpaus/SOIL_TYPE_rst
-GEE Script code : 
+
+Herramienta Collect Earth grid generator: https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Asset ID: users/sanchezpaus/SOIL_TYPE_rst
+Código script GEE:
 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanc</description>
-      <description xml:lang="fr">Soil Map From the JRC Support to Renewable Energy Directive
+      <description xml:lang="fr">Carte des Sols du JRC à l'appui de la Directive sur les Énergies Renouvelables
 
 http://esdac.jrc.ec.europa.eu/content/support-renewable-energy-directive#tabs-0-description=0
 
-See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/
+Voir http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/
 
-Legend value code label
+Valeur de légende code étiquette
 
- 1 ORG Organic
- 2 SAN Sandy Soils
- 3 WET Wetland Soils  
- 4 VOL Volcanic Soils  
- 5 SPO Spodic Soils    
- 6 HAC High Activity Clay Soils  
- 7 LAC Low Activity Clay Soils  
- 8 OtherAreas Other Areas  
- 0 No Data The map contains no data for this plot
-
-
-Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+ 1 ORG Organique
+ 2 SAN Sols sableux
+ 3 WET Sols de zones humides
+ 4 VOL Sols volcaniques
+ 5 SPO Sols podzoliques
+ 6 HAC Sols argileux à haute activité
+ 7 LAC Sols argileux à faible activité
+ 8 OtherAreas Autres zones
+ 0 No Data La carte ne contient pas de données pour cette parcelle
 
 
-Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+Obtenu à partir de l'outil Collect Earth Grid Generator. Chaque parcelle a cette information ajoutée comme colonne dans le CSV du plan d'échantillonnage.
+
+
+Outil Collect Earth grid generator : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
 
 Asset ID : users/sanchezpaus/SOIL_TYPE_rst
-GEE Script code : 
+Code script GEE :
 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanc</description>
-      <description xml:lang="pt">Soil Map From the JRC Support to Renewable Energy Directive
+      <description xml:lang="pt">Mapa de Solos do Apoio do JRC à Diretiva de Energias Renováveis
 
 http://esdac.jrc.ec.europa.eu/content/support-renewable-energy-directive#tabs-0-description=0
 
-See http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/
+Ver http://forest.jrc.ec.europa.eu/activities/lulucf/ipcc-classifications/
 
-Legend value code label
+Valor de legenda código rótulo
 
- 1 ORG Organic
- 2 SAN Sandy Soils
- 3 WET Wetland Soils  
- 4 VOL Volcanic Soils  
- 5 SPO Spodic Soils    
- 6 HAC High Activity Clay Soils  
- 7 LAC Low Activity Clay Soils  
- 8 OtherAreas Other Areas  
- 0 No Data The map contains no data for this plot
-
-
-Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+ 1 ORG Orgânico
+ 2 SAN Solos arenosos
+ 3 WET Solos de áreas úmidas
+ 4 VOL Solos vulcânicos
+ 5 SPO Solos espódicos
+ 6 HAC Solos argilosos de alta atividade
+ 7 LAC Solos argilosos de baixa atividade
+ 8 OtherAreas Outras áreas
+ 0 No Data O mapa não contém dados para esta parcela
 
 
-Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+Obtido com a ferramenta Collect Earth Grid Generator. Cada parcela tem esta informação adicionada como coluna no CSV do desenho amostral.
 
-Asset ID : users/sanchezpaus/SOIL_TYPE_rst
-GEE Script code : 
+
+Ferramenta Collect Earth grid generator: https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+
+Asset ID: users/sanchezpaus/SOIL_TYPE_rst
+Código script GEE:
 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanc</description>
       <codingScheme scope="local" />
@@ -2607,6 +2669,7 @@ GEE Script code :
       <label type="item" xml:lang="en">Climate zones</label>
       <label type="item" xml:lang="fr">Zones climatiques</label>
       <label type="item" xml:lang="es">Zonas climáticas</label>
+      <label type="item" xml:lang="pt">Zonas climáticas</label>
       <description xml:lang="en">IPCC Climate Zones 1985-2015 Updated demonstration of the world climate zones described by IPCC in 2019. Download full dataset here : https://www.ipcc-nggip.iges.or.jp/faq/img/IPCC_Climate_Zones_Map_raster.zip
 
 1 WTM Warm Temperate Moist
@@ -2629,70 +2692,70 @@ Asset ID : users/collectearth/IPCC/ipcc_climate_1985-2015_remapped_for_surveys
 GEE Script code : 
 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
-      <description xml:lang="es">IPCC Climate Zones 1985-2015 Updated demonstration of the world climate zones described by IPCC in 2019. Download full dataset here : https://www.ipcc-nggip.iges.or.jp/faq/img/IPCC_Climate_Zones_Map_raster.zip
+      <description xml:lang="es">Zonas Climáticas IPCC 1985-2015. Demostración actualizada de las zonas climáticas mundiales descritas por el IPCC en 2019. Descargue el conjunto de datos completo aquí: https://www.ipcc-nggip.iges.or.jp/faq/img/IPCC_Climate_Zones_Map_raster.zip
 
-1 WTM Warm Temperate Moist
-2 WTD Warm Temperate Dry
-3 CTM Cool Temperate Moist
-4 CTD Cool Temperate Dry 5 POM Polar Moist 6 POD Polar Dry
-7 BOM Boreal Moist
-8 BOD Boreal Dry
-9 TRMT Tropical Montane
-10 TRW Tropical Wet
-11 TMM Tropical Moist
-12 TRD Tropical Dry
+1 WTM Templado cálido húmedo
+2 WTD Templado cálido seco
+3 CTM Templado frío húmedo
+4 CTD Templado frío seco 5 POM Polar húmedo 6 POD Polar seco
+7 BOM Boreal húmedo
+8 BOD Boreal seco
+9 TRMT Tropical de montaña
+10 TRW Tropical muy húmedo
+11 TMM Tropical húmedo
+12 TRD Tropical seco
 
-Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+Obtenido con la herramienta Collect Earth Grid Generator. Cada parcela tiene esta información añadida como columna en el CSV del diseño de muestreo.
 
 
-Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+Herramienta Collect Earth grid generator: https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
 
-Asset ID : users/collectearth/IPCC/ipcc_climate_1985-2015_remapped_for_surveys
-GEE Script code : 
+Asset ID: users/collectearth/IPCC/ipcc_climate_1985-2015_remapped_for_surveys
+Código script GEE:
 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
-      <description xml:lang="fr">IPCC Climate Zones 1985-2015 Updated demonstration of the world climate zones described by IPCC in 2019. Download full dataset here : https://www.ipcc-nggip.iges.or.jp/faq/img/IPCC_Climate_Zones_Map_raster.zip
+      <description xml:lang="fr">Zones Climatiques GIEC 1985-2015. Démonstration actualisée des zones climatiques mondiales décrites par le GIEC en 2019. Téléchargez le jeu de données complet ici : https://www.ipcc-nggip.iges.or.jp/faq/img/IPCC_Climate_Zones_Map_raster.zip
 
-1 WTM Warm Temperate Moist
-2 WTD Warm Temperate Dry
-3 CTM Cool Temperate Moist
-4 CTD Cool Temperate Dry 5 POM Polar Moist 6 POD Polar Dry
-7 BOM Boreal Moist
-8 BOD Boreal Dry
-9 TRMT Tropical Montane
-10 TRW Tropical Wet
-11 TMM Tropical Moist
-12 TRD Tropical Dry
+1 WTM Tempéré chaud humide
+2 WTD Tempéré chaud sec
+3 CTM Tempéré frais humide
+4 CTD Tempéré frais sec 5 POM Polaire humide 6 POD Polaire sec
+7 BOM Boréal humide
+8 BOD Boréal sec
+9 TRMT Tropical de montagne
+10 TRW Tropical très humide
+11 TMM Tropical humide
+12 TRD Tropical sec
 
-Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+Obtenu à partir de l'outil Collect Earth Grid Generator. Chaque parcelle a cette information ajoutée comme colonne dans le CSV du plan d'échantillonnage.
 
 
-Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+Outil Collect Earth grid generator : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
 
 Asset ID : users/collectearth/IPCC/ipcc_climate_1985-2015_remapped_for_surveys
-GEE Script code : 
+Code script GEE :
 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
-      <description xml:lang="pt">IPCC Climate Zones 1985-2015 Updated demonstration of the world climate zones described by IPCC in 2019. Download full dataset here : https://www.ipcc-nggip.iges.or.jp/faq/img/IPCC_Climate_Zones_Map_raster.zip
+      <description xml:lang="pt">Zonas Climáticas IPCC 1985-2015. Demonstração atualizada das zonas climáticas mundiais descritas pelo IPCC em 2019. Baixe o conjunto de dados completo aqui: https://www.ipcc-nggip.iges.or.jp/faq/img/IPCC_Climate_Zones_Map_raster.zip
 
-1 WTM Warm Temperate Moist
-2 WTD Warm Temperate Dry
-3 CTM Cool Temperate Moist
-4 CTD Cool Temperate Dry 5 POM Polar Moist 6 POD Polar Dry
-7 BOM Boreal Moist
-8 BOD Boreal Dry
-9 TRMT Tropical Montane
-10 TRW Tropical Wet
-11 TMM Tropical Moist
-12 TRD Tropical Dry
+1 WTM Temperado quente úmido
+2 WTD Temperado quente seco
+3 CTM Temperado frio úmido
+4 CTD Temperado frio seco 5 POM Polar úmido 6 POD Polar seco
+7 BOM Boreal úmido
+8 BOD Boreal seco
+9 TRMT Tropical de montanha
+10 TRW Tropical muito úmido
+11 TMM Tropical úmido
+12 TRD Tropical seco
 
-Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design.
+Obtido com a ferramenta Collect Earth Grid Generator. Cada parcela tem esta informação adicionada como coluna no CSV do desenho amostral.
 
 
-Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
+Ferramenta Collect Earth grid generator: https://collectearth.users.earthengine.app/view/collect-earth-grid-generator
 
-Asset ID : users/collectearth/IPCC/ipcc_climate_1985-2015_remapped_for_surveys
-GEE Script code : 
+Asset ID: users/collectearth/IPCC/ipcc_climate_1985-2015_remapped_for_surveys
+Código script GEE:
 1. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Agrid%2FtoolGrid
 2. https://code.earthengine.google.com/?scriptPath=users%2Fsanchezpauspro%2FApps%3Ag</description>
       <codingScheme scope="local" />
@@ -2842,6 +2905,7 @@ GEE Script code :
       <label type="item" xml:lang="en">Distribution of land use in the plot</label>
       <label type="item" xml:lang="fr">Distribution de l'occupation des sols dans la parcelle</label>
       <label type="item" xml:lang="es">Distribución del uso del suelo en la parcela</label>
+      <label type="item" xml:lang="pt">Distribuição do uso da terra na parcela</label>
       <description xml:lang="pt">Distribuição do uso da terra no parcela</description>
       <codingScheme scope="local" />
       <items>
@@ -3134,14 +3198,14 @@ NÃO REMOVA!</description>
         <default value="0" if='plot_distribution="single" and land_use_whole_plot!=&apos;O&apos;' />
       </number>
       <code id="5" name="land_use_category" ui:hide="true" calculated="true" list="land_uses">
-        <label type="instance" xml:lang="en">Land Use 2025</label>
-        <label type="instance" xml:lang="fr">Utilisation des terres 2025</label>
-        <label type="reporting">LU - Land Use 2025</label>
-        <label type="reporting" xml:lang="fr">UT - Land Use 2025</label>
-        <label type="reporting" xml:lang="pt">UT - Uso da terra 2025</label>
-        <label type="reporting" xml:lang="es">UT - Uso de la tierra 2025</label>
-        <label type="instance" xml:lang="es">Uso de la tierra 2025</label>
-        <label type="instance" xml:lang="pt">Uso da terra 2025</label>
+        <label type="instance" xml:lang="en">Land Use 2026</label>
+        <label type="instance" xml:lang="fr">Utilisation des terres 2026</label>
+        <label type="reporting">LU - Land Use 2026</label>
+        <label type="reporting" xml:lang="fr">UT - Utilisation des terres 2026</label>
+        <label type="reporting" xml:lang="pt">UT - Uso da terra 2026</label>
+        <label type="reporting" xml:lang="es">UT - Uso de la tierra 2026</label>
+        <label type="instance" xml:lang="es">Uso de la tierra 2026</label>
+        <label type="instance" xml:lang="pt">Uso da terra 2026</label>
         <description xml:lang="en">Calculated automatically by Collect using the percentages of the different Land Uses in the plot (in case of multiple LU). Check the "Calculate Value Expressions" for the logic of the calculation.</description>
         <description xml:lang="pt">Calculado automaticamente por Collect usando as percentagens dos diferentes Usos do Solo na parcela (no caso de múltiplos LU). Verifique o "Calculate Value Expressions" para a lógica do cálculo.</description>
         <description xml:lang="fr">Calculé automatiquement par Collect en utilisant les pourcentages des différentes utilisations du sol dans la parcelle (en cas d'UG multiples). Vérifiez les "Calculate Value Expressions" pour la logique du calcul.</description>
@@ -3162,14 +3226,14 @@ NÃO REMOVA!</description>
         <default expr="land_use_category" />
       </code>
       <code id="8" name="land_use_subcategory" required="true" ui:layoutType="radio" list="land_use_conversions" parent="land_use_category_alias">
-        <label type="instance" xml:lang="en">Land Use Change (2000-2025)</label>
-        <label type="reporting">LU - Land Use Change (2000-2025)</label>
-        <label type="reporting" xml:lang="es">UT - Cambio de Uso de la Tierra (2000-2025)</label>
-        <label type="reporting" xml:lang="fr">UT - Changement d'Affectation des terres (2000-2025)</label>
-        <label type="reporting" xml:lang="pt">UT - Mudança de uso da terra (2000-2025)</label>
-        <label type="instance" xml:lang="fr">Changement d'Affectation des terres (2000-2025)</label>
-        <label type="instance" xml:lang="es">Cambio de Uso de la Tierra (2000-2025)</label>
-        <label type="instance" xml:lang="pt">Mudança de uso da terra (2000-2025)</label>
+        <label type="instance" xml:lang="en">Land Use Change (2000-2026)</label>
+        <label type="reporting">LU - Land Use Change (2000-2026)</label>
+        <label type="reporting" xml:lang="es">UT - Cambio de Uso de la Tierra (2000-2026)</label>
+        <label type="reporting" xml:lang="fr">UT - Changement d'Affectation des terres (2000-2026)</label>
+        <label type="reporting" xml:lang="pt">UT - Mudança de uso da terra (2000-2026)</label>
+        <label type="instance" xml:lang="fr">Changement d'Affectation des terres (2000-2026)</label>
+        <label type="instance" xml:lang="es">Cambio de Uso de la Tierra (2000-2026)</label>
+        <label type="instance" xml:lang="pt">Mudança de uso da terra (2000-2026)</label>
         <description xml:lang="en">Has the land use of the plot changed since 2000 or has it remained the same?</description>
         <description xml:lang="pt">O uso da terra do parcela mudou desde 2000 ou permaneceu o mesmo?</description>
         <description xml:lang="fr">L'occupation des sols de la parcelle a-t-elle changé depuis 2000 ou est-elle restée la même ?</description>
@@ -3185,8 +3249,8 @@ NÃO REMOVA!</description>
         <label type="instance" xml:lang="es">Ha cambiado la categoría de uso de la tierra</label>
         <label type="instance" xml:lang="pt">A categoria de uso da terra mudou</label>
         <description xml:lang="en">This is a calculated field that helps us to keep track if the LU category has changed or not, aggregating all conversion classes into change or no change.</description>
-        <description xml:lang="fr">Il s'agit d'un champ calculé qui nous aide à garder un camion si la catégorie LU a changé ou non, agrégeant toutes les classes de conversion en changement ou pas de changement.</description>
-        <description xml:lang="pt">Este é um campo calculado que nos ajuda a manter o caminhão se a categoria LU mudou ou não, agregando todas as classes de conversão em alteração ou não alteração.</description>
+        <description xml:lang="fr">Il s'agit d'un champ calculé qui nous aide à garder une trace de la catégorie LU a changé ou non, agrégeant toutes les classes de conversion en changement ou pas de changement.</description>
+        <description xml:lang="pt">Este é um campo calculado que nos ajuda a manter o registro se a categoria LU mudou ou não, agregando todas as classes de conversão em alteração ou não alteração.</description>
         <description xml:lang="es">Este es un campo calculado que nos ayuda a controlar si la categoría de LU ha cambiado o no, agregando todas las clases de conversión en cambio o sin cambio.</description>
         <default expr="substring(land_use_subcategory,1,1)!=substring(land_use_subcategory,2,1)" />
       </boolean>
@@ -3198,28 +3262,28 @@ NÃO REMOVA!</description>
         <label type="instance" xml:lang="pt">Mudança de Uso da Terra - Ano da mudança</label>
         <description xml:lang="en">In which year can you first appreciate the change of Land Use?</description>
         <description xml:lang="fr">En quelle année pouvez-vous apprécier pour la première fois le changement d'utilisation des terres ?</description>
-        <description xml:lang="pt">¿En qué año se puede apreciar por primera vez el cambio de Uso de la Tierra?</description>
+        <description xml:lang="pt">Em que ano se pode apreciar pela primeira vez a mudança de Uso da Terra?</description>
         <description xml:lang="es">¿En qué año se puede apreciar por primera vez el cambio de Uso de Suelo?</description>
       </code>
       <code id="10" name="land_use_subdivision" relevant="boolean(land_use_category)" required="true" list="land_uses" parent="land_use_category">
-        <label type="instance" xml:lang="en">Land Use Subdivision 2025</label>
-        <label type="instance" xml:lang="fr">Subdivision de l'Utilisation des terres 2025</label>
-        <label type="instance" xml:lang="pt">Subdivisão de Uso da Terra 2025</label>
-        <label type="reporting">LU - Land Use Subdivision 2025</label>
-        <label type="reporting" xml:lang="fr">UT - Subdivision de l'Utilisation des terres 2025</label>
-        <label type="reporting" xml:lang="es">UT - Subdivisión de UT en 2025</label>
-        <label type="reporting" xml:lang="pt">UT - Subdivisão de Uso da Terra 2025</label>
-        <label type="instance" xml:lang="es">Subdivisión de UT en 2025</label>
+        <label type="instance" xml:lang="en">Land Use Subdivision 2026</label>
+        <label type="instance" xml:lang="fr">Subdivision de l'Utilisation des terres 2026</label>
+        <label type="instance" xml:lang="pt">Subdivisão de Uso da Terra 2026</label>
+        <label type="reporting">LU - Land Use Subdivision 2026</label>
+        <label type="reporting" xml:lang="fr">UT - Subdivision de l'Utilisation des terres 2026</label>
+        <label type="reporting" xml:lang="es">UT - Subdivisión de UT en 2026</label>
+        <label type="reporting" xml:lang="pt">UT - Subdivisão de Uso da Terra 2026</label>
+        <label type="instance" xml:lang="es">Subdivisión de UT en 2026</label>
         <description xml:lang="en">Country specific Land Use</description>
       </code>
       <boolean id="1064" name="land_use_subdivision_change" relevant="land_use_category_has_changed!=true()" required="true" ui:hideWhenNotRelevant="true" ui:tab="plot_tab">
-        <label type="instance" xml:lang="en">Land use subdivision changed 2000/2025</label>
-        <label type="instance" xml:lang="fr">Subdivision de l'Utilisation des terres a changé 2000/2025</label>
+        <label type="instance" xml:lang="en">Land use subdivision changed 2000/2026</label>
+        <label type="instance" xml:lang="fr">Subdivision de l'Utilisation des terres a changé 2000/2026</label>
         <label type="reporting">LU - Land Use Subdivision changed</label>
         <label type="reporting" xml:lang="fr">UT - Subdivision de l'Utilisation des terres a changé entre 2000 et aujourd'hui</label>
         <label type="reporting" xml:lang="es">UT - Subdivisión del uso de la tierra cambió entre 2000 y la actualidad</label>
         <label type="reporting" xml:lang="pt">UT - Subdivisão do uso da terra mudou entre 2000 e o presente</label>
-        <label type="instance" xml:lang="es">Cambio subdivisión del uso de la tierra  2000/2025</label>
+        <label type="instance" xml:lang="es">Cambio subdivisión del uso de la tierra  2000/2026</label>
         <label type="instance" xml:lang="pt">A subdivisão do uso da terra mudou entre 2000 e o presente</label>
         <description xml:lang="en">The plot has changed at subdivision level but not its use category, for example, a forest plothas changed from Native Forest to Forest Plantation (no change in Land Use but change on sudivision, indicator of degradation)</description>
         <description xml:lang="fr">La parcelle a changé au niveau du lotissement mais pas sa catégorie d'utilisation, par exemple, une parcelle forestière est passée de Forêt indigène à Plantation forestière (pas de changement d'utilisation des terres mais changement de lotissement, indicateur de dégradation)</description>
@@ -3334,6 +3398,7 @@ NÃO REMOVA!</description>
         <label type="instance" xml:lang="en">Land Use Change at least Once</label>
         <label type="instance" xml:lang="fr">Changement d'affection des terres au moins une fois</label>
         <label type="instance" xml:lang="pt">Mudança no uso do solo pelo menos uma vez</label>
+        <label type="instance" xml:lang="es">Cambio de uso de la tierra al menos una vez</label>
         <default expr="land_use_category_has_changed or land_use_subdivision_change" />
       </boolean>
       <boolean id="20116" name="second_lu_change" relevant="land_use_change_once" required="true" ui:tab="plot_tab">
@@ -3382,6 +3447,7 @@ NÃO REMOVA!</description>
       <text id="22627" name="land_use_oldest_subdivision_combination" ui:hide="true" collect:includeInDataExport="false" ui:tab="plot_tab" calculated="true" type="short">
         <label type="instance" xml:lang="en">Land Use Oldest Subdivision Combination</label>
         <label type="instance" xml:lang="fr">Combinaison de Subdivision de l'UT la plus ancienne</label>
+        <label type="instance" xml:lang="es">Combinación de subdivisión de uso de la tierra más antigua</label>
         <label type="reporting">LU Change - Land Use Oldest Subdivision Combination</label>
         <label type="reporting" xml:lang="es">UT Cambio de Uso - Combinación de subdivisión de uso de la tierra más antigua</label>
         <label type="reporting" xml:lang="fr">UT Changement d'utilisation - Utilisation du sol Combinaison de subdivisions les plus anciennes</label>
@@ -3424,6 +3490,8 @@ NÃO REMOVA!</description>
         <label type="instance" xml:lang="es">Parcela - archivo CSV que contiene la parcela</label>
         <description xml:lang="en">This attribute stores the name of the CSV file that this plot comes from (the sampling design file). This is useful to understand where the original data from the plot location and so on comes from. DO NOT REMOVE. Internal attribute used by the CE Survey.</description>
         <description xml:lang="es">Este atributo almacena el nombre del archivo CSV del que proviene esta parcela (el archivo de diseño de muestreo). Esto es útil para comprender de dónde provienen los datos originales de la ubicación de la parcela, etc. NO QUITAR. Atributo interno utilizado por la encuesta de CE.</description>
+        <description xml:lang="fr">Cet attribut stocke le nom du fichier CSV dont provient cette parcelle (le fichier du plan d'échantillonnage). Utile pour comprendre d'où proviennent les données d'origine de la localisation de la parcelle, etc. NE PAS SUPPRIMER. Attribut interne utilisé par l'enquête CE.</description>
+        <description xml:lang="pt">Este atributo armazena o nome do arquivo CSV de onde esta parcela provém (o arquivo de desenho amostral). Útil para entender de onde vêm os dados originais da localização da parcela, etc. NÃO REMOVER. Atributo interno utilizado pelo levantamento CE.</description>
       </text>
       <number id="28" name="elevation" ui:tab="tab_10007" collectearth:fromcsv="true" type="integer">
         <label type="instance" xml:lang="en">DEM - Elevation</label>
@@ -3492,6 +3560,7 @@ NÃO REMOVA!</description>
         <label type="instance" xml:lang="en">IPCC - Soil</label>
         <label type="instance" xml:lang="fr">Sol GIEC</label>
         <label type="instance" xml:lang="es">IPCC - Suelo</label>
+        <label type="instance" xml:lang="pt">IPCC - Solo</label>
         <description xml:lang="en">Attribute that will allow you to produce disaggregated on Land Use by Climate (Using the IPCC standard soil types)
 
 The emission factors for certain types of forest or crops will change depending on the type of soil that they are located.
@@ -3531,6 +3600,7 @@ GEE Script code :
         <label type="instance" xml:lang="en">IPCC - Global Ecologic Zone</label>
         <label type="instance" xml:lang="fr">Zone Ecologique Globale - GIEC</label>
         <label type="instance" xml:lang="es">IPCC - Zona Ecológica</label>
+        <label type="instance" xml:lang="pt">IPCC - Zona Ecológica Global</label>
         <description xml:lang="en">Attribute that will allow you to produce disaggregated on Land Use by Global Ecological Zones (Using the FAO Global Ecologic Zones)
 
 The emission factors for certain types of forest or crops will change depending on the GEZ that they are located on.
@@ -3553,9 +3623,9 @@ GEE Script code :
       </code>
       <text id="61484" name="country" required="true" ui:tab="tab_10007" collectearth:fromcsv="true" type="short">
         <label type="instance" xml:lang="en">GAUL - Adm. Level 0 (Country)</label>
-        <label type="instance" xml:lang="fr">GAUL - Adm. Level 0 (Pays)</label>
-        <label type="instance" xml:lang="es">GAUL - Adm. Level 0 (Pais)</label>
-        <label type="instance" xml:lang="pt">GAUL - Adm. Level 0 (Pais)</label>
+        <label type="instance" xml:lang="fr">GAUL - Niv. Adm. 0 (Pays)</label>
+        <label type="instance" xml:lang="es">GAUL - Nivel Adm. 0 (País)</label>
+        <label type="instance" xml:lang="pt">GAUL - Nível Adm. 0 (País)</label>
         <description xml:lang="en">Country where the plot is located. Usually obtained from FAOs Global Administrative Units Layer (GAUL) 2014.
 
 Keep this attribute if you want to disaggregate the data by country. This attribute is NOT necessary for the Collect Earth survey to work (in case it is not needed in your survey and you do not want to add it to the CSV files)
@@ -3569,17 +3639,17 @@ Collect Earth grid generator tool : https://collectearth.users.earthengine.app/v
 The GAUL data might be inadequate if the Administrative Units of the country have changed. We recommend you to use your official country/province/district boundaries.</description>
       </text>
       <text id="61387" name="province" required="true" ui:tab="tab_10007" collectearth:fromcsv="true" type="short">
-        <label type="instance" xml:lang="en">GAUL - Adm. Level 1 ( Province/Region)</label>
-        <label type="instance" xml:lang="fr">GAUL - Adm. Level 1 ( Province/Region )</label>
-        <label type="instance" xml:lang="es">GAUL - Adm. Level 1 ( Province/Region)</label>
-        <label type="instance" xml:lang="pt">GAUL - Adm. Level 1 ( Província/Region)</label>
+        <label type="instance" xml:lang="en">GAUL - Adm. Level 1 (Province/Region)</label>
+        <label type="instance" xml:lang="fr">GAUL - Niv. Adm. 1 (Province/Région)</label>
+        <label type="instance" xml:lang="es">GAUL - Nivel Adm. 1 (Provincia/Región)</label>
+        <label type="instance" xml:lang="pt">GAUL - Nível Adm. 1 (Província/Região)</label>
         <description xml:lang="en">Province where the plot is located. Usually obtained from FAOs Global Administrative Units Layer (GAUL) 2014. Keep this attribute if you want to disaggregate the data by province. This attribute is NOT necessary for the Collect Earth survey to work (in case it is not needed in your survey and you do not want to add it to the CSV files) About GAUL Level 0 (countries ) : https://developers.google.com/earth-engine/datasets/catalog/FAO_GAUL_SIMPLIFIED_500m_2015_level1 Obtained from the Collect Earth Grid Generator tool. Each plot has this information added as a column in the CSV of the sampling design. Collect Earth grid generator tool : https://collectearth.users.earthengine.app/view/collect-earth-grid-generator The GAUL data might be inadequate if the Administrative Units of the country have changed. We recommend you to use your official country/province/district boundaries.</description>
       </text>
       <text id="61483" name="district" required="true" ui:tab="tab_10007" collectearth:fromcsv="true" type="short">
         <label type="instance" xml:lang="en">GAUL - Adm. Level 2 (District/Commune)</label>
-        <label type="instance" xml:lang="fr">GAUL - Adm. Level 2 (District/Commune)</label>
-        <label type="instance" xml:lang="es">GAUL - Adm. Level 2 (Distrito/Municipio/Comuna)</label>
-        <label type="instance" xml:lang="pt">GAUL - Adm. Level 2 (Distrito/Comuna)</label>
+        <label type="instance" xml:lang="fr">GAUL - Niv. Adm. 2 (District/Commune)</label>
+        <label type="instance" xml:lang="es">GAUL - Nivel Adm. 2 (Distrito/Municipio/Comuna)</label>
+        <label type="instance" xml:lang="pt">GAUL - Nível Adm. 2 (Distrito/Comuna)</label>
         <description xml:lang="en">District where the plot is located. Usually obtained from FAOs Global Administrative Units Layer (GAUL) 2014.
 
 Keep this attribute if you want to disaggregate the data by district. This attribute is NOT necessary for the Collect Earth survey to work (in case it is not needed in your survey and you do not want to add it to the CSV files)
@@ -3614,10 +3684,10 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <description xml:lang="fr">Quelles sont les utilisations du terrain dans la parcelle selon l'image la plus moderne de Google Earth. Si la parcelle est entièrement couverte par le même usage, utiliser "Unique", s'il y a plusieurs usages sur la parcelle, utiliser "Multiple"</description>
       </code>
       <entity id="63366" name="land_use" relevant="plot_distribution = 'multiple'" multiple="true" ui:layout="table" collect:enumerate="true" ui:tab="tab_63365">
-        <label type="instance" xml:lang="en">Land Uses in the plot 2025</label>
-        <label type="instance" xml:lang="fr">Utilisation des terres dans la placette 2025</label>
-        <label type="instance" xml:lang="es">Usos de la tierra en la parcela 2025</label>
-        <label type="instance" xml:lang="pt">Usos do solo no lote 2025</label>
+        <label type="instance" xml:lang="en">Land Uses in the plot 2026</label>
+        <label type="instance" xml:lang="fr">Utilisation des terres dans la placette 2026</label>
+        <label type="instance" xml:lang="es">Usos de la tierra en la parcela 2026</label>
+        <label type="instance" xml:lang="pt">Usos do solo no lote 2026</label>
         <code id="63367" name="lu" relevant="parent()/plot_distribution = 'multiple'" required="true" key="true" list="land_uses">
           <label type="instance" xml:lang="en">LU</label>
           <label type="instance" xml:lang="fr">UT</label>
@@ -3633,7 +3703,7 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
           <label type="reporting" xml:lang="es">UT dentro de la parcela - Puntos de control</label>
           <label type="reporting" xml:lang="pt">UT dentro parcela - Pontos de controle</label>
           <label type="instance" xml:lang="es">Puntos de control</label>
-          <label type="instance" xml:lang="pt">Points de contrôle</label>
+          <label type="instance" xml:lang="pt">Pontos de controle</label>
           <description xml:lang="en">Count the number of points within the plot that fall on each land cover.</description>
           <description xml:lang="es">Cuente el número de puntos dentro de la parcela que caen en cada cobertura terrestre.</description>
           <description xml:lang="pt">Conte o número de pontos dentro da parcela que caem em cada cobertura de terra.</description>
@@ -4750,7 +4820,13 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <label type="instance" xml:lang="es">IPCC 2025 Conversión de Uso de la Tierra</label>
         <label type="instance" xml:lang="fr">GIEC 2025 Conversion de l'utilisation des terres</label>
         <label type="instance" xml:lang="pt">IPCC 2025 Conversão do Uso do Solo</label>
-        <default expr="land_use_subcategory" />
+        <default expr="land_use_subcategory" if="land_use_category_has_changed!= true() and ( idm:blank(second_lu_change ) or second_lu_change != true() ) " />
+        <default expr="land_use_subcategory" if="land_use_category_has_changed and land_use_subcategory_year_of_change &lt;= 2025 and land_use_subcategory_year_of_change  &gt;=2005" />
+        <default expr="concat(ipcc_current_category,ipcc_current_category)" if="land_use_subcategory_year_of_change &lt; 2005" />
+        <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="land_use_category_has_changed and ( idm:blank(second_lu_change ) or second_lu_change != true() ) and land_use_subcategory_year_of_change &gt; 2025" />
+        <default expr="concat(ipcc_oldest_category,ipcc_previous_category)" if="second_lu_change=true() and second_lu_conversion_year &lt;= 2025 and second_lu_conversion_year &gt;= 2005" />
+        <default expr="concat(ipcc_previous_category,ipcc_previous_category)" if="second_lu_change=true()  and second_lu_conversion_year &lt; 2005" />
+        <default expr="concat(ipcc_oldest_category,ipcc_oldest_category)" if="second_lu_change=true() and second_lu_conversion_year &gt;= 2005" />
       </text>
       <code id="2012654" name="ipcc_2025_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
         <label type="instance" xml:lang="en">IPCC 2025 Land Use Category</label>
@@ -4764,6 +4840,37 @@ The GAUL data might be inadequate if the Administrative Units of the country hav
         <label type="instance" xml:lang="es">IPCC 2025 Subdivisión de Uso de la Tierra</label>
         <label type="instance" xml:lang="fr">GIEC 2025 Subdivision d'utilisation des terres</label>
         <label type="instance" xml:lang="pt">IPCC 2025 Subdivisão do Uso do Solo</label>
+        <default expr="land_use_subdivision" if="land_use_change_once!= true()" />
+        <default expr="land_use_subdivision" if="land_use_category_has_changed and ( idm:blank(land_use_subdivision_change ) or land_use_subdivision_change != true() )  and land_use_subcategory_year_of_change &lt;= 2025" />
+        <default expr="land_use_initial_subdivision" if="second_lu_change = true() and ( idm:blank(land_use_category_has_changed ) or land_use_category_has_changed != true() )  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2025 and second_lu_conversion_year &lt;= 2025" />
+        <default expr="land_use_subdivision" if="second_lu_change = true() and ( idm:blank(land_use_category_has_changed ) or land_use_category_has_changed != true() )  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2025" />
+        <default expr="land_use_initial_subdivision" if="land_use_category_has_changed = true()  and ( idm:blank(second_lu_change ) or second_lu_change != true() ) and land_use_subcategory_year_of_change &gt; 2025" />
+        <default expr="land_use_initial_subdivision" if="second_lu_change=true() and second_lu_conversion_year &lt;= 2025" />
+        <default expr="second_lu_subdivision" if="second_lu_change=true() and second_lu_conversion_year &gt; 2025" />
+        <default expr="land_use_initial_subdivision" if="( idm:blank(second_lu_change ) or second_lu_change != true() )  and  land_use_category_has_changed=true()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2025 and land_use_subcategory_year_of_change &lt;= 2025" />
+        <default expr="land_use_subdivision" if="( idm:blank(second_lu_change ) or second_lu_change != true() )  and  land_use_category_has_changed=true()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2025" />
+        <default expr="land_use_initial_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &gt; 2025" />
+        <default expr="land_use_subdivision" if="land_use_category_has_changed=false()  and land_use_subdivision_change=true()  and land_use_subdivision_year_of_change &lt;= 2025" />
+      </code>
+      <text id="2013039" name="ipcc_2026_subcategory" ui:hide="true" ui:tab="tab_10020" calculated="true" type="short">
+        <label type="instance" xml:lang="en">IPCC 2026 Land Use Conversion</label>
+        <label type="instance" xml:lang="es">IPCC 2026 Conversión de Uso de la Tierra</label>
+        <label type="instance" xml:lang="fr">GIEC 2026 Conversion de l'utilisation des terres</label>
+        <label type="instance" xml:lang="pt">IPCC 2026 Conversão do Uso do Solo</label>
+        <default expr="land_use_subcategory" />
+      </text>
+      <code id="2013040" name="ipcc_2026_category" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses">
+        <label type="instance" xml:lang="en">IPCC 2026 Land Use Category</label>
+        <label type="instance" xml:lang="es">IPCC 2026 Categoría Uso de la Tierra</label>
+        <label type="instance" xml:lang="fr">GIEC 2026 Catégorie d'utilisation des terres</label>
+        <label type="instance" xml:lang="pt">IPCC 2026 Categoria de Uso do Solo</label>
+        <default expr="substring(ipcc_2026_subcategory, 2, 1)" />
+      </code>
+      <code id="2013041" name="ipcc_2026_subdivision" ui:hide="true" ui:tab="tab_10020" calculated="true" list="land_uses" parent="ipcc_2026_category">
+        <label type="instance" xml:lang="en">IPCC 2026 Land Use Subdivision</label>
+        <label type="instance" xml:lang="es">IPCC 2026 Subdivisión de Uso de la Tierra</label>
+        <label type="instance" xml:lang="fr">GIEC 2026 Subdivision d'utilisation des terres</label>
+        <label type="instance" xml:lang="pt">IPCC 2026 Subdivisão do Uso do Solo</label>
         <default expr="land_use_subdivision" />
       </code>
       <code id="2012656" name="land_use_whole_plot" relevant='plot_distribution="single"' required="true" ui:tab="tab_63365" ui:layoutType="radio" list="land_uses">

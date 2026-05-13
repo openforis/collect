@@ -725,6 +725,7 @@ Use the PREVIEW button on the bottom of the page to view the form as you edit it
       <label type="instance" xml:lang="en">Plot</label>
       <label type="instance" xml:lang="es">Parcela</label>
       <label type="instance" xml:lang="fr">Parcelle</label>
+      <label type="instance" xml:lang="pt">Parcela</label>
       <text id="2" name="id" required="true" key="true" type="short">
         <label type="instance" xml:lang="en">Plot - Id</label>
         <label type="instance" xml:lang="es">Parcela - Id</label>
