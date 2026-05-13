@@ -116,7 +116,7 @@ public class CEComponentHTMLFormatter {
 	}
 
 	private XMLBuilder createBuilder(CEFieldSet comp, XMLBuilder parentBuilder) throws Exception {
-		XMLBuilder fieldSetBuilder =  parentBuilder.e("fieldset").attr("class", "entity-group" );; //$NON-NLS-1$
+		XMLBuilder fieldSetBuilder = parentBuilder.e("fieldset").attr("class", "entity-group"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		fieldSetBuilder.e("legend").t( comp.getLabelOrName()); //$NON-NLS-1$
 
 		for (CEComponent child : comp.getChildren()) {
@@ -218,17 +218,17 @@ public class CEComponentHTMLFormatter {
 				}
 				break;
 			case LONG_TEXT:
+				String textareaContent = (comp.isReadOnly() && comp.isExtra())
+						? String.format(EXTRA_VALUE_FORMAT, comp.getName())
+						: " "; // keep a non-empty child so XMLBuilder emits a closing tag //$NON-NLS-1$
 				fieldBuilder = formControlContainer.e("textarea") //$NON-NLS-1$
 					.a("id", elId) //$NON-NLS-1$
 					.a("rows", "3") //$NON-NLS-1$ //$NON-NLS-2$
 					.a("name", elId) //$NON-NLS-1$
 					.a("class", "form-control" + componentAdditionalClass) //$NON-NLS-1$ //$NON-NLS-2$
-					.t(" "); //$NON-NLS-1$
+					.t(textareaContent);
 				if (comp.isReadOnly()) {
 					fieldBuilder.a("disabled", "disabled"); //$NON-NLS-1$ //$NON-NLS-2$
-					if (comp.isExtra()) {
-						fieldBuilder.a("value", String.format(EXTRA_VALUE_FORMAT, comp.getName()));
-					}
 				}
 				break;
 			case INTEGER:
@@ -293,7 +293,8 @@ public class CEComponentHTMLFormatter {
 					.e("input") //$NON-NLS-1$
 						.a("id", elId) //$NON-NLS-1$
 						.a("name", elId) //$NON-NLS-1$
-						.a("class", "form-control"); //$NON-NLS-1$ //$NON-NLS-2$
+						.a("type", "text") //$NON-NLS-1$ //$NON-NLS-2$
+						.a("class", "form-control" + componentAdditionalClass); //$NON-NLS-1$ //$NON-NLS-2$
 				groupContainerBuilder.e("span") //$NON-NLS-1$
 						.a("class", "input-group-addon") //$NON-NLS-1$ //$NON-NLS-2$
 						.e("span") //$NON-NLS-1$
@@ -351,7 +352,7 @@ public class CEComponentHTMLFormatter {
 			}
 
 			if(!hasNAoption){
-				selectBuilder.e("option").a("selected","true").a("value", "").t( Messages.getString("CEComponentHTMLFormatter.119", language) ); //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				selectBuilder.e("option").a("selected","selected").a("value", "").t( Messages.getString("CEComponentHTMLFormatter.119", language) ); //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 
 			for (CodeListItem item : rootItems) {
@@ -439,7 +440,7 @@ public class CEComponentHTMLFormatter {
 					if (item.hasUploadedImage()) {
 						String imgFilePath = CollectEarthProjectFileCreatorImpl.getCodeListImageFilePath(item);
 						String titleText = StringUtils.isBlank(description) ? "" : description; //$NON-NLS-1$
-						String htmlTitle = "<span><img src=\"" + imgFilePath + "\" width=\"250\"><br/>" + titleText + "</span>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						String htmlTitle = "<span><img src=\"" + escapeHtmlAttribute(imgFilePath) + "\" width=\"250\"><br/>" + titleText + "</span>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						itemBuilder
 							.a("title", htmlTitle) //$NON-NLS-1$
 							.a("data-html", "true") //$NON-NLS-1$ //$NON-NLS-2$
@@ -464,7 +465,7 @@ public class CEComponentHTMLFormatter {
 			}};
 			builder.toWriter(writer, outputProperties);
 			String result = writer.toString();
-			return result.replaceAll("&amp;#", "&#"); //to avoid double escaping unicode characters
+			return result.replace("&amp;#", "&#"); //to avoid double escaping unicode characters
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -489,6 +490,18 @@ public class CEComponentHTMLFormatter {
 	public static String getDescription(CodeListItem item, String lang) {
 		String description = item.getDescription(lang, true);
 		return HtmlUnicodeEscaperUtil.escapeHtmlUnicode( description );
+	}
+
+	private static String escapeHtmlAttribute(String value) {
+		if (value == null) {
+			return "";
+		}
+		return value
+			.replace("&", "&amp;")
+			.replace("\"", "&quot;")
+			.replace("'", "&#39;")
+			.replace("<", "&lt;")
+			.replace(">", "&gt;");
 	}
 
 }

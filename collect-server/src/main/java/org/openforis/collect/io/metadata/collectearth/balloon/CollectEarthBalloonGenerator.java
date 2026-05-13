@@ -112,7 +112,7 @@ public class CollectEarthBalloonGenerator {
 	}
 
 	private String replaceHostForPreview(String html) {
-		return html.replaceAll("\\$\\[host\\]", "preview_");
+		return html.replace("$[host]", "preview_");
 	}
 
 	private String replaceButtonLocalizationText(String htmlForBalloon) {
@@ -138,46 +138,55 @@ public class CollectEarthBalloonGenerator {
 	}
 
 	private String getIdAttributesSurvey() {
-		
-		String jsArrayKeys = "[";
 		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getFirstRootEntityDefinition().getKeyAttributeDefinitions();
 		BalloonInputFieldsUtils balloonUtils = new BalloonInputFieldsUtils();
-		
-		// TODO Fix better in the future, this is very very dirty!!
+
+		StringBuilder sb = new StringBuilder("[");
+		boolean first = true;
 		for (AttributeDefinition keyAttribute : keyAttributeDefinitions) {
-			jsArrayKeys += "'" + balloonUtils.getCollectBalloonParamName( keyAttribute )  + "',";
+			if (!first) {
+				sb.append(",");
+			}
+			sb.append("'").append(balloonUtils.getCollectBalloonParamName(keyAttribute)).append("'");
+			first = false;
 		}
-		//Remove trailing comma
-		jsArrayKeys = jsArrayKeys.substring(0, jsArrayKeys.lastIndexOf(","));
-		jsArrayKeys += "]";
-		return jsArrayKeys;		
-		
+		sb.append("]");
+		return sb.toString();
 	}
-	
+
 	private String getIdPlaceholdersSurvey() {
 		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getFirstRootEntityDefinition().getKeyAttributeDefinitions();
 		StringBuilder sb = new StringBuilder();
+		boolean first = true;
 		for (AttributeDefinition def : keyAttributeDefinitions) {
-			sb.append(def.getName()).
-			append("=")
-			.append("$[")
-			.append(EXTRA_HIDDEN_PREFIX)
-			.append(def.getName())
-			.append("]")
-			.append("&"); 
+			if (!first) {
+				sb.append("&");
+			}
+			sb.append(def.getName())
+				.append("=")
+				.append("$[")
+				.append(EXTRA_HIDDEN_PREFIX)
+				.append(def.getName())
+				.append("]");
+			first = false;
 		}
-		// remove the last & character
-		return (String) sb.subSequence(0, sb.length() -1);
+		return sb.toString();
 	}
 	
 	
 
 	private String getHTMLTemplate() throws IOException {
 		InputStream is = getClass().getClassLoader().getResourceAsStream(BALLOON_TEMPLATE_TXT);
-		StringWriter writer = new StringWriter();
-		IOUtils.copy(is, writer, OpenForisIOUtils.UTF_8);
-		String template = writer.toString();
-		return template;
+		if (is == null) {
+			throw new IOException("Balloon HTML template not found on classpath: " + BALLOON_TEMPLATE_TXT);
+		}
+		try {
+			StringWriter writer = new StringWriter();
+			IOUtils.copy(is, writer, OpenForisIOUtils.UTF_8);
+			return writer.toString();
+		} finally {
+			IOUtils.closeQuietly(is);
+		}
 	}
 
 	private String fillWithSurveyDefinitionFields(String template) {
@@ -244,7 +253,7 @@ public class CollectEarthBalloonGenerator {
 		UIOptions uiOptions = survey.getUIOptions();
 		UIConfiguration uiConfiguration = survey.getUIConfiguration();
 		if (uiConfiguration == null) {
-			throw new IllegalStateException("Error unmarshalling the survey - no UI configruration!"); //$NON-NLS-1$
+			throw new IllegalStateException("Error unmarshalling the survey - no UI configuration!"); //$NON-NLS-1$
 		}
 		if (uiConfiguration.getFormSets().isEmpty()) {
 			//no ui configuration defined
@@ -298,9 +307,8 @@ public class CollectEarthBalloonGenerator {
 		}
 	}
 
-	private void addFieldComponentToTab(CETab tab, UIField formComponent) {
+	private void addFieldComponentToTab(CETab tab, UIField uiField) {
 		CollectAnnotations annotations = survey.getAnnotations();
-		UIField uiField = (UIField) formComponent;
 		AttributeDefinition attrDef = uiField.getAttributeDefinition();
 		String nodeName = attrDef.getName();
 		boolean includeInHTML = ! (
@@ -517,8 +525,8 @@ public class CollectEarthBalloonGenerator {
 			if(( (RangeAttributeDefinition ) def).getType().equals(org.openforis.idm.metamodel.NumericAttributeDefinition.Type.INTEGER) ){
 				return CEFieldType.CODE_RANGE;
 			}else{
-				// SLIDER NOT SUPPRTED YET!
-				throw new IllegalArgumentException("REAL TYPE RANGES NOT SUPPRTED YET!"); //$NON-NLS-1$
+				// SLIDER NOT SUPPORTED YET!
+				throw new IllegalArgumentException("REAL TYPE RANGES NOT SUPPORTED YET!"); //$NON-NLS-1$
 			}
 			
 		}  else {

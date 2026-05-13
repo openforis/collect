@@ -78,7 +78,8 @@ table.ancillary-data-table td.ancillary-data-label {
 table.ancillary-data-table td.ancillary-data-value {
 	font-weight: normal;
 	color: #222;
-	word-break: break-word;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
 }
 
 
@@ -94,7 +95,7 @@ hr {
 	margin: 5px;
 }
 
-.bootstrap-select:not ([class*="span"] ) {
+.bootstrap-select:not([class*="span"]) {
 	width: 170px;
 }
 
