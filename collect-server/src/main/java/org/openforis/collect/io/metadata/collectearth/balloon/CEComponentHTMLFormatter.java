@@ -130,19 +130,21 @@ public class CEComponentHTMLFormatter {
 	}
 
 	private XMLBuilder createBuilder(CEAncillaryFields comp, XMLBuilder parentBuilder) throws Exception {
-		XMLBuilder informationFieldsBuilder =  parentBuilder.e("div").attr("class", "ancillary-data" ); //$NON-NLS-1$
+		XMLBuilder informationFieldsBuilder = parentBuilder.e("div").attr("class", "ancillary-data"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		XMLBuilder tableBuilder = informationFieldsBuilder.e("table").a("class", "ancillary-data-table"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		XMLBuilder tbodyBuilder = tableBuilder.e("tbody"); //$NON-NLS-1$
 
-		boolean firstChild = true;
 		for (CEComponent child : comp.getChildren()) {
-			if (child instanceof CEField) {
-				if( !firstChild ){ // Do not add a break line before the first element
-                    informationFieldsBuilder.e("br").up(); //$NON-NLS-1$
-                }
-				informationFieldsBuilder.e("span" ).t( child.getLabelOrName() + ": $["+  CollectEarthBalloonGenerator.EXTRA_HIDDEN_PREFIX + child.getName()+ "]" ).up();
-				firstChild = false;
-			} else {
+			if (! (child instanceof CEField)) {
 				throw new IllegalArgumentException("Only attribute fields supported inside single entity"); //$NON-NLS-1$
 			}
+			XMLBuilder rowBuilder = tbodyBuilder.e("tr"); //$NON-NLS-1$
+			rowBuilder.e("td") //$NON-NLS-1$
+				.a("class", "ancillary-data-label") //$NON-NLS-1$ //$NON-NLS-2$
+				.t(child.getLabelOrName());
+			rowBuilder.e("td") //$NON-NLS-1$
+				.a("class", "ancillary-data-value") //$NON-NLS-1$ //$NON-NLS-2$
+				.t("$[" + CollectEarthBalloonGenerator.EXTRA_HIDDEN_PREFIX + child.getName() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		return informationFieldsBuilder.up(); // Close the div;
