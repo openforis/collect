@@ -171,7 +171,15 @@ public class CEComponentHTMLFormatter {
 		XMLBuilder formControlContainer = formGroupBuilder.e("div") //$NON-NLS-1$
 				.a("class", "col-sm-8"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		String componentAdditionalClass =  comp.isExtra() || comp.isCalculated() ? " " + CollectEarthBalloonGenerator.EXTRA_HIDDEN_FIELD_CLASS : "";
+		// Mark as "extra" for the existing hide-logic; additionally tag calculated fields
+		// with their own class so styles/scripts can distinguish them from CSV-extras.
+		String componentAdditionalClass = "";
+		if (comp.isExtra() || comp.isCalculated()) {
+			componentAdditionalClass = " " + CollectEarthBalloonGenerator.EXTRA_HIDDEN_FIELD_CLASS;
+			if (comp.isCalculated()) {
+				componentAdditionalClass += " " + CollectEarthBalloonGenerator.CALCULATED_FIELD_CLASS;
+			}
+		}
 
 		if (comp instanceof CECodeField) {
 			if (comp.isReadOnly()) {
@@ -315,23 +323,24 @@ public class CEComponentHTMLFormatter {
 	}
 
 	public void addTooltip(XMLBuilder formGroupBuilder, String tooltip) {
-		if( !StringUtils.isBlank(tooltip) ) {
+		if (!StringUtils.isBlank(tooltip)) {
 			formGroupBuilder.e("span")
-				.a( "class", "ui-icon  ui-icon-info" )
-				.a( "style", "display:inline-block")
-				.a( "title", tooltip);
+				.a("class", "ui-icon ui-icon-info tooltip-icon")
+				.a("title", tooltip);
 		}
 	}
 
 	private void buildCodeSelect(XMLBuilder builder, CECodeField comp) {
 		String elId = comp.getHtmlParameterName();
 
-		//build select
+		//build select. Plugin in use is SelectBoxIt (initialised by JS) — the previous
+		//"selectboxit show-menu-arrow show-tick" classes mixed in dead Bootstrap-Select
+		//hooks (that plugin isn't bundled) and have no effect; dropped.
 		XMLBuilder selectBuilder = builder.e("select") //$NON-NLS-1$
 			.a("id", elId) //$NON-NLS-1$
 			.a("name", elId) //$NON-NLS-1$
 			.a("data-field-type", comp.getType().name()) //$NON-NLS-1$
-			.a("class", "form-control selectboxit show-menu-arrow show-tick") //$NON-NLS-1$ //$NON-NLS-2$
+			.a("class", "form-control") //$NON-NLS-1$ //$NON-NLS-2$
 			.a("data-width", "75px"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (comp.getParentName() != null) {
 			selectBuilder.a("data-parent-id-field-id", comp.getParentName()); //$NON-NLS-1$
@@ -368,20 +377,23 @@ public class CEComponentHTMLFormatter {
 	private void buildCodeRange(XMLBuilder builder, CERangeField comp) {
 		String elId = comp.getHtmlParameterName();
 
-		//build select
+		//build select (see buildCodeSelect for class-list rationale)
 		XMLBuilder selectBuilder = builder.e("select") //$NON-NLS-1$
 			.a("id", elId) //$NON-NLS-1$
 			.a("name", elId) //$NON-NLS-1$
 			.a("data-field-type", comp.getType().name()) //$NON-NLS-1$
-			.a("class", "form-control selectboxit show-menu-arrow show-tick") //$NON-NLS-1$ //$NON-NLS-2$
+			.a("class", "form-control") //$NON-NLS-1$ //$NON-NLS-2$
 			.a("data-width", "75px"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		//add root items, if any
-		for( int i=comp.getFrom(); i<comp.getTo(); i++ ){
-				String item = i+""; //$NON-NLS-1$
-				selectBuilder.e("option") //$NON-NLS-1$
-					.a("value", item) //$NON-NLS-1$
-					.t(item);
+		// Match buildCodeSelect: emit an empty "no value" option as the default selection
+		// so a freshly-opened range field doesn't silently take the "from" value.
+		selectBuilder.e("option").a("selected", "selected").a("value", "").t(Messages.getString("CEComponentHTMLFormatter.119", language));
+
+		for (int i = comp.getFrom(); i < comp.getTo(); i++) {
+			String item = i + ""; //$NON-NLS-1$
+			selectBuilder.e("option") //$NON-NLS-1$
+				.a("value", item) //$NON-NLS-1$
+				.t(item);
 		}
 	}
 
@@ -439,8 +451,10 @@ public class CEComponentHTMLFormatter {
 
 					if (item.hasUploadedImage()) {
 						String imgFilePath = CollectEarthProjectFileCreatorImpl.getCodeListImageFilePath(item);
-						String titleText = StringUtils.isBlank(description) ? "" : description; //$NON-NLS-1$
-						String htmlTitle = "<span><img src=\"" + escapeHtmlAttribute(imgFilePath) + "\" width=\"250\"><br/>" + titleText + "</span>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						// Bootstrap tooltip with data-html="true" parses title as HTML, so the description
+						// must be HTML-escaped or stray <,>,& in user content would break the markup.
+						String titleText = StringUtils.isBlank(description) ? "" : escapeHtml(description); //$NON-NLS-1$
+						String htmlTitle = "<span><img src=\"" + escapeHtml(imgFilePath) + "\" width=\"250\"><br/>" + titleText + "</span>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						itemBuilder
 							.a("title", htmlTitle) //$NON-NLS-1$
 							.a("data-html", "true") //$NON-NLS-1$ //$NON-NLS-2$
@@ -465,7 +479,10 @@ public class CEComponentHTMLFormatter {
 			}};
 			builder.toWriter(writer, outputProperties);
 			String result = writer.toString();
-			return result.replace("&amp;#", "&#"); //to avoid double escaping unicode characters
+			// HtmlUnicodeEscaperUtil emits &#xNNNN; entities BEFORE XML serialization, so
+			// XMLBuilder's text-escaper turns the leading & into &amp;. Undo that only for
+			// actual numeric character references — not arbitrary &amp;# runs in user text.
+			return result.replaceAll("&amp;#(x?[0-9A-Fa-f]+;)", "&#$1");
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -492,7 +509,7 @@ public class CEComponentHTMLFormatter {
 		return HtmlUnicodeEscaperUtil.escapeHtmlUnicode( description );
 	}
 
-	private static String escapeHtmlAttribute(String value) {
+	private static String escapeHtml(String value) {
 		if (value == null) {
 			return "";
 		}

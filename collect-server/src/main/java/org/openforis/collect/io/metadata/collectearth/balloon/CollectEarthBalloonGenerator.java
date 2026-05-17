@@ -8,10 +8,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.earth.core.handlers.BalloonInputFieldsUtils;
@@ -62,6 +65,7 @@ public class CollectEarthBalloonGenerator {
 	
 	public static final String EXTRA_HIDDEN_PREFIX = "EXTRA_";
 	protected static final String EXTRA_HIDDEN_FIELD_CLASS = "extra";
+	protected static final String CALCULATED_FIELD_CLASS = "calculated";
 	private static final Set<String> HIDDEN_ATTRIBUTE_NAMES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
 			"operator", "location", "plot_file", "actively_saved", "actively_saved_on"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 	
@@ -116,38 +120,43 @@ public class CollectEarthBalloonGenerator {
 	}
 
 	private String replaceButtonLocalizationText(String htmlForBalloon) {
-		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_FINISH_TRANSLATION, HtmlUnicodeEscaperUtil.escapeHtmlUnicode( Messages.getString("CollectEarthBalloonGenerator.11", language) ) ); //$NON-NLS-1$
-		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_NEXT_TRANSLATION, HtmlUnicodeEscaperUtil.escapeHtmlUnicode(Messages.getString("CollectEarthBalloonGenerator.12", language)) ); //$NON-NLS-1$
-		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_PREVIOUS_TRANSLATION,HtmlUnicodeEscaperUtil.escapeHtmlUnicode(Messages.getString("CollectEarthBalloonGenerator.13", language)) ); //$NON-NLS-1$
-		
-		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_COLLECT_NOT_RUNNING,HtmlUnicodeEscaperUtil.escapeHtmlUnicode(Messages.getString("CollectEarthBalloonGenerator.14", language)) ); //$NON-NLS-1$
-		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_PLACEMARK_ALREADY_FILLED,HtmlUnicodeEscaperUtil.escapeHtmlUnicode(Messages.getString("CollectEarthBalloonGenerator.15", language)) ); //$NON-NLS-1$
-		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_UI_LANGUAGE, language ); //$NON-NLS-1$
-		
-		// Added to handle multiple id attributes within a survey
-		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_EXTRA_ID_ATTRIBUTES,  getIdAttributesSurvey() ); //$NON-NLS-1$
-		
-		// Added to handle multiple id attributes within a survey
-		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST,  getIdPlaceholdersSurvey() ); //$NON-NLS-1$
+		// All placeholder->value substitutions collected once, then applied in a single
+		// regex pass over the template instead of ten sequential full-string scans.
+		Map<String, String> replacements = new LinkedHashMap<String, String>();
+		replacements.put(PLACEHOLDER_FOR_FINISH_TRANSLATION,    HtmlUnicodeEscaperUtil.escapeHtmlUnicode(Messages.getString("CollectEarthBalloonGenerator.11", language))); //$NON-NLS-1$
+		replacements.put(PLACEHOLDER_FOR_NEXT_TRANSLATION,      HtmlUnicodeEscaperUtil.escapeHtmlUnicode(Messages.getString("CollectEarthBalloonGenerator.12", language))); //$NON-NLS-1$
+		replacements.put(PLACEHOLDER_FOR_PREVIOUS_TRANSLATION,  HtmlUnicodeEscaperUtil.escapeHtmlUnicode(Messages.getString("CollectEarthBalloonGenerator.13", language))); //$NON-NLS-1$
+		replacements.put(PLACEHOLDER_COLLECT_NOT_RUNNING,       HtmlUnicodeEscaperUtil.escapeHtmlUnicode(Messages.getString("CollectEarthBalloonGenerator.14", language))); //$NON-NLS-1$
+		replacements.put(PLACEHOLDER_PLACEMARK_ALREADY_FILLED,  HtmlUnicodeEscaperUtil.escapeHtmlUnicode(Messages.getString("CollectEarthBalloonGenerator.15", language))); //$NON-NLS-1$
+		replacements.put(PLACEHOLDER_UI_LANGUAGE,               language);
+		replacements.put(PLACEHOLDER_EXTRA_ID_ATTRIBUTES,       getIdAttributesSurvey());
+		replacements.put(PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST,  getIdPlaceholdersSurvey());
+		replacements.put(PLACEHOLDER_PREVIEW,                   String.valueOf(preview).toLowerCase(Locale.ENGLISH));
+		replacements.put(PLACEHOLDER_RANDOM_NUMBER,             String.valueOf(Numbers.randomInt(10000, 5000000)));
 
-		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_PREVIEW, String.valueOf(preview).toLowerCase(Locale.ENGLISH));
-		
-		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_RANDOM_NUMBER, String.valueOf(Numbers.randomInt(10000, 5000000)));
-
-		return htmlForBalloon;
+		StringBuilder regex = new StringBuilder();
+		for (String key : replacements.keySet()) {
+			if (regex.length() > 0) regex.append('|');
+			regex.append(Pattern.quote(key));
+		}
+		Matcher m = Pattern.compile(regex.toString()).matcher(htmlForBalloon);
+		StringBuffer out = new StringBuffer(htmlForBalloon.length() + 256);
+		while (m.find()) {
+			m.appendReplacement(out, Matcher.quoteReplacement(replacements.get(m.group())));
+		}
+		m.appendTail(out);
+		return out.toString();
 	}
 
 	private String getIdAttributesSurvey() {
 		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getFirstRootEntityDefinition().getKeyAttributeDefinitions();
-		BalloonInputFieldsUtils balloonUtils = new BalloonInputFieldsUtils();
-
 		StringBuilder sb = new StringBuilder("[");
 		boolean first = true;
 		for (AttributeDefinition keyAttribute : keyAttributeDefinitions) {
 			if (!first) {
 				sb.append(",");
 			}
-			sb.append("'").append(balloonUtils.getCollectBalloonParamName(keyAttribute)).append("'");
+			sb.append("'").append(balloonInputFieldsUtils.getCollectBalloonParamName(keyAttribute)).append("'");
 			first = false;
 		}
 		sb.append("]");
@@ -175,7 +184,15 @@ public class CollectEarthBalloonGenerator {
 	
 	
 
+	// Template is an immutable classpath resource; safe to cache for the JVM lifetime.
+	// A redeploy creates a new classloader and clears this field.
+	private static volatile String cachedHtmlTemplate;
+
 	private String getHTMLTemplate() throws IOException {
+		String tpl = cachedHtmlTemplate;
+		if (tpl != null) {
+			return tpl;
+		}
 		InputStream is = getClass().getClassLoader().getResourceAsStream(BALLOON_TEMPLATE_TXT);
 		if (is == null) {
 			throw new IOException("Balloon HTML template not found on classpath: " + BALLOON_TEMPLATE_TXT);
@@ -183,7 +200,9 @@ public class CollectEarthBalloonGenerator {
 		try {
 			StringWriter writer = new StringWriter();
 			IOUtils.copy(is, writer, OpenForisIOUtils.UTF_8);
-			return writer.toString();
+			tpl = writer.toString();
+			cachedHtmlTemplate = tpl;
+			return tpl;
 		} finally {
 			IOUtils.closeQuietly(is);
 		}
