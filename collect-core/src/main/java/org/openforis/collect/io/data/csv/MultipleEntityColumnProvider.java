@@ -52,7 +52,7 @@ public class MultipleEntityColumnProvider extends ColumnProviderChain {
 		private int entityIndex;
 
 		public MultipleEntityKeyColumnProvider(CSVDataExportParameters config, EntityDefinition defn, int entityIndex, String keyName) {
-			super(config, (entityIndex + 1) + "_", defn);
+			super(config, "[" + (entityIndex + 1) + "]_", defn);
 			this.entityIndex = entityIndex;
 			this.keyName = keyName;
 		}
