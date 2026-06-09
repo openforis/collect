@@ -17,7 +17,7 @@ import org.openforis.idm.model.Node;
  */
 public class MultipleEntityColumnProvider extends ColumnProviderChain {
 	
-	private static int DEFAULT_MAX_ITEMS = 10;
+	private static final int DEFAULT_MAX_ITEMS = 10;
 	
 
 	public MultipleEntityColumnProvider(CSVDataExportParameters config, EntityDefinition defn) {
