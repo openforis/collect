@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.data.csv.EnumerableEntityColumnProvider;
+import org.openforis.collect.io.data.csv.MultipleEntityColumnProvider;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -61,6 +62,9 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 		if ( defn.isMultiple() ) {
 			if ( defn.isEnumerable() && config.isIncludeEnumeratedEntities() ) {
 				EnumerableEntityColumnProvider p = new EnumerableEntityColumnProvider(config, defn);
+				cols.add(p);
+			} else if (config.isIncludeMultipleEntities()) {
+				MultipleEntityColumnProvider p = new MultipleEntityColumnProvider(config, defn);
 				cols.add(p);
 			}
 		} else {

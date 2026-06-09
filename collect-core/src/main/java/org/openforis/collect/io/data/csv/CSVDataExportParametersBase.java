@@ -19,6 +19,7 @@ public abstract class CSVDataExportParametersBase {
 	private boolean includeCodeItemPositionColumn = false;
 	private boolean includeKMLColumnForCoordinates = false;
 	private boolean includeEnumeratedEntities = false;
+	private boolean includeMultipleEntities = false;
 	private boolean includeCompositeAttributeMergedColumn = false;
 	private boolean includeCodeItemLabelColumn = false;
 	private boolean includeGroupingLabels = true;
@@ -89,6 +90,14 @@ public abstract class CSVDataExportParametersBase {
 		this.includeEnumeratedEntities = includeEnumeratedEntities;
 	}
 
+	public boolean isIncludeMultipleEntities() {
+		return includeMultipleEntities;
+	}
+	
+	public void setIncludeMultipleEntities(boolean includeMultipleEntities) {
+		this.includeMultipleEntities = includeMultipleEntities;
+	}
+	
 	public boolean isIncludeAllAncestorAttributes() {
 		return includeAllAncestorAttributes;
 	}
