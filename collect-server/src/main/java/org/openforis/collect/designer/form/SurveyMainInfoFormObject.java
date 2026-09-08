@@ -53,7 +53,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		collectEarthSamplePoints = String.valueOf(annotations.getCollectEarthSamplePoints());
 		collectEarthShowOuterSquare = annotations.isShowOuterSquare();
 		collectEarthOuterSquareSize = String.valueOf(annotations.getOuterSquareSize());
-		collectEarthOuterSquareShape = annotations.getOuterSquareShape();
+		collectEarthOuterSquareShape = annotations.getOuterSquareShape().name();
 		bingMapsKey = annotations.getBingMapsKey();
 //		planetMapsKey = annotations.getPlanetMapsKey();
 		extraMapUrl = annotations.getExtraMapUrl();
@@ -85,7 +85,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		annotations.setCollectEarthSamplePoints(Integer.parseInt(collectEarthSamplePoints));
 		annotations.setShowOuterSquare(collectEarthShowOuterSquare);
 		annotations.setOuterSquareSize(Integer.parseInt(collectEarthOuterSquareSize));
-		annotations.setOuterSquareShape(collectEarthOuterSquareShape);
+		annotations.setOuterSquareShape(CollectAnnotations.OuterSquareShape.valueOf(collectEarthOuterSquareShape));
 		annotations.setBingMapsKey(bingMapsKey);
 //		annotations.setPlanetMapsKey(planetMapsKey);
 		annotations.setExtraMapUrl(extraMapUrl);

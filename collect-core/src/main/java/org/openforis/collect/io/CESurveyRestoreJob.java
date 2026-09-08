@@ -194,13 +194,16 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 			return Integer.parseInt(firstDistance.trim()) * 2;
 		}
 
-		private String getOuterSquareShape(Properties p) {
+		private CollectAnnotations.OuterSquareShape getOuterSquareShape(Properties p) {
 			String shape = p.getProperty("buffer_shape");
-			if (StringUtils.isBlank(shape)
-					|| !("SQUARE".equals(shape) || "CIRCLE".equals(shape) || "HEXAGON".equals(shape))) {
-				return "SQUARE";
+			if (StringUtils.isNotBlank(shape)) {
+				try {
+					return CollectAnnotations.OuterSquareShape.valueOf(shape);
+				} catch (IllegalArgumentException e) {
+					// fall back to default below
+				}
 			}
-			return shape;
+			return CollectAnnotations.OuterSquareShape.SQUARE;
 		}
 
 		private int getIntegerProperty(Properties p, String key, int defaultValue) {

@@ -43,6 +43,10 @@ public class CollectAnnotations {
 		KEYBOARD, BARCODE
 	}
 
+	public enum OuterSquareShape {
+		SQUARE, CIRCLE, HEXAGON
+	}
+
 	public enum Annotation {
 		//collect namespace
 		INCLUDE_IN_DATA_EXPORT(new QName(COLLECT_NAMESPACE_URI, "includeInDataExport"), true),
@@ -106,7 +110,7 @@ public class CollectAnnotations {
 		COLLECT_EARTH_SAMPLE_POINTS(new QName(COLLECT_EARTH_NAMESPACE_URI, "samplepoints"), 25), //0, 1, 9 (3x3), 25 (5x5), 49 (7x7)
 		COLLECT_EARTH_SHOW_OUTER_SQUARE(new QName(COLLECT_EARTH_NAMESPACE_URI, "showOuterSquare"), false),
 		COLLECT_EARTH_OUTER_SQUARE_SIZE(new QName(COLLECT_EARTH_NAMESPACE_URI, "outerSquareSize"), 150), //side length (or diameter) in meters of the extra shape drawn around the plot
-		COLLECT_EARTH_OUTER_SQUARE_SHAPE(new QName(COLLECT_EARTH_NAMESPACE_URI, "outerSquareShape"), "SQUARE"), //SQUARE, CIRCLE or HEXAGON
+		COLLECT_EARTH_OUTER_SQUARE_SHAPE(new QName(COLLECT_EARTH_NAMESPACE_URI, "outerSquareShape"), OuterSquareShape.SQUARE),
 		COLLECT_EARTH_OPEN_BING_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openBingMaps"), false),
 		COLLECT_EARTH_OPEN_EARTH_MAP(new QName(COLLECT_EARTH_NAMESPACE_URI, "openEarthMap"), false),
 		COLLECT_EARTH_OPEN_PLANET_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openPlanetMaps"), true),
@@ -445,12 +449,18 @@ public class CollectAnnotations {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OUTER_SQUARE_SIZE, value);
 	}
 
-	public String getOuterSquareShape() {
-		return getAnnotationValueString(survey, Annotation.COLLECT_EARTH_OUTER_SQUARE_SHAPE);
+	public OuterSquareShape getOuterSquareShape() {
+		String val = survey.getAnnotation(Annotation.COLLECT_EARTH_OUTER_SQUARE_SHAPE.getQName());
+		if (StringUtils.isBlank(val)) {
+			return (OuterSquareShape) Annotation.COLLECT_EARTH_OUTER_SQUARE_SHAPE.getDefaultValue();
+		} else {
+			return OuterSquareShape.valueOf(val);
+		}
 	}
 
-	public void setOuterSquareShape(String value) {
-		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OUTER_SQUARE_SHAPE, value);
+	public void setOuterSquareShape(OuterSquareShape value) {
+		String val = value == null || value == Annotation.COLLECT_EARTH_OUTER_SQUARE_SHAPE.getDefaultValue() ? null : value.name();
+		survey.setAnnotation(Annotation.COLLECT_EARTH_OUTER_SQUARE_SHAPE.getQName(), val);
 	}
 
 	public boolean isAllowOnlyDeviceCoordinate(CoordinateAttributeDefinition def) {
