@@ -105,7 +105,8 @@ public class CollectAnnotations {
 		COLLECT_EARTH_EXTRA_MAP_URL(new QName(COLLECT_EARTH_NAMESPACE_URI, "extraMapUrl")),
 		COLLECT_EARTH_SAMPLE_POINTS(new QName(COLLECT_EARTH_NAMESPACE_URI, "samplepoints"), 25), //0, 1, 9 (3x3), 25 (5x5), 49 (7x7)
 		COLLECT_EARTH_SHOW_OUTER_SQUARE(new QName(COLLECT_EARTH_NAMESPACE_URI, "showOuterSquare"), false),
-		COLLECT_EARTH_OUTER_SQUARE_SIZE(new QName(COLLECT_EARTH_NAMESPACE_URI, "outerSquareSize"), 150), //side length in meters of the extra square drawn around the plot
+		COLLECT_EARTH_OUTER_SQUARE_SIZE(new QName(COLLECT_EARTH_NAMESPACE_URI, "outerSquareSize"), 150), //side length (or diameter) in meters of the extra shape drawn around the plot
+		COLLECT_EARTH_OUTER_SQUARE_SHAPE(new QName(COLLECT_EARTH_NAMESPACE_URI, "outerSquareShape"), "SQUARE"), //SQUARE, CIRCLE or HEXAGON
 		COLLECT_EARTH_OPEN_BING_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openBingMaps"), false),
 		COLLECT_EARTH_OPEN_EARTH_MAP(new QName(COLLECT_EARTH_NAMESPACE_URI, "openEarthMap"), false),
 		COLLECT_EARTH_OPEN_PLANET_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openPlanetMaps"), true),
@@ -442,6 +443,14 @@ public class CollectAnnotations {
 
 	public void setOuterSquareSize(Integer value) {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OUTER_SQUARE_SIZE, value);
+	}
+
+	public String getOuterSquareShape() {
+		return getAnnotationValueString(survey, Annotation.COLLECT_EARTH_OUTER_SQUARE_SHAPE);
+	}
+
+	public void setOuterSquareShape(String value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OUTER_SQUARE_SHAPE, value);
 	}
 
 	public boolean isAllowOnlyDeviceCoordinate(CoordinateAttributeDefinition def) {

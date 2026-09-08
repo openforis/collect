@@ -147,6 +147,7 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 			annotations.setShowOuterSquare(outerSquareSize != null);
 			if (outerSquareSize != null) {
 				annotations.setOuterSquareSize(outerSquareSize);
+				annotations.setOuterSquareShape(getOuterSquareShape(p));
 			}
 			surveyManager.save(survey);
 		}
@@ -191,6 +192,15 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 			}
 			String firstDistance = StringUtils.split(distanceToBuffers, ',')[0];
 			return Integer.parseInt(firstDistance.trim()) * 2;
+		}
+
+		private String getOuterSquareShape(Properties p) {
+			String shape = p.getProperty("buffer_shape");
+			if (StringUtils.isBlank(shape)
+					|| !("SQUARE".equals(shape) || "CIRCLE".equals(shape) || "HEXAGON".equals(shape))) {
+				return "SQUARE";
+			}
+			return shape;
 		}
 
 		private int getIntegerProperty(Properties p, String key, int defaultValue) {

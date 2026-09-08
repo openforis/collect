@@ -162,6 +162,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 			p.put("inner_point_side", "2");
 			if (survey.getAnnotations().isShowOuterSquare()) {
 				p.put("distance_to_buffers", String.valueOf(calculateOuterSquareDistance(survey)));
+				p.put("buffer_shape", survey.getAnnotations().getOuterSquareShape());
 			}
 			p.put("ui_language", language);
 			p.put("open_gee_app", isGEEAppEnabled(survey));

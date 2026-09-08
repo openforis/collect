@@ -131,6 +131,20 @@
 				</fieldErrorHandler>
 				<space width="100px" />
 				<label
+					value="${labels.survey.collect_earth.plot_layout.outer_square_shape}:" />
+				<fieldErrorHandler
+					message="@load(vmsgs['collectEarthOuterSquareShape'])">
+					<combobox rows="1"
+						disabled="@load(not fx.collectEarthShowOuterSquare)"
+						selectedItem="@load(fx.collectEarthOuterSquareShape) @save(fx.collectEarthOuterSquareShape)"
+						onChange="@command('applyChanges')">
+						<comboitem label="${labels.survey.collect_earth.plot_layout.outer_square_shape.square}" value="SQUARE" />
+						<comboitem label="${labels.survey.collect_earth.plot_layout.outer_square_shape.circle}" value="CIRCLE" />
+						<comboitem label="${labels.survey.collect_earth.plot_layout.outer_square_shape.hexagon}" value="HEXAGON" />
+					</combobox>
+				</fieldErrorHandler>
+				<space width="30px" />
+				<label
 					value="${labels.survey.collect_earth.plot_layout.outer_square_size}:" />
 				<fieldErrorHandler
 					message="@load(vmsgs['collectEarthOuterSquareSize'])">
