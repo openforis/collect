@@ -160,6 +160,9 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 			p.put("distance_to_plot_boundaries", String.valueOf(calculateFrameDistance(survey)));
 			p.put("number_of_sampling_points_in_plot", String.valueOf(survey.getAnnotations().getCollectEarthSamplePoints()));
 			p.put("inner_point_side", "2");
+			if (survey.getAnnotations().isShowOuterSquare()) {
+				p.put("distance_to_buffers", String.valueOf(calculateOuterSquareDistance(survey)));
+			}
 			p.put("ui_language", language);
 			p.put("open_gee_app", isGEEAppEnabled(survey));
 			p.put("open_maxar_securewatch", isSecureWatchEnabled(survey));
@@ -220,6 +223,12 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		double pointsPerSide = Math.sqrt(samplePoints);
 		int frameDistance = Double.valueOf(Math.floor((double) ((plotWidth / pointsPerSide) / 2))).intValue();
 		return frameDistance;
+	}
+
+	private int calculateOuterSquareDistance(CollectSurvey survey) {
+		// distance_to_buffers is the offset (in meters) from the plot center to each side
+		// of the outer square, i.e. half of its configured side length
+		return survey.getAnnotations().getOuterSquareSize() / 2;
 	}
 
 	private int calculateDistanceBetweenSamplePoints(CollectSurvey survey) {

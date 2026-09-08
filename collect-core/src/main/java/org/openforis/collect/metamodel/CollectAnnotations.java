@@ -104,6 +104,8 @@ public class CollectAnnotations {
 		//COLLECT_EARTH_PLANET_KEY(new QName(COLLECT_EARTH_NAMESPACE_URI, "planetKey"), "GENERATE YOUR OWN PLANET API KEY AT https://www.planet.com/"),
 		COLLECT_EARTH_EXTRA_MAP_URL(new QName(COLLECT_EARTH_NAMESPACE_URI, "extraMapUrl")),
 		COLLECT_EARTH_SAMPLE_POINTS(new QName(COLLECT_EARTH_NAMESPACE_URI, "samplepoints"), 25), //0, 1, 9 (3x3), 25 (5x5), 49 (7x7)
+		COLLECT_EARTH_SHOW_OUTER_SQUARE(new QName(COLLECT_EARTH_NAMESPACE_URI, "showOuterSquare"), false),
+		COLLECT_EARTH_OUTER_SQUARE_SIZE(new QName(COLLECT_EARTH_NAMESPACE_URI, "outerSquareSize"), 150), //side length in meters of the extra square drawn around the plot
 		COLLECT_EARTH_OPEN_BING_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openBingMaps"), false),
 		COLLECT_EARTH_OPEN_EARTH_MAP(new QName(COLLECT_EARTH_NAMESPACE_URI, "openEarthMap"), false),
 		COLLECT_EARTH_OPEN_PLANET_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openPlanetMaps"), true),
@@ -424,6 +426,22 @@ public class CollectAnnotations {
 
 	public void setCollectEarthSamplePoints(Integer value) {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_SAMPLE_POINTS, value);
+	}
+
+	public boolean isShowOuterSquare() {
+		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_SHOW_OUTER_SQUARE);
+	}
+
+	public void setShowOuterSquare(boolean value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_SHOW_OUTER_SQUARE, value);
+	}
+
+	public Integer getOuterSquareSize() {
+		return getAnnotationValueInteger(survey, Annotation.COLLECT_EARTH_OUTER_SQUARE_SIZE);
+	}
+
+	public void setOuterSquareSize(Integer value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OUTER_SQUARE_SIZE, value);
 	}
 
 	public boolean isAllowOnlyDeviceCoordinate(CoordinateAttributeDefinition def) {

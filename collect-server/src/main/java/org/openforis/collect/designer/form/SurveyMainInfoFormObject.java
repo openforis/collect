@@ -17,6 +17,8 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	private String projectName;
 	private String collectEarthSamplePoints;
 	private String collectEarthPlotArea;
+	private boolean collectEarthShowOuterSquare;
+	private String collectEarthOuterSquareSize;
 	private String bingMapsKey;
 //	private String planetMapsKey;
 	private String extraMapUrl;
@@ -48,6 +50,8 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		CollectAnnotations annotations = source.getAnnotations();
 		collectEarthPlotArea = toListitemValue(annotations.getCollectEarthPlotArea());
 		collectEarthSamplePoints = String.valueOf(annotations.getCollectEarthSamplePoints());
+		collectEarthShowOuterSquare = annotations.isShowOuterSquare();
+		collectEarthOuterSquareSize = String.valueOf(annotations.getOuterSquareSize());
 		bingMapsKey = annotations.getBingMapsKey();
 //		planetMapsKey = annotations.getPlanetMapsKey();
 		extraMapUrl = annotations.getExtraMapUrl();
@@ -77,6 +81,8 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		CollectAnnotations annotations = dest.getAnnotations();
 		annotations.setCollectEarthPlotArea(fromListitemValueToDouble(collectEarthPlotArea));
 		annotations.setCollectEarthSamplePoints(Integer.parseInt(collectEarthSamplePoints));
+		annotations.setShowOuterSquare(collectEarthShowOuterSquare);
+		annotations.setOuterSquareSize(Integer.parseInt(collectEarthOuterSquareSize));
 		annotations.setBingMapsKey(bingMapsKey);
 //		annotations.setPlanetMapsKey(planetMapsKey);
 		annotations.setExtraMapUrl(extraMapUrl);
@@ -163,6 +169,22 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 
 	public void setCollectEarthPlotArea(String collectEarthPlotArea) {
 		this.collectEarthPlotArea = collectEarthPlotArea;
+	}
+
+	public boolean isCollectEarthShowOuterSquare() {
+		return collectEarthShowOuterSquare;
+	}
+
+	public void setCollectEarthShowOuterSquare(boolean collectEarthShowOuterSquare) {
+		this.collectEarthShowOuterSquare = collectEarthShowOuterSquare;
+	}
+
+	public String getCollectEarthOuterSquareSize() {
+		return collectEarthOuterSquareSize;
+	}
+
+	public void setCollectEarthOuterSquareSize(String collectEarthOuterSquareSize) {
+		this.collectEarthOuterSquareSize = collectEarthOuterSquareSize;
 	}
 
 	public String getBingMapsKey() {

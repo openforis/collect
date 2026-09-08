@@ -120,6 +120,33 @@
 					</combobox>
 				</fieldErrorHandler>
 			</hlayout>
+			<hlayout style="padding: 10px">
+				<fieldErrorHandler
+					message="@load(vmsgs['collectEarthShowOuterSquare'])">
+					<label
+						value="${labels.survey.collect_earth.plot_layout.show_outer_square}:" />
+					<checkbox
+						checked="@load(fx.collectEarthShowOuterSquare eq true) @save(fx.collectEarthShowOuterSquare)"
+						onCheck="@command('applyChanges')" />
+				</fieldErrorHandler>
+				<space width="100px" />
+				<label
+					value="${labels.survey.collect_earth.plot_layout.outer_square_size}:" />
+				<fieldErrorHandler
+					message="@load(vmsgs['collectEarthOuterSquareSize'])">
+					<combobox rows="1"
+						disabled="@load(not fx.collectEarthShowOuterSquare)"
+						selectedItem="@load(fx.collectEarthOuterSquareSize) @save(fx.collectEarthOuterSquareSize)"
+						onChange="@command('applyChanges')">
+						<comboitem label="60 m" value="60" />
+						<comboitem label="100 m" value="100" />
+						<comboitem label="150 m" value="150" />
+						<comboitem label="200 m" value="200" />
+						<comboitem label="300 m" value="300" />
+						<comboitem label="500 m" value="500" />
+					</combobox>
+				</fieldErrorHandler>
+			</hlayout>
 		</groupbox>
 
 		<groupbox width="100%" closable="false"
