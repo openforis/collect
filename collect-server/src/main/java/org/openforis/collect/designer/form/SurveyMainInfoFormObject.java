@@ -17,9 +17,9 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	private String projectName;
 	private String collectEarthSamplePoints;
 	private String collectEarthPlotArea;
-	private boolean collectEarthShowOuterSquare;
-	private String collectEarthOuterSquareSize;
-	private String collectEarthOuterSquareShape;
+	private boolean collectEarthShowOuterPolygon;
+	private String collectEarthOuterPolygonSize;
+	private String collectEarthOuterPolygonShape;
 	private String bingMapsKey;
 //	private String planetMapsKey;
 	private String extraMapUrl;
@@ -51,9 +51,9 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		CollectAnnotations annotations = source.getAnnotations();
 		collectEarthPlotArea = toListitemValue(annotations.getCollectEarthPlotArea());
 		collectEarthSamplePoints = String.valueOf(annotations.getCollectEarthSamplePoints());
-		collectEarthShowOuterSquare = annotations.isShowOuterSquare();
-		collectEarthOuterSquareSize = String.valueOf(annotations.getOuterSquareSize());
-		collectEarthOuterSquareShape = annotations.getOuterSquareShape().name();
+		collectEarthShowOuterPolygon = annotations.isShowOuterPolygon();
+		collectEarthOuterPolygonSize = String.valueOf(annotations.getOuterPolygonSize());
+		collectEarthOuterPolygonShape = annotations.getOuterPolygonShape().name();
 		bingMapsKey = annotations.getBingMapsKey();
 //		planetMapsKey = annotations.getPlanetMapsKey();
 		extraMapUrl = annotations.getExtraMapUrl();
@@ -83,9 +83,9 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		CollectAnnotations annotations = dest.getAnnotations();
 		annotations.setCollectEarthPlotArea(fromListitemValueToDouble(collectEarthPlotArea));
 		annotations.setCollectEarthSamplePoints(Integer.parseInt(collectEarthSamplePoints));
-		annotations.setShowOuterSquare(collectEarthShowOuterSquare);
-		annotations.setOuterSquareSize(Integer.parseInt(collectEarthOuterSquareSize));
-		annotations.setOuterSquareShape(CollectAnnotations.OuterSquareShape.valueOf(collectEarthOuterSquareShape));
+		annotations.setShowOuterPolygon(collectEarthShowOuterPolygon);
+		annotations.setOuterPolygonSize(Integer.parseInt(collectEarthOuterPolygonSize));
+		annotations.setOuterPolygonShape(CollectAnnotations.OuterPolygonShape.valueOf(collectEarthOuterPolygonShape));
 		annotations.setBingMapsKey(bingMapsKey);
 //		annotations.setPlanetMapsKey(planetMapsKey);
 		annotations.setExtraMapUrl(extraMapUrl);
@@ -174,28 +174,28 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		this.collectEarthPlotArea = collectEarthPlotArea;
 	}
 
-	public boolean isCollectEarthShowOuterSquare() {
-		return collectEarthShowOuterSquare;
+	public boolean isCollectEarthShowOuterPolygon() {
+		return collectEarthShowOuterPolygon;
 	}
 
-	public void setCollectEarthShowOuterSquare(boolean collectEarthShowOuterSquare) {
-		this.collectEarthShowOuterSquare = collectEarthShowOuterSquare;
+	public void setCollectEarthShowOuterPolygon(boolean collectEarthShowOuterPolygon) {
+		this.collectEarthShowOuterPolygon = collectEarthShowOuterPolygon;
 	}
 
-	public String getCollectEarthOuterSquareSize() {
-		return collectEarthOuterSquareSize;
+	public String getCollectEarthOuterPolygonSize() {
+		return collectEarthOuterPolygonSize;
 	}
 
-	public void setCollectEarthOuterSquareSize(String collectEarthOuterSquareSize) {
-		this.collectEarthOuterSquareSize = collectEarthOuterSquareSize;
+	public void setCollectEarthOuterPolygonSize(String collectEarthOuterPolygonSize) {
+		this.collectEarthOuterPolygonSize = collectEarthOuterPolygonSize;
 	}
 
-	public String getCollectEarthOuterSquareShape() {
-		return collectEarthOuterSquareShape;
+	public String getCollectEarthOuterPolygonShape() {
+		return collectEarthOuterPolygonShape;
 	}
 
-	public void setCollectEarthOuterSquareShape(String collectEarthOuterSquareShape) {
-		this.collectEarthOuterSquareShape = collectEarthOuterSquareShape;
+	public void setCollectEarthOuterPolygonShape(String collectEarthOuterPolygonShape) {
+		this.collectEarthOuterPolygonShape = collectEarthOuterPolygonShape;
 	}
 
 	public String getBingMapsKey() {

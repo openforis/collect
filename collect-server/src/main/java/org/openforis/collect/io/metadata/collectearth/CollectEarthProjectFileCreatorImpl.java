@@ -160,9 +160,9 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 			p.put("distance_to_plot_boundaries", String.valueOf(calculateFrameDistance(survey)));
 			p.put("number_of_sampling_points_in_plot", String.valueOf(survey.getAnnotations().getCollectEarthSamplePoints()));
 			p.put("inner_point_side", "2");
-			if (survey.getAnnotations().isShowOuterSquare()) {
-				p.put("distance_to_buffers", String.valueOf(calculateOuterSquareDistance(survey)));
-				p.put("buffer_shape", survey.getAnnotations().getOuterSquareShape().name());
+			if (survey.getAnnotations().isShowOuterPolygon()) {
+				p.put("distance_to_buffers", String.valueOf(calculateOuterPolygonDistance(survey)));
+				p.put("buffer_shape", survey.getAnnotations().getOuterPolygonShape().name());
 			}
 			p.put("ui_language", language);
 			p.put("open_gee_app", isGEEAppEnabled(survey));
@@ -226,10 +226,10 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		return frameDistance;
 	}
 
-	private int calculateOuterSquareDistance(CollectSurvey survey) {
+	private int calculateOuterPolygonDistance(CollectSurvey survey) {
 		// distance_to_buffers is the offset (in meters) from the plot center to each side
-		// of the outer square, i.e. half of its configured side length
-		return survey.getAnnotations().getOuterSquareSize() / 2;
+		// of the outer polygon, i.e. half of its configured side length
+		return survey.getAnnotations().getOuterPolygonSize() / 2;
 	}
 
 	private int calculateDistanceBetweenSamplePoints(CollectSurvey survey) {

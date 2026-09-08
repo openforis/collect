@@ -208,7 +208,7 @@ PLACEHOLDER_FOR_EXTRA_CSV_DATA
 		       </innerBoundaryIs>
    		</Polygon>
 
-		<#-- One extra, unfilled outer square per configured buffer/outer-square distance -- START -->
+		<#-- One extra, unfilled outer polygon per configured buffer/outer-polygon distance -- START -->
 		<#list placemark.buffers as buffer>
 		<Polygon id="poly_${placemark.placemarkId}_buffer_${buffer_index}">
 			<outerBoundaryIs>
@@ -223,7 +223,7 @@ PLACEHOLDER_FOR_EXTRA_CSV_DATA
 			</outerBoundaryIs>
 		</Polygon>
 		</#list>
-		<#-- One extra, unfilled outer square per configured buffer/outer-square distance -- END -->
+		<#-- One extra, unfilled outer polygon per configured buffer/outer-polygon distance -- END -->
    		</MultiGeometry>
 
    		</#if>

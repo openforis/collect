@@ -143,11 +143,11 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 			annotations.setSecureWatchEnabled(Boolean.parseBoolean(p.getProperty("open_maxar_securewatch")));
 			annotations.setCollectEarthSamplePoints(getIntegerProperty(p, "number_of_sampling_points_in_plot", 9));
 			annotations.setCollectEarthPlotArea(calculatePlotArea(p));
-			Integer outerSquareSize = calculateOuterSquareSize(p);
-			annotations.setShowOuterSquare(outerSquareSize != null);
-			if (outerSquareSize != null) {
-				annotations.setOuterSquareSize(outerSquareSize);
-				annotations.setOuterSquareShape(getOuterSquareShape(p));
+			Integer outerPolygonSize = calculateOuterPolygonSize(p);
+			annotations.setShowOuterPolygon(outerPolygonSize != null);
+			if (outerPolygonSize != null) {
+				annotations.setOuterPolygonSize(outerPolygonSize);
+				annotations.setOuterPolygonShape(getOuterPolygonShape(p));
 			}
 			surveyManager.save(survey);
 		}
@@ -183,9 +183,9 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 			return roundedPlotAreaHa;
 		}
 
-		private Integer calculateOuterSquareSize(Properties p) {
+		private Integer calculateOuterPolygonSize(Properties p) {
 			// distance_to_buffers can hold a comma separated list of buffer distances (e.g. "70,112,194");
-			// only the first one is restored as the (single) outer square configured in the survey designer
+			// only the first one is restored as the (single) outer polygon configured in the survey designer
 			String distanceToBuffers = p.getProperty("distance_to_buffers");
 			if (StringUtils.isBlank(distanceToBuffers)) {
 				return null;
@@ -194,16 +194,16 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 			return Integer.parseInt(firstDistance.trim()) * 2;
 		}
 
-		private CollectAnnotations.OuterSquareShape getOuterSquareShape(Properties p) {
+		private CollectAnnotations.OuterPolygonShape getOuterPolygonShape(Properties p) {
 			String shape = p.getProperty("buffer_shape");
 			if (StringUtils.isNotBlank(shape)) {
 				try {
-					return CollectAnnotations.OuterSquareShape.valueOf(shape);
+					return CollectAnnotations.OuterPolygonShape.valueOf(shape);
 				} catch (IllegalArgumentException e) {
 					// fall back to default below
 				}
 			}
-			return CollectAnnotations.OuterSquareShape.SQUARE;
+			return CollectAnnotations.OuterPolygonShape.SQUARE;
 		}
 
 		private int getIntegerProperty(Properties p, String key, int defaultValue) {

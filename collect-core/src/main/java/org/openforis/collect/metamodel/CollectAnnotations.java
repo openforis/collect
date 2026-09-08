@@ -43,7 +43,7 @@ public class CollectAnnotations {
 		KEYBOARD, BARCODE
 	}
 
-	public enum OuterSquareShape {
+	public enum OuterPolygonShape {
 		SQUARE, CIRCLE, HEXAGON
 	}
 
@@ -108,9 +108,9 @@ public class CollectAnnotations {
 		//COLLECT_EARTH_PLANET_KEY(new QName(COLLECT_EARTH_NAMESPACE_URI, "planetKey"), "GENERATE YOUR OWN PLANET API KEY AT https://www.planet.com/"),
 		COLLECT_EARTH_EXTRA_MAP_URL(new QName(COLLECT_EARTH_NAMESPACE_URI, "extraMapUrl")),
 		COLLECT_EARTH_SAMPLE_POINTS(new QName(COLLECT_EARTH_NAMESPACE_URI, "samplepoints"), 25), //0, 1, 9 (3x3), 25 (5x5), 49 (7x7)
-		COLLECT_EARTH_SHOW_OUTER_SQUARE(new QName(COLLECT_EARTH_NAMESPACE_URI, "showOuterSquare"), false),
-		COLLECT_EARTH_OUTER_SQUARE_SIZE(new QName(COLLECT_EARTH_NAMESPACE_URI, "outerSquareSize"), 150), //side length (or diameter) in meters of the extra shape drawn around the plot
-		COLLECT_EARTH_OUTER_SQUARE_SHAPE(new QName(COLLECT_EARTH_NAMESPACE_URI, "outerSquareShape"), OuterSquareShape.SQUARE),
+		COLLECT_EARTH_SHOW_OUTER_POLYGON(new QName(COLLECT_EARTH_NAMESPACE_URI, "showOuterPolygon"), false),
+		COLLECT_EARTH_OUTER_POLYGON_SIZE(new QName(COLLECT_EARTH_NAMESPACE_URI, "outerPolygonSize"), 150), //side length (or diameter) in meters of the extra shape drawn around the plot
+		COLLECT_EARTH_OUTER_POLYGON_SHAPE(new QName(COLLECT_EARTH_NAMESPACE_URI, "outerPolygonShape"), OuterPolygonShape.SQUARE),
 		COLLECT_EARTH_OPEN_BING_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openBingMaps"), false),
 		COLLECT_EARTH_OPEN_EARTH_MAP(new QName(COLLECT_EARTH_NAMESPACE_URI, "openEarthMap"), false),
 		COLLECT_EARTH_OPEN_PLANET_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openPlanetMaps"), true),
@@ -433,34 +433,34 @@ public class CollectAnnotations {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_SAMPLE_POINTS, value);
 	}
 
-	public boolean isShowOuterSquare() {
-		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_SHOW_OUTER_SQUARE);
+	public boolean isShowOuterPolygon() {
+		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_SHOW_OUTER_POLYGON);
 	}
 
-	public void setShowOuterSquare(boolean value) {
-		setAnnotationValue(survey, Annotation.COLLECT_EARTH_SHOW_OUTER_SQUARE, value);
+	public void setShowOuterPolygon(boolean value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_SHOW_OUTER_POLYGON, value);
 	}
 
-	public Integer getOuterSquareSize() {
-		return getAnnotationValueInteger(survey, Annotation.COLLECT_EARTH_OUTER_SQUARE_SIZE);
+	public Integer getOuterPolygonSize() {
+		return getAnnotationValueInteger(survey, Annotation.COLLECT_EARTH_OUTER_POLYGON_SIZE);
 	}
 
-	public void setOuterSquareSize(Integer value) {
-		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OUTER_SQUARE_SIZE, value);
+	public void setOuterPolygonSize(Integer value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OUTER_POLYGON_SIZE, value);
 	}
 
-	public OuterSquareShape getOuterSquareShape() {
-		String val = survey.getAnnotation(Annotation.COLLECT_EARTH_OUTER_SQUARE_SHAPE.getQName());
+	public OuterPolygonShape getOuterPolygonShape() {
+		String val = survey.getAnnotation(Annotation.COLLECT_EARTH_OUTER_POLYGON_SHAPE.getQName());
 		if (StringUtils.isBlank(val)) {
-			return (OuterSquareShape) Annotation.COLLECT_EARTH_OUTER_SQUARE_SHAPE.getDefaultValue();
+			return (OuterPolygonShape) Annotation.COLLECT_EARTH_OUTER_POLYGON_SHAPE.getDefaultValue();
 		} else {
-			return OuterSquareShape.valueOf(val);
+			return OuterPolygonShape.valueOf(val);
 		}
 	}
 
-	public void setOuterSquareShape(OuterSquareShape value) {
-		String val = value == null || value == Annotation.COLLECT_EARTH_OUTER_SQUARE_SHAPE.getDefaultValue() ? null : value.name();
-		survey.setAnnotation(Annotation.COLLECT_EARTH_OUTER_SQUARE_SHAPE.getQName(), val);
+	public void setOuterPolygonShape(OuterPolygonShape value) {
+		String val = value == null || value == Annotation.COLLECT_EARTH_OUTER_POLYGON_SHAPE.getDefaultValue() ? null : value.name();
+		survey.setAnnotation(Annotation.COLLECT_EARTH_OUTER_POLYGON_SHAPE.getQName(), val);
 	}
 
 	public boolean isAllowOnlyDeviceCoordinate(CoordinateAttributeDefinition def) {

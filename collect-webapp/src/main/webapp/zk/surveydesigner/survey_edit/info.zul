@@ -122,35 +122,35 @@
 			</hlayout>
 			<hlayout style="padding: 10px">
 				<fieldErrorHandler
-					message="@load(vmsgs['collectEarthShowOuterSquare'])">
+					message="@load(vmsgs['collectEarthShowOuterPolygon'])">
 					<label
-						value="${labels.survey.collect_earth.plot_layout.show_outer_square}:" />
+						value="${labels.survey.collect_earth.plot_layout.show_outer_polygon}:" />
 					<checkbox
-						checked="@load(fx.collectEarthShowOuterSquare eq true) @save(fx.collectEarthShowOuterSquare)"
+						checked="@load(fx.collectEarthShowOuterPolygon eq true) @save(fx.collectEarthShowOuterPolygon)"
 						onCheck="@command('applyChanges')" />
 				</fieldErrorHandler>
 				<space width="100px" />
 				<label
-					value="${labels.survey.collect_earth.plot_layout.outer_square_shape}:" />
+					value="${labels.survey.collect_earth.plot_layout.outer_polygon_shape}:" />
 				<fieldErrorHandler
-					message="@load(vmsgs['collectEarthOuterSquareShape'])">
+					message="@load(vmsgs['collectEarthOuterPolygonShape'])">
 					<combobox rows="1"
-						disabled="@load(not fx.collectEarthShowOuterSquare)"
-						selectedItem="@load(fx.collectEarthOuterSquareShape) @save(fx.collectEarthOuterSquareShape)"
+						disabled="@load(not fx.collectEarthShowOuterPolygon)"
+						selectedItem="@load(fx.collectEarthOuterPolygonShape) @save(fx.collectEarthOuterPolygonShape)"
 						onChange="@command('applyChanges')">
-						<comboitem label="${labels.survey.collect_earth.plot_layout.outer_square_shape.square}" value="SQUARE" />
-						<comboitem label="${labels.survey.collect_earth.plot_layout.outer_square_shape.circle}" value="CIRCLE" />
-						<comboitem label="${labels.survey.collect_earth.plot_layout.outer_square_shape.hexagon}" value="HEXAGON" />
+						<comboitem label="${labels.survey.collect_earth.plot_layout.outer_polygon_shape.square}" value="SQUARE" />
+						<comboitem label="${labels.survey.collect_earth.plot_layout.outer_polygon_shape.circle}" value="CIRCLE" />
+						<comboitem label="${labels.survey.collect_earth.plot_layout.outer_polygon_shape.hexagon}" value="HEXAGON" />
 					</combobox>
 				</fieldErrorHandler>
 				<space width="30px" />
 				<label
-					value="${labels.survey.collect_earth.plot_layout.outer_square_size}:" />
+					value="${labels.survey.collect_earth.plot_layout.outer_polygon_size}:" />
 				<fieldErrorHandler
-					message="@load(vmsgs['collectEarthOuterSquareSize'])">
+					message="@load(vmsgs['collectEarthOuterPolygonSize'])">
 					<combobox rows="1"
-						disabled="@load(not fx.collectEarthShowOuterSquare)"
-						selectedItem="@load(fx.collectEarthOuterSquareSize) @save(fx.collectEarthOuterSquareSize)"
+						disabled="@load(not fx.collectEarthShowOuterPolygon)"
+						selectedItem="@load(fx.collectEarthOuterPolygonSize) @save(fx.collectEarthOuterPolygonSize)"
 						onChange="@command('applyChanges')">
 						<comboitem label="60 m" value="60" />
 						<comboitem label="100 m" value="100" />
