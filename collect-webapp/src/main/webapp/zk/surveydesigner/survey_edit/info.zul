@@ -129,37 +129,38 @@
 						checked="@load(fx.collectEarthShowOuterPolygon eq true) @save(fx.collectEarthShowOuterPolygon)"
 						onCheck="@command('applyChanges')" />
 				</fieldErrorHandler>
-				<space width="100px" />
-				<label
-					value="${labels.survey.collect_earth.plot_layout.outer_polygon_shape}:" />
-				<fieldErrorHandler
-					message="@load(vmsgs['collectEarthOuterPolygonShape'])">
-					<combobox rows="1"
-						disabled="@load(not fx.collectEarthShowOuterPolygon)"
-						selectedItem="@load(fx.collectEarthOuterPolygonShape) @save(fx.collectEarthOuterPolygonShape)"
-						onChange="@command('applyChanges')">
-						<comboitem label="${labels.survey.collect_earth.plot_layout.outer_polygon_shape.square}" value="SQUARE" />
-						<comboitem label="${labels.survey.collect_earth.plot_layout.outer_polygon_shape.circle}" value="CIRCLE" />
-						<comboitem label="${labels.survey.collect_earth.plot_layout.outer_polygon_shape.hexagon}" value="HEXAGON" />
-					</combobox>
-				</fieldErrorHandler>
-				<space width="30px" />
-				<label
-					value="${labels.survey.collect_earth.plot_layout.outer_polygon_size}:" />
-				<fieldErrorHandler
-					message="@load(vmsgs['collectEarthOuterPolygonSize'])">
-					<combobox rows="1"
-						disabled="@load(not fx.collectEarthShowOuterPolygon)"
-						selectedItem="@load(fx.collectEarthOuterPolygonSize) @save(fx.collectEarthOuterPolygonSize)"
-						onChange="@command('applyChanges')">
-						<comboitem label="60 m" value="60" />
-						<comboitem label="100 m" value="100" />
-						<comboitem label="150 m" value="150" />
-						<comboitem label="200 m" value="200" />
-						<comboitem label="300 m" value="300" />
-						<comboitem label="500 m" value="500" />
-					</combobox>
-				</fieldErrorHandler>
+				<hlayout visible="@load(fx.collectEarthShowOuterPolygon)">
+					<space width="100px" />
+					<label
+						value="${labels.survey.collect_earth.plot_layout.outer_polygon_shape.$}:" />
+					<fieldErrorHandler
+						message="@load(vmsgs['collectEarthOuterPolygonShape'])">
+						<combobox rows="1"
+							disabled="@load(not fx.collectEarthShowOuterPolygon)"
+							selectedItem="@load(fx.collectEarthOuterPolygonShape) @save(fx.collectEarthOuterPolygonShape)"
+							onChange="@command('applyChanges')">
+							<comboitem label="${labels.survey.collect_earth.plot_layout.outer_polygon_shape.square}" value="SQUARE" />
+							<comboitem label="${labels.survey.collect_earth.plot_layout.outer_polygon_shape.hexagon}" value="HEXAGON" />
+						</combobox>
+					</fieldErrorHandler>
+					<space width="30px" />
+					<label
+						value="${labels.survey.collect_earth.plot_layout.outer_polygon_size}:" />
+					<fieldErrorHandler
+						message="@load(vmsgs['collectEarthOuterPolygonSize'])">
+						<combobox rows="1"
+							disabled="@load(not fx.collectEarthShowOuterPolygon)"
+							selectedItem="@load(fx.collectEarthOuterPolygonSize) @save(fx.collectEarthOuterPolygonSize)"
+							onChange="@command('applyChanges')">
+							<comboitem label="60 m" value="60" />
+							<comboitem label="100 m" value="100" />
+							<comboitem label="150 m" value="150" />
+							<comboitem label="200 m" value="200" />
+							<comboitem label="300 m" value="300" />
+							<comboitem label="500 m" value="500" />
+						</combobox>
+					</fieldErrorHandler>
+				</hlayout>
 			</hlayout>
 		</groupbox>
 
