@@ -158,6 +158,9 @@
 							<comboitem label="200 m" value="200" />
 							<comboitem label="300 m" value="300" />
 							<comboitem label="500 m" value="500" />
+							<comboitem label="1 km" value="1000" />
+							<comboitem label="1.5 km" value="1500" />
+							<comboitem label="2 km" value="2000" />
 						</combobox>
 					</fieldErrorHandler>
 				</hlayout>
