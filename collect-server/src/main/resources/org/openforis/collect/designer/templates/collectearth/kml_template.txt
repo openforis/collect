@@ -163,44 +163,22 @@ PLACEHOLDER_FOR_EXTRA_CSV_DATA
    		
    		<#else>   
         
+        <MultiGeometry>
         <Polygon id="poly_${placemark.placemarkId}">
         	<outerBoundaryIs>
 				<LinearRing>
 					<extrude>0</extrude>
-   					
+
 					<coordinates>
 					<#-- Iterate over shape coordinates, store values in variable placemark -- START -->
 					<#list placemark.shape as coord>
 						${coord.longitude},${coord.latitude},0
-					</#list>  
-					<#-- Iterate over shape points -- END -->
-					<#list placemark.buffers as buffer>
-						<#-- Iterate over buffer polygons -- START -->
-						<#list buffer.shape as coord>
-							${coord.longitude},${coord.latitude},0
-						</#list>  
 					</#list>
-					</coordinates>
-				</LinearRing>
-			</outerBoundaryIs>
-			
-			<#list placemark.buffers as buffer>
-			<outerBoundaryIs>
-				<LinearRing>
-					<extrude>0</extrude>
-   					
-					<coordinates>
-					<#-- Iterate over shape coordinates, store values in variable placemark -- START -->
-					<#list buffer.shape as coord>
-						${coord.longitude},${coord.latitude},0
-					</#list>  
 					<#-- Iterate over shape points -- END -->
 					</coordinates>
 				</LinearRing>
 			</outerBoundaryIs>
-			</#list>
-			
-			
+
 			<innerBoundaryIs>
 			<#list placemark.points as square>
 
@@ -211,7 +189,7 @@ PLACEHOLDER_FOR_EXTRA_CSV_DATA
 		           </#list>
 		          </coordinates>
 		        </LinearRing>
-		        
+
 		        <#if square.points?? >
 				<#list square.points as innerpoint>
 
@@ -222,14 +200,32 @@ PLACEHOLDER_FOR_EXTRA_CSV_DATA
 					   </#list>
 					  </coordinates>
 					</LinearRing>
-				 
+
 				  </#list>
 				  </#if>
-		     
-		      </#list>  
+
+		      </#list>
 		       </innerBoundaryIs>
    		</Polygon>
-   		
+
+		<#-- One extra, unfilled outer polygon per configured buffer/outer-polygon distance -- START -->
+		<#list placemark.buffers as buffer>
+		<Polygon id="poly_${placemark.placemarkId}_buffer_${buffer_index}">
+			<outerBoundaryIs>
+				<LinearRing>
+					<extrude>0</extrude>
+					<coordinates>
+					<#list buffer.shape as coord>
+						${coord.longitude},${coord.latitude},0
+					</#list>
+					</coordinates>
+				</LinearRing>
+			</outerBoundaryIs>
+		</Polygon>
+		</#list>
+		<#-- One extra, unfilled outer polygon per configured buffer/outer-polygon distance -- END -->
+   		</MultiGeometry>
+
    		</#if>
 	</Placemark>
 	
