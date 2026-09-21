@@ -32,6 +32,21 @@ ${html_for_balloon}
 	</LineStyle>
 </Style>
 
+	<Style id="reference-area-style">
+		<#-- the reference area only gives context: thinner and fainter than the plot boundary, and with no balloon of its own -->
+		<BalloonStyle>
+			<displayMode>hide</displayMode>
+		</BalloonStyle>
+		<PolyStyle>
+			<fill>0</fill>
+		</PolyStyle>
+		<LineStyle>
+			<color>8800FFFF</color>
+			<colorMode>normal</colorMode>
+			<width>1</width>
+		</LineStyle>
+	</Style>
+
 	<Style id="red-line-style">
 		<LineStyle>
 			<color>#a00000ff</color>
@@ -112,6 +127,29 @@ ${html_for_balloon}
 	    </Placemark>
     </#if>
     
+    <#if placemark.buffers?has_content >
+	    <Placemark>
+	    	<styleUrl>#reference-area-style</styleUrl>
+			<MultiGeometry>
+			<#-- One unfilled reference area per distance in distance_to_buffers -->
+			<#list placemark.buffers as referenceArea>
+				<Polygon id="poly_${placemark.placemarkId}_reference_area_${referenceArea_index}">
+					<outerBoundaryIs>
+						<LinearRing>
+							<extrude>0</extrude>
+							<coordinates>
+							<#list referenceArea.shape as coord>
+								${coord.longitude},${coord.latitude},0
+							</#list>
+							</coordinates>
+						</LinearRing>
+					</outerBoundaryIs>
+				</Polygon>
+			</#list>
+			</MultiGeometry>
+	    </Placemark>
+    </#if>
+
 	<Placemark id="${placemark.placemarkId}">
 		<name>${placemark.placemarkId}</name>
 		<ExtendedData>
@@ -163,7 +201,6 @@ PLACEHOLDER_FOR_EXTRA_CSV_DATA
    		
    		<#else>   
         
-        <MultiGeometry>
         <Polygon id="poly_${placemark.placemarkId}">
         	<outerBoundaryIs>
 				<LinearRing>
@@ -207,24 +244,6 @@ PLACEHOLDER_FOR_EXTRA_CSV_DATA
 		      </#list>
 		       </innerBoundaryIs>
    		</Polygon>
-
-		<#-- One extra, unfilled outer polygon per configured buffer/outer-polygon distance -- START -->
-		<#list placemark.buffers as buffer>
-		<Polygon id="poly_${placemark.placemarkId}_buffer_${buffer_index}">
-			<outerBoundaryIs>
-				<LinearRing>
-					<extrude>0</extrude>
-					<coordinates>
-					<#list buffer.shape as coord>
-						${coord.longitude},${coord.latitude},0
-					</#list>
-					</coordinates>
-				</LinearRing>
-			</outerBoundaryIs>
-		</Polygon>
-		</#list>
-		<#-- One extra, unfilled outer polygon per configured buffer/outer-polygon distance -- END -->
-   		</MultiGeometry>
 
    		</#if>
 	</Placemark>

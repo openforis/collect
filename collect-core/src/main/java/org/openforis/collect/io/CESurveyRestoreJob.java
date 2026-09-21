@@ -11,9 +11,10 @@ import java.util.zip.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.io.metadata.IdmlImportTask;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
+import org.openforis.collect.io.metadata.collectearth.CollectEarthExternalServices;
+import org.openforis.collect.io.metadata.collectearth.CollectEarthPlotLayout;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
@@ -119,7 +120,6 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 
 	private static class CEPropertiesImportTask extends Task {
 
-		private static final double[] PREDEFINED_PLOT_AREAS = new double[]{0.25d, 0.50d, 1.0d, 5.0d, 10.0d};
 		// input
 		private SurveyManager surveyManager;
 		private CollectSurvey survey;
@@ -128,27 +128,9 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 		@Override
 		protected void execute() throws Throwable {
 			Properties p = loadPropertiesFromFile();
-			CollectAnnotations annotations = survey.getAnnotations();
-			annotations.setBingMapsKey((String) p.get("bing_maps_key"));
-			annotations.setBingMapsEnabled(Boolean.parseBoolean(p.getProperty("open_bing_maps")));
-			//annotations.setPlanetMapsKey((String) p.get("planet_maps_key"));
-			annotations.setPlanetMapsEnabled(Boolean.parseBoolean(p.getProperty("open_planet_maps")));
-
-			annotations.setEarthMapEnabled(Boolean.parseBoolean(p.getProperty("open_earth_map")));
-			annotations.setYandexMapsEnabled(Boolean.parseBoolean(p.getProperty("open_yandex_maps")));
-			annotations.setStreetViewEnabled(Boolean.parseBoolean(p.getProperty("open_street_view")));
-			annotations.setGEEExplorerEnabled(Boolean.parseBoolean(p.getProperty("open_earth_engine")));
-			annotations.setGEECodeEditorEnabled(Boolean.parseBoolean(p.getProperty("open_gee_playground")));
-			annotations.setGEEAppEnabled(Boolean.parseBoolean(p.getProperty("open_gee_app")));
-			annotations.setSecureWatchEnabled(Boolean.parseBoolean(p.getProperty("open_maxar_securewatch")));
-			annotations.setCollectEarthSamplePoints(getIntegerProperty(p, "number_of_sampling_points_in_plot", 9));
-			annotations.setCollectEarthPlotArea(calculatePlotArea(p));
-			Integer outerPolygonSize = calculateOuterPolygonSize(p);
-			annotations.setShowOuterPolygon(outerPolygonSize != null);
-			if (outerPolygonSize != null) {
-				annotations.setOuterPolygonSize(outerPolygonSize);
-				annotations.setOuterPolygonShape(getOuterPolygonShape(p));
-			}
+			// the Planet API key is left out on purpose: it belongs to the interpreter, not to the survey
+			CollectEarthExternalServices.fromProjectProperties(p).saveTo(survey);
+			CollectEarthPlotLayout.fromProjectProperties(p).saveTo(survey);
 			surveyManager.save(survey);
 		}
 
@@ -162,57 +144,6 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 				IOUtils.closeQuietly(is);
 			}
 			return p;
-		}
-
-		private double calculatePlotArea(Properties p) {
-			int numberOfSamplingPoints = getIntegerProperty(p, "number_of_sampling_points_in_plot", 9);
-			int distanceBetweenSamplePoints = getIntegerProperty(p, "distance_between_sample_points", 10);
-			int distanceToPlotBoundaries = getIntegerProperty(p, "distance_to_plot_boundaries", 5);
-
-			double plotArea = Math.pow((Math.sqrt(numberOfSamplingPoints) - 1) * distanceBetweenSamplePoints + (distanceToPlotBoundaries * 2), 2);
-			double plotAreaHa = plotArea / 10000;
-			double roundedPlotAreaHa = 1.0d;
-			if (plotAreaHa > 0) {
-				for (double predefinedValue : PREDEFINED_PLOT_AREAS) {
-					if (plotAreaHa <= predefinedValue) {
-						roundedPlotAreaHa = predefinedValue;
-						break;
-					}
-				}
-			}
-			return roundedPlotAreaHa;
-		}
-
-		private Integer calculateOuterPolygonSize(Properties p) {
-			// distance_to_buffers can hold a comma separated list of buffer distances (e.g. "70,112,194");
-			// only the first one is restored as the (single) outer polygon configured in the survey designer
-			String distanceToBuffers = p.getProperty("distance_to_buffers");
-			if (StringUtils.isBlank(distanceToBuffers)) {
-				return null;
-			}
-			String firstDistance = StringUtils.split(distanceToBuffers, ',')[0];
-			return Integer.parseInt(firstDistance.trim()) * 2;
-		}
-
-		private CollectAnnotations.OuterPolygonShape getOuterPolygonShape(Properties p) {
-			String shape = p.getProperty("buffer_shape");
-			if (StringUtils.isNotBlank(shape)) {
-				try {
-					return CollectAnnotations.OuterPolygonShape.valueOf(shape);
-				} catch (IllegalArgumentException e) {
-					// fall back to default below
-				}
-			}
-			return CollectAnnotations.OuterPolygonShape.SQUARE;
-		}
-
-		private int getIntegerProperty(Properties p, String key, int defaultValue) {
-			String valueStr = p.getProperty(key);
-			if (StringUtils.isBlank(valueStr)) {
-				return defaultValue;
-			} else {
-				return Integer.parseInt(valueStr);
-			}
 		}
 
 		public void setSurveyManager(SurveyManager surveyManager) {

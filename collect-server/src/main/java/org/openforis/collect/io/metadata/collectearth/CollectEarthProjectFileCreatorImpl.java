@@ -18,7 +18,6 @@ import org.openforis.collect.io.metadata.collectearth.balloon.CollectEarthBalloo
 import org.openforis.collect.io.metadata.collectearth.balloon.HtmlUnicodeEscaperUtil;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FileWrapper;
 import org.openforis.collect.model.SurveyFile;
@@ -57,7 +56,6 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private static final String TEST_PLOTS_FILE_NAME = "test_plots.ced";
 	private static final String CUBE_FILE_NAME = "collectEarthCubes.xml.fmt";
 	private static final String PROJECT_PROPERTIES_FILE_NAME = "project_definition.properties";
-	private static final double HECTARES_TO_SQUARE_METERS_CONVERSION_FACTOR = 10000d;
 	private static final String README_FILE = "README.txt";
 	private static final String GRID_FOLDER_NAME = "grid";
 
@@ -155,20 +153,9 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 			p.put("metadata_file", "${project_path}/" + PLACEMARK_FILE_NAME);
 			p.put("template", "${project_path}/kml_template.fmt");
 			p.put("csv", "${project_path}/" + determineSelectedGridFileName(survey));
-			p.put("sample_shape", "SQUARE");
-			p.put("distance_between_sample_points", String.valueOf(calculateDistanceBetweenSamplePoints(survey)));
-			p.put("distance_to_plot_boundaries", String.valueOf(calculateFrameDistance(survey)));
-			p.put("number_of_sampling_points_in_plot", String.valueOf(survey.getAnnotations().getCollectEarthSamplePoints()));
-			p.put("inner_point_side", "2");
-			if (survey.getAnnotations().isShowOuterPolygon()) {
-				p.put("distance_to_buffers", String.valueOf(calculateOuterPolygonDistance(survey)));
-				p.put("buffer_shape", survey.getAnnotations().getOuterPolygonShape().name());
-			}
+			CollectEarthPlotLayout.fromSurvey(survey).writeProjectProperties(p);
+			CollectEarthExternalServices.fromSurvey(survey).writeProjectProperties(p);
 			p.put("ui_language", language);
-			p.put("open_gee_app", isGEEAppEnabled(survey));
-			p.put("open_maxar_securewatch", isSecureWatchEnabled(survey));
-			p.put("open_street_view", isStreetViewEnabled(survey));
-			p.put("extra_map_url", StringUtils.trimToEmpty(getExtraMapUrl(survey)));
 			p.put("coordinates_reference_system", getSRSUsed(survey));
 	
 			p.store(writer, null);
@@ -192,58 +179,6 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 			throw new IllegalArgumentException("Yoy must use one single Spatial Reference System in your survey");
 		}
 		return spatialReferenceSystems.get(0).getId();
-	}
-
-	private String getExtraMapUrl(CollectSurvey survey){
-		CollectAnnotations annotations = survey.getAnnotations();
-		return annotations.getExtraMapUrl();
-	}
-
-	private String isGEEAppEnabled(CollectSurvey survey){
-		CollectAnnotations annotations = survey.getAnnotations();
-		return annotations.isGEEAppEnabled()?"true":"false";
-	}
-
-	private String isSecureWatchEnabled(CollectSurvey survey){
-		CollectAnnotations annotations = survey.getAnnotations();
-		return annotations.isSecureWatchEnabled()?"true":"false";
-	}
-
-	private String isStreetViewEnabled(CollectSurvey survey){
-		CollectAnnotations annotations = survey.getAnnotations();
-		return annotations.isStreetViewEnabled()?"true":"false";
-	}
-
-	private int calculateFrameDistance(CollectSurvey survey) {
-		CollectAnnotations annotations = survey.getAnnotations();
-		double plotWidth = Math.sqrt(annotations.getCollectEarthPlotArea() * HECTARES_TO_SQUARE_METERS_CONVERSION_FACTOR);
-		int samplePoints = annotations.getCollectEarthSamplePoints();
-		if (samplePoints == 0) {
-			return Double.valueOf(Math.floor((double) (plotWidth / 2))).intValue();
-		}
-		double pointsPerSide = Math.sqrt(samplePoints);
-		int frameDistance = Double.valueOf(Math.floor((double) ((plotWidth / pointsPerSide) / 2))).intValue();
-		return frameDistance;
-	}
-
-	private int calculateOuterPolygonDistance(CollectSurvey survey) {
-		// distance_to_buffers is the offset (in meters) from the plot center to each side
-		// of the outer polygon, i.e. half of its configured side length
-		return survey.getAnnotations().getOuterPolygonSize() / 2;
-	}
-
-	private int calculateDistanceBetweenSamplePoints(CollectSurvey survey) {
-		CollectAnnotations annotations = survey.getAnnotations();
-
-		double plotWidth = Math.sqrt(annotations.getCollectEarthPlotArea() * HECTARES_TO_SQUARE_METERS_CONVERSION_FACTOR);
-		int samplePoints = annotations.getCollectEarthSamplePoints();
-		if (samplePoints <= 1) {
-			return 0;
-		}
-		double pointsPerWidth = Math.sqrt(samplePoints);
-		int frameDistance = calculateFrameDistance(survey);
-		int distanceInMeters = Double.valueOf(Math.floor((double) ((plotWidth - (frameDistance * 2)) / ( pointsPerWidth - 1 ) ))).intValue();
-		return distanceInMeters;
 	}
 
 	private File generateBalloon(CollectSurvey survey, String language) throws IOException {
