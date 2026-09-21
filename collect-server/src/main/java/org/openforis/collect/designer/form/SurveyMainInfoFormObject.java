@@ -34,15 +34,10 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	private Integer collectEarthDistanceBetweenPlots;
 	private String collectEarthReferenceAreaShape;
 	private Integer collectEarthReferenceAreaDistance;
-	private String bingMapsKey;
 	private String planetMapsKey;
 	private String extraMapUrl;
-	private boolean openBingMaps;
 	private boolean openEarthMap;
 	private boolean openPlanetMaps;
-	private boolean openYandexMaps;
-	private boolean openGEEExplorer;
-	private boolean openGEECodeEditor;
 	private boolean openGEEApp;
 	private Date geeAppDateFrom;
 	private Date geeAppDateTo;
@@ -71,16 +66,11 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 
 		CollectAnnotations annotations = source.getAnnotations();
 		loadCollectEarthPlotLayout(CollectEarthPlotLayout.fromSurvey(source));
-		bingMapsKey = annotations.getBingMapsKey();
 		planetMapsKey = annotations.getPlanetMapsKey();
 		extraMapUrl = annotations.getExtraMapUrl();
-		openBingMaps = annotations.isBingMapsEnabled();
 		openEarthMap = annotations.isEarthMapEnabled();
 		openPlanetMaps = annotations.isPlanetMapsEnabled();
-		openYandexMaps = annotations.isYandexMapsEnabled();
 		openStreetView = annotations.isStreetViewEnabled();
-		openGEEExplorer = annotations.isGEEExplorerEnabled();
-		openGEECodeEditor = annotations.isGEECodeEditorEnabled();
 		openGEEApp = annotations.isGEEAppEnabled();
 		geeAppDateFrom = parseDate(annotations.getGEEAppDateFrom());
 		geeAppDateTo = parseDate(annotations.getGEEAppDateTo());
@@ -170,15 +160,11 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 			// the options that the selected plot shape does not use keep their values, in case the shape is changed again
 			toCollectEarthPlotLayout().saveTo(dest);
 		}
-		annotations.setBingMapsKey(bingMapsKey);
 		annotations.setPlanetMapsKey(nullIfEmpty(planetMapsKey));
 		annotations.setExtraMapUrl(extraMapUrl);
-		annotations.setBingMapsEnabled( openBingMaps );
 		annotations.setEarthMapEnabled( openEarthMap );
 		annotations.setPlanetMapsEnabled( openPlanetMaps );
-		annotations.setYandexMapsEnabled( openYandexMaps );
 		annotations.setStreetViewEnabled( openStreetView );
-		annotations.setGEECodeEditorEnabled( openGEECodeEditor );
 		annotations.setGEEAppEnabled( openGEEApp );
 		annotations.setGEEAppDateFrom(formatDate(geeAppDateFrom));
 		annotations.setGEEAppDateTo(formatDate(geeAppDateTo));
@@ -188,7 +174,6 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		annotations.setPlanetTfoDateTo(nullIfEmpty(planetTfoDateTo));
 		annotations.setSecureWatchEnabled( openSecureWatch );
 		annotations.setSecureWatchUrl(secureWatchUrl);
-		annotations.setGEEExplorerEnabled(openGEEExplorer );
 		annotations.setKeyChangeAllowed(keyChangeAllowed);
 	}
 
@@ -393,14 +378,6 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		this.secureWatchUrl = secureWatchUrl;
 	}
 
-	public String getBingMapsKey() {
-		return bingMapsKey;
-	}
-
-	public void setBingMapsKey(String bingMapsKey) {
-		this.bingMapsKey = bingMapsKey;
-	}
-
 	public String getExtraMapUrl() {
 		return extraMapUrl;
 	}
@@ -409,44 +386,12 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		this.extraMapUrl = extraMapUrl;
 	}
 
-	public boolean isOpenBingMaps() {
-		return openBingMaps;
-	}
-
-	public void setOpenBingMaps(boolean openBingMaps) {
-		this.openBingMaps = openBingMaps;
-	}
-
 	public boolean isOpenEarthMap() {
 		return openEarthMap;
 	}
 
 	public void setOpenEarthMap(boolean openEarthMap) {
 		this.openEarthMap = openEarthMap;
-	}
-
-	public boolean isOpenYandexMaps() {
-		return openYandexMaps;
-	}
-
-	public void setOpenYandexMaps(boolean openYandexMaps) {
-		this.openYandexMaps = openYandexMaps;
-	}
-
-	public boolean isOpenGEEExplorer() {
-		return openGEEExplorer;
-	}
-
-	public void setOpenGEEExplorer(boolean openGEEExplorer) {
-		this.openGEEExplorer = openGEEExplorer;
-	}
-
-	public boolean isOpenGEECodeEditor() {
-		return openGEECodeEditor;
-	}
-
-	public void setOpenGEECodeEditor(boolean openGEECodeEditor) {
-		this.openGEECodeEditor = openGEECodeEditor;
 	}
 
 	public boolean isOpenGEEApp() {

@@ -116,7 +116,6 @@ public class CollectAnnotations {
 		COLLECT_EARTH_SHOW_READONLY_FIELD(new QName(COLLECT_EARTH_NAMESPACE_URI, "showreadonlyfield"), false),
 		COLLECT_EARTH_INCLUDE_IN_HEADER(new QName(COLLECT_EARTH_NAMESPACE_URI, "includeinheader"), false),
 		COLLECT_EARTH_PLOT_AREA(new QName(COLLECT_EARTH_NAMESPACE_URI, "plotarea"), 1d), //legacy: replaced by the distance between sample points and the margin with the plot border
-		COLLECT_EARTH_BING_KEY(new QName(COLLECT_EARTH_NAMESPACE_URI, "bingKey"), "GENERATE YOUR OWN BING MAPS KEY AT https://www.bingmapsportal.com"),
 		COLLECT_EARTH_PLANET_KEY(new QName(COLLECT_EARTH_NAMESPACE_URI, "planetKey")), //shared by everybody who opens the project file; empty leaves the key of each interpreter alone
 		COLLECT_EARTH_EXTRA_MAP_URL(new QName(COLLECT_EARTH_NAMESPACE_URI, "extraMapUrl")),
 		COLLECT_EARTH_SAMPLE_POINTS(new QName(COLLECT_EARTH_NAMESPACE_URI, "samplepoints"), 25), //0, 1, 9 (3x3), 25 (5x5), 49 (7x7)
@@ -128,12 +127,8 @@ public class CollectAnnotations {
 		COLLECT_EARTH_DISTANCE_BETWEEN_PLOTS(new QName(COLLECT_EARTH_NAMESPACE_URI, "distanceBetweenPlots"), 100), //meters
 		COLLECT_EARTH_REFERENCE_AREA_SHAPE(new QName(COLLECT_EARTH_NAMESPACE_URI, "referenceAreaShape"), CollectEarthReferenceAreaShape.NONE),
 		COLLECT_EARTH_REFERENCE_AREA_DISTANCE(new QName(COLLECT_EARTH_NAMESPACE_URI, "referenceAreaDistance")), //meters from the plot center
-		COLLECT_EARTH_OPEN_BING_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openBingMaps"), false),
 		COLLECT_EARTH_OPEN_EARTH_MAP(new QName(COLLECT_EARTH_NAMESPACE_URI, "openEarthMap"), false),
 		COLLECT_EARTH_OPEN_PLANET_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openPlanetMaps"), true),
-		COLLECT_EARTH_OPEN_YANDEX_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openYandexMaps"), false),
-		COLLECT_EARTH_OPEN_GEE_EXPLORER(new QName(COLLECT_EARTH_NAMESPACE_URI, "openExplorer"), false),
-		COLLECT_EARTH_OPEN_GEE_CODE_EDITOR(new QName(COLLECT_EARTH_NAMESPACE_URI, "openCodeEditor"), false),
 		COLLECT_EARTH_OPEN_GEE_APP(new QName(COLLECT_EARTH_NAMESPACE_URI, "openGEEApp"), true),
 		COLLECT_EARTH_OPEN_SECUREWATCH(new QName(COLLECT_EARTH_NAMESPACE_URI, "openSecureWatch"), false),
 		COLLECT_EARTH_SECUREWATCH_URL(new QName(COLLECT_EARTH_NAMESPACE_URI, "secureWatchUrl")),
@@ -353,13 +348,6 @@ public class CollectAnnotations {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_PLOT_AREA, value);
 	}
 
-	public String getBingMapsKey() {
-		return getAnnotationValueString(survey, Annotation.COLLECT_EARTH_BING_KEY);
-	}
-
-	public void setBingMapsKey(String value) {
-		setAnnotationValue(survey, Annotation.COLLECT_EARTH_BING_KEY, value);
-	}
 	public String getPlanetMapsKey() {
 		return getAnnotationValueString(survey, Annotation.COLLECT_EARTH_PLANET_KEY);
 	}
@@ -374,14 +362,6 @@ public class CollectAnnotations {
 
 	public void setExtraMapUrl(String value) {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_EXTRA_MAP_URL, value);
-	}
-
-	public boolean isBingMapsEnabled() {
-		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_BING_MAPS);
-	}
-
-	public void setBingMapsEnabled( boolean value) {
-		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_BING_MAPS, value);
 	}
 
 	public boolean isEarthMapEnabled() {
@@ -400,36 +380,12 @@ public class CollectAnnotations {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_PLANET_MAPS, value);
 	}
 
-	public boolean isYandexMapsEnabled() {
-		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_YANDEX_MAPS);
-	}
-
-	public void setYandexMapsEnabled( boolean value) {
-		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_YANDEX_MAPS, value);
-	}
-
-	public boolean isGEEExplorerEnabled() {
-		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_GEE_EXPLORER);
-	}
-
-	public void setGEEExplorerEnabled( boolean value) {
-		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_GEE_EXPLORER, value);
-	}
-
-	public boolean isGEECodeEditorEnabled() {
-		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_GEE_CODE_EDITOR);
-	}
-
 	public boolean isGEEAppEnabled() {
 		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_GEE_APP);
 	}
 
 	public boolean isSecureWatchEnabled() {
 		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_SECUREWATCH);
-	}
-
-	public void setGEECodeEditorEnabled( boolean value) {
-		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_GEE_CODE_EDITOR, value);
 	}
 
 	public void setGEEAppEnabled( boolean value) {

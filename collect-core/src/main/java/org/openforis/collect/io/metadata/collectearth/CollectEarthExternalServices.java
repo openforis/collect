@@ -41,12 +41,6 @@ public class CollectEarthExternalServices {
 	private String secureWatchUrl;
 	private boolean streetViewEnabled;
 	private String extraMapUrl;
-	// only configurable in older surveys: Collect Earth does not open these any more
-	private boolean bingMapsEnabled;
-	private String bingMapsKey;
-	private boolean yandexMapsEnabled;
-	private boolean geeExplorerEnabled;
-	private boolean geeCodeEditorEnabled;
 
 	public static CollectEarthExternalServices fromSurvey(CollectSurvey survey) {
 		CollectAnnotations annotations = survey.getAnnotations();
@@ -65,11 +59,6 @@ public class CollectEarthExternalServices {
 		services.secureWatchUrl = annotations.getSecureWatchUrl();
 		services.streetViewEnabled = annotations.isStreetViewEnabled();
 		services.extraMapUrl = annotations.getExtraMapUrl();
-		services.bingMapsEnabled = annotations.isBingMapsEnabled();
-		services.bingMapsKey = annotations.getBingMapsKey();
-		services.yandexMapsEnabled = annotations.isYandexMapsEnabled();
-		services.geeExplorerEnabled = annotations.isGEEExplorerEnabled();
-		services.geeCodeEditorEnabled = annotations.isGEECodeEditorEnabled();
 		return services;
 	}
 
@@ -89,11 +78,6 @@ public class CollectEarthExternalServices {
 		annotations.setSecureWatchUrl(secureWatchUrl);
 		annotations.setStreetViewEnabled(streetViewEnabled);
 		annotations.setExtraMapUrl(extraMapUrl);
-		annotations.setBingMapsEnabled(bingMapsEnabled);
-		annotations.setBingMapsKey(bingMapsKey);
-		annotations.setYandexMapsEnabled(yandexMapsEnabled);
-		annotations.setGEEExplorerEnabled(geeExplorerEnabled);
-		annotations.setGEECodeEditorEnabled(geeCodeEditorEnabled);
 	}
 
 	public static CollectEarthExternalServices fromProjectProperties(Properties p) {
@@ -112,11 +96,6 @@ public class CollectEarthExternalServices {
 		services.secureWatchUrl = getStringProperty(p, "secure_watch_url");
 		services.streetViewEnabled = getBooleanProperty(p, "open_street_view");
 		services.extraMapUrl = getStringProperty(p, "extra_map_url");
-		services.bingMapsEnabled = getBooleanProperty(p, "open_bing_maps");
-		services.bingMapsKey = getStringProperty(p, "bing_maps_key");
-		services.yandexMapsEnabled = getBooleanProperty(p, "open_yandex_maps");
-		services.geeExplorerEnabled = getBooleanProperty(p, "open_earth_engine");
-		services.geeCodeEditorEnabled = getBooleanProperty(p, "open_gee_playground");
 		return services;
 	}
 
@@ -297,45 +276,5 @@ public class CollectEarthExternalServices {
 
 	public void setExtraMapUrl(String extraMapUrl) {
 		this.extraMapUrl = extraMapUrl;
-	}
-
-	public boolean isBingMapsEnabled() {
-		return bingMapsEnabled;
-	}
-
-	public void setBingMapsEnabled(boolean bingMapsEnabled) {
-		this.bingMapsEnabled = bingMapsEnabled;
-	}
-
-	public String getBingMapsKey() {
-		return bingMapsKey;
-	}
-
-	public void setBingMapsKey(String bingMapsKey) {
-		this.bingMapsKey = bingMapsKey;
-	}
-
-	public boolean isYandexMapsEnabled() {
-		return yandexMapsEnabled;
-	}
-
-	public void setYandexMapsEnabled(boolean yandexMapsEnabled) {
-		this.yandexMapsEnabled = yandexMapsEnabled;
-	}
-
-	public boolean isGEEExplorerEnabled() {
-		return geeExplorerEnabled;
-	}
-
-	public void setGEEExplorerEnabled(boolean geeExplorerEnabled) {
-		this.geeExplorerEnabled = geeExplorerEnabled;
-	}
-
-	public boolean isGEECodeEditorEnabled() {
-		return geeCodeEditorEnabled;
-	}
-
-	public void setGEECodeEditorEnabled(boolean geeCodeEditorEnabled) {
-		this.geeCodeEditorEnabled = geeCodeEditorEnabled;
 	}
 }
