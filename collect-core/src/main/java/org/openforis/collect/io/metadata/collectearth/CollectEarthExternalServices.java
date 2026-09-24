@@ -18,6 +18,22 @@ import org.openforis.collect.model.CollectSurvey;
  */
 public class CollectEarthExternalServices {
 
+	/** Property keys used in the Collect Earth project file (ce.properties) */
+	public static final String PROPERTY_KEY_OPEN_GEE_APP = "open_gee_app";
+	public static final String PROPERTY_KEY_GEE_APP_DATE_FROM = "geeapp_date_from";
+	public static final String PROPERTY_KEY_GEE_APP_DATE_TO = "geeapp_date_to";
+	public static final String PROPERTY_KEY_OPEN_EARTH_MAP = "open_earth_map";
+	public static final String PROPERTY_KEY_OPEN_ESRI_WAYBACK = "open_esri_wayback";
+	public static final String PROPERTY_KEY_OPEN_PLANET_MAPS = "open_planet_maps";
+	public static final String PROPERTY_KEY_PLANET_MAPS_KEY = "planet_maps_key";
+	public static final String PROPERTY_KEY_PLANET_MAPS_USE_TFO = "planet_maps_use_tfo";
+	public static final String PROPERTY_KEY_PLANET_TFO_DATE_FROM = "planet_tfo_date_from";
+	public static final String PROPERTY_KEY_PLANET_TFO_DATE_TO = "planet_tfo_date_to";
+	public static final String PROPERTY_KEY_OPEN_MAXAR_SECUREWATCH = "open_maxar_securewatch";
+	public static final String PROPERTY_KEY_SECURE_WATCH_URL = "secure_watch_url";
+	public static final String PROPERTY_KEY_OPEN_STREET_VIEW = "open_street_view";
+	public static final String PROPERTY_KEY_EXTRA_MAP_URL = "extra_map_url";
+
 	/** First mosaic published by the Planet Tropical Forest Observatory */
 	private static final int FIRST_MONTHLY_MOSAIC_YEAR = 2020;
 	private static final int FIRST_MONTHLY_MOSAIC_MONTH = 9;
@@ -82,20 +98,20 @@ public class CollectEarthExternalServices {
 
 	public static CollectEarthExternalServices fromProjectProperties(Properties p) {
 		CollectEarthExternalServices services = new CollectEarthExternalServices();
-		services.geeAppEnabled = getBooleanProperty(p, "open_gee_app");
-		services.geeAppDateFrom = getStringProperty(p, "geeapp_date_from");
-		services.geeAppDateTo = getStringProperty(p, "geeapp_date_to");
-		services.earthMapEnabled = getBooleanProperty(p, "open_earth_map");
-		services.esriWaybackEnabled = getBooleanProperty(p, "open_esri_wayback");
-		services.planetMapsEnabled = getBooleanProperty(p, "open_planet_maps");
-		services.planetMapsKey = getStringProperty(p, "planet_maps_key");
-		services.planetMapsUseTfo = getBooleanProperty(p, "planet_maps_use_tfo");
-		services.planetTfoDateFrom = getStringProperty(p, "planet_tfo_date_from");
-		services.planetTfoDateTo = getStringProperty(p, "planet_tfo_date_to");
-		services.secureWatchEnabled = getBooleanProperty(p, "open_maxar_securewatch");
-		services.secureWatchUrl = getStringProperty(p, "secure_watch_url");
-		services.streetViewEnabled = getBooleanProperty(p, "open_street_view");
-		services.extraMapUrl = getStringProperty(p, "extra_map_url");
+		services.geeAppEnabled = getBooleanProperty(p, PROPERTY_KEY_OPEN_GEE_APP);
+		services.geeAppDateFrom = getStringProperty(p, PROPERTY_KEY_GEE_APP_DATE_FROM);
+		services.geeAppDateTo = getStringProperty(p, PROPERTY_KEY_GEE_APP_DATE_TO);
+		services.earthMapEnabled = getBooleanProperty(p, PROPERTY_KEY_OPEN_EARTH_MAP);
+		services.esriWaybackEnabled = getBooleanProperty(p, PROPERTY_KEY_OPEN_ESRI_WAYBACK);
+		services.planetMapsEnabled = getBooleanProperty(p, PROPERTY_KEY_OPEN_PLANET_MAPS);
+		services.planetMapsKey = getStringProperty(p, PROPERTY_KEY_PLANET_MAPS_KEY);
+		services.planetMapsUseTfo = getBooleanProperty(p, PROPERTY_KEY_PLANET_MAPS_USE_TFO);
+		services.planetTfoDateFrom = getStringProperty(p, PROPERTY_KEY_PLANET_TFO_DATE_FROM);
+		services.planetTfoDateTo = getStringProperty(p, PROPERTY_KEY_PLANET_TFO_DATE_TO);
+		services.secureWatchEnabled = getBooleanProperty(p, PROPERTY_KEY_OPEN_MAXAR_SECUREWATCH);
+		services.secureWatchUrl = getStringProperty(p, PROPERTY_KEY_SECURE_WATCH_URL);
+		services.streetViewEnabled = getBooleanProperty(p, PROPERTY_KEY_OPEN_STREET_VIEW);
+		services.extraMapUrl = getStringProperty(p, PROPERTY_KEY_EXTRA_MAP_URL);
 		return services;
 	}
 
@@ -107,27 +123,27 @@ public class CollectEarthExternalServices {
 	 * ships with.
 	 */
 	public void writeProjectProperties(Properties p) {
-		p.put("open_gee_app", String.valueOf(geeAppEnabled));
+		p.put(PROPERTY_KEY_OPEN_GEE_APP, String.valueOf(geeAppEnabled));
 		// an empty date range means all the imagery that the GEE app has
-		p.put("geeapp_date_from", geeAppEnabled ? StringUtils.trimToEmpty(geeAppDateFrom) : "");
-		p.put("geeapp_date_to", geeAppEnabled ? StringUtils.trimToEmpty(geeAppDateTo) : "");
-		p.put("open_earth_map", String.valueOf(earthMapEnabled));
-		p.put("open_esri_wayback", String.valueOf(esriWaybackEnabled));
-		p.put("open_planet_maps", String.valueOf(planetMapsEnabled));
+		p.put(PROPERTY_KEY_GEE_APP_DATE_FROM, geeAppEnabled ? StringUtils.trimToEmpty(geeAppDateFrom) : "");
+		p.put(PROPERTY_KEY_GEE_APP_DATE_TO, geeAppEnabled ? StringUtils.trimToEmpty(geeAppDateTo) : "");
+		p.put(PROPERTY_KEY_OPEN_EARTH_MAP, String.valueOf(earthMapEnabled));
+		p.put(PROPERTY_KEY_OPEN_ESRI_WAYBACK, String.valueOf(esriWaybackEnabled));
+		p.put(PROPERTY_KEY_OPEN_PLANET_MAPS, String.valueOf(planetMapsEnabled));
 		if (StringUtils.isNotBlank(planetMapsKey)) {
-			p.put("planet_maps_key", planetMapsKey.trim());
+			p.put(PROPERTY_KEY_PLANET_MAPS_KEY, planetMapsKey.trim());
 		}
-		p.put("planet_maps_use_tfo", String.valueOf(planetMapsEnabled && planetMapsUseTfo));
+		p.put(PROPERTY_KEY_PLANET_MAPS_USE_TFO, String.valueOf(planetMapsEnabled && planetMapsUseTfo));
 		// an empty mosaic means the first (or the latest) one available
 		boolean tfoInUse = planetMapsEnabled && planetMapsUseTfo;
-		p.put("planet_tfo_date_from", tfoInUse ? StringUtils.trimToEmpty(planetTfoDateFrom) : "");
-		p.put("planet_tfo_date_to", tfoInUse ? StringUtils.trimToEmpty(planetTfoDateTo) : "");
-		p.put("open_maxar_securewatch", String.valueOf(secureWatchEnabled));
+		p.put(PROPERTY_KEY_PLANET_TFO_DATE_FROM, tfoInUse ? StringUtils.trimToEmpty(planetTfoDateFrom) : "");
+		p.put(PROPERTY_KEY_PLANET_TFO_DATE_TO, tfoInUse ? StringUtils.trimToEmpty(planetTfoDateTo) : "");
+		p.put(PROPERTY_KEY_OPEN_MAXAR_SECUREWATCH, String.valueOf(secureWatchEnabled));
 		if (StringUtils.isNotBlank(secureWatchUrl)) {
-			p.put("secure_watch_url", secureWatchUrl.trim());
+			p.put(PROPERTY_KEY_SECURE_WATCH_URL, secureWatchUrl.trim());
 		}
-		p.put("open_street_view", String.valueOf(streetViewEnabled));
-		p.put("extra_map_url", StringUtils.trimToEmpty(extraMapUrl));
+		p.put(PROPERTY_KEY_OPEN_STREET_VIEW, String.valueOf(streetViewEnabled));
+		p.put(PROPERTY_KEY_EXTRA_MAP_URL, StringUtils.trimToEmpty(extraMapUrl));
 	}
 
 	/**

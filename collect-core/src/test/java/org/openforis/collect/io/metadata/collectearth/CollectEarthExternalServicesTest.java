@@ -4,6 +4,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthExternalServices.PROPERTY_KEY_EXTRA_MAP_URL;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthExternalServices.PROPERTY_KEY_GEE_APP_DATE_FROM;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthExternalServices.PROPERTY_KEY_GEE_APP_DATE_TO;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthExternalServices.PROPERTY_KEY_OPEN_EARTH_MAP;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthExternalServices.PROPERTY_KEY_OPEN_ESRI_WAYBACK;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthExternalServices.PROPERTY_KEY_OPEN_GEE_APP;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthExternalServices.PROPERTY_KEY_OPEN_MAXAR_SECUREWATCH;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthExternalServices.PROPERTY_KEY_OPEN_PLANET_MAPS;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthExternalServices.PROPERTY_KEY_OPEN_STREET_VIEW;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthExternalServices.PROPERTY_KEY_PLANET_MAPS_KEY;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthExternalServices.PROPERTY_KEY_PLANET_MAPS_USE_TFO;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthExternalServices.PROPERTY_KEY_PLANET_TFO_DATE_FROM;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthExternalServices.PROPERTY_KEY_PLANET_TFO_DATE_TO;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthExternalServices.PROPERTY_KEY_SECURE_WATCH_URL;
 
 import java.util.Calendar;
 import java.util.List;
@@ -33,12 +47,12 @@ public class CollectEarthExternalServicesTest {
 	public void everyServiceIsWrittenAlsoWhenItIsSwitchedOff() {
 		// Collect Earth keeps the value of the project loaded before this one for the properties that are not present
 		Properties p = writeProjectProperties();
-		assertEquals("true", p.get("open_gee_app")); // on by default
-		assertEquals("false", p.get("open_earth_map"));
-		assertEquals("false", p.get("open_esri_wayback"));
-		assertEquals("false", p.get("open_maxar_securewatch"));
-		assertEquals("false", p.get("open_street_view"));
-		assertEquals("", p.get("extra_map_url"));
+		assertEquals("true", p.get(PROPERTY_KEY_OPEN_GEE_APP)); // on by default
+		assertEquals("false", p.get(PROPERTY_KEY_OPEN_EARTH_MAP));
+		assertEquals("false", p.get(PROPERTY_KEY_OPEN_ESRI_WAYBACK));
+		assertEquals("false", p.get(PROPERTY_KEY_OPEN_MAXAR_SECUREWATCH));
+		assertEquals("false", p.get(PROPERTY_KEY_OPEN_STREET_VIEW));
+		assertEquals("", p.get(PROPERTY_KEY_EXTRA_MAP_URL));
 	}
 
 	@Test
@@ -48,8 +62,8 @@ public class CollectEarthExternalServicesTest {
 		annotations.setGEEAppDateTo("2020-12-31");
 
 		Properties p = writeProjectProperties();
-		assertEquals("2015-06-01", p.get("geeapp_date_from"));
-		assertEquals("2020-12-31", p.get("geeapp_date_to"));
+		assertEquals("2015-06-01", p.get(PROPERTY_KEY_GEE_APP_DATE_FROM));
+		assertEquals("2020-12-31", p.get(PROPERTY_KEY_GEE_APP_DATE_TO));
 	}
 
 	@Test
@@ -59,9 +73,9 @@ public class CollectEarthExternalServicesTest {
 		annotations.setGEEAppDateTo("2020-12-31");
 
 		Properties p = writeProjectProperties();
-		assertEquals("false", p.get("open_gee_app"));
-		assertEquals("", p.get("geeapp_date_from"));
-		assertEquals("", p.get("geeapp_date_to"));
+		assertEquals("false", p.get(PROPERTY_KEY_OPEN_GEE_APP));
+		assertEquals("", p.get(PROPERTY_KEY_GEE_APP_DATE_FROM));
+		assertEquals("", p.get(PROPERTY_KEY_GEE_APP_DATE_TO));
 	}
 
 	@Test
@@ -71,16 +85,16 @@ public class CollectEarthExternalServicesTest {
 		annotations.setPlanetTfoDateTo("2021-09");
 
 		Properties p = writeProjectProperties();
-		assertEquals("true", p.get("open_planet_maps"));
-		assertEquals("false", p.get("planet_maps_use_tfo"));
-		assertEquals("", p.get("planet_tfo_date_from"));
-		assertEquals("", p.get("planet_tfo_date_to"));
+		assertEquals("true", p.get(PROPERTY_KEY_OPEN_PLANET_MAPS));
+		assertEquals("false", p.get(PROPERTY_KEY_PLANET_MAPS_USE_TFO));
+		assertEquals("", p.get(PROPERTY_KEY_PLANET_TFO_DATE_FROM));
+		assertEquals("", p.get(PROPERTY_KEY_PLANET_TFO_DATE_TO));
 
 		annotations.setPlanetMapsUseTfo(true);
 		p = writeProjectProperties();
-		assertEquals("true", p.get("planet_maps_use_tfo"));
-		assertEquals("2021-03", p.get("planet_tfo_date_from"));
-		assertEquals("2021-09", p.get("planet_tfo_date_to"));
+		assertEquals("true", p.get(PROPERTY_KEY_PLANET_MAPS_USE_TFO));
+		assertEquals("2021-03", p.get(PROPERTY_KEY_PLANET_TFO_DATE_FROM));
+		assertEquals("2021-09", p.get(PROPERTY_KEY_PLANET_TFO_DATE_TO));
 	}
 
 	@Test
@@ -89,20 +103,20 @@ public class CollectEarthExternalServicesTest {
 		annotations.setPlanetMapsUseTfo(true);
 
 		// without one, the key that the interpreter set in their own Collect Earth is left alone
-		assertNull(writeProjectProperties().get("planet_maps_key"));
+		assertNull(writeProjectProperties().get(PROPERTY_KEY_PLANET_MAPS_KEY));
 
 		annotations.setPlanetMapsKey("PLAK1234567890");
-		assertEquals("PLAK1234567890", writeProjectProperties().get("planet_maps_key"));
+		assertEquals("PLAK1234567890", writeProjectProperties().get(PROPERTY_KEY_PLANET_MAPS_KEY));
 	}
 
 	@Test
 	public void theSecureWatchUrlIsOnlyWrittenWhenTheSurveyHasOne() {
 		// an empty value would leave Collect Earth without the URL it ships with
-		assertNull(writeProjectProperties().get("secure_watch_url"));
+		assertNull(writeProjectProperties().get(PROPERTY_KEY_SECURE_WATCH_URL));
 
 		annotations.setSecureWatchEnabled(true);
 		annotations.setSecureWatchUrl("https://securewatch.maxar.com/?config=my_own");
-		assertEquals("https://securewatch.maxar.com/?config=my_own", writeProjectProperties().get("secure_watch_url"));
+		assertEquals("https://securewatch.maxar.com/?config=my_own", writeProjectProperties().get(PROPERTY_KEY_SECURE_WATCH_URL));
 	}
 
 	@Test
@@ -144,12 +158,12 @@ public class CollectEarthExternalServicesTest {
 	@Test
 	public void restoredServicesAreStoredInTheSurveyAnnotations() {
 		Properties p = new Properties();
-		p.put("open_gee_app", "false");
-		p.put("open_esri_wayback", "true");
-		p.put("open_planet_maps", "true");
-		p.put("planet_maps_use_tfo", "true");
-		p.put("planet_tfo_date_from", "2022-01");
-		p.put("secure_watch_url", "https://securewatch.maxar.com/?config=other");
+		p.put(PROPERTY_KEY_OPEN_GEE_APP, "false");
+		p.put(PROPERTY_KEY_OPEN_ESRI_WAYBACK, "true");
+		p.put(PROPERTY_KEY_OPEN_PLANET_MAPS, "true");
+		p.put(PROPERTY_KEY_PLANET_MAPS_USE_TFO, "true");
+		p.put(PROPERTY_KEY_PLANET_TFO_DATE_FROM, "2022-01");
+		p.put(PROPERTY_KEY_SECURE_WATCH_URL, "https://securewatch.maxar.com/?config=other");
 
 		CollectEarthExternalServices.fromProjectProperties(p).saveTo(survey);
 
