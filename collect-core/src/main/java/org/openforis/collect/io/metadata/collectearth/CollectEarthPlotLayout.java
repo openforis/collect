@@ -20,6 +20,17 @@ import org.openforis.collect.model.CollectSurvey;
  */
 public class CollectEarthPlotLayout {
 
+	/** Property keys used in the Collect Earth project file (ce.properties) */
+	public static final String PROPERTY_KEY_SAMPLE_SHAPE = "sample_shape";
+	public static final String PROPERTY_KEY_SAMPLE_POINTS = "number_of_sampling_points_in_plot";
+	public static final String PROPERTY_KEY_DISTANCE_BETWEEN_SAMPLE_POINTS = "distance_between_sample_points";
+	public static final String PROPERTY_KEY_DISTANCE_TO_PLOT_BOUNDARIES = "distance_to_plot_boundaries";
+	public static final String PROPERTY_KEY_INNER_POINT_SIDE = "inner_point_side";
+	public static final String PROPERTY_KEY_LARGE_CENTRAL_PLOT_SIDE = "large_central_plot_side";
+	public static final String PROPERTY_KEY_DISTANCE_BETWEEN_PLOTS = "distance_between_plots";
+	public static final String PROPERTY_KEY_BUFFER_SHAPE = "buffer_shape";
+	public static final String PROPERTY_KEY_DISTANCE_TO_BUFFERS = "distance_to_buffers";
+
 	public static final int MIN_DISTANCE_BETWEEN_SAMPLE_POINTS = 2;
 	public static final int MAX_DISTANCE_BETWEEN_SAMPLE_POINTS = 1000;
 	public static final int MIN_DISTANCE_TO_PLOT_BOUNDARIES = 0;
@@ -104,20 +115,20 @@ public class CollectEarthPlotLayout {
 	 */
 	public static CollectEarthPlotLayout fromProjectProperties(Properties p) {
 		CollectEarthPlotLayout layout = new CollectEarthPlotLayout();
-		layout.setPlotShape(getEnumProperty(p, "sample_shape", CollectEarthPlotShape.class, CollectEarthPlotShape.SQUARE));
-		layout.samplePoints = getIntegerProperty(p, "number_of_sampling_points_in_plot", DEFAULT_SAMPLE_POINTS);
-		layout.distanceBetweenSamplePoints = getIntegerProperty(p, "distance_between_sample_points", 0);
-		layout.distanceToPlotBoundaries = getIntegerProperty(p, "distance_to_plot_boundaries", 0);
-		layout.innerPointSide = getIntegerProperty(p, "inner_point_side", DEFAULT_INNER_POINT_SIDE);
-		layout.largeCentralPlotSide = getIntegerProperty(p, "large_central_plot_side", DEFAULT_LARGE_CENTRAL_PLOT_SIDE);
-		layout.distanceBetweenPlots = getIntegerProperty(p, "distance_between_plots", DEFAULT_DISTANCE_BETWEEN_PLOTS);
+		layout.setPlotShape(getEnumProperty(p, PROPERTY_KEY_SAMPLE_SHAPE, CollectEarthPlotShape.class, CollectEarthPlotShape.SQUARE));
+		layout.samplePoints = getIntegerProperty(p, PROPERTY_KEY_SAMPLE_POINTS, DEFAULT_SAMPLE_POINTS);
+		layout.distanceBetweenSamplePoints = getIntegerProperty(p, PROPERTY_KEY_DISTANCE_BETWEEN_SAMPLE_POINTS, 0);
+		layout.distanceToPlotBoundaries = getIntegerProperty(p, PROPERTY_KEY_DISTANCE_TO_PLOT_BOUNDARIES, 0);
+		layout.innerPointSide = getIntegerProperty(p, PROPERTY_KEY_INNER_POINT_SIDE, DEFAULT_INNER_POINT_SIDE);
+		layout.largeCentralPlotSide = getIntegerProperty(p, PROPERTY_KEY_LARGE_CENTRAL_PLOT_SIDE, DEFAULT_LARGE_CENTRAL_PLOT_SIDE);
+		layout.distanceBetweenPlots = getIntegerProperty(p, PROPERTY_KEY_DISTANCE_BETWEEN_PLOTS, DEFAULT_DISTANCE_BETWEEN_PLOTS);
 
 		// distance_to_buffers can hold a comma separated list of distances (e.g. "70,112,194"); only the first one
 		// is kept, as a single reference area is what the survey designer configures
-		Integer referenceAreaDistance = parseInteger(StringUtils.substringBefore(p.getProperty("distance_to_buffers"), ","));
+		Integer referenceAreaDistance = parseInteger(StringUtils.substringBefore(p.getProperty(PROPERTY_KEY_DISTANCE_TO_BUFFERS), ","));
 		if (referenceAreaDistance != null) {
 			// projects that set distance_to_buffers before the shape became configurable expect square reference areas
-			layout.referenceAreaShape = getEnumProperty(p, "buffer_shape", CollectEarthReferenceAreaShape.class, CollectEarthReferenceAreaShape.SQUARE);
+			layout.referenceAreaShape = getEnumProperty(p, PROPERTY_KEY_BUFFER_SHAPE, CollectEarthReferenceAreaShape.class, CollectEarthReferenceAreaShape.SQUARE);
 			layout.referenceAreaDistance = referenceAreaDistance;
 		}
 		return layout;
@@ -129,25 +140,25 @@ public class CollectEarthPlotLayout {
 	 * loaded before this one (Collect Earth only overwrites the properties present in the project file).
 	 */
 	public void writeProjectProperties(Properties p) {
-		p.put("sample_shape", plotShape.name());
-		p.put("number_of_sampling_points_in_plot", isSamplePointsApplicable() ? String.valueOf(samplePoints) : "");
+		p.put(PROPERTY_KEY_SAMPLE_SHAPE, plotShape.name());
+		p.put(PROPERTY_KEY_SAMPLE_POINTS, isSamplePointsApplicable() ? String.valueOf(samplePoints) : "");
 		// these two distances are written as numbers even when they are not used, because the Collect Earth versions
 		// released before the reference area options fail to open a project that leaves them empty
-		p.put("distance_between_sample_points", String.valueOf(
+		p.put(PROPERTY_KEY_DISTANCE_BETWEEN_SAMPLE_POINTS, String.valueOf(
 				isDistanceBetweenSamplePointsApplicable() ? distanceBetweenSamplePoints : 0));
-		p.put("distance_to_plot_boundaries", String.valueOf(
+		p.put(PROPERTY_KEY_DISTANCE_TO_PLOT_BOUNDARIES, String.valueOf(
 				isDistanceToPlotBoundariesApplicable() ? distanceToPlotBoundaries : 0));
-		p.put("inner_point_side", isInnerPointSideApplicable() ? String.valueOf(innerPointSide) : "");
-		p.put("large_central_plot_side", isLargeCentralPlotSideApplicable() ? String.valueOf(largeCentralPlotSide) : "");
-		p.put("distance_between_plots", isDistanceBetweenPlotsApplicable() ? String.valueOf(distanceBetweenPlots) : "");
+		p.put(PROPERTY_KEY_INNER_POINT_SIDE, isInnerPointSideApplicable() ? String.valueOf(innerPointSide) : "");
+		p.put(PROPERTY_KEY_LARGE_CENTRAL_PLOT_SIDE, isLargeCentralPlotSideApplicable() ? String.valueOf(largeCentralPlotSide) : "");
+		p.put(PROPERTY_KEY_DISTANCE_BETWEEN_PLOTS, isDistanceBetweenPlotsApplicable() ? String.valueOf(distanceBetweenPlots) : "");
 		if (isReferenceAreaEnabled()) {
-			p.put("buffer_shape", referenceAreaShape.name());
-			p.put("distance_to_buffers", String.valueOf(
+			p.put(PROPERTY_KEY_BUFFER_SHAPE, referenceAreaShape.name());
+			p.put(PROPERTY_KEY_DISTANCE_TO_BUFFERS, String.valueOf(
 					referenceAreaDistance == null ? getRecommendedReferenceAreaDistance() : referenceAreaDistance));
 		} else {
 			// for Collect Earth an empty distance means that there is no reference area
-			p.put("buffer_shape", CollectEarthReferenceAreaShape.NONE.name());
-			p.put("distance_to_buffers", "");
+			p.put(PROPERTY_KEY_BUFFER_SHAPE, CollectEarthReferenceAreaShape.NONE.name());
+			p.put(PROPERTY_KEY_DISTANCE_TO_BUFFERS, "");
 		}
 	}
 

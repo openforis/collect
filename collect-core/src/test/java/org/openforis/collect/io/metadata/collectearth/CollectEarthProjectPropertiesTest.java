@@ -2,6 +2,15 @@ package org.openforis.collect.io.metadata.collectearth;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthPlotLayout.PROPERTY_KEY_BUFFER_SHAPE;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthPlotLayout.PROPERTY_KEY_DISTANCE_BETWEEN_PLOTS;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthPlotLayout.PROPERTY_KEY_DISTANCE_BETWEEN_SAMPLE_POINTS;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthPlotLayout.PROPERTY_KEY_DISTANCE_TO_BUFFERS;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthPlotLayout.PROPERTY_KEY_DISTANCE_TO_PLOT_BOUNDARIES;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthPlotLayout.PROPERTY_KEY_INNER_POINT_SIDE;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthPlotLayout.PROPERTY_KEY_LARGE_CENTRAL_PLOT_SIDE;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthPlotLayout.PROPERTY_KEY_SAMPLE_POINTS;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthPlotLayout.PROPERTY_KEY_SAMPLE_SHAPE;
 
 import java.util.Properties;
 
@@ -37,11 +46,11 @@ public class CollectEarthProjectPropertiesTest {
 		annotations.setCollectEarthInnerPointSide(2);
 
 		Properties p = writeProjectProperties();
-		assertEquals("SQUARE", p.get("sample_shape"));
-		assertEquals("25", p.get("number_of_sampling_points_in_plot"));
-		assertEquals("20", p.get("distance_between_sample_points"));
-		assertEquals("10", p.get("distance_to_plot_boundaries"));
-		assertEquals("2", p.get("inner_point_side"));
+		assertEquals("SQUARE", p.get(PROPERTY_KEY_SAMPLE_SHAPE));
+		assertEquals("25", p.get(PROPERTY_KEY_SAMPLE_POINTS));
+		assertEquals("20", p.get(PROPERTY_KEY_DISTANCE_BETWEEN_SAMPLE_POINTS));
+		assertEquals("10", p.get(PROPERTY_KEY_DISTANCE_TO_PLOT_BOUNDARIES));
+		assertEquals("2", p.get(PROPERTY_KEY_INNER_POINT_SIDE));
 	}
 
 	@Test
@@ -51,10 +60,10 @@ public class CollectEarthProjectPropertiesTest {
 		annotations.setCollectEarthSamplePoints(9);
 
 		Properties p = writeProjectProperties();
-		assertEquals("SQUARE", p.get("sample_shape"));
-		assertEquals("9", p.get("number_of_sampling_points_in_plot"));
-		assertEquals("17", p.get("distance_between_sample_points"));
-		assertEquals("8", p.get("distance_to_plot_boundaries"));
+		assertEquals("SQUARE", p.get(PROPERTY_KEY_SAMPLE_SHAPE));
+		assertEquals("9", p.get(PROPERTY_KEY_SAMPLE_POINTS));
+		assertEquals("17", p.get(PROPERTY_KEY_DISTANCE_BETWEEN_SAMPLE_POINTS));
+		assertEquals("8", p.get(PROPERTY_KEY_DISTANCE_TO_PLOT_BOUNDARIES));
 	}
 
 	@Test
@@ -66,12 +75,12 @@ public class CollectEarthProjectPropertiesTest {
 		annotations.setCollectEarthDistanceBetweenPlots(80);
 
 		Properties p = writeProjectProperties();
-		assertEquals("CIRCLE", p.get("sample_shape"));
-		assertEquals("30", p.get("distance_between_sample_points"));
+		assertEquals("CIRCLE", p.get(PROPERTY_KEY_SAMPLE_SHAPE));
+		assertEquals("30", p.get(PROPERTY_KEY_DISTANCE_BETWEEN_SAMPLE_POINTS));
 		// a round plot has no margin, but Collect Earth requires a number
-		assertEquals("0", p.get("distance_to_plot_boundaries"));
-		assertEquals("", p.get("large_central_plot_side"));
-		assertEquals("", p.get("distance_between_plots"));
+		assertEquals("0", p.get(PROPERTY_KEY_DISTANCE_TO_PLOT_BOUNDARIES));
+		assertEquals("", p.get(PROPERTY_KEY_LARGE_CENTRAL_PLOT_SIDE));
+		assertEquals("", p.get(PROPERTY_KEY_DISTANCE_BETWEEN_PLOTS));
 	}
 
 	@Test
@@ -82,11 +91,11 @@ public class CollectEarthProjectPropertiesTest {
 		annotations.setCollectEarthInnerPointSide(3);
 
 		Properties p = writeProjectProperties();
-		assertEquals("NFI_THREE_CIRCLES", p.get("sample_shape"));
-		assertEquals("15", p.get("distance_between_sample_points"));
-		assertEquals("80", p.get("distance_between_plots"));
-		assertEquals("3", p.get("inner_point_side"));
-		assertEquals("", p.get("number_of_sampling_points_in_plot"));
+		assertEquals("NFI_THREE_CIRCLES", p.get(PROPERTY_KEY_SAMPLE_SHAPE));
+		assertEquals("15", p.get(PROPERTY_KEY_DISTANCE_BETWEEN_SAMPLE_POINTS));
+		assertEquals("80", p.get(PROPERTY_KEY_DISTANCE_BETWEEN_PLOTS));
+		assertEquals("3", p.get(PROPERTY_KEY_INNER_POINT_SIDE));
+		assertEquals("", p.get(PROPERTY_KEY_SAMPLE_POINTS));
 	}
 
 	@Test
@@ -95,8 +104,8 @@ public class CollectEarthProjectPropertiesTest {
 		annotations.setCollectEarthReferenceAreaDistance(300);
 
 		Properties p = writeProjectProperties();
-		assertEquals("HEXAGON", p.get("buffer_shape"));
-		assertEquals("300", p.get("distance_to_buffers"));
+		assertEquals("HEXAGON", p.get(PROPERTY_KEY_BUFFER_SHAPE));
+		assertEquals("300", p.get(PROPERTY_KEY_DISTANCE_TO_BUFFERS));
 	}
 
 	@Test
@@ -106,8 +115,8 @@ public class CollectEarthProjectPropertiesTest {
 		annotations.setCollectEarthReferenceAreaDistance(300);
 
 		Properties p = writeProjectProperties();
-		assertEquals("NONE", p.get("buffer_shape"));
-		assertEquals("", p.get("distance_to_buffers"));
+		assertEquals("NONE", p.get(PROPERTY_KEY_BUFFER_SHAPE));
+		assertEquals("", p.get(PROPERTY_KEY_DISTANCE_TO_BUFFERS));
 	}
 
 	@Test
@@ -137,9 +146,9 @@ public class CollectEarthProjectPropertiesTest {
 	public void restoredLayoutIsStoredInTheSurveyAnnotations() {
 		annotations.setCollectEarthPlotArea(0.5d);
 		Properties p = new Properties();
-		p.put("sample_shape", "HEXAGON");
-		p.put("number_of_sampling_points_in_plot", "9");
-		p.put("distance_between_sample_points", "40");
+		p.put(PROPERTY_KEY_SAMPLE_SHAPE, "HEXAGON");
+		p.put(PROPERTY_KEY_SAMPLE_POINTS, "9");
+		p.put(PROPERTY_KEY_DISTANCE_BETWEEN_SAMPLE_POINTS, "40");
 
 		CollectEarthPlotLayout.fromProjectProperties(p).saveTo(survey);
 
@@ -154,9 +163,9 @@ public class CollectEarthProjectPropertiesTest {
 	public void projectFileWrittenByHandIsRestored() {
 		Properties p = new Properties();
 		// distance_to_buffers accepts a list of distances and buffer_shape is read ignoring the case
-		p.put("distance_to_buffers", " 70 , 112 , 194 ");
-		p.put("buffer_shape", "hexagon");
-		p.put("distance_between_sample_points", "22.0");
+		p.put(PROPERTY_KEY_DISTANCE_TO_BUFFERS, " 70 , 112 , 194 ");
+		p.put(PROPERTY_KEY_BUFFER_SHAPE, "hexagon");
+		p.put(PROPERTY_KEY_DISTANCE_BETWEEN_SAMPLE_POINTS, "22.0");
 
 		CollectEarthPlotLayout restored = CollectEarthPlotLayout.fromProjectProperties(p);
 		assertEquals(CollectEarthReferenceAreaShape.HEXAGON, restored.getReferenceAreaShape());
@@ -167,8 +176,8 @@ public class CollectEarthProjectPropertiesTest {
 	@Test
 	public void projectFileWithoutDistanceHasNoReferenceArea() {
 		Properties p = new Properties();
-		p.put("buffer_shape", "SQUARE");
-		p.put("distance_to_buffers", "");
+		p.put(PROPERTY_KEY_BUFFER_SHAPE, "SQUARE");
+		p.put(PROPERTY_KEY_DISTANCE_TO_BUFFERS, "");
 
 		CollectEarthPlotLayout restored = CollectEarthPlotLayout.fromProjectProperties(p);
 		assertEquals(CollectEarthReferenceAreaShape.NONE, restored.getReferenceAreaShape());
