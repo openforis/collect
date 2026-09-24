@@ -1,8 +1,16 @@
 package org.openforis.collect.designer.form;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.openforis.collect.io.metadata.collectearth.CollectEarthExternalServices;
+import org.openforis.collect.io.metadata.collectearth.CollectEarthPlotLayout;
 import org.openforis.collect.metamodel.CollectAnnotations;
+import org.openforis.collect.metamodel.CollectAnnotations.CollectEarthPlotShape;
+import org.openforis.collect.metamodel.CollectAnnotations.CollectEarthReferenceAreaShape;
+import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
-import org.springframework.util.StringUtils;
 
 /**
  *
@@ -11,26 +19,34 @@ import org.springframework.util.StringUtils;
  */
 public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 
+	private static final String COLLECT_EARTH_DATE_FORMAT = "yyyy-MM-dd";
+
 	private String name;
 	private boolean published;
 	private String description;
 	private String projectName;
+	private String collectEarthPlotShape;
 	private String collectEarthSamplePoints;
-	private String collectEarthPlotArea;
-	private boolean collectEarthShowOuterPolygon;
-	private String collectEarthOuterPolygonSize;
-	private String collectEarthOuterPolygonShape;
-	private String bingMapsKey;
-//	private String planetMapsKey;
+	private Integer collectEarthDistanceBetweenSamplePoints;
+	private Integer collectEarthDistanceToPlotBoundaries;
+	private Integer collectEarthInnerPointSide;
+	private Integer collectEarthLargeCentralPlotSide;
+	private Integer collectEarthDistanceBetweenPlots;
+	private String collectEarthReferenceAreaShape;
+	private Integer collectEarthReferenceAreaDistance;
+	private String planetMapsKey;
 	private String extraMapUrl;
-	private boolean openBingMaps;
 	private boolean openEarthMap;
 	private boolean openPlanetMaps;
-	private boolean openYandexMaps;
-	private boolean openGEEExplorer;
-	private boolean openGEECodeEditor;
 	private boolean openGEEApp;
+	private Date geeAppDateFrom;
+	private Date geeAppDateTo;
+	private boolean openEsriWayback;
+	private boolean planetMapsUseTfo;
+	private String planetTfoDateFrom;
+	private String planetTfoDateTo;
 	private boolean openSecureWatch;
+	private String secureWatchUrl;
 	private boolean openStreetView;
 
 	private String defaultDescription;
@@ -49,29 +65,88 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		defaultDescription = source.getDescription();
 
 		CollectAnnotations annotations = source.getAnnotations();
-		collectEarthPlotArea = toListitemValue(annotations.getCollectEarthPlotArea());
-		collectEarthSamplePoints = String.valueOf(annotations.getCollectEarthSamplePoints());
-		collectEarthShowOuterPolygon = annotations.isShowOuterPolygon();
-		collectEarthOuterPolygonSize = String.valueOf(annotations.getOuterPolygonSize());
-		collectEarthOuterPolygonShape = annotations.getOuterPolygonShape().name();
-		bingMapsKey = annotations.getBingMapsKey();
-//		planetMapsKey = annotations.getPlanetMapsKey();
+		loadCollectEarthPlotLayout(CollectEarthPlotLayout.fromSurvey(source));
+		planetMapsKey = annotations.getPlanetMapsKey();
 		extraMapUrl = annotations.getExtraMapUrl();
-		openBingMaps = annotations.isBingMapsEnabled();
 		openEarthMap = annotations.isEarthMapEnabled();
 		openPlanetMaps = annotations.isPlanetMapsEnabled();
-		openYandexMaps = annotations.isYandexMapsEnabled();
 		openStreetView = annotations.isStreetViewEnabled();
-		openGEEExplorer = annotations.isGEEExplorerEnabled();
-		openGEECodeEditor = annotations.isGEECodeEditorEnabled();
 		openGEEApp = annotations.isGEEAppEnabled();
+		geeAppDateFrom = parseDate(annotations.getGEEAppDateFrom());
+		geeAppDateTo = parseDate(annotations.getGEEAppDateTo());
+		openEsriWayback = annotations.isEsriWaybackEnabled();
+		planetMapsUseTfo = annotations.isPlanetMapsUseTfo();
+		// the mosaic that Collect Earth picks on its own is stored as an empty value, and it is an entry of the list
+		planetTfoDateFrom = emptyIfNull(annotations.getPlanetTfoDateFrom());
+		planetTfoDateTo = emptyIfNull(annotations.getPlanetTfoDateTo());
 		openSecureWatch = annotations.isSecureWatchEnabled();
+		secureWatchUrl = annotations.getSecureWatchUrl();
 		keyChangeAllowed = annotations.isKeyChangeAllowed();
 	}
 
-	protected String toListitemValue(Double number) {
-		return StringUtils.trimTrailingCharacter(
-				StringUtils.trimTrailingCharacter(number.toString().replace('.', '_'), '0'), '_');
+	private void loadCollectEarthPlotLayout(CollectEarthPlotLayout layout) {
+		collectEarthPlotShape = layout.getPlotShape().name();
+		collectEarthSamplePoints = String.valueOf(layout.getSamplePoints());
+		collectEarthDistanceBetweenSamplePoints = layout.getDistanceBetweenSamplePoints();
+		collectEarthDistanceToPlotBoundaries = layout.getDistanceToPlotBoundaries();
+		collectEarthInnerPointSide = layout.getInnerPointSide();
+		collectEarthLargeCentralPlotSide = layout.getLargeCentralPlotSide();
+		collectEarthDistanceBetweenPlots = layout.getDistanceBetweenPlots();
+		collectEarthReferenceAreaShape = layout.getReferenceAreaShape().name();
+		collectEarthReferenceAreaDistance = layout.getReferenceAreaDistance();
+	}
+
+	/**
+	 * External services as they are being edited
+	 */
+	public CollectEarthExternalServices toCollectEarthExternalServices() {
+		CollectEarthExternalServices services = new CollectEarthExternalServices();
+		services.setGEEAppEnabled(openGEEApp);
+		services.setGEEAppDateFrom(formatDate(geeAppDateFrom));
+		services.setGEEAppDateTo(formatDate(geeAppDateTo));
+		services.setEarthMapEnabled(openEarthMap);
+		services.setEsriWaybackEnabled(openEsriWayback);
+		services.setPlanetMapsEnabled(openPlanetMaps);
+		services.setPlanetMapsKey(planetMapsKey);
+		services.setPlanetMapsUseTfo(planetMapsUseTfo);
+		services.setPlanetTfoDateFrom(planetTfoDateFrom);
+		services.setPlanetTfoDateTo(planetTfoDateTo);
+		services.setSecureWatchEnabled(openSecureWatch);
+		services.setSecureWatchUrl(secureWatchUrl);
+		services.setStreetViewEnabled(openStreetView);
+		services.setExtraMapUrl(extraMapUrl);
+		return services;
+	}
+
+	/**
+	 * Plot layout as it is being edited; the numbers that have been left empty count as 0
+	 */
+	public CollectEarthPlotLayout toCollectEarthPlotLayout() {
+		return createCollectEarthPlotLayout(collectEarthPlotShape, collectEarthSamplePoints,
+				collectEarthDistanceBetweenSamplePoints, collectEarthDistanceToPlotBoundaries, collectEarthInnerPointSide,
+				collectEarthLargeCentralPlotSide, collectEarthDistanceBetweenPlots, collectEarthReferenceAreaShape,
+				collectEarthReferenceAreaDistance);
+	}
+
+	public static CollectEarthPlotLayout createCollectEarthPlotLayout(String plotShape, String samplePoints,
+			Integer distanceBetweenSamplePoints, Integer distanceToPlotBoundaries, Integer innerPointSide,
+			Integer largeCentralPlotSide, Integer distanceBetweenPlots, String referenceAreaShape,
+			Integer referenceAreaDistance) {
+		CollectEarthPlotLayout layout = new CollectEarthPlotLayout();
+		layout.setPlotShape(plotShape == null ? null : CollectEarthPlotShape.valueOf(plotShape));
+		layout.setSamplePoints(samplePoints == null ? 0 : Integer.parseInt(samplePoints));
+		layout.setDistanceBetweenSamplePoints(zeroIfNull(distanceBetweenSamplePoints));
+		layout.setDistanceToPlotBoundaries(zeroIfNull(distanceToPlotBoundaries));
+		layout.setInnerPointSide(zeroIfNull(innerPointSide));
+		layout.setLargeCentralPlotSide(zeroIfNull(largeCentralPlotSide));
+		layout.setDistanceBetweenPlots(zeroIfNull(distanceBetweenPlots));
+		layout.setReferenceAreaShape(referenceAreaShape == null ? null : CollectEarthReferenceAreaShape.valueOf(referenceAreaShape));
+		layout.setReferenceAreaDistance(referenceAreaDistance);
+		return layout;
+	}
+
+	private static int zeroIfNull(Integer value) {
+		return value == null ? 0 : value;
 	}
 
 	@Override
@@ -81,33 +156,25 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		dest.setProjectName(languageCode, projectName);
 		dest.setPublished(published);
 		CollectAnnotations annotations = dest.getAnnotations();
-		annotations.setCollectEarthPlotArea(fromListitemValueToDouble(collectEarthPlotArea));
-		annotations.setCollectEarthSamplePoints(Integer.parseInt(collectEarthSamplePoints));
-		annotations.setShowOuterPolygon(collectEarthShowOuterPolygon);
-		annotations.setOuterPolygonSize(Integer.parseInt(collectEarthOuterPolygonSize));
-		annotations.setOuterPolygonShape(CollectAnnotations.OuterPolygonShape.valueOf(collectEarthOuterPolygonShape));
-		annotations.setBingMapsKey(bingMapsKey);
-//		annotations.setPlanetMapsKey(planetMapsKey);
+		if (dest.getTarget() == SurveyTarget.COLLECT_EARTH) {
+			// the options that the selected plot shape does not use keep their values, in case the shape is changed again
+			toCollectEarthPlotLayout().saveTo(dest);
+		}
+		annotations.setPlanetMapsKey(nullIfEmpty(planetMapsKey));
 		annotations.setExtraMapUrl(extraMapUrl);
-		annotations.setBingMapsEnabled( openBingMaps );
 		annotations.setEarthMapEnabled( openEarthMap );
 		annotations.setPlanetMapsEnabled( openPlanetMaps );
-		annotations.setYandexMapsEnabled( openYandexMaps );
 		annotations.setStreetViewEnabled( openStreetView );
-		annotations.setGEECodeEditorEnabled( openGEECodeEditor );
 		annotations.setGEEAppEnabled( openGEEApp );
+		annotations.setGEEAppDateFrom(formatDate(geeAppDateFrom));
+		annotations.setGEEAppDateTo(formatDate(geeAppDateTo));
+		annotations.setEsriWaybackEnabled(openEsriWayback);
+		annotations.setPlanetMapsUseTfo(planetMapsUseTfo);
+		annotations.setPlanetTfoDateFrom(nullIfEmpty(planetTfoDateFrom));
+		annotations.setPlanetTfoDateTo(nullIfEmpty(planetTfoDateTo));
 		annotations.setSecureWatchEnabled( openSecureWatch );
-		annotations.setGEEExplorerEnabled(openGEEExplorer );
+		annotations.setSecureWatchUrl(secureWatchUrl);
 		annotations.setKeyChangeAllowed(keyChangeAllowed);
-	}
-
-	protected double fromListitemValueToDouble(String value) {
-		return Double.parseDouble(value.replace('_', '.'));
-	}
-
-	@Override
-	protected void reset() {
-		// TODO Auto-generated method stub
 	}
 
 	public String getName() {
@@ -121,7 +188,6 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	public boolean isPublished() {
 		return published;
 	}
-/*
 	public String getPlanetMapsKey() {
 		return planetMapsKey;
 	}
@@ -129,7 +195,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	public void setPlanetMapsKey(String planetMapsKey) {
 		this.planetMapsKey = planetMapsKey;
 	}
-*/
+
 	public boolean isOpenPlanetMaps() {
 		return openPlanetMaps;
 	}
@@ -166,44 +232,150 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		this.collectEarthSamplePoints = collectEarthSamplePoints;
 	}
 
-	public String getCollectEarthPlotArea() {
-		return collectEarthPlotArea;
+	public String getCollectEarthPlotShape() {
+		return collectEarthPlotShape;
 	}
 
-	public void setCollectEarthPlotArea(String collectEarthPlotArea) {
-		this.collectEarthPlotArea = collectEarthPlotArea;
+	public void setCollectEarthPlotShape(String collectEarthPlotShape) {
+		this.collectEarthPlotShape = collectEarthPlotShape;
 	}
 
-	public boolean isCollectEarthShowOuterPolygon() {
-		return collectEarthShowOuterPolygon;
+	public Integer getCollectEarthDistanceBetweenSamplePoints() {
+		return collectEarthDistanceBetweenSamplePoints;
 	}
 
-	public void setCollectEarthShowOuterPolygon(boolean collectEarthShowOuterPolygon) {
-		this.collectEarthShowOuterPolygon = collectEarthShowOuterPolygon;
+	public void setCollectEarthDistanceBetweenSamplePoints(Integer collectEarthDistanceBetweenSamplePoints) {
+		this.collectEarthDistanceBetweenSamplePoints = collectEarthDistanceBetweenSamplePoints;
 	}
 
-	public String getCollectEarthOuterPolygonSize() {
-		return collectEarthOuterPolygonSize;
+	public Integer getCollectEarthDistanceToPlotBoundaries() {
+		return collectEarthDistanceToPlotBoundaries;
 	}
 
-	public void setCollectEarthOuterPolygonSize(String collectEarthOuterPolygonSize) {
-		this.collectEarthOuterPolygonSize = collectEarthOuterPolygonSize;
+	public void setCollectEarthDistanceToPlotBoundaries(Integer collectEarthDistanceToPlotBoundaries) {
+		this.collectEarthDistanceToPlotBoundaries = collectEarthDistanceToPlotBoundaries;
 	}
 
-	public String getCollectEarthOuterPolygonShape() {
-		return collectEarthOuterPolygonShape;
+	public Integer getCollectEarthInnerPointSide() {
+		return collectEarthInnerPointSide;
 	}
 
-	public void setCollectEarthOuterPolygonShape(String collectEarthOuterPolygonShape) {
-		this.collectEarthOuterPolygonShape = collectEarthOuterPolygonShape;
+	public void setCollectEarthInnerPointSide(Integer collectEarthInnerPointSide) {
+		this.collectEarthInnerPointSide = collectEarthInnerPointSide;
 	}
 
-	public String getBingMapsKey() {
-		return bingMapsKey;
+	public Integer getCollectEarthLargeCentralPlotSide() {
+		return collectEarthLargeCentralPlotSide;
 	}
 
-	public void setBingMapsKey(String bingMapsKey) {
-		this.bingMapsKey = bingMapsKey;
+	public void setCollectEarthLargeCentralPlotSide(Integer collectEarthLargeCentralPlotSide) {
+		this.collectEarthLargeCentralPlotSide = collectEarthLargeCentralPlotSide;
+	}
+
+	public Integer getCollectEarthDistanceBetweenPlots() {
+		return collectEarthDistanceBetweenPlots;
+	}
+
+	public void setCollectEarthDistanceBetweenPlots(Integer collectEarthDistanceBetweenPlots) {
+		this.collectEarthDistanceBetweenPlots = collectEarthDistanceBetweenPlots;
+	}
+
+	public String getCollectEarthReferenceAreaShape() {
+		return collectEarthReferenceAreaShape;
+	}
+
+	public void setCollectEarthReferenceAreaShape(String collectEarthReferenceAreaShape) {
+		this.collectEarthReferenceAreaShape = collectEarthReferenceAreaShape;
+	}
+
+	public Integer getCollectEarthReferenceAreaDistance() {
+		return collectEarthReferenceAreaDistance;
+	}
+
+	public void setCollectEarthReferenceAreaDistance(Integer collectEarthReferenceAreaDistance) {
+		this.collectEarthReferenceAreaDistance = collectEarthReferenceAreaDistance;
+	}
+
+	private static String emptyIfNull(String value) {
+		return value == null ? "" : value;
+	}
+
+	private static String nullIfEmpty(String value) {
+		return value == null || value.trim().isEmpty() ? null : value;
+	}
+
+	/**
+	 * Collect Earth keeps the dates of the GEE app as yyyy-MM-dd text
+	 */
+	private static Date parseDate(String value) {
+		if (value == null || value.trim().isEmpty()) {
+			return null;
+		}
+		try {
+			return new SimpleDateFormat(COLLECT_EARTH_DATE_FORMAT).parse(value);
+		} catch (ParseException e) {
+			return null;
+		}
+	}
+
+	private static String formatDate(Date value) {
+		return value == null ? null : new SimpleDateFormat(COLLECT_EARTH_DATE_FORMAT).format(value);
+	}
+
+	public Date getGeeAppDateFrom() {
+		return geeAppDateFrom;
+	}
+
+	public void setGeeAppDateFrom(Date geeAppDateFrom) {
+		this.geeAppDateFrom = geeAppDateFrom;
+	}
+
+	public Date getGeeAppDateTo() {
+		return geeAppDateTo;
+	}
+
+	public void setGeeAppDateTo(Date geeAppDateTo) {
+		this.geeAppDateTo = geeAppDateTo;
+	}
+
+	public boolean isOpenEsriWayback() {
+		return openEsriWayback;
+	}
+
+	public void setOpenEsriWayback(boolean openEsriWayback) {
+		this.openEsriWayback = openEsriWayback;
+	}
+
+	public boolean isPlanetMapsUseTfo() {
+		return planetMapsUseTfo;
+	}
+
+	public void setPlanetMapsUseTfo(boolean planetMapsUseTfo) {
+		this.planetMapsUseTfo = planetMapsUseTfo;
+	}
+
+	public String getPlanetTfoDateFrom() {
+		return planetTfoDateFrom;
+	}
+
+	public void setPlanetTfoDateFrom(String planetTfoDateFrom) {
+		this.planetTfoDateFrom = planetTfoDateFrom;
+	}
+
+	public String getPlanetTfoDateTo() {
+		return planetTfoDateTo;
+	}
+
+	public void setPlanetTfoDateTo(String planetTfoDateTo) {
+		this.planetTfoDateTo = planetTfoDateTo;
+	}
+
+	public String getSecureWatchUrl() {
+		return secureWatchUrl;
+	}
+
+	public void setSecureWatchUrl(String secureWatchUrl) {
+		this.secureWatchUrl = secureWatchUrl;
 	}
 
 	public String getExtraMapUrl() {
@@ -214,44 +386,12 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		this.extraMapUrl = extraMapUrl;
 	}
 
-	public boolean isOpenBingMaps() {
-		return openBingMaps;
-	}
-
-	public void setOpenBingMaps(boolean openBingMaps) {
-		this.openBingMaps = openBingMaps;
-	}
-
 	public boolean isOpenEarthMap() {
 		return openEarthMap;
 	}
 
 	public void setOpenEarthMap(boolean openEarthMap) {
 		this.openEarthMap = openEarthMap;
-	}
-
-	public boolean isOpenYandexMaps() {
-		return openYandexMaps;
-	}
-
-	public void setOpenYandexMaps(boolean openYandexMaps) {
-		this.openYandexMaps = openYandexMaps;
-	}
-
-	public boolean isOpenGEEExplorer() {
-		return openGEEExplorer;
-	}
-
-	public void setOpenGEEExplorer(boolean openGEEExplorer) {
-		this.openGEEExplorer = openGEEExplorer;
-	}
-
-	public boolean isOpenGEECodeEditor() {
-		return openGEECodeEditor;
-	}
-
-	public void setOpenGEECodeEditor(boolean openGEECodeEditor) {
-		this.openGEECodeEditor = openGEECodeEditor;
 	}
 
 	public boolean isOpenGEEApp() {

@@ -86,166 +86,312 @@
 		<groupbox width="100%" closable="false"
 			visible="@load(vm.collectEarthSurvey)">
 			<caption label="${labels.survey.collect_earth.plot_layout.$}" />
-			<hlayout style="padding: 10px">
-				<label
-					value="${labels.survey.collect_earth.plot_layout.plot_area}:" />
-				<fieldErrorHandler
-					message="@load(vmsgs['collectEarthPlotArea'])">
-					<combobox rows="1"
-						selectedItem="@load(fx.collectEarthPlotArea) @save(fx.collectEarthPlotArea)"
-						onChange="@command('applyChanges')">
-						<comboitem label="0.1 ha" value="0_1" />
-						<comboitem label="0.25 ha" value="0_25" />
-						<comboitem label="0.50 ha" value="0_5" />
-						<comboitem label="1 ha" value="1" />
-						<comboitem label="3 ha" value="3" />
-						<comboitem label="5 ha" value="5" />
-						<comboitem label="6 ha" value="6" />
-						<comboitem label="10 ha" value="10" />
-					</combobox>
-				</fieldErrorHandler>
-				<space width="100px" />
-				<label
-					value="${labels.survey.collect_earth.plot_layout.sample_points}:" />
-				<fieldErrorHandler
-					message="@load(vmsgs['collectEarthSamplePoints'])">
-					<combobox rows="1"
-						selectedItem="@load(fx.collectEarthSamplePoints) @save(fx.collectEarthSamplePoints)"
-						onChange="@command('applyChanges')">
-						<comboitem label="Empty square" value="0" />
-						<comboitem label="Central point" value="1" />
-						<comboitem label="3x3" value="9" />
-						<comboitem label="5x5" value="25" />
-						<comboitem label="7x7" value="49" />
-					</combobox>
-				</fieldErrorHandler>
-			</hlayout>
-			<hlayout style="padding: 10px">
-				<fieldErrorHandler
-					message="@load(vmsgs['collectEarthShowOuterPolygon'])">
-					<label
-						value="${labels.survey.collect_earth.plot_layout.show_outer_polygon}:" />
-					<checkbox
-						checked="@load(fx.collectEarthShowOuterPolygon eq true) @save(fx.collectEarthShowOuterPolygon)"
-						onCheck="@command('applyChanges')" />
-				</fieldErrorHandler>
-				<hlayout visible="@load(fx.collectEarthShowOuterPolygon)">
-					<space width="100px" />
-					<label
-						value="${labels.survey.collect_earth.plot_layout.outer_polygon_shape.$}:" />
-					<fieldErrorHandler
-						message="@load(vmsgs['collectEarthOuterPolygonShape'])">
-						<combobox rows="1"
-							disabled="@load(not fx.collectEarthShowOuterPolygon)"
-							selectedItem="@load(fx.collectEarthOuterPolygonShape) @save(fx.collectEarthOuterPolygonShape)"
-							onChange="@command('applyChanges')">
-							<comboitem label="${labels.survey.collect_earth.plot_layout.outer_polygon_shape.square}" value="SQUARE" />
-							<comboitem label="${labels.survey.collect_earth.plot_layout.outer_polygon_shape.hexagon}" value="HEXAGON" />
-						</combobox>
-					</fieldErrorHandler>
-					<space width="30px" />
-					<label
-						value="${labels.survey.collect_earth.plot_layout.outer_polygon_size}:" />
-					<fieldErrorHandler
-						message="@load(vmsgs['collectEarthOuterPolygonSize'])">
-						<combobox rows="1"
-							disabled="@load(not fx.collectEarthShowOuterPolygon)"
-							selectedItem="@load(fx.collectEarthOuterPolygonSize) @save(fx.collectEarthOuterPolygonSize)"
-							onChange="@command('applyChanges')">
-							<comboitem label="60 m" value="60" />
-							<comboitem label="100 m" value="100" />
-							<comboitem label="150 m" value="150" />
-							<comboitem label="200 m" value="200" />
-							<comboitem label="300 m" value="300" />
-							<comboitem label="500 m" value="500" />
-							<comboitem label="1 km" value="1000" />
-							<comboitem label="1.5 km" value="1500" />
-							<comboitem label="2 km" value="2000" />
-						</combobox>
-					</fieldErrorHandler>
-				</hlayout>
-			</hlayout>
+			<grid>
+				<columns>
+					<column width="300px" />
+					<column />
+				</columns>
+				<rows>
+					<row>
+						<label value="${labels.survey.collect_earth.plot_layout.plot_shape.$}:" />
+						<fieldErrorHandler
+							message="@load(vmsgs['collectEarthPlotShape'])">
+							<combobox readonly="true" width="350px"
+								selectedItem="@bind(fx.collectEarthPlotShape)"
+								onSelect="@command('applyChanges')">
+								<comboitem label="${labels.survey.collect_earth.plot_layout.plot_shape.square}" value="SQUARE" />
+								<comboitem label="${labels.survey.collect_earth.plot_layout.plot_shape.square_with_large_central_plot}" value="SQUARE_WITH_LARGE_CENTRAL_PLOT" />
+								<comboitem label="${labels.survey.collect_earth.plot_layout.plot_shape.circle}" value="CIRCLE" />
+								<comboitem label="${labels.survey.collect_earth.plot_layout.plot_shape.kml_polygon}" value="KML_POLYGON" />
+								<comboitem label="${labels.survey.collect_earth.plot_layout.plot_shape.wkt_polygon}" value="WKT_POLYGON" />
+								<comboitem label="${labels.survey.collect_earth.plot_layout.plot_shape.geojson_polygon}" value="GEOJSON_POLYGON" />
+								<comboitem label="${labels.survey.collect_earth.plot_layout.plot_shape.hexagon}" value="HEXAGON" />
+								<comboitem label="${labels.survey.collect_earth.plot_layout.plot_shape.nfma}" value="NFMA" />
+								<comboitem label="${labels.survey.collect_earth.plot_layout.plot_shape.nfma_250}" value="NFMA_250" />
+								<comboitem label="${labels.survey.collect_earth.plot_layout.plot_shape.square_circle}" value="SQUARE_CIRCLE" />
+								<comboitem label="${labels.survey.collect_earth.plot_layout.plot_shape.nfi_three_circles}" value="NFI_THREE_CIRCLES" />
+								<comboitem label="${labels.survey.collect_earth.plot_layout.plot_shape.nfi_four_circles}" value="NFI_FOUR_CIRCLES" />
+							</combobox>
+						</fieldErrorHandler>
+					</row>
+					<row visible="@load(vm.collectEarthPlotLayout.samplePointsApplicable)">
+						<label value="${labels.survey.collect_earth.plot_layout.sample_points.$}:" />
+						<fieldErrorHandler
+							message="@load(vmsgs['collectEarthSamplePoints'])">
+							<combobox readonly="true" width="350px"
+								selectedItem="@bind(fx.collectEarthSamplePoints)"
+								onSelect="@command('applyChanges')">
+								<comboitem label="${labels.survey.collect_earth.plot_layout.sample_points.none}" value="0" />
+								<comboitem label="${labels.survey.collect_earth.plot_layout.sample_points.central_point}" value="1" />
+								<comboitem label="2x2" value="4" />
+								<comboitem label="3x3" value="9" />
+								<comboitem label="4x4" value="16" />
+								<comboitem label="5x5" value="25" />
+								<comboitem label="6x6" value="36" />
+								<comboitem label="7x7" value="49" />
+								<comboitem label="8x8" value="64" />
+								<comboitem label="9x9" value="81" />
+								<comboitem label="10x10" value="100" />
+							</combobox>
+						</fieldErrorHandler>
+					</row>
+					<row visible="@load(vm.collectEarthPlotLayout.distanceBetweenSamplePointsApplicable)">
+						<label value="@load(vm.collectEarthDistanceBetweenSamplePointsLabel)" />
+						<fieldErrorHandler
+							message="@load(vmsgs['collectEarthDistanceBetweenSamplePoints'])">
+							<spinner width="100px" value="@bind(fx.collectEarthDistanceBetweenSamplePoints)"
+								tooltiptext="@load(vm.collectEarthDistanceBetweenSamplePointsTooltip)"
+								onChange="@command('applyChanges')" />
+						</fieldErrorHandler>
+					</row>
+					<row visible="@load(vm.collectEarthPlotLayout.distanceToPlotBoundariesApplicable)">
+						<label value="${labels.survey.collect_earth.plot_layout.distance_to_plot_boundaries.$}:" />
+						<fieldErrorHandler
+							message="@load(vmsgs['collectEarthDistanceToPlotBoundaries'])">
+							<spinner width="100px" value="@bind(fx.collectEarthDistanceToPlotBoundaries)"
+								tooltiptext="${labels.survey.collect_earth.plot_layout.distance_to_plot_boundaries.tooltip}"
+								onChange="@command('applyChanges')" />
+						</fieldErrorHandler>
+					</row>
+					<row visible="@load(vm.collectEarthPlotLayout.innerPointSideApplicable)">
+						<label value="${labels.survey.collect_earth.plot_layout.inner_point_side.$}:" />
+						<fieldErrorHandler
+							message="@load(vmsgs['collectEarthInnerPointSide'])">
+							<spinner width="100px" value="@bind(fx.collectEarthInnerPointSide)"
+								tooltiptext="${labels.survey.collect_earth.plot_layout.inner_point_side.tooltip}"
+								onChange="@command('applyChanges')" />
+						</fieldErrorHandler>
+					</row>
+					<row visible="@load(vm.collectEarthPlotLayout.largeCentralPlotSideApplicable)">
+						<label value="${labels.survey.collect_earth.plot_layout.large_central_plot_side.$}:" />
+						<fieldErrorHandler
+							message="@load(vmsgs['collectEarthLargeCentralPlotSide'])">
+							<spinner width="100px" value="@bind(fx.collectEarthLargeCentralPlotSide)"
+								tooltiptext="${labels.survey.collect_earth.plot_layout.large_central_plot_side.tooltip}"
+								onChange="@command('applyChanges')" />
+						</fieldErrorHandler>
+					</row>
+					<row visible="@load(vm.collectEarthPlotLayout.distanceBetweenPlotsApplicable)">
+						<label value="${labels.survey.collect_earth.plot_layout.distance_between_plots.$}:" />
+						<fieldErrorHandler
+							message="@load(vmsgs['collectEarthDistanceBetweenPlots'])">
+							<spinner width="100px" value="@bind(fx.collectEarthDistanceBetweenPlots)"
+								tooltiptext="${labels.survey.collect_earth.plot_layout.distance_between_plots.tooltip}"
+								onChange="@command('applyChanges')" />
+						</fieldErrorHandler>
+					</row>
+					<row visible="@load(vm.collectEarthPlotLayout.referenceAreaApplicable)">
+						<label value="${labels.survey.collect_earth.plot_layout.reference_area_shape.$}:" />
+						<fieldErrorHandler
+							message="@load(vmsgs['collectEarthReferenceAreaShape'])">
+							<combobox readonly="true" width="350px"
+								selectedItem="@bind(fx.collectEarthReferenceAreaShape)"
+								onSelect="@command('collectEarthReferenceAreaShapeChanged')">
+								<comboitem label="${labels.survey.collect_earth.plot_layout.reference_area_shape.none}" value="NONE" />
+								<comboitem label="${labels.survey.collect_earth.plot_layout.reference_area_shape.square}" value="SQUARE" />
+								<comboitem label="${labels.survey.collect_earth.plot_layout.reference_area_shape.circle}" value="CIRCLE" />
+								<comboitem label="${labels.survey.collect_earth.plot_layout.reference_area_shape.hexagon}" value="HEXAGON" />
+							</combobox>
+						</fieldErrorHandler>
+					</row>
+					<row visible="@load(vm.collectEarthPlotLayout.referenceAreaEnabled)">
+						<label value="${labels.survey.collect_earth.plot_layout.reference_area_distance.$}:" />
+						<fieldErrorHandler
+							message="@load(vmsgs['collectEarthReferenceAreaDistance'])">
+							<spinner width="100px" value="@bind(fx.collectEarthReferenceAreaDistance)"
+								tooltiptext="${labels.survey.collect_earth.plot_layout.reference_area_distance.tooltip}"
+								onChange="@command('applyChanges')" />
+						</fieldErrorHandler>
+					</row>
+				</rows>
+			</grid>
+			<vlayout style="padding: 10px" visible="@load(vm.collectEarthPlotLayout.referenceAreaApplicable)">
+				<label style="color: #b45a00" multiline="true"
+					visible="@load(vm.collectEarthPlotLayout.referenceAreaTooSmall)"
+					value="${labels.survey.collect_earth.plot_layout.reference_area_too_small}" />
+				<label value="@load(vm.collectEarthPlotAreaInfo)" />
+			</vlayout>
 		</groupbox>
 
 		<groupbox width="100%" closable="false"
 			visible="@load(vm.collectEarthSurvey)">
 			<caption
 				label="${labels.survey.collect_earth.other_settings.$}" />
-
-			<hlayout style="padding: 10px">
-				<fieldErrorHandler
-					message="@load(vmsgs['openStreetView'])">
-					<label
-						value="${labels.survey.collect_earth.other_settings.open_street_view}:" />
-					<checkbox
-						checked="@load(fx.openStreetView eq true) @save(fx.openStreetView)"
-						onCheck="@command('applyChanges')" />
-				</fieldErrorHandler>
-
-				<space width="30px" />
-
-				<hlayout>
-					<fieldErrorHandler
-						message="@load(vmsgs['openSecureWatch'])">
-						<label
-							use="org.openforis.collect.designer.component.FieldLabel"
-							value="${labels.survey.collect_earth.other_settings.open_securewatch_maps}" />
-					</fieldErrorHandler>
-					<fieldErrorHandler
-						message="@load(vmsgs['openSecureWatch'])">
-						<checkbox
-							checked="@load(fx.openSecureWatch eq true) @save(fx.openSecureWatch)"
-							onCheck="@command('applyChanges')" />
-					</fieldErrorHandler>
-
-					<image popup="openSecureWatchInfoTooltip"
-						style="cursor:pointer" src="/assets/images/info-small.png" />
-				</hlayout>
-
-				<space width="30px" />
-
-				<fieldErrorHandler
-					message="@load(vmsgs['openEarthMap'])">
-					<label
-						value="${labels.survey.collect_earth.other_settings.open_earth_map}:" />
-					<checkbox
-						checked="@load(fx.openEarthMap eq true) @save(fx.openEarthMap)"
-						onCheck="@command('applyChanges')" />
-				</fieldErrorHandler>
-
-
-			</hlayout>
-
-			<hlayout style="padding: 10px">
-
-			    <fieldErrorHandler
-					message="@load(vmsgs['openGEEApp'])">
-					<label
-						value="${labels.survey.collect_earth.other_settings.open_gee_app}:" />
-					<checkbox
-						checked="@load(fx.openGEEApp eq true) @save(fx.openGEEApp)"
-						onCheck="@command('applyChanges')" />
-				</fieldErrorHandler>
-				
-			</hlayout>
-
-			<hlayout>
-				<fieldErrorHandler
-					message="@load(vmsgs['extraMapUrl'])">
-					<label
-						use="org.openforis.collect.designer.component.FieldLabel"
-						value="${labels.survey.collect_earth.other_settings.extra_map_url}" />
-				</fieldErrorHandler>
-				<fieldErrorHandler
-					message="@load(vmsgs['extraMapUrl'])">
-					<textbox width="550px" value="@bind(fx.extraMapUrl)"
-						placeholder="${labels.survey.collect_earth.other_settings.extra_map_url_placeholder}"
-						onChange="@command('applyChanges')" />
-				</fieldErrorHandler>
-
-				<image popup="extraMapUrlInfoTooltip"
-					style="cursor:pointer" src="/assets/images/info-small.png" />
-			</hlayout>
+			<grid>
+				<columns>
+					<column width="300px" />
+					<column />
+				</columns>
+				<rows>
+					<row>
+						<label value="${labels.survey.collect_earth.other_settings.open_gee_app}:" />
+						<hlayout>
+							<fieldErrorHandler
+								message="@load(vmsgs['openGEEApp'])">
+								<checkbox
+									checked="@load(fx.openGEEApp eq true) @save(fx.openGEEApp)"
+									onCheck="@command('applyChanges')" />
+							</fieldErrorHandler>
+							<hlayout visible="@load(vm.collectEarthGeeAppDatesVisible)">
+								<space width="20px" />
+								<label value="${labels.survey.collect_earth.other_settings.gee_app_date_from}:" />
+								<fieldErrorHandler
+									message="@load(vmsgs['geeAppDateFrom'])">
+									<datebox width="130px" format="yyyy-MM-dd"
+										value="@bind(fx.geeAppDateFrom)"
+										onChange="@command('applyChanges')" />
+								</fieldErrorHandler>
+								<space width="10px" />
+								<label value="${labels.survey.collect_earth.other_settings.gee_app_date_to}:" />
+								<fieldErrorHandler
+									message="@load(vmsgs['geeAppDateTo'])">
+									<datebox width="130px" format="yyyy-MM-dd"
+										value="@bind(fx.geeAppDateTo)"
+										onChange="@command('applyChanges')" />
+								</fieldErrorHandler>
+								<image popup="geeAppDatesInfoTooltip"
+									style="cursor:pointer" src="/assets/images/info-small.png" />
+							</hlayout>
+						</hlayout>
+					</row>
+					<row>
+						<label value="${labels.survey.collect_earth.other_settings.open_earth_map}:" />
+						<fieldErrorHandler
+							message="@load(vmsgs['openEarthMap'])">
+							<checkbox
+								checked="@load(fx.openEarthMap eq true) @save(fx.openEarthMap)"
+								onCheck="@command('applyChanges')" />
+						</fieldErrorHandler>
+					</row>
+					<row>
+						<label value="${labels.survey.collect_earth.other_settings.open_esri_wayback}:" />
+						<fieldErrorHandler
+							message="@load(vmsgs['openEsriWayback'])">
+							<checkbox
+								checked="@load(fx.openEsriWayback eq true) @save(fx.openEsriWayback)"
+								onCheck="@command('applyChanges')" />
+						</fieldErrorHandler>
+					</row>
+					<row>
+						<label value="${labels.survey.collect_earth.other_settings.open_planet_maps}:" />
+						<hlayout>
+							<fieldErrorHandler
+								message="@load(vmsgs['openPlanetMaps'])">
+								<checkbox
+									checked="@load(fx.openPlanetMaps eq true) @save(fx.openPlanetMaps)"
+									onCheck="@command('applyChanges')" />
+							</fieldErrorHandler>
+							<image popup="planetMapsInfoTooltip"
+								style="cursor:pointer" src="/assets/images/info-small.png" />
+						</hlayout>
+					</row>
+					<row visible="@load(vm.collectEarthPlanetOptionsVisible)">
+						<label value="${labels.survey.collect_earth.other_settings.planet_maps_key}:" />
+						<fieldErrorHandler
+							message="@load(vmsgs['planetMapsKey'])">
+							<textbox width="450px" value="@bind(fx.planetMapsKey)"
+								placeholder="${labels.survey.collect_earth.other_settings.planet_maps_key_placeholder}"
+								onChange="@command('applyChanges')" />
+						</fieldErrorHandler>
+					</row>
+					<row visible="@load(vm.collectEarthPlanetOptionsVisible)">
+						<label value="${labels.survey.collect_earth.other_settings.planet_maps_use_tfo}:" />
+						<hlayout>
+							<fieldErrorHandler
+								message="@load(vmsgs['planetMapsUseTfo'])">
+								<checkbox
+									checked="@load(fx.planetMapsUseTfo eq true) @save(fx.planetMapsUseTfo)"
+									onCheck="@command('applyChanges')" />
+							</fieldErrorHandler>
+							<hlayout visible="@load(vm.collectEarthPlanetTfoMosaicsVisible)">
+								<space width="20px" />
+								<label value="${labels.survey.collect_earth.other_settings.planet_tfo_date_from}:" />
+								<fieldErrorHandler
+									message="@load(vmsgs['planetTfoDateFrom'])">
+									<combobox readonly="true" width="160px"
+										model="@load(vm.planetTfoMosaics)"
+										selectedItem="@bind(fx.planetTfoDateFrom)"
+										onSelect="@command('applyChanges')">
+										<template name="model">
+											<comboitem
+												label="@load(empty each ? vm.planetTfoDefaultMosaicLabel : each)" />
+										</template>
+									</combobox>
+								</fieldErrorHandler>
+								<space width="10px" />
+								<label value="${labels.survey.collect_earth.other_settings.planet_tfo_date_to}:" />
+								<fieldErrorHandler
+									message="@load(vmsgs['planetTfoDateTo'])">
+									<combobox readonly="true" width="160px"
+										model="@load(vm.planetTfoMosaics)"
+										selectedItem="@bind(fx.planetTfoDateTo)"
+										onSelect="@command('applyChanges')">
+										<template name="model">
+											<comboitem
+												label="@load(empty each ? vm.planetTfoDefaultMosaicLabel : each)" />
+										</template>
+									</combobox>
+								</fieldErrorHandler>
+							</hlayout>
+						</hlayout>
+					</row>
+					<row visible="@load(vm.collectEarthPlanetOptionsVisible)">
+						<label />
+						<label style="color: #5a5a5a" multiline="true"
+							value="${labels.survey.collect_earth.other_settings.planet_api_key_note}" />
+					</row>
+					<row>
+						<label value="${labels.survey.collect_earth.other_settings.open_securewatch_maps}:" />
+						<hlayout>
+							<fieldErrorHandler
+								message="@load(vmsgs['openSecureWatch'])">
+								<checkbox
+									checked="@load(fx.openSecureWatch eq true) @save(fx.openSecureWatch)"
+									onCheck="@command('applyChanges')" />
+							</fieldErrorHandler>
+							<image popup="openSecureWatchInfoTooltip"
+								style="cursor:pointer" src="/assets/images/info-small.png" />
+							<hlayout visible="@load(vm.collectEarthSecureWatchUrlVisible)">
+								<space width="20px" />
+								<label value="${labels.survey.collect_earth.other_settings.secure_watch_url}:" />
+								<fieldErrorHandler
+									message="@load(vmsgs['secureWatchUrl'])">
+									<textbox width="450px" value="@bind(fx.secureWatchUrl)"
+										placeholder="${labels.survey.collect_earth.other_settings.secure_watch_url_placeholder}"
+										onChange="@command('applyChanges')" />
+								</fieldErrorHandler>
+							</hlayout>
+						</hlayout>
+					</row>
+					<row>
+						<label value="${labels.survey.collect_earth.other_settings.open_street_view}:" />
+						<fieldErrorHandler
+							message="@load(vmsgs['openStreetView'])">
+							<checkbox
+								checked="@load(fx.openStreetView eq true) @save(fx.openStreetView)"
+								onCheck="@command('applyChanges')" />
+						</fieldErrorHandler>
+					</row>
+					<row>
+						<fieldErrorHandler
+							message="@load(vmsgs['extraMapUrl'])">
+							<label
+								use="org.openforis.collect.designer.component.FieldLabel"
+								value="${labels.survey.collect_earth.other_settings.extra_map_url}" />
+						</fieldErrorHandler>
+						<hlayout>
+							<fieldErrorHandler
+								message="@load(vmsgs['extraMapUrl'])">
+								<textbox width="550px" value="@bind(fx.extraMapUrl)"
+									placeholder="${labels.survey.collect_earth.other_settings.extra_map_url_placeholder}"
+									onChange="@command('applyChanges')" />
+							</fieldErrorHandler>
+							<image popup="extraMapUrlInfoTooltip"
+								style="cursor:pointer" src="/assets/images/info-small.png" />
+						</hlayout>
+					</row>
+				</rows>
+			</grid>
 		</groupbox>
 
 		<collapsiblepanel open="false"
@@ -279,6 +425,18 @@
 	<popup id="keyChangeAllowedInfoTooltip" width="300px">
 		<html><![CDATA[
     		${labels.survey.key_change_allowed.tooltip}
+        ]]></html>
+	</popup>
+
+	<popup id="geeAppDatesInfoTooltip" width="300px">
+		<html><![CDATA[
+    		${labels.survey.collect_earth.other_settings.gee_app_dates_tooltip}
+        ]]></html>
+	</popup>
+
+	<popup id="planetMapsInfoTooltip" width="300px">
+		<html><![CDATA[
+    		${labels.survey.collect_earth.other_settings.planet_maps_tooltip}
         ]]></html>
 	</popup>
 

@@ -1,9 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <survey lastId="2111206" created="2026-03-26T14:04:19.173+01:00"
 	modified="2026-03-26T14:06:33.774+01:00"
-	collectearth:bingKey="AjVg2KjkXqNtIcnLTZfIwahJATb-LGJigDTj1eCHBah5BTTgWU8rBQD0cTC8-6IA"
-	collectearth:openEarthMap="true" collectearth:plotarea="0.1"
-	collectearth:openBingMaps="true" collectearth:samplepoints="1"
+	collectearth:openEarthMap="true" collectearth:plotarea="0.1" collectearth:samplepoints="1"
 	collect:target="CE" collect:collectVersion="4.0.105"
 	xsi:schemaLocation="http://www.openforis.org/idml/3.0  &#9;&#9;https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3.xsd       &#9;&#9;http://www.openforis.org/collect/3.0/ui  &#9;&#9;https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd"
 	xmlns="http://www.openforis.org/idml/3.0"

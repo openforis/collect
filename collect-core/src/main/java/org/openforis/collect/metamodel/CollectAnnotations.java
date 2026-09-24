@@ -43,8 +43,20 @@ public class CollectAnnotations {
 		KEYBOARD, BARCODE
 	}
 
-	public enum OuterPolygonShape {
-		SQUARE, CIRCLE, HEXAGON
+	/**
+	 * Plot shapes supported by Collect Earth (names match its sample_shape property)
+	 */
+	public enum CollectEarthPlotShape {
+		SQUARE, SQUARE_WITH_LARGE_CENTRAL_PLOT, CIRCLE, KML_POLYGON, WKT_POLYGON, GEOJSON_POLYGON, HEXAGON,
+		NFMA, NFMA_250, SQUARE_CIRCLE, NFI_THREE_CIRCLES, NFI_FOUR_CIRCLES
+	}
+
+	/**
+	 * Shape of the optional reference area that Collect Earth draws around the plot (names match its buffer_shape property).
+	 * The reference area is not part of the plot: it only gives the interpreter an idea of the surroundings.
+	 */
+	public enum CollectEarthReferenceAreaShape {
+		NONE, SQUARE, CIRCLE, HEXAGON
 	}
 
 	public enum Annotation {
@@ -103,22 +115,29 @@ public class CollectAnnotations {
 		COLLECT_EARTH_HIDE_IN_RECORD_LIST(new QName(COLLECT_EARTH_NAMESPACE_URI, "hideinrecordlist"), false),
 		COLLECT_EARTH_SHOW_READONLY_FIELD(new QName(COLLECT_EARTH_NAMESPACE_URI, "showreadonlyfield"), false),
 		COLLECT_EARTH_INCLUDE_IN_HEADER(new QName(COLLECT_EARTH_NAMESPACE_URI, "includeinheader"), false),
-		COLLECT_EARTH_PLOT_AREA(new QName(COLLECT_EARTH_NAMESPACE_URI, "plotarea"), 1d),
-		COLLECT_EARTH_BING_KEY(new QName(COLLECT_EARTH_NAMESPACE_URI, "bingKey"), "GENERATE YOUR OWN BING MAPS KEY AT https://www.bingmapsportal.com"),
-		//COLLECT_EARTH_PLANET_KEY(new QName(COLLECT_EARTH_NAMESPACE_URI, "planetKey"), "GENERATE YOUR OWN PLANET API KEY AT https://www.planet.com/"),
+		COLLECT_EARTH_PLOT_AREA(new QName(COLLECT_EARTH_NAMESPACE_URI, "plotarea"), 1d), //legacy: replaced by the distance between sample points and the margin with the plot border
+		COLLECT_EARTH_PLANET_KEY(new QName(COLLECT_EARTH_NAMESPACE_URI, "planetKey")), //shared by everybody who opens the project file; empty leaves the key of each interpreter alone
 		COLLECT_EARTH_EXTRA_MAP_URL(new QName(COLLECT_EARTH_NAMESPACE_URI, "extraMapUrl")),
 		COLLECT_EARTH_SAMPLE_POINTS(new QName(COLLECT_EARTH_NAMESPACE_URI, "samplepoints"), 25), //0, 1, 9 (3x3), 25 (5x5), 49 (7x7)
-		COLLECT_EARTH_SHOW_OUTER_POLYGON(new QName(COLLECT_EARTH_NAMESPACE_URI, "showOuterPolygon"), false),
-		COLLECT_EARTH_OUTER_POLYGON_SIZE(new QName(COLLECT_EARTH_NAMESPACE_URI, "outerPolygonSize"), 150), //side length (or diameter) in meters of the extra shape drawn around the plot
-		COLLECT_EARTH_OUTER_POLYGON_SHAPE(new QName(COLLECT_EARTH_NAMESPACE_URI, "outerPolygonShape"), OuterPolygonShape.SQUARE),
-		COLLECT_EARTH_OPEN_BING_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openBingMaps"), false),
+		COLLECT_EARTH_PLOT_SHAPE(new QName(COLLECT_EARTH_NAMESPACE_URI, "plotShape"), CollectEarthPlotShape.SQUARE),
+		COLLECT_EARTH_DISTANCE_BETWEEN_SAMPLE_POINTS(new QName(COLLECT_EARTH_NAMESPACE_URI, "distanceBetweenSamplePoints")), //meters; radius of circle, hexagon and NFI cluster plots
+		COLLECT_EARTH_DISTANCE_TO_PLOT_BOUNDARIES(new QName(COLLECT_EARTH_NAMESPACE_URI, "distanceToPlotBoundaries")), //meters
+		COLLECT_EARTH_INNER_POINT_SIDE(new QName(COLLECT_EARTH_NAMESPACE_URI, "innerPointSide"), 2), //meters
+		COLLECT_EARTH_LARGE_CENTRAL_PLOT_SIDE(new QName(COLLECT_EARTH_NAMESPACE_URI, "largeCentralPlotSide"), 20), //meters
+		COLLECT_EARTH_DISTANCE_BETWEEN_PLOTS(new QName(COLLECT_EARTH_NAMESPACE_URI, "distanceBetweenPlots"), 100), //meters
+		COLLECT_EARTH_REFERENCE_AREA_SHAPE(new QName(COLLECT_EARTH_NAMESPACE_URI, "referenceAreaShape"), CollectEarthReferenceAreaShape.NONE),
+		COLLECT_EARTH_REFERENCE_AREA_DISTANCE(new QName(COLLECT_EARTH_NAMESPACE_URI, "referenceAreaDistance")), //meters from the plot center
 		COLLECT_EARTH_OPEN_EARTH_MAP(new QName(COLLECT_EARTH_NAMESPACE_URI, "openEarthMap"), false),
 		COLLECT_EARTH_OPEN_PLANET_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openPlanetMaps"), true),
-		COLLECT_EARTH_OPEN_YANDEX_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openYandexMaps"), false),
-		COLLECT_EARTH_OPEN_GEE_EXPLORER(new QName(COLLECT_EARTH_NAMESPACE_URI, "openExplorer"), false),
-		COLLECT_EARTH_OPEN_GEE_CODE_EDITOR(new QName(COLLECT_EARTH_NAMESPACE_URI, "openCodeEditor"), false),
 		COLLECT_EARTH_OPEN_GEE_APP(new QName(COLLECT_EARTH_NAMESPACE_URI, "openGEEApp"), true),
 		COLLECT_EARTH_OPEN_SECUREWATCH(new QName(COLLECT_EARTH_NAMESPACE_URI, "openSecureWatch"), false),
+		COLLECT_EARTH_SECUREWATCH_URL(new QName(COLLECT_EARTH_NAMESPACE_URI, "secureWatchUrl")),
+		COLLECT_EARTH_OPEN_ESRI_WAYBACK(new QName(COLLECT_EARTH_NAMESPACE_URI, "openEsriWayback"), false),
+		COLLECT_EARTH_GEE_APP_DATE_FROM(new QName(COLLECT_EARTH_NAMESPACE_URI, "geeAppDateFrom")), //yyyy-MM-dd
+		COLLECT_EARTH_GEE_APP_DATE_TO(new QName(COLLECT_EARTH_NAMESPACE_URI, "geeAppDateTo")), //yyyy-MM-dd
+		COLLECT_EARTH_PLANET_MAPS_USE_TFO(new QName(COLLECT_EARTH_NAMESPACE_URI, "planetMapsUseTfo"), false),
+		COLLECT_EARTH_PLANET_TFO_DATE_FROM(new QName(COLLECT_EARTH_NAMESPACE_URI, "planetTfoDateFrom")), //mosaic name, empty for the first available one
+		COLLECT_EARTH_PLANET_TFO_DATE_TO(new QName(COLLECT_EARTH_NAMESPACE_URI, "planetTfoDateTo")), //mosaic name, empty for the latest available one
 		COLLECT_EARTH_OPEN_STREET_VIEW(new QName(COLLECT_EARTH_NAMESPACE_URI, "openStreetView"), false),
 
 		//Collect Mobile
@@ -329,14 +348,6 @@ public class CollectAnnotations {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_PLOT_AREA, value);
 	}
 
-	public String getBingMapsKey() {
-		return getAnnotationValueString(survey, Annotation.COLLECT_EARTH_BING_KEY);
-	}
-
-	public void setBingMapsKey(String value) {
-		setAnnotationValue(survey, Annotation.COLLECT_EARTH_BING_KEY, value);
-	}
-/*
 	public String getPlanetMapsKey() {
 		return getAnnotationValueString(survey, Annotation.COLLECT_EARTH_PLANET_KEY);
 	}
@@ -344,21 +355,13 @@ public class CollectAnnotations {
 	public void setPlanetMapsKey(String value) {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_PLANET_KEY, value);
 	}
-*/
+
 	public String getExtraMapUrl() {
 		return getAnnotationValueString(survey, Annotation.COLLECT_EARTH_EXTRA_MAP_URL);
 	}
 
 	public void setExtraMapUrl(String value) {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_EXTRA_MAP_URL, value);
-	}
-
-	public boolean isBingMapsEnabled() {
-		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_BING_MAPS);
-	}
-
-	public void setBingMapsEnabled( boolean value) {
-		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_BING_MAPS, value);
 	}
 
 	public boolean isEarthMapEnabled() {
@@ -377,26 +380,6 @@ public class CollectAnnotations {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_PLANET_MAPS, value);
 	}
 
-	public boolean isYandexMapsEnabled() {
-		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_YANDEX_MAPS);
-	}
-
-	public void setYandexMapsEnabled( boolean value) {
-		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_YANDEX_MAPS, value);
-	}
-
-	public boolean isGEEExplorerEnabled() {
-		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_GEE_EXPLORER);
-	}
-
-	public void setGEEExplorerEnabled( boolean value) {
-		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_GEE_EXPLORER, value);
-	}
-
-	public boolean isGEECodeEditorEnabled() {
-		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_GEE_CODE_EDITOR);
-	}
-
 	public boolean isGEEAppEnabled() {
 		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_GEE_APP);
 	}
@@ -405,16 +388,68 @@ public class CollectAnnotations {
 		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_SECUREWATCH);
 	}
 
-	public void setGEECodeEditorEnabled( boolean value) {
-		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_GEE_CODE_EDITOR, value);
-	}
-
 	public void setGEEAppEnabled( boolean value) {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_GEE_APP, value);
 	}
 
 	public void setSecureWatchEnabled( boolean value) {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_SECUREWATCH, value);
+	}
+
+	public String getSecureWatchUrl() {
+		return getAnnotationValueString(survey, Annotation.COLLECT_EARTH_SECUREWATCH_URL);
+	}
+
+	public void setSecureWatchUrl(String value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_SECUREWATCH_URL, value);
+	}
+
+	public boolean isEsriWaybackEnabled() {
+		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_ESRI_WAYBACK);
+	}
+
+	public void setEsriWaybackEnabled(boolean value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_ESRI_WAYBACK, value);
+	}
+
+	public String getGEEAppDateFrom() {
+		return getAnnotationValueString(survey, Annotation.COLLECT_EARTH_GEE_APP_DATE_FROM);
+	}
+
+	public void setGEEAppDateFrom(String value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_GEE_APP_DATE_FROM, value);
+	}
+
+	public String getGEEAppDateTo() {
+		return getAnnotationValueString(survey, Annotation.COLLECT_EARTH_GEE_APP_DATE_TO);
+	}
+
+	public void setGEEAppDateTo(String value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_GEE_APP_DATE_TO, value);
+	}
+
+	public boolean isPlanetMapsUseTfo() {
+		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_PLANET_MAPS_USE_TFO);
+	}
+
+	public void setPlanetMapsUseTfo(boolean value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_PLANET_MAPS_USE_TFO, value);
+	}
+
+	public String getPlanetTfoDateFrom() {
+		return getAnnotationValueString(survey, Annotation.COLLECT_EARTH_PLANET_TFO_DATE_FROM);
+	}
+
+	public void setPlanetTfoDateFrom(String value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_PLANET_TFO_DATE_FROM, value);
+	}
+
+	public String getPlanetTfoDateTo() {
+		return getAnnotationValueString(survey, Annotation.COLLECT_EARTH_PLANET_TFO_DATE_TO);
+	}
+
+	public void setPlanetTfoDateTo(String value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_PLANET_TFO_DATE_TO, value);
 	}
 
 	public boolean isStreetViewEnabled() {
@@ -433,34 +468,74 @@ public class CollectAnnotations {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_SAMPLE_POINTS, value);
 	}
 
-	public boolean isShowOuterPolygon() {
-		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_SHOW_OUTER_POLYGON);
+	public CollectEarthPlotShape getCollectEarthPlotShape() {
+		return (CollectEarthPlotShape) getAnnotationValueEnum(survey, Annotation.COLLECT_EARTH_PLOT_SHAPE, CollectEarthPlotShape.class);
 	}
 
-	public void setShowOuterPolygon(boolean value) {
-		setAnnotationValue(survey, Annotation.COLLECT_EARTH_SHOW_OUTER_POLYGON, value);
+	public void setCollectEarthPlotShape(CollectEarthPlotShape value) {
+		setAnnotationValueEnum(survey, Annotation.COLLECT_EARTH_PLOT_SHAPE, value);
 	}
 
-	public Integer getOuterPolygonSize() {
-		return getAnnotationValueInteger(survey, Annotation.COLLECT_EARTH_OUTER_POLYGON_SIZE);
+	/**
+	 * Null in surveys that still define the plot by its area (see {@link #getCollectEarthPlotArea()})
+	 */
+	public Integer getCollectEarthDistanceBetweenSamplePoints() {
+		return getAnnotationValueInteger(survey, Annotation.COLLECT_EARTH_DISTANCE_BETWEEN_SAMPLE_POINTS);
 	}
 
-	public void setOuterPolygonSize(Integer value) {
-		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OUTER_POLYGON_SIZE, value);
+	public void setCollectEarthDistanceBetweenSamplePoints(Integer value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_DISTANCE_BETWEEN_SAMPLE_POINTS, value);
 	}
 
-	public OuterPolygonShape getOuterPolygonShape() {
-		String val = survey.getAnnotation(Annotation.COLLECT_EARTH_OUTER_POLYGON_SHAPE.getQName());
-		if (StringUtils.isBlank(val)) {
-			return (OuterPolygonShape) Annotation.COLLECT_EARTH_OUTER_POLYGON_SHAPE.getDefaultValue();
-		} else {
-			return OuterPolygonShape.valueOf(val);
-		}
+	/**
+	 * Null in surveys that still define the plot by its area (see {@link #getCollectEarthPlotArea()})
+	 */
+	public Integer getCollectEarthDistanceToPlotBoundaries() {
+		return getAnnotationValueInteger(survey, Annotation.COLLECT_EARTH_DISTANCE_TO_PLOT_BOUNDARIES);
 	}
 
-	public void setOuterPolygonShape(OuterPolygonShape value) {
-		String val = value == null || value == Annotation.COLLECT_EARTH_OUTER_POLYGON_SHAPE.getDefaultValue() ? null : value.name();
-		survey.setAnnotation(Annotation.COLLECT_EARTH_OUTER_POLYGON_SHAPE.getQName(), val);
+	public void setCollectEarthDistanceToPlotBoundaries(Integer value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_DISTANCE_TO_PLOT_BOUNDARIES, value);
+	}
+
+	public Integer getCollectEarthInnerPointSide() {
+		return getAnnotationValueInteger(survey, Annotation.COLLECT_EARTH_INNER_POINT_SIDE);
+	}
+
+	public void setCollectEarthInnerPointSide(Integer value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_INNER_POINT_SIDE, value);
+	}
+
+	public Integer getCollectEarthLargeCentralPlotSide() {
+		return getAnnotationValueInteger(survey, Annotation.COLLECT_EARTH_LARGE_CENTRAL_PLOT_SIDE);
+	}
+
+	public void setCollectEarthLargeCentralPlotSide(Integer value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_LARGE_CENTRAL_PLOT_SIDE, value);
+	}
+
+	public Integer getCollectEarthDistanceBetweenPlots() {
+		return getAnnotationValueInteger(survey, Annotation.COLLECT_EARTH_DISTANCE_BETWEEN_PLOTS);
+	}
+
+	public void setCollectEarthDistanceBetweenPlots(Integer value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_DISTANCE_BETWEEN_PLOTS, value);
+	}
+
+	public CollectEarthReferenceAreaShape getCollectEarthReferenceAreaShape() {
+		return (CollectEarthReferenceAreaShape) getAnnotationValueEnum(survey, Annotation.COLLECT_EARTH_REFERENCE_AREA_SHAPE, CollectEarthReferenceAreaShape.class);
+	}
+
+	public void setCollectEarthReferenceAreaShape(CollectEarthReferenceAreaShape value) {
+		setAnnotationValueEnum(survey, Annotation.COLLECT_EARTH_REFERENCE_AREA_SHAPE, value);
+	}
+
+	public Integer getCollectEarthReferenceAreaDistance() {
+		return getAnnotationValueInteger(survey, Annotation.COLLECT_EARTH_REFERENCE_AREA_DISTANCE);
+	}
+
+	public void setCollectEarthReferenceAreaDistance(Integer value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_REFERENCE_AREA_DISTANCE, value);
 	}
 
 	public boolean isAllowOnlyDeviceCoordinate(CoordinateAttributeDefinition def) {
@@ -551,7 +626,7 @@ public class CollectAnnotations {
 		setAnnotationValue(def, Annotation.COORDINATE_ATTRIBUTE_INCLUDE_ACCURACY, includeAccuracy);
 	}
 
-	private <T extends Enum<T>> Enum<T> getAnnotationValueEnum(AttributeDefinition def, Annotation annotation, Class<T> enumType) {
+	private <T extends Enum<T>> Enum<T> getAnnotationValueEnum(Annotatable def, Annotation annotation, Class<T> enumType) {
 		String enumName = def.getAnnotation(annotation.getQName());
 		if(StringUtils.isBlank(enumName)) {
 			return annotation.getDefaultValue();
@@ -594,7 +669,7 @@ public class CollectAnnotations {
 		String annotationValue = annotatable.getAnnotation(annotation.getQName());
 		return StringUtils.isBlank(annotationValue)
 			? (Integer) annotation.getDefaultValue()
-			: Integer.parseInt(annotationValue);
+			: Integer.valueOf(annotationValue);
 	}
 
 	private Double getAnnotationValueDouble(Annotatable annotatable, Annotation annotation) {
