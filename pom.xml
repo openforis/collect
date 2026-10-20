@@ -34,6 +34,11 @@
 		<sonar.language>java</sonar.language>
 		<sonar.organization>openforis</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+		<!-- The Collect Earth balloon assets run inside Google Earth; no test of the Maven build can execute them -->
+		<sonar.coverage.exclusions>**/earthFiles/**</sonar.coverage.exclusions>
+		<jacoco.version>0.8.12</jacoco.version>
+		<!-- Set by jacoco:prepare-agent; empty when JaCoCo is skipped, so that @{argLine} below still resolves -->
+		<argLine></argLine>
 	</properties>
 
 	<distributionManagement>
@@ -105,6 +110,27 @@
 
 	<build>
 		<plugins>
+			<!-- Test coverage for SonarCloud: target/site/jacoco/jacoco.xml of every module, where the scanner looks for it -->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
@@ -303,7 +329,9 @@
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>3.5.4</version>
 					<configuration>
+	                    <!-- @{argLine} keeps the JaCoCo agent that prepare-agent sets in it -->
 	                    <argLine>
+	                        @{argLine}
 	                        --add-opens=java.base/java.lang=ALL-UNNAMED
 	                        --add-opens=java.base/java.util=ALL-UNNAMED
 	                    </argLine>
