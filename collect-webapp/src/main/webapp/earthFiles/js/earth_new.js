@@ -1,5 +1,7 @@
 var SEPARATOR_MULTIPLE_PARAMETERS = "==="; //used to separate multiple attribute VALUES
 var SEPARATOR_MULTIPLE_VALUES = ";";
+var QUALIFIER_SEPARATOR = "::"; //between a code and the text of a qualifiable item ("other::Eucalyptus")
+var QUALIFIER_ID_SUFFIX = "_qualifier"; //id of the text input of a qualifiable item: id of its code field + suffix
 var DATE_FORMAT = 'MM/DD/YYYY';
 var TIME_FORMAT = 'HH:ss';
 
@@ -293,7 +295,7 @@ var createPlacemarkUpdateRequest = function(inputField) {
 	} else {
 		var $inputField = $(inputField)
 		values = {};
-		values[encodeURIComponent($inputField.attr('name'))] = $inputField.val();
+		values[encodeURIComponent($inputField.attr('name'))] = qualifyValue($inputField.attr('id'), $inputField.val());
 		values[encodeURIComponent(ACTIVELY_SAVED_FIELD_ID)] = findById(ACTIVELY_SAVED_FIELD_ID).val();
 		$form.find("." + EXTRA_FIELD_CLASS).each(function() {
 			var $this = $(this);
@@ -652,6 +654,7 @@ var updateStepsErrorFeedback = function() {
 
 var initFormInputFields = function(parentContainer) {
 	initCodeButtonGroups(parentContainer);
+	initCodeQualifiers(parentContainer);
 	initDateTimePickers(parentContainer);
 	initBooleanButtons(parentContainer);
 	initializeChangeEventSaver(parentContainer);
@@ -713,6 +716,7 @@ var initCodeButtonGroups = function(parentContainer) {
 		if (! wasActive) {
 			btn.toggleClass("active", true);
 		}
+		updateQualifierVisibility(inputField);
 		
 		updateData(inputField);
 		
@@ -816,7 +820,7 @@ var cloneStepTemplate = function (options) {
 	var title = headingPrefix + " (" + (newEntityIndex) + ")";
 	content.find("input, select, label, div.code-items-group, div.code-items").each(function(_i, elem) {
 		var el = $(elem);
-		["id", "name", "for", "data-parent-id-field-id"].forEach(function(attr) {
+		["id", "name", "for", "data-parent-id-field-id", "data-qualifier-for"].forEach(function(attr) {
 			replaceTextInAttribute(el, attr, "$index", newEntityIndex);
 		});
 	});
@@ -1096,6 +1100,21 @@ var fillDataWithJson = function(inputFieldInfoByParameterName) {
 }
 
 var setValueInInputField = function(inputField, value) {
+	// the text of a qualifiable item goes into its own input, the codes into the code field
+	var qualifierInput = findQualifierInput(inputField.attr("id"));
+	if (qualifierInput.length > 0 && value != null) {
+		var qualified = splitQualifiedValue(value);
+		value = qualified.codes;
+		// not while the interpreter is typing in it: the answer may be older than what is there
+		if (!qualifierInput.is(":focus") && qualifierInput.val() != qualified.qualifier) {
+			qualifierInput.val(qualified.qualifier);
+		}
+	}
+	setCodesInInputField(inputField, value);
+	updateQualifierVisibility(inputField);
+};
+
+var setCodesInInputField = function(inputField, value) {
 	var tagName = inputField.prop("tagName");
 	switch (tagName) {
 	case "INPUT":
@@ -1143,6 +1162,100 @@ var setValueInInputField = function(inputField, value) {
 		}
 		break;
 	}
+};
+
+/*
+ * Qualifiable code list items ("Other, specify"). The code field keeps the codes; the text goes in the input next to it
+ * (QUALIFIER_ID_SUFFIX, built by CEComponentHTMLFormatter), and is sent after the first selected qualifiable code.
+ */
+var findQualifierInput = function(fieldId) {
+	return fieldId ? findById(fieldId + QUALIFIER_ID_SUFFIX) : $();
+};
+
+var getQualifiableCodes = function(qualifierInput) {
+	var codes = qualifierInput.data("qualifiableCodes");
+	return $.isArray(codes) ? codes : [];
+};
+
+// "a===other::text" -> {codes: "a===other", qualifier: "text"}
+var splitQualifiedValue = function(value) {
+	var parts = value == null || value === "" ? [] : String(value).split(SEPARATOR_MULTIPLE_PARAMETERS);
+	var codes = [];
+	var qualifier = "";
+	for (var i = 0; i < parts.length; i++) {
+		var at = parts[i].indexOf(QUALIFIER_SEPARATOR);
+		if (at < 0) {
+			codes.push(parts[i]);
+		} else {
+			codes.push(parts[i].substring(0, at));
+			if (qualifier === "") {
+				qualifier = parts[i].substring(at + QUALIFIER_SEPARATOR.length);
+			}
+		}
+	}
+	return {codes: codes.join(SEPARATOR_MULTIPLE_PARAMETERS), qualifier: qualifier};
+};
+
+// The value of a code field as the server reads it: the text after the first selected qualifiable code
+var qualifyValue = function(fieldId, value) {
+	var qualifierInput = findQualifierInput(fieldId);
+	if (qualifierInput.length == 0 || value == null || value === "") {
+		return value;
+	}
+	var text = $.trim(qualifierInput.val());
+	if (text === "") {
+		return value;
+	}
+	var qualifiableCodes = getQualifiableCodes(qualifierInput);
+	var parts = String(value).split(SEPARATOR_MULTIPLE_PARAMETERS);
+	for (var i = 0; i < parts.length; i++) {
+		if ($.inArray(parts[i], qualifiableCodes) >= 0) {
+			parts[i] = parts[i] + QUALIFIER_SEPARATOR + text;
+			break;
+		}
+	}
+	return parts.join(SEPARATOR_MULTIPLE_PARAMETERS);
+};
+
+// The text input is shown while a qualifiable item is selected
+var updateQualifierVisibility = function(inputField) {
+	var qualifierInput = findQualifierInput($(inputField).attr("id"));
+	if (qualifierInput.length == 0) {
+		return;
+	}
+	var qualifiableCodes = getQualifiableCodes(qualifierInput);
+	var value = $(inputField).val();
+	var parts = value == null || value === "" ? [] : String(value).split(SEPARATOR_MULTIPLE_PARAMETERS);
+	var selected = false;
+	for (var i = 0; i < parts.length; i++) {
+		if ($.inArray(parts[i], qualifiableCodes) >= 0) {
+			selected = true;
+		}
+	}
+	qualifierInput.css("display", selected ? "block" : "none");
+	if (!selected) {
+		// the server drops the text with its item
+		qualifierInput.val("");
+	}
+};
+
+var initCodeQualifiers = function(parentContainer) {
+	(parentContainer || $form).find("input.code-qualifier").each(function() {
+		var qualifierInput = $(this);
+		var inputField = findById(qualifierInput.data("qualifierFor"));
+		// typing in it saves the code field, which carries the text
+		qualifierInput.keyup(function() {
+			updateData(inputField, 1500);
+		});
+		qualifierInput.change(function() {
+			updateData(inputField);
+		});
+		if (inputField.prop("tagName") == "SELECT") {
+			inputField.change(function() {
+				updateQualifierVisibility(inputField);
+			});
+		}
+	});
 };
 
 function getVisibleComponent(components) {
@@ -1231,7 +1344,7 @@ var serializeFormToJSON = function(form) {
    $.each(a, function() {
 	 if (this.name.indexOf('$index') < 0) { // skip parameters in template
 	   var key = encodeURIComponent(this.name);
-	   var value = this.value || '';
+	   var value = qualifyValue(this.name, this.value || '');
 	   var existingValue = o[key]
 	   if (existingValue) {
 		   // multiple values: transform item in "key" into an array

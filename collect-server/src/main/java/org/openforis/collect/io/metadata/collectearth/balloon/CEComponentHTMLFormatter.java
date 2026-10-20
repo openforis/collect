@@ -1,6 +1,7 @@
 package org.openforis.collect.io.metadata.collectearth.balloon;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,6 +24,8 @@ import com.jamesmurty.utils.XMLBuilder;
 public class CEComponentHTMLFormatter {
 
 	private static final String EXTRA_VALUE_FORMAT = "$[EXTRA_%s]";
+	/** Suffix of the id of the text input of a qualifiable item ( "Other, specify" ), next to its code field */
+	static final String QUALIFIER_ID_SUFFIX = "_qualifier"; //$NON-NLS-1$
 
 	private String language;
 
@@ -196,9 +199,11 @@ public class CEComponentHTMLFormatter {
 				switch(((CEField) comp).getType()) {
 				case CODE_BUTTON_GROUP:
 					buildCodeButtonGroup(formControlContainer, (CECodeField) comp);
+					buildQualifierInput(formControlContainer, (CECodeField) comp);
 					break;
 				case CODE_SELECT:
 					buildCodeSelect(formControlContainer, (CECodeField) comp);
+					buildQualifierInput(formControlContainer, (CECodeField) comp);
 					break;
 				case CODE_RANGE:
 					buildCodeRange(formControlContainer, (CERangeField) comp);
@@ -372,6 +377,53 @@ public class CEComponentHTMLFormatter {
 			}
 
 		}
+	}
+
+	/**
+	 * The text of a qualifiable item ( "Other, specify" ). Shown by earth_new.js while such an item is selected, and sent
+	 * after the code as "code::text", which Collect Earth saves as the qualifier of the code. It has no name, so it is never
+	 * sent as a parameter of its own.
+	 */
+	void buildQualifierInput(XMLBuilder formControlContainer, CECodeField comp) {
+		List<String> qualifiableCodes = getQualifiableCodes(comp);
+		if (qualifiableCodes.isEmpty()) {
+			return;
+		}
+		String elId = comp.getHtmlParameterName();
+		formControlContainer.e("input") //$NON-NLS-1$
+			.a("id", elId + QUALIFIER_ID_SUFFIX) //$NON-NLS-1$
+			.a("type", "text") //$NON-NLS-1$ //$NON-NLS-2$
+			.a("class", "form-control code-qualifier") //$NON-NLS-1$ //$NON-NLS-2$
+			.a("data-qualifier-for", elId) //$NON-NLS-1$
+			.a("data-qualifiable-codes", toJsonArray(qualifiableCodes)) //$NON-NLS-1$
+			.a("placeholder", Messages.getString("CEComponentHTMLFormatter.200", language)) //$NON-NLS-1$ //$NON-NLS-2$
+			.a("style", "display: none; margin-top: 4px;"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	static List<String> getQualifiableCodes(CECodeField comp) {
+		List<String> result = new ArrayList<String>();
+		for (List<CodeListItem> items : comp.getCodeItemsByParentId().values()) {
+			if (items != null) {
+				for (CodeListItem item : items) {
+					if (item.isQualifiable() && !result.contains(item.getCode())) {
+						result.add(item.getCode());
+					}
+				}
+			}
+		}
+		return result;
+	}
+
+	/** ["a","b"], which jQuery's data() reads back as an array */
+	static String toJsonArray(List<String> values) {
+		StringBuilder sb = new StringBuilder("["); //$NON-NLS-1$
+		for (int i = 0; i < values.size(); i++) {
+			if (i > 0) {
+				sb.append(',');
+			}
+			sb.append('"').append(values.get(i).replace("\\", "\\\\").replace("\"", "\\\"")).append('"'); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		}
+		return sb.append(']').toString();
 	}
 
 	private void buildCodeRange(XMLBuilder builder, CERangeField comp) {
