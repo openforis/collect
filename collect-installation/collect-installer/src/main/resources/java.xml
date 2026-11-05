@@ -5,24 +5,8 @@
     <selected>1</selected>
     <show>0</show>
 
-    <!-- folders storing JRE -->
+    <!-- folders storing JRE (64-bit only: Java 17+ has no 32-bit builds for Linux, nor maintained ones for Windows) -->
     <folderList>
-        <folder>
-            <description>Java binaries - Microsoft Windows</description>
-            <destination>${installdir}/java</destination>
-            <name>java_windows</name>
-            <platforms>windows</platforms>
-            <distributionFileList>
-                <distributionFile>
-                    <allowWildcards>1</allowWildcards>
-                    <origin>jre_files/jre%JRE_VERSION_FULL%-windows/java-windows/*</origin>
-                </distributionFile>
-            </distributionFileList>
-            <ruleList>
-                <isTrue value="${java_install_jre}"/>
-                <compareText logic="equals" text="${env(PROGRAMW6432)}" value=""/>
-            </ruleList>
-        </folder>
         <folder>
             <description>Java binaries - Microsoft Windows x64</description>
             <destination>${installdir}/java</destination>
@@ -31,23 +15,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>jre_files/jre%JRE_VERSION_FULL%-windows-x64/java-windows/*</origin>
-                </distributionFile>
-            </distributionFileList>
-            <ruleList>
-                <isTrue value="${java_install_jre}"/>
-                <compareText logic="does_not_equal" text="${env(PROGRAMW6432)}" value=""/>
-            </ruleList>
-        </folder>
-        <folder>
-            <description>Java binaries - Linux</description>
-            <destination>${installdir}/java</destination>
-            <name>java_linux</name>
-            <platforms>linux</platforms>
-            <distributionFileList>
-                <distributionFile>
-                    <allowWildcards>1</allowWildcards>
-                    <origin>jre_files/jre%JRE_VERSION_FULL%-linux/java-linux/*</origin>
+                    <origin>jre_files/windows-x64/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -62,7 +30,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>jre_files/jre%JRE_VERSION_FULL%-linux-x64/java-linux-x64/*</origin>
+                    <origin>jre_files/linux-x64/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -77,7 +45,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>jre_files/jre%JRE_VERSION_FULL%-osx/java-osx/*</origin>
+                    <origin>jre_files/osx/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -189,94 +157,12 @@
                 <platformTest negate="1" type="windows"/>
             </ruleList>
         </changePermissions>
-
-        <!-- Create symbolic links on various platforms -->
-        <actionGroup>
-            <actionList>
-                <createSymLink linkName="${installdir}/java/bin/ControlPanel" target="jcontrol">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/bin"/>
-                        <fileExists path="${installdir}/java/bin/jcontrol"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/jre/bin/ControlPanel" target="jcontrol">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/jre/bin"/>
-                        <fileExists path="${installdir}/java/jre/bin/jcontrol"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/jre/lib/i386/client/libjsig.so" target="../libjsig.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/jre/lib/i386/client"/>
-                        <fileExists path="${installdir}/java/jre/lib/i386/libjsig.so"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/jre/lib/i386/server/libjsig.so" target="../libjsig.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/jre/lib/i386/server"/>
-                        <fileExists path="${installdir}/java/jre/lib/i386/libjsig.so"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/bin/ControlPanel" target="jcontrol">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/bin"/>
-                        <fileExists path="${installdir}/java/bin/jcontrol"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/lib/i386/client/libjsig.so" target="../libjsig.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/lib/i386/client"/>
-                        <fileExists path="${installdir}/java/lib/i386/libjsig.so"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/lib/i386/server/libjsig.so" target="../libjsig.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/lib/i386/server"/>
-                        <fileExists path="${installdir}/java/lib/i386/libjsig.so"/>
-                    </ruleList>
-                </createSymLink>
-            </actionList>
+        <!-- used by the JVM to start processes -->
+        <changePermissions abortOnError="0" files="${installdir}/java/lib/jspawnhelper" permissions="0755" showMessageOnError="0">
             <ruleList>
-                <platformTest type="linux"/>
+                <fileExists path="${installdir}/java/lib/jspawnhelper"/>
             </ruleList>
-        </actionGroup>
-        <actionGroup>
-            <actionList>
-                <createSymLink linkName="${installdir}/java/bin/ControlPanel" target="jcontrol">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/bin"/>
-                        <fileExists path="${installdir}/java/bin/jcontrol"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/jre/bin/ControlPanel" target="jcontrol">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/jre/bin"/>
-                        <fileExists path="${installdir}/java/jre/bin/jcontrol"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/jre/lib/amd64/server/libjsig.so" target="../libjsig.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/jre/lib/amd64/server"/>
-                        <fileExists path="${installdir}/java/jre/lib/amd64/libjsig.so"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/bin/ControlPanel" target="jcontrol">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/bin"/>
-                        <fileExists path="${installdir}/java/bin/jcontrol"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/lib/amd64/server/libjsig.so" target="../libjsig.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/lib/amd64/server"/>
-                        <fileExists path="${installdir}/java/lib/amd64/libjsig.so"/>
-                    </ruleList>
-                </createSymLink>
-            </actionList>
-            <ruleList>
-                <platformTest type="linux-x64"/>
-            </ruleList>
-        </actionGroup>
+        </changePermissions>
 
         <!-- create Java launcher using preferred JRE -->
         <createJavaLaunchers>
@@ -362,7 +248,7 @@
                 <setInstallerVariable name="java_version_major" value="%JRE_VERSION_MAJOR%"/>
                 <setInstallerVariable name="java_version" value="%JRE_VERSION%"/>
                 <setInstallerVariable name="java_version_full" value="%JRE_VERSION_FULL%"/>
-                <setInstallerVariable name="java_version_vendor" value="Oracle"/>
+                <setInstallerVariable name="java_version_vendor" value="Eclipse Adoptium"/>
                 <setInstallerVariable name="java_bitness" value="64"/>
 
                 <!-- determine Java binary name - javaw.exe on Windows, java otherwise -->

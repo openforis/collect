@@ -68,6 +68,62 @@ check_for_updates = 1
 				<deleteFile path="${project.rollbackBackupDirectory}" />
 			</postInstallationActionList>
 		</component>
+		<!-- Java runtime: replaces the one bundled by previous versions -->
+		<component>
+			<name>java</name>
+			<description>Java Runtime Environment</description>
+			<canBeEdited>0</canBeEdited>
+			<selected>1</selected>
+			<show>0</show>
+			<folderList>
+				<folder>
+					<name>java_windows_x64</name>
+					<description>Java binaries - Microsoft Windows x64</description>
+					<destination>${installdir}/java</destination>
+					<platforms>windows</platforms>
+					<distributionFileList>
+						<distributionFile allowWildcards="1">
+							<origin>jre_files/windows-x64/*</origin>
+						</distributionFile>
+					</distributionFileList>
+				</folder>
+				<folder>
+					<name>java_linux_x64</name>
+					<description>Java binaries - Linux-x64</description>
+					<destination>${installdir}/java</destination>
+					<platforms>linux-x64</platforms>
+					<distributionFileList>
+						<distributionFile allowWildcards="1">
+							<origin>jre_files/linux-x64/*</origin>
+						</distributionFile>
+					</distributionFileList>
+				</folder>
+				<folder>
+					<name>java_osx</name>
+					<description>Java binaries - Mac OS X</description>
+					<destination>${installdir}/java</destination>
+					<platforms>osx</platforms>
+					<distributionFileList>
+						<distributionFile allowWildcards="1">
+							<origin>jre_files/osx/*</origin>
+						</distributionFile>
+					</distributionFileList>
+				</folder>
+			</folderList>
+			<postInstallationActionList>
+				<changePermissions abortOnError="0" files="${installdir}/java/bin/*" permissions="0755" showMessageOnError="0">
+					<ruleList>
+						<platformTest negate="1" type="windows" />
+					</ruleList>
+				</changePermissions>
+				<!-- used by the JVM to start processes -->
+				<changePermissions abortOnError="0" files="${installdir}/java/lib/jspawnhelper" permissions="0755" showMessageOnError="0">
+					<ruleList>
+						<fileExists path="${installdir}/java/lib/jspawnhelper" />
+					</ruleList>
+				</changePermissions>
+			</postInstallationActionList>
+		</component>
 		<!-- autoupdate -->
 		<component>
 			<name>autoupdater</name>
@@ -112,6 +168,15 @@ check_for_updates = 1
 		</component>
 	</componentList>
 	<preInstallationActionList>
+		<!-- the bundled JRE is 64-bit only -->
+		<throwError>
+			<text>This version of Open Foris Collect requires a 64-bit version of Windows.
+Your current installation has not been changed.</text>
+			<ruleList>
+				<platformTest type="windows" />
+				<compareText logic="equals" text="${env(PROGRAMW6432)}" value="" />
+			</ruleList>
+		</throwError>
 		<setInstallerVariable name="installdir"
 			value=".." />
 		<setInstallerVariable name="server_http_port"
@@ -186,6 +251,10 @@ check_for_updates = 1
 		<!-- delete old lib files -->
 		<deleteFile>
 			<path>${installdir}/lib/*.jar</path>
+		</deleteFile>
+		<!-- delete the old Java runtime: Java 9+ does not start if files of a Java 8 runtime (lib/ext) are left in its folder -->
+		<deleteFile>
+			<path>${installdir}/java</path>
 		</deleteFile>
 	</readyToInstallActionList>
 	<requireInstallationByRootUser>0</requireInstallationByRootUser>
