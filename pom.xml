@@ -120,7 +120,7 @@
 								<requireMavenVersion>
 									<version>3.6.3</version>
 								</requireMavenVersion>
-								<!-- frontend-maven-plugin 2.x runs on Java 17+; bytecode still targets Java 8 (release 8) -->
+								<!-- the code targets Java 17 (release 17); frontend-maven-plugin 2.x also needs Java 17+ -->
 								<requireJavaVersion>
 									<version>17</version>
 								</requireJavaVersion>
@@ -323,7 +323,7 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>3.16.0</version>
 					<configuration>
-						<release>8</release>
+						<release>17</release>
 						<encoding>${project.build.sourceEncoding}</encoding>
 					</configuration>
 				</plugin>

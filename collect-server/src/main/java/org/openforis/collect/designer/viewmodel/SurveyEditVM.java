@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
@@ -59,7 +61,6 @@ import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.bind.annotation.QueryParam;
-import org.zkoss.util.logging.Log;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.EventListener;
@@ -73,7 +74,7 @@ import org.zkoss.zul.Window;
  */
 public class SurveyEditVM extends SurveyBaseVM {
 
-	private static final Log log = Log.lookup(SurveyEditVM.class);
+	private static final Logger log = LogManager.getLogger(SurveyEditVM.class);
 
 	public static final String SHOW_PREVIEW_POP_UP_GLOBAL_COMMAND = "showPreview";
 	public static final String BACKGROUD_SAVE_GLOBAL_COMMAND = "backgroundSurveySave";
@@ -439,7 +440,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 					FileInputStream is = new FileInputStream(file);
 					Filedownload.save(is, contentType, fileName);
 				} catch (FileNotFoundException e) {
-					log.error(e);
+					log.error(e.getMessage(), e);
 					MessageUtil.showError("survey.schema.export_summary.error", e.getMessage());
 				}
 			}

@@ -270,7 +270,7 @@
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
-			<version>4.33.0</version><!-- Version 5 requires Java 17 -->
+			<version>4.33.0</version><!-- Version 5 is licensed under FSL-1.1-ALv2 instead of Apache 2.0 -->
 		</dependency>
 		<!-- Protostuff -->
 		<dependency>

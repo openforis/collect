@@ -108,7 +108,7 @@
 											<label value="${labels.survey.versioning.date}:" />
 		                                </fieldErrorHandler>
 		      			                <fieldErrorHandler message="@load(vmsgs['date'])">
-											<datebox width="150px" compact="false" buttonVisible="true" format="@load(vm.dateFormat)" 
+											<datebox width="150px" buttonVisible="true" format="@load(vm.dateFormat)" 
 					                    		value="@bind(fx.date)" onChange="@command('applyChanges')" />
 		                                </fieldErrorHandler>
 									</row>
