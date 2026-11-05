@@ -6,7 +6,8 @@ LABEL APPLICATION="Open Foris Collect"
 
 WORKDIR /app
 COPY . .
-RUN apt-get update && apt-get install -y git
+# libatomic1: required by the Node.js binary used by frontend-maven-plugin
+RUN apt-get update && apt-get install -y git libatomic1
 RUN mvn package
 
 FROM tomcat:9.0.123-jdk21-temurin
