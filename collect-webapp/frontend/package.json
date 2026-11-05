@@ -62,6 +62,10 @@
   "overrides": {
     "react-virtualized": {
       "dom-helpers": "^6.0.1"
+    },
+    "react-popper": {
+      "react": "$react",
+      "react-dom": "$react-dom"
     }
   }
 }
