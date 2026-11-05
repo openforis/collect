@@ -11,7 +11,8 @@
 	<packaging>jar</packaging>
 	
 	<properties>
-		<jetty.version>9.4.58.v20250814</jetty.version> <!-- 10+ requires Java 11 -->
+		<!-- Spring 5.3 WebSocket supports only Jetty 9.4 and 10 (both end of life); Jetty 12 needs Spring 6 -->
+		<jetty.version>9.4.58.v20250814</jetty.version>
 		<jetty-websocket.version>9.4.58.v20250814</jetty-websocket.version>
 	</properties>
 
