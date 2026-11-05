@@ -26,11 +26,11 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<openforis.commons.version>0.1.35</openforis.commons.version>
-		<spring.version>5.3.27</spring.version>
-		<spring-security.version>5.8.3</spring-security.version>
+		<spring.version>5.3.39</spring.version>
+		<spring-security.version>5.8.16</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>
-		<log4j.version>2.20.0</log4j.version>
-		<slf4j.version>1.7.36</slf4j.version>
+		<log4j.version>2.26.1</log4j.version>
+		<slf4j.version>2.0.20</slf4j.version>
 		<sonar.language>java</sonar.language>
 		<sonar.organization>openforis</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
@@ -108,7 +108,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.7.0</version>
 				<executions>
 					<execution>
 						<id>enforce-maven</id>
@@ -120,6 +120,10 @@
 								<requireMavenVersion>
 									<version>3.6.3</version>
 								</requireMavenVersion>
+								<!-- frontend-maven-plugin 2.x runs on Java 17+; bytecode still targets Java 8 (release 8) -->
+								<requireJavaVersion>
+									<version>17</version>
+								</requireJavaVersion>
 							</rules>
 						</configuration>
 					</execution>
@@ -164,7 +168,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>3.2.1</version>
+				<version>3.4.0</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -176,7 +180,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.3.2</version>
+				<version>3.12.0</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
@@ -205,7 +209,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-gpg-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.2.8</version>
 				<executions>
 					<execution>
 						<id>sign-artifacts</id>
@@ -219,7 +223,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.3</version>
+				<version>3.3.1</version>
 				<configuration>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<!-- During release:perform, enable these profiles -->
@@ -251,12 +255,12 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>license-maven-plugin</artifactId>
-				<version>2.0.0</version>
+				<version>2.7.1</version>
 			</plugin>
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.14</version>
+				<version>1.7.0</version>
 				<extensions>true</extensions>
 				<configuration>
 					<serverId>ossrh-staging-api</serverId>
@@ -270,38 +274,38 @@
 			<plugins>
 				<plugin>
 					<artifactId>maven-clean-plugin</artifactId>
-					<version>3.1.0</version>
+					<version>3.5.0</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-deploy-plugin</artifactId>
-					<version>2.8.2</version>
-				</plugin>
-				<plugin>
-					<artifactId>maven-install-plugin</artifactId>
-					<version>2.5.2</version>
-				</plugin>
-				<plugin>
-					<artifactId>maven-resources-plugin</artifactId>
 					<version>3.2.0</version>
 				</plugin>
 				<plugin>
+					<artifactId>maven-install-plugin</artifactId>
+					<version>3.2.0</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.5.0</version>
+				</plugin>
+				<plugin>
 					<artifactId>maven-site-plugin</artifactId>
-					<version>3.11.0</version>
+					<version>3.22.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>3.0.0</version>
+					<version>3.6.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>3.3.2</version>
+					<version>3.12.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>3.5.4</version>
+					<version>3.6.1</version>
 					<configuration>
 	                    <argLine>
 	                        --add-opens=java.base/java.lang=ALL-UNNAMED
@@ -317,22 +321,21 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.10.0</version>
+					<version>3.16.0</version>
 					<configuration>
-						<source>1.8</source>
-						<target>1.8</target>
+						<release>8</release>
 						<encoding>${project.build.sourceEncoding}</encoding>
 					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-antrun-plugin</artifactId>
-					<version>3.1.0</version>
+					<version>3.2.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>build-helper-maven-plugin</artifactId>
-					<version>3.3.0</version>
+					<version>3.6.2</version>
 				</plugin>
 				<plugin>
 					<groupId>com.soebes.maven.plugins</groupId>
@@ -342,7 +345,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>3.5.0</version>
+					<version>3.11.0</version>
 				</plugin>
 				<plugin>
 					<groupId>com.google.code.maven-replacer-plugin</groupId>
@@ -352,7 +355,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.2.2</version>
+					<version>3.5.1</version>
 				</plugin>
 
 				<!--This plugin's configuration is used to store Eclipse m2e settings
@@ -389,12 +392,12 @@
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>buildnumber-maven-plugin</artifactId>
-					<version>3.0.0</version>
+					<version>3.3.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>versions-maven-plugin</artifactId>
-					<version>2.15.0</version>
+					<version>2.23.0</version>
 					<configuration>
 						<rulesUri>file:./conf/maven-versions-rules.xml</rulesUri>
 					</configuration>
@@ -420,10 +423,6 @@
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
-		</repository>
-		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
 		</repository>
 		<!-- GeoTools -->
 		<repository>
@@ -459,7 +458,7 @@
 			<dependency>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>3.3.2</version>
+				<version>3.5.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.commons</groupId>
@@ -504,7 +503,7 @@
 			<dependency>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>3.3.0</version>
+				<version>3.6.2</version>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
@@ -528,7 +527,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.apache.logging.log4j</groupId>
-				<artifactId>log4j-slf4j-impl</artifactId>
+				<artifactId>log4j-slf4j2-impl</artifactId>
 				<version>${log4j.version}</version>
 			</dependency>
 			<dependency>
@@ -549,7 +548,7 @@
 			<dependency>
 				<groupId>commons-logging</groupId>
 				<artifactId>commons-logging</artifactId>
-				<version>1.2</version>
+				<version>1.4.0</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-digester</groupId>
@@ -559,22 +558,22 @@
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
-				<version>3.12.0</version>
+				<version>3.21.0</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>2.11.0</version>
+				<version>2.22.0</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-fileupload</groupId>
 				<artifactId>commons-fileupload</artifactId>
-				<version>1.5</version>
+				<version>1.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-vfs2</artifactId>
-				<version>2.9.0</version>
+				<version>2.10.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
@@ -639,37 +638,37 @@
 			<dependency>
 				<groupId>net.lingala.zip4j</groupId>
 				<artifactId>zip4j</artifactId>
-				<version>2.11.5</version>
+				<version>2.11.6</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-dbcp2</artifactId>
-				<version>2.9.0</version>
+				<version>2.14.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-pool2</artifactId>
-				<version>2.11.1</version>
+				<version>2.13.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.xerial</groupId>
 				<artifactId>sqlite-jdbc</artifactId>
-				<version>3.42.0.0</version>
+				<version>3.54.1.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>
-				<version>42.7.4</version>
+				<version>42.7.14</version>
 			</dependency>
 			<dependency>
 				<groupId>com.h2database</groupId>
 				<artifactId>h2</artifactId>
-				<version>2.3.232</version>
+				<version>2.5.252</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
-				<artifactId>mockito-all</artifactId>
-				<version>2.0.2-beta</version>
+				<artifactId>mockito-core</artifactId>
+				<version>5.24.0</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
