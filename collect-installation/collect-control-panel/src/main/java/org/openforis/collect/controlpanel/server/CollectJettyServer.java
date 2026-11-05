@@ -11,6 +11,8 @@ public class CollectJettyServer extends JettyApplicationServer {
 
 	public CollectJettyServer(int port, File webappsFolder, JndiDataSourceConfiguration... jndiDsConfigurations) {
 		super(port, webappsFolder, jndiDsConfigurations);
+		// the JAXB 2.2 bundled with Saiku defines classes through reflection, which Java 17 forbids: disable that optimization
+		System.setProperty("com.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize", "true");
 	}
 	
 	@Override
