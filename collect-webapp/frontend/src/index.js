@@ -1,7 +1,7 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { HashRouter, Route, Routes } from 'react-router-dom'
-import thunkMiddleware from 'redux-thunk'
+import { thunk as thunkMiddleware } from 'redux-thunk'
 import { createStore, applyMiddleware, compose } from 'redux'
 import { Provider } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material'
@@ -36,7 +36,7 @@ const store = createStore(
 const theme = createTheme()
 
 Labels.initialize(() => {
-  ReactDOM.render(
+  createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       <SessionTimeoutVerifier>
         <Startup>
@@ -53,7 +53,6 @@ Labels.initialize(() => {
           </ThemeProvider>
         </Startup>
       </SessionTimeoutVerifier>
-    </Provider>,
-    document.getElementById('root')
+    </Provider>
   )
 })

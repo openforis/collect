@@ -1,8 +1,8 @@
 import './DataGrid.scss'
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import classNames from 'classnames'
-import { DataGrid as MuiDataGrid, GridToolbar, useGridApiContext } from '@mui/x-data-grid'
+import { DataGrid as MuiDataGrid, useGridApiContext } from '@mui/x-data-grid'
 
 import L from 'utils/Labels'
 import { QuickSearchHeader } from './QuickSearchHeader'
@@ -20,33 +20,36 @@ const EditCell = (props) => {
   return renderEditCell({ id, field, row, api: apiRef.current, onValueUpdate })
 }
 
+// max page size allowed in the MIT version of the MUI DataGrid
+const MAX_PAGE_SIZE = 100
+
 export const DataGrid = (props) => {
   const {
-    checkboxSelection,
+    checkboxSelection = false,
     className,
     columns,
-    dataMode,
-    density,
+    dataMode = 'client',
+    density = 'standard',
     disableMultipleSelection,
     disableSelectionOnClick,
-    exportFileName,
+    exportFileName = null,
     getRowId,
-    headerHeight,
+    headerHeight = 56,
     hideFooter,
-    hideFooterPagination,
+    hideFooterPagination = false,
     isCellEditable,
     loading,
-    onFilterModelChange: onFilterModelChangeProp,
+    onFilterModelChange: onFilterModelChangeProp = null,
     onPageChange,
     onPageSizeChange: onPageSizeChangeProp,
     onRowDoubleClick: onRowDoubleClickProp,
     onSelectedIdsChange,
     onSortModelChange,
-    pageSize: pageSizeProp,
+    pageSize: pageSizeProp = 25,
     rowCount,
     rows,
     selectionModel,
-    showToolbar,
+    showToolbar = false,
     sortModel,
   } = props
 
@@ -54,7 +57,18 @@ export const DataGrid = (props) => {
 
   const [filterModel, setFilterModel] = useState(undefined)
 
-  const [pageSize, setPageSize] = useState(hideFooter || hideFooterPagination ? undefined : pageSizeProp)
+  // when footer or pagination is hidden, show all rows
+  const allRowsShown = hideFooter || hideFooterPagination
+
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: allRowsShown ? MAX_PAGE_SIZE : pageSizeProp,
+  })
+
+  const rowSelectionModel = useMemo(
+    () => (selectionModel ? { type: 'include', ids: new Set(selectionModel) } : undefined),
+    [selectionModel]
+  )
 
   const onCellDoubleClick = useCallback(
     (params) => {
@@ -69,7 +83,7 @@ export const DataGrid = (props) => {
       (value) => {
         const itemsUpdated = Strings.isBlank(value)
           ? []
-          : [{ id: field, columnField: field, operatorValue: 'contains', value }]
+          : [{ id: field, field, operator: 'contains', value }]
         const filterModelUpdated = { items: itemsUpdated }
         filterModelRef.current = filterModelUpdated
         setFilterModel(filterModelUpdated)
@@ -79,21 +93,30 @@ export const DataGrid = (props) => {
     [filterModel, setFilterModel]
   )
 
-  const onPageSizeChange = useCallback(
-    (pageSizeNew) => {
-      if (onPageSizeChangeProp) {
-        onPageSizeChangeProp(pageSizeNew)
+  const onPaginationModelChange = useCallback(
+    (paginationModelNew) => {
+      const { page, pageSize } = paginationModelNew
+      if (pageSize !== paginationModel.pageSize) {
+        if (onPageSizeChangeProp) {
+          onPageSizeChangeProp(pageSize)
+        }
+        setPaginationModel({ page: 0, pageSize })
       } else {
-        setPageSize(pageSizeNew)
+        if (page !== paginationModel.page) {
+          onPageChange?.(page)
+        }
+        setPaginationModel(paginationModelNew)
       }
     },
-    [onPageSizeChangeProp, setPageSize]
+    [onPageChange, onPageSizeChangeProp, paginationModel]
   )
 
-  // when footer or pagination is hidden, show all rows
   useEffect(() => {
-    setPageSize(hideFooter || hideFooterPagination ? undefined : pageSizeProp)
-  }, [hideFooter, hideFooterPagination, pageSizeProp])
+    setPaginationModel((paginationModelPrev) => ({
+      ...paginationModelPrev,
+      pageSize: allRowsShown ? MAX_PAGE_SIZE : pageSizeProp,
+    }))
+  }, [allRowsShown, pageSizeProp])
 
   // TODO handle DataGrid onFilterModelChange
   // const onFilterModelChange = useCallback(
@@ -155,55 +178,39 @@ export const DataGrid = (props) => {
           renderHeader,
           sortable,
           valueFormatter: valueFormatterProp
-            ? ({ id, field, value, api }) => {
-                const row = api.getRow(id)
-                return valueFormatterProp({ id, field, value, api, row })
+            ? (value, row, column, apiRef) => {
+                const { current: api } = apiRef
+                return valueFormatterProp({ id: api.getRowId(row), field: column.field, value, api, row })
               }
             : undefined,
           width,
         }
       })}
-      components={{ Toolbar: showToolbar ? GridToolbar : null }}
-      componentsProps={{ ...(showToolbar ? { toolbar: { csvOptions: { fileName: exportFileName } } } : {}) }}
+      columnHeaderHeight={headerHeight}
       density={density}
-      disableMultipleColumnsFiltering={false}
-      disableMultipleSelection={disableMultipleSelection}
-      disableSelectionOnClick={disableSelectionOnClick}
-      experimentalFeatures={{ newEditingApi: true }}
+      disableMultipleRowSelection={disableMultipleSelection}
+      disableRowSelectionExcludeModel
+      disableRowSelectionOnClick={disableSelectionOnClick}
       filterMode={dataMode}
       filterModel={filterModel}
-      headerHeight={headerHeight}
       hideFooter={hideFooter}
       hideFooterPagination={hideFooterPagination}
       isCellEditable={isCellEditable}
       loading={loading}
       onCellDoubleClick={onCellDoubleClick}
-      onPageChange={onPageChange}
-      onPageSizeChange={onPageSizeChange}
-      onSelectionModelChange={onSelectedIdsChange}
+      onPaginationModelChange={onPaginationModelChange}
+      onRowSelectionModelChange={onSelectedIdsChange ? (model) => onSelectedIdsChange(Array.from(model.ids)) : undefined}
       onSortModelChange={onSortModelChange}
-      pageSize={pageSize}
+      pageSizeOptions={[10, 15, 25, 50, MAX_PAGE_SIZE]}
       paginationMode={dataMode}
+      paginationModel={paginationModel}
       rowCount={rowCount}
       rows={rows}
-      rowsPerPageOptions={[10, 15, 25, 50, 100]}
-      selectionModel={selectionModel}
+      rowSelectionModel={rowSelectionModel}
+      showToolbar={showToolbar}
+      slotProps={{ toolbar: { csvOptions: { fileName: exportFileName }, showQuickFilter: false } }}
       sortingMode={dataMode}
       sortModel={sortModel}
     />
   )
-}
-
-DataGrid.defaultProps = {
-  checkboxSelection: false,
-  dataMode: 'client',
-  density: 'standard',
-  disableMultipleSelection: undefined,
-  exportFileName: null,
-  headerHeight: 56,
-  hideFooterPagination: false,
-  onFilterModelChange: null,
-  pageSize: 25,
-  selectionModel: undefined,
-  showToolbar: false,
 }

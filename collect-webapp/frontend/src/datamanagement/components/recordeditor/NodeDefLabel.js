@@ -7,7 +7,7 @@ import InfoIcon from 'common/components/InfoIcon'
 import { NodeDefinition } from 'model/Survey'
 
 const NodeDefLabel = (props) => {
-  const { nodeDefinition, limitWidth } = props
+  const { nodeDefinition, limitWidth = true } = props
   const { numberLabel, labelOrName, description, labelWidth: labelWidthNodeDef } = nodeDefinition
 
   const hasNumberLabel = !!numberLabel
@@ -32,10 +32,6 @@ const NodeDefLabel = (props) => {
 NodeDefLabel.propTypes = {
   nodeDefinition: PropTypes.instanceOf(NodeDefinition).isRequired,
   limitWidth: PropTypes.bool,
-}
-
-NodeDefLabel.defaultProps = {
-  limitWidth: true,
 }
 
 export default NodeDefLabel

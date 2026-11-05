@@ -18,8 +18,8 @@ class NewSurveyPage extends Component {
 
   render() {
     return (
-      <Grid container justifyContent="center">
-        <Grid item>
+      <Grid container sx={{ justifyContent: 'center' }}>
+        <Grid>
           <NewSurveyParametersForm />
         </Grid>
       </Grid>

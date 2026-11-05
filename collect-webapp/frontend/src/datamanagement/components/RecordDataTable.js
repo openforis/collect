@@ -91,14 +91,14 @@ class RecordDataTable extends Component {
     const summaryValues = []
     let ownerIds = []
     filterModel?.items?.forEach((filterItem) => {
-      const { columnField, value } = filterItem
-      if (columnField.startsWith('key')) {
-        const keyValueIdx = parseInt(columnField.substring(3), 10) - 1
+      const { field, value } = filterItem
+      if (field.startsWith('key')) {
+        const keyValueIdx = parseInt(field.substring(3), 10) - 1
         keyValues[keyValueIdx] = Strings.appendIfMissing(value, '*') // starts with value
-      } else if (columnField.startsWith(SUMMARY_FIELD_PREFIX)) {
-        const summaryValueIdx = parseInt(columnField.substring(columnField.indexOf('_') + 1), 10)
+      } else if (field.startsWith(SUMMARY_FIELD_PREFIX)) {
+        const summaryValueIdx = parseInt(field.substring(field.indexOf('_') + 1), 10)
         summaryValues[summaryValueIdx] = Strings.appendIfMissing(value, '*') // starts with value
-      } else if (columnField === 'owner') {
+      } else if (field === 'owner') {
         ownerIds = value
       }
     })
@@ -280,10 +280,10 @@ class RecordDataTable extends Component {
                   users={availableOwners}
                   filterHandler={(ownerIds) => {
                     const filterItems = filterModel.items
-                    const filterItem = { id: 'owner', columnField: 'owner', value: ownerIds }
-                    const filterItemIdx = Arrays.indexOf(filterItems, filterItem, 'columnField')
+                    const filterItem = { id: 'owner', field: 'owner', value: ownerIds }
+                    const filterItemIdx = Arrays.indexOf(filterItems, filterItem, 'field')
                     const filterItemsUpdated = Arrays.isEmpty(ownerIds)
-                      ? Arrays.removeItem(filterItems, filterItem, 'columnField')
+                      ? Arrays.removeItem(filterItems, filterItem, 'field')
                       : filterItemIdx >= 0
                       ? Arrays.replaceItemAt(filterItems, filterItemIdx, filterItem)
                       : [...filterItems, filterItem]

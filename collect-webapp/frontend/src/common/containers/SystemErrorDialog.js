@@ -21,7 +21,14 @@ import RouterUtils from 'utils/RouterUtils'
 import { Dialog } from 'common/components'
 
 const SystemErrorDialog = (props) => {
-  const { details, message, showProgressBar, showRefreshButton, title, width } = props
+  const {
+    details = null,
+    message = null,
+    showProgressBar = false,
+    showRefreshButton = true,
+    title = 'systemError.title',
+    width = 400,
+  } = props
 
   return (
     <Dialog open disableBackdropClick disableEscapeKeyDown maxWidth={false} className="system-error-dialog">
@@ -60,15 +67,6 @@ SystemErrorDialog.propTypes = {
   showRefreshButton: PropTypes.bool,
   title: PropTypes.string,
   width: PropTypes.number,
-}
-
-SystemErrorDialog.defaultProps = {
-  details: null,
-  message: null,
-  showProgressBar: false,
-  showRefreshButton: true,
-  title: 'systemError.title',
-  width: 400,
 }
 
 export default SystemErrorDialog

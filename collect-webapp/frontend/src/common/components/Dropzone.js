@@ -15,26 +15,29 @@ const Size = {
 
 const Dropzone = (props) => {
   const {
-    className: classNameProps,
+    className: classNameProps = null,
     handleFileDrop,
     acceptedFileTypes,
     acceptedFileTypesDescription,
-    selectedFilePreview,
-    size,
-    width,
-    height,
+    selectedFilePreview = null,
+    size = Size.LARGE,
+    width = '100%',
+    height = '200px',
   } = props
 
   const handleFilesDrop = (acceptedFiles) => {
     //only single file upload supported
     if (acceptedFiles !== null && acceptedFiles.length === 1) {
       const file = acceptedFiles[0]
-      handleFileDrop(file)
+      // react-dropzone's accept prop rejects extensions with dashes (e.g. .collect-backup): check extensions here
+      const fileName = file.name.toLowerCase()
+      if (acceptedFileTypes.split(',').some((ext) => fileName.endsWith(ext.trim().toLowerCase()))) {
+        handleFileDrop(file)
+      }
     }
   }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: acceptedFileTypes,
     onDrop: handleFilesDrop,
   })
 
@@ -42,7 +45,7 @@ const Dropzone = (props) => {
 
   return (
     <div {...getRootProps({ className, style: { width, height } })}>
-      <input {...getInputProps()} />
+      <input {...getInputProps({ accept: acceptedFileTypes })} />
       {selectedFilePreview ? (
         <p className="fileDroppedMessage">
           {size === Size.LARGE && <span className="checked large" />}
@@ -77,14 +80,6 @@ Dropzone.propTypes = {
   size: PropTypes.oneOf([Size.SMALL, Size.MEDIUM, Size.LARGE]),
   width: PropTypes.string,
   height: PropTypes.string,
-}
-
-Dropzone.defaultProps = {
-  className: null,
-  selectedFilePreview: null,
-  size: 'large',
-  width: '100%',
-  height: '200px',
 }
 
 export default Dropzone

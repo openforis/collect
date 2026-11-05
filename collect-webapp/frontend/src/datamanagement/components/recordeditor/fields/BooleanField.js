@@ -71,12 +71,14 @@ class BooleanField extends AbstractField {
             className={classNames({ readOnly })}
             variant="outlined"
             disabled={readOnly}
-            inputProps={{
-              maxLength: 1,
-            }}
             style={{ width: '55px' }}
             onChange={(event) => this.onChangeText(event.target.value)}
             value={valueToText(fieldValue)}
+            slotProps={{
+              htmlInput: {
+                maxLength: 1,
+              },
+            }}
           />
         )}
         {dirty && <DirtyFieldSpinner />}

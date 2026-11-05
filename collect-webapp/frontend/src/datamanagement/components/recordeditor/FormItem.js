@@ -25,7 +25,7 @@ const internalComponentByFieldType = {
 const _includeLabel = (itemDef) => itemDef instanceof FieldDefinition
 
 const FormItem = (props) => {
-  const { itemDef, parentEntity, fullSize } = props
+  const { itemDef, parentEntity, fullSize = false } = props
   const { nodeDefinition, type } = itemDef
   const { id: nodeDefinitionId } = nodeDefinition
 
@@ -57,10 +57,6 @@ const FormItem = (props) => {
       </div>
     </>
   )
-}
-
-FormItem.defaultProps = {
-  fullSize: false,
 }
 
 export default FormItem

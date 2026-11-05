@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { render, unmountComponentAtNode, findDOMNode } from 'react-dom'
+import { createRoot } from 'react-dom/client'
 
 import Button from '@mui/material/Button'
 import DialogContent from '@mui/material/DialogContent'
@@ -34,7 +34,7 @@ class BaseDialog extends Component {
 
   handleEntered() {
     const focusBtn = this.okButton ? this.okButton : this.cancelButton
-    if (focusBtn) findDOMNode(focusBtn).focus()
+    if (focusBtn) focusBtn.focus()
   }
 
   handleOk() {
@@ -67,9 +67,11 @@ class ConfirmDialog extends BaseDialog {
     return (
       <Dialog
         open
-        TransitionProps={{
-          onEntered: () => {
-            this.handleEntered()
+        slotProps={{
+          transition: {
+            onEntered: () => {
+              this.handleEntered()
+            },
           },
         }}
         onBackdropClick={this.handleCancel}
@@ -99,9 +101,11 @@ class AlertDialog extends BaseDialog {
     return (
       <Dialog
         open
-        TransitionProps={{
-          onEntered: () => {
-            this.handleEntered()
+        slotProps={{
+          transition: {
+            onEntered: () => {
+              this.handleEntered()
+            },
           },
         }}
         onBackdropClick={this.handleCancel}
@@ -127,9 +131,11 @@ class LoadingDialog extends BaseDialog {
     return (
       <Dialog
         open
-        TransitionProps={{
-          onEntered: () => {
-            this.handleEntered()
+        slotProps={{
+          transition: {
+            onEntered: () => {
+              this.handleEntered()
+            },
           },
         }}
       >
@@ -161,7 +167,8 @@ class ConfirmDialogConfiguration {
 
 export default class Dialogs {
   static confirm(title, message, onOk, onCancel, configuration) {
-    render(
+    Dialogs._render(
+      CONFIRM_TARGET_DIV_ID,
       <ConfirmDialog
         targetDivId={CONFIRM_TARGET_DIV_ID}
         title={title}
@@ -169,35 +176,36 @@ export default class Dialogs {
         onOk={onOk}
         onCancel={onCancel}
         configuration={Object.assign({}, new ConfirmDialogConfiguration(), configuration)}
-      />,
-      Dialogs._createTargetDiv(CONFIRM_TARGET_DIV_ID)
+      />
     )
   }
 
   static alert(title, message, onOk = null) {
-    render(
-      <AlertDialog targetDivId={ALERT_TARGET_DIV_ID} title={title} message={message} onOk={onOk} />,
-      Dialogs._createTargetDiv(ALERT_TARGET_DIV_ID)
+    Dialogs._render(
+      ALERT_TARGET_DIV_ID,
+      <AlertDialog targetDivId={ALERT_TARGET_DIV_ID} title={title} message={message} onOk={onOk} />
     )
   }
 
   static showLoadingDialog(allowCancel = false, onCancel = null, title = L.l('global.loading')) {
-    return render(
-      <LoadingDialog targetDivId={LOADING_TARGET_DIV_ID} title={title} allowCancel={allowCancel} onCancel={onCancel} />,
-      Dialogs._createTargetDiv(LOADING_TARGET_DIV_ID)
+    Dialogs._render(
+      LOADING_TARGET_DIV_ID,
+      <LoadingDialog targetDivId={LOADING_TARGET_DIV_ID} title={title} allowCancel={allowCancel} onCancel={onCancel} />
     )
+    return { close: () => Dialogs._removeTargetDiv(LOADING_TARGET_DIV_ID) }
   }
 
-  static _createTargetDiv(targetDivId) {
+  static _render(targetDivId, element) {
     const targetDiv = document.createElement('div')
     targetDiv.id = targetDivId
     document.body.appendChild(targetDiv)
-    return targetDiv
+    targetDiv.reactRoot = createRoot(targetDiv)
+    targetDiv.reactRoot.render(element)
   }
 
   static _removeTargetDiv(targetDivId) {
     const target = document.getElementById(targetDivId)
-    unmountComponentAtNode(target)
+    target.reactRoot.unmount()
     target.parentNode.removeChild(target)
   }
 }

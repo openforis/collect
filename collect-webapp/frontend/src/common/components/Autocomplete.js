@@ -15,27 +15,31 @@ const PopperCustom =
     return <Popper {...props} style={style} placement="bottom-start" />
   }
 
+// stable default values: used as effect dependencies
+const EMPTY_ARRAY = []
+const NOOP = () => {}
+
 const Autocomplete = (props) => {
   const {
-    asynchronous,
-    multiple,
-    className,
-    disabled,
-    items: itemsProps,
-    inputValue: initialInputValue,
-    inputFieldWidth,
-    popUpWidth,
-    popUpWidthContentBased,
-    selectedItems,
-    fetchFunction,
-    isItemEqualToValue,
-    itemRenderFunction,
-    itemLabelFunction,
-    onInputChange: onInputChangeProps,
-    readOnly,
-    tagsRenderFunction,
+    asynchronous = false,
+    multiple = false,
+    className = null,
+    disabled = false,
+    items: itemsProps = EMPTY_ARRAY,
+    inputValue: initialInputValue = null,
+    inputFieldWidth = 300,
+    popUpWidth = null, // default to inputFieldWidth
+    popUpWidthContentBased = false,
+    selectedItems = EMPTY_ARRAY,
+    fetchFunction = null,
+    isItemEqualToValue = null,
+    itemRenderFunction = null,
+    itemLabelFunction = null,
+    onInputChange: onInputChangeProps = NOOP,
+    readOnly = false,
+    tagsRenderFunction = null,
     onSelect,
-    onDismiss,
+    onDismiss = NOOP,
   } = props
 
   const [state, setStateInternal] = useState({
@@ -138,14 +142,17 @@ const Autocomplete = (props) => {
       fullWidth={inputFieldWidth === '100%'}
       style={{ width: inputFieldWidthPx }}
       variant="outlined"
-      InputProps={{
-        ...params.InputProps,
-        endAdornment: (
-          <>
-            {loading && <LoadingSpinnerSmall />}
-            {params.InputProps.endAdornment}
-          </>
-        ),
+      slotProps={{
+        ...params.slotProps,
+        input: {
+          ...params.slotProps.input,
+          endAdornment: (
+            <>
+              {loading && <LoadingSpinnerSmall />}
+              {params.slotProps.input.endAdornment}
+            </>
+          ),
+        },
       }}
     />
   )
@@ -170,13 +177,15 @@ const Autocomplete = (props) => {
       filterOptions={filterOptions}
       loading={loading}
       renderInput={renderInput}
-      renderTags={tagsRenderFunction}
+      renderValue={tagsRenderFunction}
       renderOption={renderOption}
       className={className}
       disabled={disabled || readOnly}
       multiple={multiple}
-      PopperComponent={PopperCustom({ popUpWidth, popUpWidthContentBased })}
       isOptionEqualToValue={isOptionEqualToValue}
+      slots={{
+        popper: PopperCustom({ popUpWidth, popUpWidthContentBased }),
+      }}
     />
   )
 }
@@ -204,27 +213,6 @@ Autocomplete.propTypes = {
   readOnly: PropTypes.bool,
   selectedItems: PropTypes.array,
   tagsRenderFunction: PropTypes.func,
-}
-
-Autocomplete.defaultProps = {
-  asynchronous: false,
-  multiple: false,
-  fetchFunction: null,
-  disabled: false,
-  className: null,
-  inputValue: null,
-  inputFieldWidth: 300,
-  isItemEqualToValue: null,
-  items: [],
-  itemRenderFunction: null,
-  itemLabelFunction: null,
-  onInputChange: () => {},
-  onDismiss: () => {},
-  popUpWidth: null, // default to inputFieldWidth
-  popUpWidthContentBased: false,
-  readOnly: false,
-  selectedItems: [],
-  tagsRenderFunction: null,
 }
 
 export default Autocomplete

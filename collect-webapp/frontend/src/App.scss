@@ -94,7 +94,8 @@
   .form-item-field-wrapper.not-relevant {
     input,
     .form-item-table,
-    .MuiFormControl-root.MuiTextField-root {
+    .MuiFormControl-root.MuiTextField-root,
+    .MuiFormControl-root.MuiPickersTextField-root {
       background-color: #d4d4d4;
     }
 
@@ -112,7 +113,8 @@
     width: fit-content;
 
     .MuiFormControl-root.MuiTextField-root,
-    .MuiInputBase-root.MuiOutlinedInput-root {
+    .MuiInputBase-root.MuiOutlinedInput-root,
+    .MuiFormControl-root.MuiPickersTextField-root {
       fieldset {
         border: 2px solid;
         border-radius: 4px;
@@ -122,7 +124,8 @@
     &.error,
     .date-picker-wrapper.error {
       .MuiFormControl-root.MuiTextField-root,
-      .MuiInputBase-root.MuiOutlinedInput-root {
+      .MuiInputBase-root.MuiOutlinedInput-root,
+      .MuiFormControl-root.MuiPickersTextField-root {
         fieldset {
           border: 2px solid red !important;
         }
@@ -130,7 +133,8 @@
     }
 
     &.warning {
-      .MuiFormControl-root.MuiTextField-root fieldset {
+      .MuiFormControl-root.MuiTextField-root fieldset,
+      .MuiFormControl-root.MuiPickersTextField-root fieldset {
         border: 2px solid orange !important;
       }
     }
@@ -164,8 +168,14 @@
   }
 }
 
-.MuiOutlinedInput-root.MuiInputBase-root {
+.MuiOutlinedInput-root.MuiInputBase-root,
+.MuiPickersOutlinedInput-root.MuiPickersInputBase-root {
   padding: 0px 6px;
+}
+
+// date/time pickers (section based input)
+.MuiPickersOutlinedInput-root .MuiPickersInputBase-sectionsContainer {
+  padding: 6px 0;
 }
 
 .MuiAutocomplete-root {

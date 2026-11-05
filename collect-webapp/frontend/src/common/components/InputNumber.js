@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import NumberFormat from 'react-number-format'
+import { NumericFormat } from 'react-number-format'
 import { TextField } from '@mui/material'
 
 const CustomInput = (inputProps) => {
@@ -20,16 +20,18 @@ const CustomInput = (inputProps) => {
       onMouseUp={onMouseUp}
       value={value}
       style={style}
-      inputProps={{
-        maxLength,
-        size,
+      slotProps={{
+        htmlInput: {
+          maxLength,
+          size,
+        },
       }}
     />
   )
 }
 
 const InputNumber = (props) => {
-  const { decimalScale, maxLength, onChange: onChangeProps, readOnly, size, value, width } = props
+  const { decimalScale, maxLength, onChange: onChangeProps, readOnly = false, size, value = null, width } = props
 
   const onChange = (values) => {
     const { floatValue: valueChanged, value: inputValue } = values
@@ -39,7 +41,7 @@ const InputNumber = (props) => {
   }
 
   return (
-    <NumberFormat
+    <NumericFormat
       decimalScale={decimalScale}
       maxLength={maxLength}
       onValueChange={onChange}
@@ -60,15 +62,6 @@ InputNumber.propTypes = {
   size: PropTypes.number,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-}
-
-InputNumber.defaultProps = {
-  decimalScale: undefined,
-  maxLength: undefined,
-  readOnly: false,
-  size: undefined,
-  value: null,
-  width: undefined,
 }
 
 export default InputNumber

@@ -6,7 +6,7 @@ import Accordion from '@mui/material/Accordion'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import Grid from '@mui/material/Grid'
+import Stack from '@mui/material/Stack'
 
 import * as JobActions from 'actions/job'
 import ServiceFactory from 'services/ServiceFactory'
@@ -93,8 +93,8 @@ class SaikuPage extends Component {
       )
     }
     return (
-      <Grid container direction="column" alignItems="center" spacing={5}>
-        <Grid item>
+      <Stack spacing={5} sx={{ alignItems: 'center' }}>
+        <div>
           <Accordion defaultExpanded style={{ width: '550px' }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>Prepare Saiku database</AccordionSummary>
             <AccordionDetails>
@@ -149,13 +149,13 @@ class SaikuPage extends Component {
               </Container>
             </AccordionDetails>
           </Accordion>
-        </Grid>
-        <Grid item>
+        </div>
+        <div>
           <Button onClick={this.handleStartSaikuClick} className="btn btn-info">
             Start Saiku
           </Button>
-        </Grid>
-      </Grid>
+        </div>
+      </Stack>
     )
   }
 }
