@@ -227,6 +227,14 @@ check_for_updates = 1</text>
 		</include>
 	</componentList>
 	<preInstallationActionList>
+		<!-- the bundled JRE is 64-bit only -->
+		<throwError>
+			<text>Open Foris Collect requires a 64-bit version of Windows.</text>
+			<ruleList>
+				<platformTest type="windows" />
+				<compareText logic="equals" text="${env(PROGRAMW6432)}" value="" />
+			</ruleList>
+		</throwError>
 		<!-- define installdir variable -->
 		<if>
         	<actionList>

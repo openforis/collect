@@ -19,6 +19,8 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.SuccessHandler;
@@ -53,7 +55,6 @@ import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
-import org.zkoss.util.logging.Log;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
@@ -67,7 +68,7 @@ import org.zkoss.zul.Window;
  */
 public class SurveyExportParametersVM extends BaseVM {
 	
-	private static Log LOG = Log.lookup(SurveyExportParametersVM.class);
+	private static final Logger LOG = LogManager.getLogger(SurveyExportParametersVM.class);
 	
 	private static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	
@@ -183,7 +184,7 @@ public class SurveyExportParametersVM extends BaseVM {
 		try {
 			Filedownload.save(new FileInputStream(file), contentType, fileName);
 		} catch (FileNotFoundException e) {
-			LOG.error(e);
+			LOG.error(e.getMessage(), e);
 			MessageUtil.showError("survey.export_survey.error", e.getMessage());
 		}
 	}
@@ -235,7 +236,7 @@ public class SurveyExportParametersVM extends BaseVM {
 					COLLECT_EARTH_PROJECT_FILE_EXTENSION);
 			Filedownload.save(is, contentType, outputFileName);
 		} catch(Exception e) {
-			LOG.error(e);
+			LOG.error(e.getMessage(), e);
 			MessageUtil.showError("survey.export.error_generating_collect_earth_project_file", e.getMessage());
 			IOUtils.closeQuietly(is);
 		} finally {

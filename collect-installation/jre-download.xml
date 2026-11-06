@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Downloads the Eclipse Temurin JRE bundled by the installer and by the updater (version and checksums
+	are defined in collect-installation/pom.xml), verifies its SHA-256 checksum and unpacks it into
+	${jre.output.dir}/<platform>, the folders used by the InstallBuilder project files.
+-->
+<project name="jre-download" default="download-jres" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+	<loadresource property="jre.file.version">
+		<propertyresource name="installer.jre.version.full" />
+		<filterchain>
+			<tokenfilter>
+				<replacestring from="+" to="_" />
+			</tokenfilter>
+		</filterchain>
+	</loadresource>
+	<loadresource property="jre.release.urlencoded">
+		<propertyresource name="installer.jre.version.full" />
+		<filterchain>
+			<tokenfilter>
+				<replacestring from="+" to="%2B" />
+			</tokenfilter>
+		</filterchain>
+	</loadresource>
+
+	<macrodef name="download-jre">
+		<attribute name="platform" />
+		<attribute name="adoptium-os" />
+		<attribute name="ext" />
+		<attribute name="sha256" />
+		<!-- path of the JRE home inside the archive (the macOS archive is an application bundle) -->
+		<attribute name="home" default="*" />
+		<attribute name="home-depth" default="1" />
+		<sequential>
+			<local name="file" />
+			<local name="checksum.ok" />
+			<local name="zip" />
+			<property name="file" value="OpenJDK${installer.jre.version.major}U-jre_x64_@{adoptium-os}_hotspot_${jre.file.version}.@{ext}" />
+			<mkdir dir="${jre.download.dir}" />
+			<get src="https://github.com/adoptium/temurin${installer.jre.version.major}-binaries/releases/download/jdk-${jre.release.urlencoded}/${file}"
+				dest="${jre.download.dir}/${file}" skipexisting="true" />
+			<checksum file="${jre.download.dir}/${file}" algorithm="SHA-256" property="@{sha256}" verifyproperty="checksum.ok" />
+			<fail message="SHA-256 checksum of ${file} does not match installer.jre.sha256.@{platform}">
+				<condition>
+					<isfalse value="${checksum.ok}" />
+				</condition>
+			</fail>
+			<delete dir="${jre.output.dir}/@{platform}" />
+			<condition property="zip">
+				<equals arg1="@{ext}" arg2="zip" />
+			</condition>
+			<unzip if:set="zip" src="${jre.download.dir}/${file}" dest="${jre.output.dir}/@{platform}">
+				<patternset includes="@{home}/**" />
+				<cutdirsmapper dirs="@{home-depth}" />
+			</unzip>
+			<untar unless:set="zip" src="${jre.download.dir}/${file}" dest="${jre.output.dir}/@{platform}" compression="gzip">
+				<patternset includes="@{home}/**" />
+				<cutdirsmapper dirs="@{home-depth}" />
+			</untar>
+			<!-- untar does not keep file permissions -->
+			<chmod unless:set="zip" dir="${jre.output.dir}/@{platform}" perm="755" includes="bin/*,lib/jspawnhelper,lib/jexec" />
+		</sequential>
+	</macrodef>
+
+	<target name="download-jres">
+		<download-jre platform="linux-x64" adoptium-os="linux" ext="tar.gz" sha256="${installer.jre.sha256.linux-x64}" />
+		<download-jre platform="windows-x64" adoptium-os="windows" ext="zip" sha256="${installer.jre.sha256.windows-x64}" />
+		<download-jre platform="osx" adoptium-os="mac" ext="tar.gz" sha256="${installer.jre.sha256.osx}"
+			home="*/Contents/Home" home-depth="3" />
+	</target>
+</project>

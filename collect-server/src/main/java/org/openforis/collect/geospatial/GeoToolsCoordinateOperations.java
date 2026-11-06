@@ -19,7 +19,16 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.geotools.geometry.DirectPosition2D;
+import org.geotools.api.geometry.Position;
+import org.geotools.api.referencing.FactoryException;
+import org.geotools.api.referencing.crs.CRSAuthorityFactory;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.referencing.datum.Datum;
+import org.geotools.api.referencing.operation.MathTransform;
+import org.geotools.api.referencing.operation.TransformException;
+import org.geotools.api.util.GenericName;
+import org.geotools.api.util.InternationalString;
+import org.geotools.geometry.Position2D;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.referencing.crs.AbstractSingleCRS;
@@ -28,16 +37,6 @@ import org.openforis.idm.geospatial.CoordinateOperationException;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.model.Coordinate;
-import org.opengis.geometry.DirectPosition;
-import org.opengis.geometry.coordinate.Position;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.datum.Datum;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.util.GenericName;
-import org.opengis.util.InternationalString;
 
 /**
  * @author M. Togna
@@ -238,7 +237,7 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 			return coordinate;
 		} else {
 			Position position = toPosition(coordinate.getX(), coordinate.getY(), coordinate.getSrsId(), toSrsId);
-			DirectPosition directPosition = position.getDirectPosition();
+			Position directPosition = position.getDirectPosition();
 			return new Coordinate(directPosition.getOrdinate(0), directPosition.getOrdinate(1), toSrsId);
 		}
 	}
@@ -253,13 +252,13 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 
 	private Coordinate convert(double x, double y, String fromSrsId, String toSrsId) {
 		try {
-			DirectPosition src = new DirectPosition2D(x, y);
+			Position src = new Position2D(x, y);
 			MathTransform transform = getOrCreateTransform(fromSrsId, toSrsId);
 			if (transform == null) {
 				LOG.error("Unknown CRS: " + toSrsId);
 				return new Coordinate(0d, 0d, toSrsId);
 			} else {
-				DirectPosition directPosition = transform.transform(src, null);
+				Position directPosition = transform.transform(src, null);
 				double[] coord = directPosition.getCoordinate();
 				return new Coordinate(coord[0], coord[1], toSrsId);
 			}
@@ -275,7 +274,7 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 	
 	private Position toPosition(double x, double y, String fromSrsId, String toSrsId) {
 		try {
-			DirectPosition src = new DirectPosition2D(x, y);
+			Position src = new Position2D(x, y);
 			MathTransform transform = getOrCreateTransform(fromSrsId, toSrsId);
 			if (transform == null) {
 				if (LOG.isErrorEnabled()) {
@@ -283,13 +282,13 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 					String toSRSIdCleaned = SurveyObjects.adjustInternalName(StringUtils.truncate(toSrsId, 20));
 					LOG.error(String.format("Cannot find transform from %s to %s", fromSRSIdCleaned, toSRSIdCleaned));
 				}
-				return new DirectPosition2D(0, 0);
+				return new Position2D(0, 0);
 			}
-			DirectPosition directPosition = transform.transform(src, null);
+			Position directPosition = transform.transform(src, null);
 			return directPosition;
 		} catch (Throwable t) {
 			LOG.error("Error converting: x=" + x + " y=" + y + " srs=" + fromSrsId, t);
-			return new DirectPosition2D(0, 0);
+			return new Position2D(0, 0);
 		}
 	}
 

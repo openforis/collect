@@ -3,8 +3,6 @@ package org.openforis.web.server;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Properties;
 
 import javax.naming.NamingException;
@@ -56,17 +54,7 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 	}
 
 	private void printClasspath() {
-		ClassLoader cl = ClassLoader.getSystemClassLoader();
-        URL[] urls = ((URLClassLoader)cl).getURLs();
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < urls.length; i++) {
-			URL url = urls[i];
-        	sb.append(url.getFile());
-        	if (i < urls.length - 1) {
-        		sb.append(';');
-        	}
-		}
-    	LOG.info("Classpath: " + sb.toString());
+		LOG.info("Classpath: " + System.getProperty("java.class.path"));
 	}
 	
 	@Override

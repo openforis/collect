@@ -3,7 +3,6 @@
 <?header name="X-Frame-Options" value="ALLOWALL"?>
 
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="layouts/template.zul"?>
-<?component name="extendedTextbox" class="org.openforis.collect.designer.component.ExtendedTextbox"?>
 
 <?link rel="shortcut icon" type="image/x-icon" href="/assets/images/favicon.ico"?>
 <?link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico"?>
@@ -11,7 +10,7 @@
 
 <?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <zk xmlns:w="client">
-	<script type="text/javascript"><![CDATA[ 
+	<script><![CDATA[ 
         function switchTab(notify, init){ 
         	if (this.desktop && !init && notify) { 
         		zAu.send(new zk.Event(this, 'onSwitchTab'));

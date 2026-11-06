@@ -17,7 +17,7 @@
       	    caption.setSclass("open-" + self.isOpen());
       	]]></attribute>
       	<caption id="caption" sclass="open-false">
-      		<div align="left">
+      		<div style="text-align: left">
       			<label value="${labels.global.details_title}" />
       		</div>
       	</caption>

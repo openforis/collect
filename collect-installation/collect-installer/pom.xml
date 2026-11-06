@@ -23,6 +23,29 @@
 			<id>installer</id>
 			<build>
 				<plugins>
+					<!-- 0. download the JRE -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>download-jre</id>
+								<phase>process-sources</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<ant antfile="${project.basedir}/../jre-download.xml">
+											<!-- shared by the installer and the updater modules -->
+											<property name="jre.download.dir" value="${project.basedir}/../target/jre-download" />
+											<property name="jre.output.dir" value="${installer-build-path}/jre_files" />
+										</ant>
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 					<!-- 1. copy dependencies -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -174,40 +197,19 @@
 						</configuration>
 					</plugin>
 
-					<!-- 4. iterate over platforms and prepare updaters -->
+					<!-- 4. iterate over platforms, copy autoupdaters and build installers -->
 					<plugin>
 						<groupId>com.soebes.maven.plugins</groupId>
 						<artifactId>iterator-maven-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>download-jre-autoupdater</id>
+								<id>copy-autoupdaters</id>
 								<phase>process-sources</phase>
 								<goals>
 									<goal>iterator</goal>
 								</goals>
 								<configuration>
 									<pluginExecutors>
-										<!-- download and extract JRE -->
-										<pluginExecutor>
-											<plugin>
-												<groupId>org.apache.maven.plugins</groupId>
-												<artifactId>maven-dependency-plugin</artifactId>
-											</plugin>
-											<goal>unpack</goal>
-											<configuration>
-												<artifactItems>
-													<artifactItem>
-														<groupId>net.java.openjdk</groupId>
-														<artifactId>jre</artifactId>
-														<version>${installer.jre.version.full}</version>
-														<classifier>${jre.classifier}</classifier>
-														<type>zip</type>
-														<overWrite>false</overWrite>
-														<outputDirectory>${installer-build-path}/jre_files</outputDirectory>
-													</artifactItem>
-												</artifactItems>
-											</configuration>
-										</pluginExecutor>
 										<!-- copy autoupdater artifacts -->
 										<pluginExecutor>
 											<plugin>
@@ -216,7 +218,6 @@
 											</plugin>
 											<goal>copy</goal>
 											<configuration>
-												<skip>${installer.skip}</skip>
 												<artifactItems>
 													<artifactItem>
 														<groupId>org.openforis.collect</groupId>
@@ -250,7 +251,6 @@
 											</plugin>
 											<goal>exec</goal>
 											<configuration>
-												<skip>${installer.skip}</skip>
 												<executable>${installbuilder.builder.executable}</executable>
 												<arguments>
 													<argument>build</argument>
@@ -267,7 +267,6 @@
 											</plugin>
 											<goal>run</goal>
 											<configuration>
-												<skip>${installer.skip}</skip>
 												<target>
 													<move file="${installbuilder.builder.output}/${installbuilder.project.name}-${installer-version-id}-${installer.classifier}-installer.${installer.extension}" tofile="${project.build.directory}/${installer.classifier}-installer.${installer.extension}" failonerror="true" />
 												</target>
@@ -281,7 +280,6 @@
 											</plugin>
 											<goal>attach-artifact</goal>
 											<configuration>
-												<skipAttach>${installer.skip}</skipAttach>
 												<artifacts>
 													<artifact>
 														<file>${project.build.directory}/${installer.classifier}-installer.${installer.extension}</file>

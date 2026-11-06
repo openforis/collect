@@ -1,25 +1,13 @@
 # Installing local dependencies
 
-The installer of Collect needs some pre-packed files containing an embedded version of Java JRE.
-The ones currently being used are derived from OpenJDK and can be downloaded from https://www.openlogic.com/openjdk-downloads
-Each JRE file for every type of OS (CLASSIFIER) must be:
-- downloaded from https://www.openlogic.com/openjdk-downloads
-- unzipped
-- the root folder of the files should be renamed into jreVERSION-CLASSIFIER
-- inside that folder there should be a folder called java-CLASSIFIER
-- move all the content into that folder (bin, lib etc.)
-- copy the file lib/java.xml into that folder
-- zip the entire content including the root folder
+## Java runtime
+The installer and the updater bundle an Eclipse Temurin JRE (64-bit only: linux-x64, windows-x64, osx).
+It is not a Maven dependency: `jre-download.xml` downloads it from Adoptium during the build,
+verifies its SHA-256 checksum and unpacks it into the folders used by the InstallBuilder project files.
 
-Possible CLASSIFIER values: linux, linux-x64, osx, windows-i386, windows-x64
-Current version: 1.8.0_272
-
-## Install JRE locally
-Once generated that files, they need to be installed in the local Maven repository.
-Put the correct values into "path-to-file", "VERSION" and "CLASSIFIER" and run the following command:
-
-mvn install:install-file -Dfile=<path-to-file> -DgroupId=net.java.openjdk -DartifactId=jre -Dversion=VERSION -Dpackaging=zip -Dclassifier=CLASSIFIER
-
+To change version, update the `installer.jre.*` properties in `pom.xml`, including the checksums of the
+JRE archives, listed by `https://api.adoptium.net/v3/assets/release_name/eclipse/jdk-<version>?image_type=jre`
+(write the "+" of the version as `%2B`, e.g. `jdk-21.0.13%2B9`).
 
 ## Install Saiku dependency locally
 mvn install:install-file -Dfile=<path-to-file> -DgroupId=meteorite.bi -DartifactId=saiku-webapp-full -Dversion=2.6_b -Dpackaging=war
