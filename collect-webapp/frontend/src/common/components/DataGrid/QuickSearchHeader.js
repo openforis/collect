@@ -9,7 +9,7 @@ export const QuickSearchHeader = (props) => {
   const [value, setValue] = useState('')
 
   useEffect(() => {
-    if (filterModel?.items?.[0]?.columnField !== field) {
+    if (filterModel?.items?.[0]?.field !== field) {
       setValue('') // only one search field at a time is supported
     }
   }, [filterModel])

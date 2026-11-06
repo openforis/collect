@@ -3,7 +3,7 @@ import Constants from 'Constants'
 class RouterUtils {
   static navigateToHomePage(navigate) {
     if (navigate) {
-      RouterUtils._navigateToUrl(navigate, '')
+      RouterUtils._navigateToUrl(navigate, '/')
     } else {
       window.location.assign(Constants.BASE_URL)
     }

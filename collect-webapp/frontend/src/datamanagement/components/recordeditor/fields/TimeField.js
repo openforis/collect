@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import moment from 'moment'
 
-import { TextField } from '@mui/material'
 import { TimePicker as MuiTimePicker } from '@mui/x-date-pickers/TimePicker'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
@@ -11,7 +11,7 @@ import AbstractField from './AbstractField'
 import * as FieldSizes from './FieldsSizes'
 import DirtyFieldSpinner from './DirtyFieldSpinner'
 
-const fromValueToDate = (value) => (value ? new Date(1970, 1, 1, value.hour, value.minute) : null)
+const fromValueToDate = (value) => (value ? moment(new Date(1970, 1, 1, value.hour, value.minute)) : null)
 const fromDateToValue = (date) => ({
   hour: Dates.getHours(date),
   minute: Dates.getMinutes(date),
@@ -45,13 +45,12 @@ class TimeField extends AbstractField {
       <div>
         <LocalizationProvider dateAdapter={AdapterMoment}>
           <MuiTimePicker
-            inputFormat={Dates.TIME_FORMAT}
+            format={Dates.TIME_FORMAT}
             ampm={false}
             disabled={readOnly}
             value={selectedTime}
             onChange={this.onChange}
-            style={{ width: `${width}px` }}
-            renderInput={(params) => <TextField {...params} />}
+            slotProps={{ textField: { style: { width: `${width}px` } } }}
           />
         </LocalizationProvider>
         {dirty && <DirtyFieldSpinner />}

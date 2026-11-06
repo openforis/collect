@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import classNames from 'classnames'
-import Truncate from 'react-truncate'
 
 import Strings from 'utils/Strings'
 
@@ -21,7 +20,7 @@ export const itemLabelFunction = (attributeDefinition) => (item) => {
 }
 
 const CodeFieldItemLabel = (props) => {
-  const { item, attributeDefinition, singleLine } = props
+  const { item, attributeDefinition, singleLine = false } = props
 
   const [labelTruncated, setLabelTruncated] = useState(false)
 
@@ -40,10 +39,11 @@ const CodeFieldItemLabel = (props) => {
       title={tooltip}
     >
       {singleLine ? (
-        <span className="text">
-          <Truncate lines={1} onTruncate={(labelTruncated) => setLabelTruncated(labelTruncated)}>
-            {label}
-          </Truncate>
+        <span
+          className="text"
+          onMouseEnter={(event) => setLabelTruncated(event.currentTarget.scrollWidth > event.currentTarget.clientWidth)}
+        >
+          {label}
         </span>
       ) : (
         label
@@ -51,10 +51,6 @@ const CodeFieldItemLabel = (props) => {
       {hasDescription && <InfoIcon />}
     </span>
   )
-}
-
-CodeFieldItemLabel.defaultProps = {
-  singleLine: false,
 }
 
 export default CodeFieldItemLabel

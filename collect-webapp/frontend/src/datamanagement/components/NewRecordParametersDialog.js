@@ -16,7 +16,7 @@ import L from 'utils/Labels'
 import Dates from 'utils/Dates'
 
 const NewRecordParametersDialog = (props) => {
-  const { onClose, onOk, versions, open } = props
+  const { onClose, onOk, versions, open = false } = props
 
   return (
     <Dialog onClose={onClose} aria-labelledby="new-record-parameters-dialog-title" open={open}>
@@ -55,10 +55,6 @@ NewRecordParametersDialog.propTypes = {
   onOk: PropTypes.func.isRequired,
   open: PropTypes.bool,
   versions: PropTypes.array.isRequired,
-}
-
-NewRecordParametersDialog.defaultProps = {
-  open: false,
 }
 
 export default NewRecordParametersDialog

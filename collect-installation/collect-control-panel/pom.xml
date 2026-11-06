@@ -11,23 +11,9 @@
 	<packaging>jar</packaging>
 	
 	<properties>
-		<jetty.version>9.4.43.v20210629</jetty.version>
-		<jetty-websocket.version>9.4.43.v20210629</jetty-websocket.version>
+		<jetty.version>9.4.58.v20250814</jetty.version> <!-- 10+ requires Java 11 -->
+		<jetty-websocket.version>9.4.58.v20250814</jetty-websocket.version>
 	</properties>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<encoding>${project.build.sourceEncoding}</encoding>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 
 	<profiles>
 		<profile>
@@ -89,7 +75,7 @@
 		<dependency>
 			<groupId>com.formdev</groupId>
 			<artifactId>flatlaf</artifactId>
-			<version>1.5</version>
+			<version>3.8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.xerial</groupId>

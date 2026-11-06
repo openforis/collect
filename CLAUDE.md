@@ -8,7 +8,7 @@ Open Foris Collect is a multi-module Maven project for field-based inventory dat
 
 ## Build System
 
-This is a Maven 3.6.3+ multi-module project requiring JDK 8+ and Node.js 12+.
+This is a Maven 3.6.3+ multi-module project requiring JDK 17+ to build (bytecode targets Java 8, the runtime bundled by the installer) and Node.js 22+ for frontend development (the Maven build downloads its own Node).
 
 ### Build Commands
 
@@ -70,16 +70,16 @@ The project is organized into the following Maven modules:
 ## Technology Stack
 
 ### Backend
-- Spring Framework 5.3.27 (beans, context, web MVC, security, transactions)
-- Spring Security 5.8.3
+- Spring Framework 5.3.39 (beans, context, web MVC, security, transactions)
+- Spring Security 5.8.16 (Spring 6+ requires Java 17)
 - Liquibase for database migrations (changelogs in `collect-core/src/main/resources/org/openforis/collect/db/changelog/`)
 - Supported databases: PostgreSQL, SQLite, H2
 - Apache Commons libraries (lang3, io, vfs2, dbcp2)
 
 ### Frontend
-- React 17.0.2 with React Router 6
+- React 19 with React Router 7
 - Redux with redux-thunk for state management
-- Material-UI (MUI) v5 for UI components
+- Material-UI (MUI) v9 for UI components
 - Formik for forms
 - React Bootstrap & Reactstrap
 - SockJS + STOMP for WebSocket communication

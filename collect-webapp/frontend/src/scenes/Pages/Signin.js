@@ -5,6 +5,8 @@ import { connect } from 'react-redux'
 import { logInUser } from 'actions/login';
 
 class Signin extends Component {
+  usernameTextFieldRef = React.createRef()
+  passwordTextFieldRef = React.createRef()
 
   static propTypes = {
     dispatch: PropTypes.func.isRequired
@@ -14,8 +16,8 @@ class Signin extends Component {
     const { dispatch } = this.props
 
     let credentials = {
-      "username": this.refs.usernameTextField.value,
-      "password": this.refs.passwordTextField.value
+      "username": this.usernameTextFieldRef.current.value,
+      "password": this.passwordTextFieldRef.current.value
     }
     dispatch(logInUser(credentials))
   }
@@ -33,11 +35,11 @@ class Signin extends Component {
                     <p className="text-muted">Sign In to your account</p>
                     <div className="input-group mb-3">
                       <span className="input-group-addon"><i className="icon-user"></i></span>
-                      <input ref="usernameTextField" name="username" type="text" className="form-control" placeholder="Username"/>
+                      <input ref={this.usernameTextFieldRef} name="username" type="text" className="form-control" placeholder="Username"/>
                     </div>
                     <div className="input-group mb-4">
                       <span className="input-group-addon"><i className="icon-lock"></i></span>
-                      <input ref="passwordTextField" name="password" type="password" className="form-control" placeholder="Password"/>
+                      <input ref={this.passwordTextFieldRef} name="password" type="password" className="form-control" placeholder="Password"/>
                     </div>
                     <div className="row">
                       <div className="col-6">

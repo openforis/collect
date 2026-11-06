@@ -11,7 +11,7 @@
 	<description>Collect web application packaged together with Apache Tomcat and related dependencies</description>
 
 	<properties>
-		<tomcat.version>9.0.14</tomcat.version>
+		<tomcat.version>9.0.123</tomcat.version>
 		<output.directory>collect-server</output.directory>
 		<output.finalName>collect-server-${project.version}</output.finalName>
 	</properties>
@@ -69,7 +69,7 @@
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
 			<artifactId>collect-webapp</artifactId>
-			<version>4.0.88</version>
+			<version>${project.version}</version>
 			<type>war</type>
 		</dependency>
 		<dependency>

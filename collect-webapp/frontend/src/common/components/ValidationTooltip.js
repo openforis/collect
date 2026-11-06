@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import Validation from 'model/Validation'
 
 const ValidationTooltip = (props) => {
-  const { validation, target } = props
+  const { validation = new Validation(), target } = props
   const { errorMessage, warningMessage } = validation
 
   const className = classnames({ error: validation.hasErrors(), warning: validation.hasWarnings() })
@@ -22,10 +22,6 @@ const ValidationTooltip = (props) => {
 
 ValidationTooltip.propTypes = {
   validation: PropTypes.instanceOf(Validation),
-}
-
-ValidationTooltip.defaultProps = {
-  validation: new Validation(),
 }
 
 export default ValidationTooltip

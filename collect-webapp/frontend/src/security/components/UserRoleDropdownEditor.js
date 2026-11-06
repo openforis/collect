@@ -7,12 +7,13 @@ export default class UserRoleDropdownEditor extends Component {
         this.updateData = this.updateData.bind(this)
         this.handleChange = this.handleChange.bind(this)
         this.handleCancel = this.handleCancel.bind(this)
+        this.roleSelectRef = React.createRef()
 
         this.state = { role: props.defaultValue }
     }
 
     focus() {
-        this.refs.roleSelect.focus()
+        this.roleSelectRef.current.focus()
     }
 
     updateData() {
@@ -33,7 +34,7 @@ export default class UserRoleDropdownEditor extends Component {
         return (
             <span>
                 <select
-                    ref="roleSelect"
+                    ref={this.roleSelectRef}
                     value={this.state.role}
                     onKeyDown={this.props.onKeyDown}
                     onChange={this.handleChange} >

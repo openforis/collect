@@ -18,19 +18,21 @@ export const QuickSearchField = (props) => {
         e.stopPropagation()
       }}
       placeholder="Search…"
-      InputProps={{
-        startAdornment: <Search fontSize="small" />,
-        endAdornment: (
-          <IconButton
-            title="Clear"
-            aria-label="Clear"
-            size="small"
-            style={{ visibility: value ? 'visible' : 'hidden' }}
-            onClick={clearSearch}
-          >
-            <Clear fontSize="small" />
-          </IconButton>
-        ),
+      slotProps={{
+        input: {
+          startAdornment: <Search fontSize="small" />,
+          endAdornment: (
+            <IconButton
+              title="Clear"
+              aria-label="Clear"
+              size="small"
+              style={{ visibility: value ? 'visible' : 'hidden' }}
+              onClick={clearSearch}
+            >
+              <Clear fontSize="small" />
+            </IconButton>
+          ),
+        },
       }}
     />
   )

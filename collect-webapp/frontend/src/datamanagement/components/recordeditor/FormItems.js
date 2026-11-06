@@ -10,7 +10,7 @@ import FormItem from './FormItem'
 import AbstractFormComponent from './AbstractFormComponent'
 
 const FormItemsItem = (props) => {
-  const { itemDef, parentEntity, fullSize, style } = props
+  const { itemDef, parentEntity, fullSize = false, style } = props
   const { nodeDefinition } = itemDef
   const { hideWhenNotRelevant } = nodeDefinition
   const relevant = parentEntity.isChildRelevant(nodeDefinition)
@@ -31,10 +31,6 @@ const FormItemsItem = (props) => {
       {formItem}
     </div>
   )
-}
-
-FormItemsItem.defaultProps = {
-  fullSize: false,
 }
 
 export default class FormItems extends AbstractFormComponent {

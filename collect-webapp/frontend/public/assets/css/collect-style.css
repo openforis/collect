@@ -178,7 +178,8 @@ fieldset,
   margin-left: 20px !important;
 }
 
-.MuiOutlinedInput-root fieldset {
+.MuiOutlinedInput-root fieldset,
+.MuiPickersOutlinedInput-root fieldset {
   margin: auto !important;
 }
 
