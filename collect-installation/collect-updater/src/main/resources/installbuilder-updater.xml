@@ -6,6 +6,11 @@
 	<logoImage>images/of-collect-logo-small.png</logoImage>
 	<installationLogFile>${installdir}/autoupdate/update.log
 	</installationLogFile>
+	<parameterList>
+		<!-- set to 0 at build time (builder option setvars bundle_jre=0) to build the updater without the JRE,
+			for installations that already have it (update_4.xml) -->
+		<stringParameter name="bundle_jre" value="1" ask="0" cliOptionShow="0" />
+	</parameterList>
 	<componentList>
 		<!-- webapps, lib -->
 		<component>
@@ -75,6 +80,9 @@ check_for_updates = 1
 			<canBeEdited>0</canBeEdited>
 			<selected>1</selected>
 			<show>0</show>
+			<shouldPackRuleList>
+				<compareText text="${bundle_jre}" logic="equals" value="1" />
+			</shouldPackRuleList>
 			<folderList>
 				<folder>
 					<name>java_windows_x64</name>
@@ -208,6 +216,28 @@ Your current installation has not been changed.</text>
 				</portTest>
 			</ruleList>
 		</throwError>
+		<!-- the updater without the JRE keeps the installed one, which must be Java 17+ (installed by Collect 4.1.0+) -->
+		<actionGroup>
+			<actionList>
+				<setInstallerVariable name="installed_java_version" value="0" />
+				<propertiesFileGet file="${installdir}/java/release" key="JAVA_VERSION" variable="installed_java_version"
+					abortOnError="0" showMessageOnError="0" />
+				<!-- the release file quotes the value: JAVA_VERSION="21.0.13" -->
+				<setInstallerVariableFromRegEx name="installed_java_version" text="${installed_java_version}"
+					pattern="^&quot;?([^&quot;]*)&quot;?$" substitution="\1" />
+				<throwError>
+					<text>This update requires the Java runtime installed by Open Foris Collect 4.1.0 or later.
+Download the latest Open Foris Collect installer to update your installation.
+Your current installation has not been changed.</text>
+					<ruleList>
+						<compareVersions version1="${installed_java_version}" logic="less" version2="17" />
+					</ruleList>
+				</throwError>
+			</actionList>
+			<ruleList>
+				<compareText text="${bundle_jre}" logic="equals" value="0" />
+			</ruleList>
+		</actionGroup>
 	</preInstallationActionList>
 	<readyToInstallActionList>
 		<!-- delete old backup dir -->
@@ -255,6 +285,9 @@ Your current installation has not been changed.</text>
 		<!-- delete the old Java runtime: Java 9+ does not start if files of a Java 8 runtime (lib/ext) are left in its folder -->
 		<deleteFile>
 			<path>${installdir}/java</path>
+			<ruleList>
+				<compareText text="${bundle_jre}" logic="equals" value="1" />
+			</ruleList>
 		</deleteFile>
 	</readyToInstallActionList>
 	<requireInstallationByRootUser>0</requireInstallationByRootUser>

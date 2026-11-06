@@ -14,11 +14,16 @@
 		<!-- to avoid replacing relative path to images and other resources used by the installer -->
 		<installer-build-path>${project.build.directory}/installer</installer-build-path>
 		<installbuilder-updater-file-name>installbuilder-updater.xml</installbuilder-updater-file-name>
-		<autoupdate-xml-file-name>update_3.xml</autoupdate-xml-file-name>
+		<!-- update feeds: update_3.xml lists the updaters with the JRE, update_4.xml the ones without it -->
+		<autoupdate-xml-files>update_*.xml</autoupdate-xml-files>
 		<!-- updater file names -->
 		<windows-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-windows-installer.exe</windows-updater-file-name>
 		<linux-x64-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-linux-x64-installer.run</linux-x64-updater-file-name>
 		<osx-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-osx-installer.dmg</osx-updater-file-name>
+		<!-- updaters without the JRE: InstallBuilder builds the macOS .app, then packs it into a .dmg with the same name -->
+		<windows-updater-nojre-file-name>OpenForisCollectUpdater-${installer-version-id}-windows-nojre-installer.exe</windows-updater-nojre-file-name>
+		<linux-x64-updater-nojre-file-name>OpenForisCollectUpdater-${installer-version-id}-linux-x64-nojre-installer.run</linux-x64-updater-nojre-file-name>
+		<osx-updater-nojre-name>OpenForisCollectUpdater-${installer-version-id}-osx-nojre-installer</osx-updater-nojre-name>
 	</properties>
 
 	<profiles>
@@ -168,7 +173,7 @@
 							<basedir>${installer-build-path}</basedir>
 							<includes>
 								<include>${installbuilder-updater-file-name}</include>
-								<include>${autoupdate-xml-file-name}</include>
+								<include>${autoupdate-xml-files}</include>
 							</includes>
 							<regex>false</regex>
 							<replacements>
@@ -176,17 +181,14 @@
 									<token>PROJECT_VERSION</token>
 									<value>${project.version}</value>
 								</replacement>
+								<!-- no plain VERSION token: it would also replace JAVA_VERSION in installbuilder-updater.xml -->
 								<replacement>
 									<token>VERSION_ID</token>
 									<value>${installer-version-id}</value>
 								</replacement>
 								<replacement>
-									<token>VERSION</token>
-									<value>${project.version}</value>
-								</replacement>
-								<replacement>
 									<token>UPDATE_XML_URL</token>
-									<value>${collect.update_3.url}</value> <!-- use latest update URL -->
+									<value>${collect.update_4.url}</value> <!-- use latest update URL -->
 								</replacement>
 								<replacement>
 									<token>NEXUS_URL</token>
@@ -249,6 +251,61 @@
 									</arguments>
 								</configuration>
 							</execution>
+							<!-- the same updaters without the JRE (update_4.xml) -->
+							<execution>
+								<id>linux-x64-installer-nojre</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${installbuilder.builder.executable}</executable>
+									<arguments>
+										<argument>build</argument>
+										<argument>${installer-build-path}/${installbuilder-updater-file-name}</argument>
+										<argument>linux-x64</argument>
+										<argument>--setvars</argument>
+										<argument>bundle_jre=0</argument>
+										<argument>project.installerFilename=${linux-x64-updater-nojre-file-name}</argument>
+									</arguments>
+								</configuration>
+							</execution>
+							<execution>
+								<id>windows-installer-nojre</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${installbuilder.builder.executable}</executable>
+									<arguments>
+										<argument>build</argument>
+										<argument>${installer-build-path}/${installbuilder-updater-file-name}</argument>
+										<argument>windows</argument>
+										<argument>--setvars</argument>
+										<argument>bundle_jre=0</argument>
+										<argument>project.installerFilename=${windows-updater-nojre-file-name}</argument>
+									</arguments>
+								</configuration>
+							</execution>
+							<execution>
+								<id>osx-installer-nojre</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${installbuilder.builder.executable}</executable>
+									<arguments>
+										<argument>build</argument>
+										<argument>${installer-build-path}/${installbuilder-updater-file-name}</argument>
+										<argument>osx</argument>
+										<argument>--setvars</argument>
+										<argument>bundle_jre=0</argument>
+										<argument>project.installerFilename=${osx-updater-nojre-name}.app</argument>
+									</arguments>
+								</configuration>
+							</execution>
 						</executions>
 					</plugin>
 					
@@ -285,6 +342,9 @@
 										<move file="${installbuilder.builder.output}/${windows-updater-file-name}" tofile="${project.build.directory}/${windows-updater-file-name}" failonerror="false" />
 										<move file="${installbuilder.builder.output}/${linux-x64-updater-file-name}" tofile="${project.build.directory}/${linux-x64-updater-file-name}" failonerror="false" />
 										<move file="${installbuilder.builder.output}/${osx-updater-file-name}" tofile="${project.build.directory}/${osx-updater-file-name}" failonerror="false" />
+										<move file="${installbuilder.builder.output}/${windows-updater-nojre-file-name}" tofile="${project.build.directory}/${windows-updater-nojre-file-name}" failonerror="false" />
+										<move file="${installbuilder.builder.output}/${linux-x64-updater-nojre-file-name}" tofile="${project.build.directory}/${linux-x64-updater-nojre-file-name}" failonerror="false" />
+										<move file="${installbuilder.builder.output}/${osx-updater-nojre-name}.dmg" tofile="${project.build.directory}/${osx-updater-nojre-name}.dmg" failonerror="false" />
 									</target>
 								</configuration>
 							</execution>
@@ -319,6 +379,22 @@
 											<classifier>osx</classifier>
 											<type>dmg</type>
 										</artifact>
+										<!-- names listed in update_4.xml -->
+										<artifact>
+											<file>${project.build.directory}/${windows-updater-nojre-file-name}</file>
+											<classifier>windows-nojre</classifier>
+											<type>exe</type>
+										</artifact>
+										<artifact>
+											<file>${project.build.directory}/${linux-x64-updater-nojre-file-name}</file>
+											<classifier>linux-x64-nojre</classifier>
+											<type>run</type>
+										</artifact>
+										<artifact>
+											<file>${project.build.directory}/${osx-updater-nojre-name}.dmg</file>
+											<classifier>osx-nojre</classifier>
+											<type>dmg</type>
+										</artifact>
 									</artifacts>
 								</configuration>
 							</execution>
@@ -335,7 +411,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
 						<executions>
-							<!-- 7 Upload the XML file that defines the presence of updates to the FTP directory -->
+							<!-- 7 Upload the XML files that define the presence of updates (update_3.xml, update_4.xml) to the FTP directory -->
 							<execution>
 								<phase>install</phase>
 								<configuration>
@@ -345,7 +421,7 @@
 										<property name="password" value="${collect.autoupdater.ftp.password}" />
 										<property name="remote_folder" value="${collect.autoupdater.ftp.remotefolder}" />
 										<property name="local_folder" value="${installer-build-path}" />
-										<property name="file_name" value="${autoupdate-xml-file-name}" />
+										<property name="file_name" value="${autoupdate-xml-files}" />
 										<ant antfile="${installer-build-path}/ant_ftp_upload.xml" />
 									</target>
 								</configuration>
