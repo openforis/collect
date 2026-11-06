@@ -31,6 +31,10 @@
 		<installer.jre.sha256.linux-x64>a535a1df9c6284d9618872984e026ae0352d1f7e9e0605425c0e6114f47351dd</installer.jre.sha256.linux-x64>
 		<installer.jre.sha256.windows-x64>2332c0b4cff6bed722da3567c91d5e47568bcba863fa4945d0a8d6fc76158628</installer.jre.sha256.windows-x64>
 		<installer.jre.sha256.osx>c909674b1c10c261b9a3fb7e9c0efebd303e33f88a4fe84be7135b5e2d711f89</installer.jre.sha256.osx>
+		<!-- update feed written into update.ini by the installer and the updaters. update_3.xml (read by
+			4.0.x installations, which have Java 8) lists the updaters bundling the JRE; update_4.xml (read
+			by installations that already have this JRE) lists the updaters without it -->
+		<collect.update_4.url>http://www.openforis.org/fileadmin/installer/collect/update_4.xml</collect.update_4.url>
 	</properties>
 
 	<profiles>

@@ -191,7 +191,7 @@
 								</replacement>
 								<replacement>
 									<token>UPDATE_XML_URL</token>
-									<value>${collect.update_3.url}</value> <!-- always use latest update URL -->
+									<value>${collect.update_4.url}</value> <!-- always use latest update URL -->
 								</replacement>
 							</replacements>
 						</configuration>
