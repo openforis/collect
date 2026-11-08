@@ -26,6 +26,13 @@
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
 			<version>2.12.2</version>
+			<exclusions>
+				<!-- the JDK provides these packages; a second copy breaks the Eclipse compiler on Java 9+ ("accessible from more than one module") -->
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>commons-collections</groupId>
