@@ -15,7 +15,7 @@ const getWindowLocationBaseUrl = () => {
 }
 
 export default class Constants {
-  static APP_VERSION = Objects.defaultIfNull(process.env.REACT_APP_COLLECT_PROJECT_VERSION, DEV_VERSION)
+  static APP_VERSION = Objects.defaultIfNull(import.meta.env.REACT_APP_COLLECT_PROJECT_VERSION, DEV_VERSION)
   static BASE_PATH = Constants.determineBasePath()
   static BASE_URL = Constants.determineBaseURL()
   static BASE_ASSETS_URL = Constants.determineBaseAssetsURL()
@@ -36,7 +36,7 @@ export default class Constants {
   }
 
   static isDevEnvironment() {
-    const env = process.env.NODE_ENV
+    const env = import.meta.env.MODE
     return !env || env === 'development'
   }
 }

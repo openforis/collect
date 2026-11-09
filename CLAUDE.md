@@ -89,7 +89,7 @@ The project is organized into the following Maven modules:
 
 ### Build Tools
 - Maven (backend)
-- React Scripts (frontend)
+- Vite (frontend; config in `collect-webapp/frontend/vite.config.mjs`)
 - Gulp for SASS compilation
 
 ## Key Architectural Patterns
