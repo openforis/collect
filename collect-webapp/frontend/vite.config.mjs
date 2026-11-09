@@ -35,8 +35,9 @@ const stripBareClassFields = {
   },
 }
 
-export default defineConfig({
-  base: './',
+// dev: served at /collect/ like the webapp, on 127.0.0.1 (the only origin CollectCorsFilter allows)
+export default defineConfig(({ command }) => ({
+  base: command === 'serve' ? '/collect/' : './',
   envPrefix: 'REACT_APP_',
   plugins: [stripBareClassFields, react()],
   // sockjs-client (via react-stomp) expects Node's `global`
@@ -44,6 +45,6 @@ export default defineConfig({
   resolve: {
     alias: [{ find: new RegExp(`^(${srcEntries.join('|')})(?=/|$)`), replacement: `${srcDir}/$1` }],
   },
-  server: { port: 3000 },
+  server: { host: '127.0.0.1', port: 3000, strictPort: true },
   build: { outDir: 'build', assetsDir: 'static' },
-})
+}))

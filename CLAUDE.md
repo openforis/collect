@@ -146,7 +146,7 @@ Separate changelogs exist for different database types:
    ```
 6. Start Tomcat (backend will run on port 8080)
 7. Start frontend dev server: `cd collect-webapp/frontend && npm start`
-8. Access UI at `http://127.0.0.1:3000` (use 127.0.0.1, not localhost, for CORS)
+8. Access UI at `http://127.0.0.1:3000/collect/` (use 127.0.0.1, not localhost, for CORS)
 9. Use a CORS plugin to enable API calls from dev server to backend
 
 ### Running with Docker

@@ -2,6 +2,10 @@ package org.openforis.collect.config;
 
 public abstract class CollectConfiguration {
 
+	// Vite dev server (see collect-webapp/frontend/vite.config.mjs)
+	public static final String DEV_FRONTEND_ORIGIN = "http://127.0.0.1:3000";
+	public static final String DEV_FRONTEND_URL = DEV_FRONTEND_ORIGIN + "/collect";
+
 	private static boolean developmentMode;
 	private static String usersRestfulApiUrl;
 	
