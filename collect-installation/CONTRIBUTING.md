@@ -12,7 +12,7 @@ JRE archives, listed by `https://api.adoptium.net/v3/assets/release_name/eclipse
 ## Updaters and update feeds
 Each installation reads the update feed whose URL is in `autoupdate/update.ini`. Every release builds
 two updaters per platform and publishes two feeds (`-Ppublishupdater`):
-- `update_3.xml`, read by 4.0.x installations (Java 8): lists the updaters that bundle the JRE
+- `update_3.xml`, read by installations of Collect 4.0.110 or older (Java 8): lists the updaters that bundle the JRE
   (`collect-updater-<version>-<platform>`); they replace the `java` folder;
 - `update_4.xml`, read by installations that already have the bundled JRE: lists the updaters without it
   (`collect-updater-<version>-<platform>-nojre`, built with `--setvars bundle_jre=0`), which refuse to run

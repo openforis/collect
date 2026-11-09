@@ -34,8 +34,8 @@ These properties can be specified in the Maven settings.xml file.
 
 Property Name | Description
 ------------- | -------------
-openforis.nexus.url | URL of the Nexus repository where latest artifacts have been released (e.g. https://oss.sonatype.org/content/repositories/releases if Sonatype Central repository is used); it's used to retrieve the latest version available and to check if an update is needed, and to generate the links to the updaters.)
-collect.update.url | URL of update.xml file (used by InstallBuilder AutoUpdate to retrieve the new updaters)
+openforis.nexus.url | URL of the Maven repository where latest artifacts have been released (https://repo1.maven.org/maven2 for Maven Central; the old OSSRH URLs on oss.sonatype.org no longer work); it's used to retrieve the latest version available and to check if an update is needed, and to generate the links to the updaters.)
+collect.update_4.url | URL of the update_4.xml file written into autoupdate/update.ini by the installer and the updaters (used by InstallBuilder AutoUpdate to retrieve the new updaters). It has a default value in collect-installation/pom.xml; set it in settings.xml to override it. It must be the URL where the publishupdater profile uploads the update_*.xml files (collect.autoupdater.ftp.host/remotefolder).
 
 #### VMWare InstallBuilder variables
 They are used by collect-installer, collect-updater and collect-autoupdater modules, running with "installer" profile enabled.
