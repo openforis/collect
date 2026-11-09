@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
+import org.openforis.collect.config.CollectConfiguration;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SessionRecordFileManager;
@@ -41,7 +42,9 @@ public class PreviewPopUpVM extends SurveyBaseVM {
 			uriBuilderParams.addParameter("versionId", versionId);
 		}
 		uriBuilderParams.addParameter("recordStep", recordStep);
-		this.uri = Resources.Page.PREVIEW_PATH.getLocation() + surveyId + uriBuilderParams.build().toString();
+		String path = Resources.Page.PREVIEW_PATH.getLocation() + surveyId + uriBuilderParams.build().toString();
+		// in dev mode the React app is served by the Vite dev server, not by this webapp
+		this.uri = CollectConfiguration.isDevelopmentMode() ? CollectConfiguration.DEV_FRONTEND_URL + path : path;
 	}
 
 	public String getContentUrl() {
