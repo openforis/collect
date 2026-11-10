@@ -65,8 +65,8 @@ public class CommandControllerTest {
 		EntityDefinition rootEntityDefn = survey.getSchema().createEntityDefinition();
 		rootEntityDefn.setName("plot");
 		survey.getSchema().addRootEntityDefinition(rootEntityDefn);
-		CollectRecord record = new CollectRecord(survey, null, rootEntityDefn, false);
-		record.setPreview(preview);
+		CollectRecord collectRecord = new CollectRecord(survey, null, rootEntityDefn, false);
+		collectRecord.setPreview(preview);
 
 		CommandController controller = new CommandController();
 		ReflectionTestUtils.setField(controller, "sessionManager", new SessionManager() {
@@ -84,7 +84,7 @@ public class CommandControllerTest {
 		ReflectionTestUtils.setField(controller, "sessionRecordProvider", new SessionRecordProvider(null) {
 			@Override
 			public CollectRecord provide(CollectSurvey survey, Integer recordId, Step recordStep) {
-				return record;
+				return collectRecord;
 			}
 		});
 		ReflectionTestUtils.setField(controller, "commandDispatcher", new CommandDispatcher() {
@@ -108,7 +108,7 @@ public class CommandControllerTest {
 			}
 
 			@Override
-			public void sendRecordMessage(CollectRecord record, Message message) {
+			public void sendRecordMessage(CollectRecord collectRecord, Message message) {
 				recipients.add(RECORD_VIEWERS);
 				messages.add(message);
 			}

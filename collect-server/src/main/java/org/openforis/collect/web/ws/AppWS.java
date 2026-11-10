@@ -72,19 +72,19 @@ public class AppWS {
 	 * Sends a message about a record (e.g. a value update) to the connected users who can view the record, so that
 	 * other users editing or viewing it get the changes too.
 	 */
-	public void sendRecordMessage(CollectRecord record, Message message) {
+	public void sendRecordMessage(CollectRecord collectRecord, Message message) {
 		if (CollectConfiguration.isDevelopmentMode()) {
 			messageSender.send(message);
 			return;
 		}
 		for (SimpUser connectedUser : userRegistry.getUsers()) {
-			if (canViewRecord(connectedUser.getName(), record)) {
+			if (canViewRecord(connectedUser.getName(), collectRecord)) {
 				messageSender.sendToUser(connectedUser.getName(), message);
 			}
 		}
 	}
 
-	private boolean canViewRecord(String username, CollectRecord record) {
+	private boolean canViewRecord(String username, CollectRecord collectRecord) {
 		User user = userManager.loadByUserName(username);
 		if (user == null) {
 			return false;
@@ -92,7 +92,7 @@ public class AppWS {
 		if (user.hasEffectiveRole(UserRole.ADMIN)) {
 			return true;
 		}
-		Integer surveyUserGroupId = ((CollectSurvey) record.getSurvey()).getUserGroupId();
+		Integer surveyUserGroupId = ((CollectSurvey) collectRecord.getSurvey()).getUserGroupId();
 		UserInGroup userInGroup = surveyUserGroupId == null ? null
 				: userGroupManager.findUserInGroupOrDescendants(surveyUserGroupId, user.getId());
 		if (userInGroup == null) {
@@ -100,7 +100,7 @@ public class AppWS {
 		}
 		// limited users can see only their own records
 		boolean limited = user.hasRole(UserRole.ENTRY_LIMITED) || userInGroup.getRole() == UserGroupRole.DATA_CLEANER_LIMITED;
-		return !limited || record.getOwner() != null && user.getId().equals(record.getOwner().getId());
+		return !limited || collectRecord.getOwner() != null && user.getId().equals(collectRecord.getOwner().getId());
 	}
 
 	public static class SurveyMessage extends Message {

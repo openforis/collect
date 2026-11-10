@@ -1,7 +1,6 @@
 package org.openforis.collect.web.ws;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -123,7 +122,7 @@ public class AppWSTest {
 			UserInGroup userInGroup = new UserInGroup();
 			userInGroup.setUserId(id);
 			userInGroup.setRole(groupRole);
-			when(userGroupManager.findUserInGroupOrDescendants(eq(SURVEY_USER_GROUP_ID), eq(id))).thenReturn(userInGroup);
+			when(userGroupManager.findUserInGroupOrDescendants(SURVEY_USER_GROUP_ID, id)).thenReturn(userInGroup);
 		}
 		return user;
 	}
@@ -134,8 +133,8 @@ public class AppWSTest {
 		EntityDefinition rootEntityDefn = survey.getSchema().createEntityDefinition();
 		rootEntityDefn.setName("plot");
 		survey.getSchema().addRootEntityDefinition(rootEntityDefn);
-		CollectRecord record = new CollectRecord(survey, null, rootEntityDefn, false);
-		record.setOwner(owner);
-		return record;
+		CollectRecord collectRecord = new CollectRecord(survey, null, rootEntityDefn, false);
+		collectRecord.setOwner(owner);
+		return collectRecord;
 	}
 }
