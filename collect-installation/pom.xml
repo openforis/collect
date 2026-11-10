@@ -34,7 +34,7 @@
 		<!-- update feed written into update.ini by the installer and the updaters. update_3.xml (read by
 			installations of Collect 4.0.110 or older, which have Java 8) lists the updaters bundling the JRE; update_4.xml (read
 			by installations that already have this JRE) lists the updaters without it -->
-		<collect.update_4.url>http://www.openforis.org/fileadmin/installer/collect/update_4.xml</collect.update_4.url>
+		<collect.update_4.url>https://www.openforis.org/fileadmin/installer/collect/update_4.xml</collect.update_4.url>
 	</properties>
 
 	<profiles>
