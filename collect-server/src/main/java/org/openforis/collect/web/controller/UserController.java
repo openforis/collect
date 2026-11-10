@@ -49,8 +49,11 @@ public class UserController extends AbstractPersistedObjectEditFormController<In
 	private UserValidator userValidator;
 	@Autowired
 	private PasswordChangeValidator passwordChangeValidator;
-	@Autowired
-	private AccessControl accessControl;
+	private final AccessControl accessControl;
+
+	public UserController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
 
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {

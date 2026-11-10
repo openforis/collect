@@ -27,16 +27,13 @@ public class UserControllerTest {
 
 	private final SessionManager sessionManager = mock(SessionManager.class);
 	private final UserManager userManager = mock(UserManager.class);
-	private final UserController controller = new UserController();
+	private final UserController controller = new UserController(new AccessControl(sessionManager, null));
 	private final UserForm form = new UserForm();
 	private final BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
 	private final UsersDeleteParameters deleteParameters = new UsersDeleteParameters();
 
 	@Before
 	public void init() {
-		AccessControl accessControl = new AccessControl();
-		ReflectionTestUtils.setField(accessControl, "sessionManager", sessionManager);
-		ReflectionTestUtils.setField(controller, "accessControl", accessControl);
 		ReflectionTestUtils.setField(controller, "sessionManager", sessionManager);
 		ReflectionTestUtils.setField(controller, "surveyManager", mock(SurveyManager.class));
 		controller.setItemManager(userManager);

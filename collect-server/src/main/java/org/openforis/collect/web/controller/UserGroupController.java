@@ -55,8 +55,11 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 	private SessionManager sessionManager;
 	@Autowired
 	private SurveyManager surveyManager;
-	@Autowired
-	private AccessControl accessControl;
+	private final AccessControl accessControl;
+
+	public UserGroupController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {

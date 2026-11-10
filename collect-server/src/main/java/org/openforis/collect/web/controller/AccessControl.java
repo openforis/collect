@@ -4,7 +4,6 @@ import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserRole;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
@@ -15,10 +14,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class AccessControl {
 
-	@Autowired
-	private SessionManager sessionManager;
-	@Autowired
-	private UserGroupManager userGroupManager;
+	private final SessionManager sessionManager;
+	private final UserGroupManager userGroupManager;
+
+	public AccessControl(SessionManager sessionManager, UserGroupManager userGroupManager) {
+		this.sessionManager = sessionManager;
+		this.userGroupManager = userGroupManager;
+	}
 
 	public User getLoggedUser() {
 		User user = sessionManager.getLoggedUser();

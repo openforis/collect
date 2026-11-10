@@ -13,7 +13,6 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserRole;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.test.util.ReflectionTestUtils;
 
 public class AccessControlTest {
 
@@ -25,14 +24,12 @@ public class AccessControlTest {
 
 	@Before
 	public void init() {
-		accessControl = new AccessControl();
-		ReflectionTestUtils.setField(accessControl, "sessionManager", new SessionManager() {
+		accessControl = new AccessControl(new SessionManager() {
 			@Override
 			public User getLoggedUser() {
 				return loggedUser;
 			}
-		});
-		ReflectionTestUtils.setField(accessControl, "userGroupManager", new LocalUserGroupManager() {
+		}, new LocalUserGroupManager() {
 			@Override
 			public List<UserGroup> findAllRelatedUserGroups(User user) {
 				UserGroup group = new UserGroup();

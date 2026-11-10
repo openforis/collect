@@ -32,17 +32,14 @@ public class UserGroupControllerTest {
 
 	private final SessionManager sessionManager = mock(SessionManager.class);
 	private final UserGroupManager userGroupManager = mock(UserGroupManager.class);
-	private final UserGroupController controller = new UserGroupController();
+	private final UserGroupController controller = new UserGroupController(
+			new AccessControl(sessionManager, userGroupManager));
 	private final UserGroupForm form = new UserGroupForm();
 	private final BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
 	private final UserGroupsDeleteParameters deleteParameters = new UserGroupsDeleteParameters();
 
 	@Before
 	public void init() {
-		AccessControl accessControl = new AccessControl();
-		ReflectionTestUtils.setField(accessControl, "sessionManager", sessionManager);
-		ReflectionTestUtils.setField(accessControl, "userGroupManager", userGroupManager);
-		ReflectionTestUtils.setField(controller, "accessControl", accessControl);
 		ReflectionTestUtils.setField(controller, "sessionManager", sessionManager);
 		ReflectionTestUtils.setField(controller, "surveyManager", mock(SurveyManager.class));
 		controller.setItemManager(userGroupManager);
