@@ -5,6 +5,6 @@ OF = function() {};
  * (or in the _csrf parameter of a form) of state-changing requests.
  */
 OF.csrfToken = function() {
-	var match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]*)/);
+	const match = /(?:^|;\s*)XSRF-TOKEN=([^;]*)/.exec(document.cookie);
 	return match ? match[1] : "";
 };
