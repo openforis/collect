@@ -27,7 +27,6 @@ import org.openforis.collect.web.ws.WebSocketMessageSender.Message;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.springframework.messaging.simp.user.SimpUser;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
-import org.springframework.test.util.ReflectionTestUtils;
 
 public class AppWSTest {
 
@@ -41,8 +40,7 @@ public class AppWSTest {
 
 	@Before
 	public void init() {
-		appWS = new AppWS();
-		ReflectionTestUtils.setField(appWS, "messageSender", new WebSocketMessageSender() {
+		WebSocketMessageSender messageSender = new WebSocketMessageSender() {
 			@Override
 			public void send(Message message) {
 				sent.add("all");
@@ -52,12 +50,10 @@ public class AppWSTest {
 			public void sendToUser(String username, Message message) {
 				sent.add(username);
 			}
-		});
+		};
 		SimpUserRegistry userRegistry = mock(SimpUserRegistry.class);
 		when(userRegistry.getUsers()).thenReturn(connectedUsers);
-		ReflectionTestUtils.setField(appWS, "userRegistry", userRegistry);
-		ReflectionTestUtils.setField(appWS, "userManager", userManager);
-		ReflectionTestUtils.setField(appWS, "userGroupManager", userGroupManager);
+		appWS = new AppWS(messageSender, userRegistry, userManager, userGroupManager);
 	}
 
 	@After

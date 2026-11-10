@@ -100,7 +100,7 @@ public class CommandControllerTest {
 				throw new UnsupportedOperationException();
 			}
 		});
-		ReflectionTestUtils.setField(controller, "appWS", new AppWS() {
+		ReflectionTestUtils.setField(controller, "appWS", new AppWS(null, null, null, null) {
 			@Override
 			public void sendMessageToUser(String username, Message message) {
 				recipients.add(username);

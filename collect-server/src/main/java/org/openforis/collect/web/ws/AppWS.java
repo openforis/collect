@@ -13,7 +13,6 @@ import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.model.UserInGroup.UserGroupRole;
 import org.openforis.collect.model.UserRole;
 import org.openforis.collect.web.ws.WebSocketMessageSender.Message;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.user.SimpUser;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Component;
@@ -21,14 +20,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class AppWS {
 
-	@Autowired
-	private WebSocketMessageSender messageSender;
-	@Autowired
-	private SimpUserRegistry userRegistry;
-	@Autowired
-	private UserManager userManager;
-	@Autowired
-	private UserGroupManager userGroupManager;
+	private final WebSocketMessageSender messageSender;
+	private final SimpUserRegistry userRegistry;
+	private final UserManager userManager;
+	private final UserGroupManager userGroupManager;
+
+	public AppWS(WebSocketMessageSender messageSender, SimpUserRegistry userRegistry, UserManager userManager,
+			UserGroupManager userGroupManager) {
+		this.messageSender = messageSender;
+		this.userRegistry = userRegistry;
+		this.userManager = userManager;
+		this.userGroupManager = userGroupManager;
+	}
 
 	public enum MessageType {
 		SURVEYS_UPDATED, SURVEY_UPDATED, SURVEY_PUBLISHED, SURVEY_UNPUBLISHED, SURVEY_DELETED, RECORD_LOCKED,
