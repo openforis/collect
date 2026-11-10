@@ -21,6 +21,11 @@ $(window, document).ready(function() {
 		$("#session-expired-message").show();
 	}
 
+	// fill the CSRF token when the form is submitted (also when auto-submitted with the default credentials)
+	$(document.f).on("submit", function() {
+		this._csrf.value = OF.csrfToken();
+	});
+
 	if (LOGGED_OUT || ERROR) {
 		initializeForm();
 	} else {
@@ -45,7 +50,7 @@ $(window, document).ready(function() {
 		var form = document.f;
 		form.username.value = DEFAULT_USERNAME;
 		form.password.value = DEFAULT_PASSWORD;
-		form.submit();
+		$(form).submit();
 	}
 	
 	function initializeForm() {
