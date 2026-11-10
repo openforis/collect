@@ -165,7 +165,7 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 					for (var i = 0; i < levelCodes.length; i++) {
 						var keyDef = keyDefs.length > i ? keyDefs[i] : null;
 						var levelName = keyDef ? keyDef.getLabelOrName() : "level " + (i + 1);
-						result += levelName + ": " + levelCodes[i] + "<br>";
+						result += OF.Strings.escapeHtml(levelName) + ": " + OF.Strings.escapeHtml(levelCodes[i]) + "<br>";
 					}
 					return result;
 				}
@@ -203,6 +203,10 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 		}
 		if (infoContent) {
 			$this.popupContent.html(infoContent);
+			$this.popupContent.find(".edit-record-link").on("click", function() {
+				const { recId, recKeys } = feature.get('nodeInfo');
+				Collect.DataManager.MapPanelComposer.openRecordEditPopUp(feature.get('survey').id, recId, String(recKeys));
+			});
 			$this.popupContent.find(".accordion").accordion({heightStyle: "content", animate: 0});
 			$this.popupContent.find(".data.info-icon-button").tooltip({
 				html: true,
@@ -235,12 +239,14 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 Collect.DataManager.MapPanelComposer.prototype.createNodeInfoBalloon = function(survey, nodeInfo) {
 	const { x, y, recordData, attrDefId, recId, recStep, recKeys, distance } = nodeInfo
 	const hasLocation = Boolean(x) && Boolean(y);
-	
+	// record values and labels are user input: never insert them as HTML
+	const esc = value => OF.Strings.escapeHtml(String(value));
+
 	var dynamicPart = "";
 	var data = recordData;
 	data.forEach(function(item) {
 		var def = survey.getDefinition(item.definitionId);
-		dynamicPart += "<label>" + def.label + "</label>: " + (item.value == null ? "-": item.value);
+		dynamicPart += "<label>" + esc(def.label) + "</label>: " + (item.value == null ? "-": esc(item.value));
 		dynamicPart += "<br/>";
 	});
 
@@ -256,11 +262,11 @@ Collect.DataManager.MapPanelComposer.prototype.createNodeInfoBalloon = function(
 		   </div>`;
 	
 	const result = `
-		<b>${survey.getDefinition(attrDefId).label}</b>
+		<b>${esc(survey.getDefinition(attrDefId).label)}</b>
 		<br>
-		<label>Record</label>: ${recKeys}
+		<label>Record</label>: ${esc(recKeys)}
 		<br>
-	 	<label>Phase</label>: ${recStep}
+	 	<label>Phase</label>: ${esc(recStep)}
 		<br>
 		<div class='accordion' style='width: 300px; height: 200px; padding: 0.5em'>
 		   <h3>
@@ -273,7 +279,7 @@ Collect.DataManager.MapPanelComposer.prototype.createNodeInfoBalloon = function(
 		  ${hasLocation ? locationContent : ''}
 		</div>
 		<br>
-		<a href="javascript:void(0);" onclick="Collect.DataManager.MapPanelComposer.openRecordEditPopUp(${survey.id}, ${recId}, '${recKeys}')">Edit Record</a>
+		<a href="javascript:void(0);" class="edit-record-link">Edit Record</a>
 		</div>`;
 	
 	return result;

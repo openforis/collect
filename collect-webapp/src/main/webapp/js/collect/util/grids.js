@@ -1,6 +1,11 @@
 Collect.Grids = {
 };
 
+// bootstrap-table 1.9 writes cell values as raw HTML: escape them unless a column defines its own formatter
+$.fn.bootstrapTable.columnDefaults.formatter = function(value) {
+	return typeof value === 'string' ? OF.Strings.escapeHtml(value) : value;
+};
+
 Collect.Grids.createRootEntityKeyColumns = function(survey, rootEntity, sortable) {
 	if (! rootEntity) {
 		rootEntity = survey.rootEntities[0];
