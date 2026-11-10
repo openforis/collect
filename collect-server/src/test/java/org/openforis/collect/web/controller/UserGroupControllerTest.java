@@ -33,7 +33,7 @@ public class UserGroupControllerTest {
 	private final SessionManager sessionManager = mock(SessionManager.class);
 	private final UserGroupManager userGroupManager = mock(UserGroupManager.class);
 	private final UserGroupController controller = new UserGroupController(
-			new AccessControl(sessionManager, userGroupManager));
+			new AccessControl(sessionManager, userGroupManager, null));
 	private final UserGroupForm form = new UserGroupForm();
 	private final BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
 	private final UserGroupsDeleteParameters deleteParameters = new UserGroupsDeleteParameters();

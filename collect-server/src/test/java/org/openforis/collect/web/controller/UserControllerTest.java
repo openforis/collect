@@ -27,7 +27,7 @@ public class UserControllerTest {
 
 	private final SessionManager sessionManager = mock(SessionManager.class);
 	private final UserManager userManager = mock(UserManager.class);
-	private final UserController controller = new UserController(new AccessControl(sessionManager, null));
+	private final UserController controller = new UserController(new AccessControl(sessionManager, null, null));
 	private final UserForm form = new UserForm();
 	private final BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
 	private final UsersDeleteParameters deleteParameters = new UsersDeleteParameters();

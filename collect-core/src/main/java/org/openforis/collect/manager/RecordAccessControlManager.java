@@ -28,6 +28,75 @@ public class RecordAccessControlManager {
 		return step != Step.ENTRY || ! user.hasEffectiveRole(UserRole.CLEANSING);
 	}
 	
+	// The following rules mirror the ones in the web UI (collect-webapp/frontend/src/model/User.js)
+
+	/**
+	 * Users with role ENTRY_LIMITED or DATA_CLEANER_LIMITED in the survey group can access only their own records
+	 */
+	public boolean canView(User user, UserGroupRole roleInSurveyGroup, User recordOwner) {
+		boolean limited = user.getRole() == UserRole.ENTRY_LIMITED || roleInSurveyGroup == UserGroupRole.DATA_CLEANER_LIMITED;
+		return !limited || isOwner(user, recordOwner);
+	}
+
+	public boolean canEditRecords(User user, UserGroupRole roleInSurveyGroup) {
+		if (user.getRole() == UserRole.VIEW || roleInSurveyGroup == null) {
+			return false;
+		}
+		switch (roleInSurveyGroup) {
+		case OWNER, ADMINISTRATOR, SUPERVISOR, DATA_CLEANER_LIMITED, DATA_ANALYZER, OPERATOR:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	public boolean canCreateRecords(User user, UserGroupRole roleInSurveyGroup) {
+		return user.getRole() != UserRole.ENTRY_LIMITED && canEditRecords(user, roleInSurveyGroup);
+	}
+
+	public boolean canEdit(User user, UserGroupRole roleInSurveyGroup, Step step, User recordOwner) {
+		if (!canEditRecords(user, roleInSurveyGroup) || !canView(user, roleInSurveyGroup, recordOwner)
+				|| !(recordOwner == null || isOwner(user, recordOwner) || user.hasEffectiveRole(UserRole.CLEANSING))) {
+			return false;
+		}
+		switch (step) {
+		case ENTRY:
+			return user.hasEffectiveRole(UserRole.ENTRY) || isOwner(user, recordOwner);
+		case CLEANSING:
+			return user.hasEffectiveRole(UserRole.CLEANSING);
+		default:
+			return false;
+		}
+	}
+
+	public boolean canDemote(User user, UserGroupRole roleInSurveyGroup, Step step, User recordOwner) {
+		return step == Step.ANALYSIS ? user.hasEffectiveRole(UserRole.ANALYSIS)
+				: canEdit(user, roleInSurveyGroup, step, recordOwner);
+	}
+
+	/**
+	 * Same permission is required to promote or demote records in bulk
+	 */
+	public boolean canChangeRecordOwner(User user, UserGroupRole roleInSurveyGroup) {
+		return user.hasEffectiveRole(UserRole.CLEANSING) && canImportRecords(roleInSurveyGroup);
+	}
+
+	public boolean canImportRecords(UserGroupRole roleInSurveyGroup) {
+		if (roleInSurveyGroup == null) {
+			return false;
+		}
+		switch (roleInSurveyGroup) {
+		case OWNER, ADMINISTRATOR, SUPERVISOR, DATA_ANALYZER:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	private boolean isOwner(User user, User recordOwner) {
+		return recordOwner != null && user.getId().equals(recordOwner.getId());
+	}
+
 	public boolean canDeleteRecords(final User user, UserGroupRole roleInSurveyGroup, Collection<CollectRecordSummary> recordSummaries) {
 		switch(user.getRole()) {
 		case VIEW:

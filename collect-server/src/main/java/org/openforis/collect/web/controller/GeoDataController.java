@@ -54,8 +54,13 @@ public class GeoDataController {
 	private CollectJobManager jobManager;
 	@Autowired
 	private CoordinateOperations coordinateOperations;
+	private final AccessControl accessControl;
 
 	
+	public GeoDataController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
+
 	@RequestMapping(value = "geo/coordinate/convert.json", method=GET)
 	public @ResponseBody Coordinate convertCoordinateTo(
 			@RequestParam double x, 
@@ -75,6 +80,7 @@ public class GeoDataController {
 			@RequestParam int maxNumberOfRecords) throws Exception {
 		final List<CoordinateAttributePoint> result = new ArrayList<CoordinateAttributePoint>();
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
+		accessControl.checkCanAccessSurvey(survey);
 		
 		extractAllRecordCoordinates(survey, recordOffset, maxNumberOfRecords, 
 				coordinateAttributeId, srsId, new CoordinateProcessor() {
@@ -95,6 +101,7 @@ public class GeoDataController {
 			@RequestParam int maxNumberOfRecords) throws Exception {
 		final List<GeometryNodeInfo> result = new ArrayList<GeometryNodeInfo>();
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
+		accessControl.checkCanAccessSurvey(survey);
 		
 		processNodes(survey, recordOffset, maxNumberOfRecords, 
 				attributeId, new NodeProcessor() {
@@ -114,6 +121,7 @@ public class GeoDataController {
 			@RequestParam int coordinateAttributeId,
 			HttpServletResponse response) throws Exception {
 		CollectSurvey survey = surveyManager.getById(surveyId);
+		accessControl.checkCanAccessSurvey(survey);
 		CoordinateAttributeDefinition nodeDef = (CoordinateAttributeDefinition) survey.getSchema().getDefinitionById(coordinateAttributeId);
 		
 		RecordCoordinatesKmlGeneratorJob job = new RecordCoordinatesKmlGeneratorJob();

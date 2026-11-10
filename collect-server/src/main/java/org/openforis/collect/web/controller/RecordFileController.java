@@ -50,14 +50,18 @@ public class RecordFileController extends BasicController implements Serializabl
 	private SessionRecordFileManager sessionRecordFileManager;
 	@Autowired
 	private SessionRecordProvider recordProvider;
+	private final transient AccessControl accessControl;
+
+	public RecordFileController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
 
 	@RequestMapping(value = "/survey/{surveyId}/data/records/{recordId}/{recordStep}/file", method = RequestMethod.GET)
 	public void downloadFile(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable("surveyId") int surveyId, @PathVariable("recordId") int recordId,
 			@PathVariable("recordStep") Step recordStep, @RequestParam("nodePath") String nodePath) throws IOException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
-		CollectRecord record = recordProvider.provide(survey, recordId == 0 ? null : recordId, recordStep);
-		FileAttribute fileAttribute = record.getNodeByPath(nodePath);
+		FileAttribute fileAttribute = provideRecord(survey, recordId, recordStep).getNodeByPath(nodePath);
 		File file = getFile(fileAttribute);
 		String outputFileName = determineOutputFileName(survey, fileAttribute, file);
 		Controllers.writeFileToResponse(response, file, outputFileName);
@@ -68,8 +72,7 @@ public class RecordFileController extends BasicController implements Serializabl
 			@PathVariable("surveyId") int surveyId, @PathVariable("recordId") int recordId,
 			@PathVariable("recordStep") Step recordStep, @RequestParam("nodePath") String nodePath) throws IOException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
-		CollectRecord record = recordProvider.provide(survey, recordId == 0 ? null : recordId, recordStep);
-		FileAttribute node = record.getNodeByPath(nodePath);
+		FileAttribute node = provideRecord(survey, recordId, recordStep).getNodeByPath(nodePath);
 		File file = getFile(node);
 		try {
 			String extension = FilenameUtils.getExtension(file.getName());
@@ -82,6 +85,16 @@ public class RecordFileController extends BasicController implements Serializabl
 			// Try to write original file to response
 			Controllers.writeFileToResponse(response, file);
 		}
+	}
+
+	private CollectRecord provideRecord(CollectSurvey survey, int recordId, Step recordStep) {
+		if (recordId == 0) {
+			// preview record (kept in session)
+			accessControl.checkCanAccessSurvey(survey);
+			return recordProvider.provide(survey, null, recordStep);
+		}
+		accessControl.checkCanViewRecord(survey, recordId);
+		return recordProvider.provide(survey, recordId, recordStep);
 	}
 
 	private File getFile(FileAttribute node) {

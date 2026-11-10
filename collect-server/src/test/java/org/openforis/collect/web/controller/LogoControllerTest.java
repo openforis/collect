@@ -25,7 +25,7 @@ public class LogoControllerTest {
 	public void onlyAdminCanUploadLogo() throws Exception {
 		SessionManager sessionManager = mock(SessionManager.class);
 		LogoManager logoManager = mock(LogoManager.class);
-		LogoController controller = new LogoController(new AccessControl(sessionManager, null));
+		LogoController controller = new LogoController(new AccessControl(sessionManager, null, null));
 		ReflectionTestUtils.setField(controller, "logoManager", logoManager);
 		UploadItem uploadItem = new UploadItem();
 		CommonsMultipartFile file = mock(CommonsMultipartFile.class);

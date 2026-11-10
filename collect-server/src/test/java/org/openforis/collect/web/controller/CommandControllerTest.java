@@ -3,6 +3,7 @@ package org.openforis.collect.web.controller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +69,8 @@ public class CommandControllerTest {
 		CollectRecord collectRecord = new CollectRecord(survey, null, rootEntityDefn, false);
 		collectRecord.setPreview(preview);
 
-		CommandController controller = new CommandController();
+		// access checks are tested in CommandControllerAccessTest
+		CommandController controller = new CommandController(mock(AccessControl.class));
 		ReflectionTestUtils.setField(controller, "sessionManager", new SessionManager() {
 			@Override
 			public String getLoggedUsername() {
