@@ -3,6 +3,7 @@
  */
 package org.openforis.idm.metamodel.expression;
 
+import org.apache.commons.jxpath.FunctionLibrary;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathIntrospector;
 import org.apache.commons.jxpath.Variables;
@@ -26,6 +27,8 @@ abstract class AbstractSchemaExpression {
 		JXPathIntrospector.registerDynamicClass(Schema.class, SchemaPropertyHandler.class);
 
 		CONTEXT = JXPathContext.newContext(null);
+		// empty library: without it JXPath falls back to generic functions, allowing calls to any Java method
+		CONTEXT.setFunctions(new FunctionLibrary());
 	}
 
 	private String expression;

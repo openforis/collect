@@ -1,7 +1,9 @@
 package org.openforis.collect.persistence.xml;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.openforis.idm.testfixture.NodeBuilder.attribute;
 import static org.openforis.idm.testfixture.NodeBuilder.entity;
 import static org.openforis.idm.testfixture.RecordBuilder.record;
@@ -9,6 +11,7 @@ import static org.openforis.idm.testfixture.RecordBuilder.record;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.GregorianCalendar;
 
@@ -102,7 +105,20 @@ public class DataMarshallerTest extends CollectIntegrationTest {
 		res = evaluateXPathExpression(doc, "cluster/id/@state");
 		assertEquals("", res);
 	}
-	
+
+	@Test
+	public void testUnmarshalRejectsDoctype() throws Exception {
+		CollectSurvey survey = surveyManager.get("archenland1");
+		if ( survey == null ) {
+			survey = importModel();
+		}
+		String xml = "<?xml version=\"1.0\"?><!DOCTYPE cluster [<!ENTITY x SYSTEM \"file:///etc/hostname\">]>"
+				+ "<cluster survey=\"archenland1\" version=\"2.0\" step=\"ENTRY\"><id><code>&x;</code></id></cluster>";
+		DataUnmarshaller.ParseRecordResult result = new DataUnmarshaller(survey).parse(new StringReader(xml));
+		assertFalse(result.isSuccess());
+		assertTrue(result.getFailures().get(0).getMessage().contains("DOCTYPE"));
+	}
+
 	private CollectRecord createTestRecord(CollectSurvey survey) throws RecordPersistenceException {
 		RecordBuilder recordBuilder = record(
 			attribute("id", "123_456"),

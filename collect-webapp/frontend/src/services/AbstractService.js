@@ -4,6 +4,13 @@ import Constants from 'Constants';
 import Objects from 'utils/Objects';
 import Strings from 'utils/Strings';
 
+// Spring Security CSRF token: the server sets the XSRF-TOKEN cookie (also readable by the dev server on 127.0.0.1:3000,
+// cookies are not port specific) and expects it back in a header on state-changing requests
+const csrfHeaders = () => {
+    const token = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]*)/)?.[1]
+    return token ? { 'X-XSRF-TOKEN': token } : {}
+}
+
 export default class AbstractService {
 
     BASE_URL = Constants.API_BASE_URL;
@@ -27,7 +34,8 @@ export default class AbstractService {
             credentials: 'include',
             method: 'POST',
             headers: {
-              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+              ...csrfHeaders()
             },
             body: body
         }).then(response => response.json(),
@@ -53,6 +61,7 @@ export default class AbstractService {
         return fetch(this.BASE_URL + url, {
             credentials: 'include',
             method: 'POST',
+            headers: csrfHeaders(),
             body: formData
         }).then(response => response.json(),
             this._handleError)
@@ -64,6 +73,7 @@ export default class AbstractService {
     postFile(url, file, data, onError = null, onProgress = null) {
         const req = Request.post(this.BASE_URL + url)
             .withCredentials()
+            .set(csrfHeaders())
             .attach('file', file)
             .field(data)
             
@@ -89,7 +99,8 @@ export default class AbstractService {
         let queryData = this._toQueryData(data, null, false);
         return fetch(this.BASE_URL + url + (queryData === null ? '': '?' + queryData), {
                 credentials: 'include',
-                method: method
+                method: method,
+                headers: method === 'GET' ? {} : csrfHeaders()
             })
             .then(response => {
                 if (response.ok) {
@@ -108,7 +119,8 @@ export default class AbstractService {
             credentials: 'include',
             method,
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              ...csrfHeaders()
             },
             body: data ? JSON.stringify(data) : null
         }).then(response => response.json(),
