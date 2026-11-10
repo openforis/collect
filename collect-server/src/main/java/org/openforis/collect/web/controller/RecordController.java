@@ -82,7 +82,6 @@ import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
-import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.model.UserInGroup.UserGroupRole;
 import org.openforis.collect.model.UserRole;
@@ -170,6 +169,8 @@ public class RecordController extends BasicController implements Serializable {
 	private transient EventQueue eventQueue;
 	@Autowired
 	private AppWS appWS;
+	private final transient AccessControl accessControl;
+	private final RecordAccessControlManager recordAccessControlManager = new RecordAccessControlManager();
 
 	private CSVDataExportJob csvDataExportJob;
 	private SurveyBackupJob fullBackupJob;
@@ -177,11 +178,16 @@ public class RecordController extends BasicController implements Serializable {
 	private CSVDataImportJob csvDataImportJob;
 	private ValidationReportJob validationReportJob;
 
+	public RecordController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
+
 	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}/binary_data.json", method = GET)
 	public @ResponseBody Map<String, Object> loadData(@PathVariable("surveyId") int surveyId,
 			@PathVariable("recordId") int recordId, @RequestParam(value = "step") Integer stepNumber) throws Exception {
 		stepNumber = getStepNumberOrDefault(stepNumber);
 		CollectSurvey survey = surveyManager.getById(surveyId);
+		accessControl.checkCanViewRecord(survey, recordId);
 		byte[] data = recordManager.loadBinaryData(survey, recordId, Step.valueOf(stepNumber));
 		byte[] encoded = Base64.encodeBase64(data);
 		String result = new String(encoded);
@@ -197,6 +203,7 @@ public class RecordController extends BasicController implements Serializable {
 			@RequestParam(value = "rootEntityDefinitionId", required = false) Integer rootEntityDefinitionId,
 			@RequestParam(value = "step", required = false) Integer stepNumber) throws Exception {
 		CollectSurvey survey = surveyManager.getById(surveyId);
+		accessControl.checkCanAccessSurvey(survey);
 		RecordFilter filter = createRecordFilter(survey, sessionManager.getLoggedUser(), userGroupManager,
 				rootEntityDefinitionId, false);
 		if (stepNumber != null) {
@@ -210,7 +217,9 @@ public class RecordController extends BasicController implements Serializable {
 	public @ResponseBody Map<String, Object> loadRecordSummaries(@PathVariable("surveyId") int surveyId,
 			@Valid RecordSummarySearchParameters params) {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
-		User user = loadUser(params.getUserId(), params.getUsername());
+		accessControl.checkCanAccessSurvey(survey);
+		// records are filtered according to the logged user permissions
+		User user = sessionManager.getLoggedUser();
 
 		Map<String, Object> result = new HashMap<String, Object>();
 		Schema schema = survey.getSchema();
@@ -262,19 +271,7 @@ public class RecordController extends BasicController implements Serializable {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		Step step = stepNumber == null ? null : Step.valueOf(stepNumber);
 		User user = sessionManager.getLoggedUser();
-		UserGroup surveyUserGrup = survey.getUserGroup();
-		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyUserGrup.getId(), user.getId());
-		if (userInGroup == null) {
-			throw new IllegalArgumentException(
-					String.format("User %s is not allowed to load record with id %d", user.getUsername(), recordId));
-		}
-		CollectRecordSummary recordSummary = recordManager.loadUniqueRecordSummary(survey, recordId);
-		if ((user.hasRole(UserRole.ENTRY_LIMITED) || userInGroup.getRole() == UserGroupRole.DATA_CLEANER_LIMITED)
-				&& (recordSummary.getOwner() == null || !user.getId().equals(recordSummary.getOwner().getId()))) {
-			throw new IllegalStateException(
-					String.format("User '%s' (entry_limited) cannot access record with ID %d: he doesn't own it.",
-							user.getUsername(), recordId));
-		}
+		accessControl.checkCanViewRecord(survey, recordId);
 		CollectRecord record = lock
 				? recordManager.checkout(survey, user, recordId, step, sessionManager.getSessionState().getSessionId(),
 						true)
@@ -290,6 +287,8 @@ public class RecordController extends BasicController implements Serializable {
 		String ownerIdStr = body.get("ownerId");
 		Integer ownerId = ownerIdStr == null ? null : Integer.parseInt(ownerIdStr);
 		CollectSurvey survey = surveyManager.getById(surveyId);
+		accessControl.checkCanViewRecord(survey, recordId);
+		accessControl.checkSurveyPermission(survey, recordAccessControlManager::canChangeRecordOwner);
 		SessionState sessionState = sessionManager.getSessionState();
 		recordManager.assignOwner(survey, recordId, ownerId, sessionState.getUser(), sessionState.getSessionId());
 		return new Response();
@@ -299,6 +298,7 @@ public class RecordController extends BasicController implements Serializable {
 	public @ResponseBody Response promoteRecord(@PathVariable("surveyId") int surveyId,
 			@PathVariable("recordId") int recordId) throws MissingRecordKeyException, RecordPromoteException {
 		CollectSurvey survey = surveyManager.getById(surveyId);
+		accessControl.checkCanEditRecord(survey, recordId);
 		CollectRecord record = recordManager.load(survey, recordId);
 		recordManager.promote(record, sessionManager.getLoggedUser(), true);
 		return new Response();
@@ -308,6 +308,9 @@ public class RecordController extends BasicController implements Serializable {
 	public @ResponseBody Response demoteRecord(@PathVariable("surveyId") int surveyId,
 			@PathVariable("recordId") int recordId) throws RecordPersistenceException {
 		CollectSurvey survey = surveyManager.getById(surveyId);
+		CollectRecordSummary summary = accessControl.checkCanViewRecord(survey, recordId);
+		accessControl.checkSurveyPermission(survey, (user, role) -> 
+				recordAccessControlManager.canDemote(user, role, summary.getStep(), summary.getOwner()));
 		recordManager.demote(survey, recordId, sessionManager.getLoggedUser());
 		return new Response();
 	}
@@ -319,6 +322,7 @@ public class RecordController extends BasicController implements Serializable {
 		SessionState sessionState = sessionManager.getSessionState();
 		User loggedUser = sessionState.getUser();
 		CollectSurvey survey = surveyManager.getById(surveyId);
+		accessControl.checkSurveyPermission(survey, recordAccessControlManager::canChangeRecordOwner);
 		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
 		job.setSurvey(survey);
 		job.setRootEntity(rootEntityDef.getName());
@@ -350,6 +354,12 @@ public class RecordController extends BasicController implements Serializable {
 		}
 		CollectSurvey survey = params.isPreview() ? surveyManager.loadSurvey(surveyId)
 				: surveyManager.getById(surveyId);
+		if (params.isPreview()) {
+			// preview records are never stored
+			accessControl.checkCanAccessSurvey(survey);
+		} else {
+			accessControl.checkSurveyPermission(survey, recordAccessControlManager::canCreateRecords);
+		}
 		params.setRootEntityName(ObjectUtils.defaultIfNull(params.getRootEntityName(),
 				survey.getSchema().getFirstRootEntityDefinition().getName()));
 		Integer latestVersionId = survey.getLatestVersion() != null ? survey.getLatestVersion().getId() : null;
@@ -364,6 +374,9 @@ public class RecordController extends BasicController implements Serializable {
 	@RequestMapping(value = "survey/{surveyId}/data/records/random", method = POST, consumes = APPLICATION_JSON_VALUE)
 	public @ResponseBody RecordProxy createRandomRecord(@PathVariable("surveyId") int surveyId,
 			@RequestBody NewRecordParameters params) throws RecordPersistenceException {
+		accessControl.checkSurveyPermission(surveyManager.getById(surveyId), recordAccessControlManager::canCreateRecords);
+		params.setUserId(sessionManager.getLoggedUser().getId());
+		params.setUsername(null);
 		CollectRecord record = randomRecordGenerator.generate(surveyId, params);
 		return toProxy(record);
 	}
@@ -399,6 +412,7 @@ public class RecordController extends BasicController implements Serializable {
 			FileUtils.copyInputStreamToFile(multipartFile.getInputStream(), tempFile);
 
 			CollectSurvey survey = surveyManager.getById(surveyId);
+			accessControl.checkSurveyPermission(survey, (user, role) -> recordAccessControlManager.canImportRecords(role));
 
 			DataRestoreSummaryJob job = jobManager.createJob(DataRestoreSummaryJob.class);
 			job.setUser(sessionManager.getLoggedUser());
@@ -458,9 +472,10 @@ public class RecordController extends BasicController implements Serializable {
 			@RequestParam(required = false) boolean validateRecords,
 			@RequestParam(required = false) boolean deleteEntitiesBeforeImport,
 			@RequestParam(required = false) String newRecordVersionName) throws IOException {
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		accessControl.checkSurveyPermission(survey, (user, role) -> recordAccessControlManager.canImportRecords(role));
 		File file = Files.writeToTempFile(multipartFile.getInputStream(), multipartFile.getOriginalFilename(),
 				"ofc_csv_data_import");
-		CollectSurvey survey = surveyManager.getById(surveyId);
 		CSVDataImportJob job = jobManager.createJob(TransactionalCSVDataImportJob.class);
 		CSVDataImportSettings settings = new CSVDataImportSettings();
 		settings.setDeleteExistingEntities(deleteEntitiesBeforeImport);
@@ -506,6 +521,7 @@ public class RecordController extends BasicController implements Serializable {
 	public void exportRecord(int surveyId, int recordId, int stepNumber, OutputFormat outputFormat,
 			HttpServletResponse response) throws RecordPersistenceException, IOException {
 		CollectSurvey survey = surveyManager.getById(surveyId);
+		accessControl.checkCanViewRecord(survey, recordId);
 		CollectRecord record = recordManager.load(survey, recordId);
 		RecordAccessControlManager accessControlManager = new RecordAccessControlManager();
 		if (accessControlManager.canEdit(sessionManager.getLoggedUser(), record)) {
@@ -544,6 +560,7 @@ public class RecordController extends BasicController implements Serializable {
 			@RequestBody CSVExportParametersForm parameters) throws IOException {
 		User user = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.getById(surveyId);
+		accessControl.checkCanAccessSurvey(survey);
 		CSVDataExportParameters exportParameters = parameters.toExportParameters(survey, user, userGroupManager);
 
 		Job job = null;
@@ -590,6 +607,7 @@ public class RecordController extends BasicController implements Serializable {
 			@RequestBody BackupDataExportParameters parameters) throws IOException {
 		User user = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.getById(surveyId);
+		accessControl.checkCanAccessSurvey(survey);
 		RecordFilter filter = createRecordFilter(survey, user, userGroupManager, null, parameters.onlyOwnedRecords, 
 				parameters.modifiedSince, parameters.modifiedUntil);
 		filter.setFilterExpression(parameters.filterExpression);
@@ -627,6 +645,7 @@ public class RecordController extends BasicController implements Serializable {
 			throws RecordPersistenceException, IOException {
 		User user = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.getById(surveyId);
+		accessControl.checkCanViewRecord(survey, recordId);
 
 		RecordFilter filter = createRecordFilter(survey, user, userGroupManager);
 		filter.setRecordId(recordId);
@@ -659,6 +678,7 @@ public class RecordController extends BasicController implements Serializable {
 
 	@RequestMapping(value = "survey/{surveyId}/data/records/stats", method = GET)
 	public @ResponseBody RecordsStats generateStats(@PathVariable("surveyId") int surveyId) {
+		accessControl.checkCanAccessSurvey(surveyManager.getById(surveyId));
 		Date[] period = recordManager.findWorkingPeriod(surveyId);
 		if (period == null) {
 			return RecordsStats.EMPTY;
@@ -672,6 +692,7 @@ public class RecordController extends BasicController implements Serializable {
 		User user = sessionManager.getLoggedUser();
 		Locale locale = sessionManager.getSessionState().getLocale();
 		CollectSurvey survey = surveyManager.getById(surveyId);
+		accessControl.checkCanAccessSurvey(survey);
 		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
 		ValidationReportJob job = jobManager.createJob(ValidationReportJob.class);
 		Input input = new Input();
@@ -727,8 +748,9 @@ public class RecordController extends BasicController implements Serializable {
 			@RequestParam String oldMeasurement, @RequestParam String newMeasurement, @RequestParam Double percentage,
 			@RequestParam String sourceGridSurveyFileName, @RequestParam Boolean countOnly) {
 		User user = sessionManager.getLoggedUser();
-		RandomRecordsGenerationJob job = jobManager.createJob(RandomRecordsGenerationJob.class);
 		CollectSurvey survey = surveyManager.getById(surveyId);
+		accessControl.checkSurveyPermission(survey, recordAccessControlManager::canCreateRecords);
+		RandomRecordsGenerationJob job = jobManager.createJob(RandomRecordsGenerationJob.class);
 		job.setUser(user);
 		job.setSurvey(survey);
 		job.setCountOnly(countOnly);
@@ -815,8 +837,10 @@ public class RecordController extends BasicController implements Serializable {
 		RecordFilter filter = new RecordFilter(survey);
 		filter.setRecordIds(recordIds);
 		List<CollectRecordSummary> recordSummaries = recordManager.loadSummaries(filter);
+		if (recordSummaries.size() != recordIds.size()) {
+			return false; // some records don't belong to the survey
+		}
 		User loggedUser = sessionManager.getLoggedUser();
-		RecordAccessControlManager recordAccessControlManager = new RecordAccessControlManager();
 		UserInGroup userInSurveyGroup = userGroupManager.findUserInGroupOrDescendants(survey.getUserGroupId(),
 				loggedUser.getId());
 		boolean canDeleteRecords = userInSurveyGroup != null && recordAccessControlManager.canDeleteRecords(loggedUser,

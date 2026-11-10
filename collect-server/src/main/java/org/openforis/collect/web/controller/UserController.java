@@ -49,6 +49,11 @@ public class UserController extends AbstractPersistedObjectEditFormController<In
 	private UserValidator userValidator;
 	@Autowired
 	private PasswordChangeValidator passwordChangeValidator;
+	private final AccessControl accessControl;
+
+	public UserController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
 
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
@@ -62,6 +67,7 @@ public class UserController extends AbstractPersistedObjectEditFormController<In
 	@RequestMapping(value = "{userId}/surveys/summaries.json", method=GET)
 	public @ResponseBody
 	List<SurveySummary> loadSummariesByUser(@PathVariable int userId) {
+		accessControl.checkAdminOrSelf(userId);
 		User user = itemManager.loadById(userId);
 		return surveyManager.getSurveySummaries(user);
 	}
@@ -76,11 +82,23 @@ public class UserController extends AbstractPersistedObjectEditFormController<In
 	protected User getLoggedUser() {
 		return sessionManager.getLoggedUser();
 	}
+
+	@Override
+	protected void checkCanRead(Integer id) {
+		accessControl.checkAdminOrSelf(id);
+	}
+
+	// users can only change their own password, using the changepassword endpoint (it verifies the old one)
+	@Override
+	protected void checkCanEdit() {
+		accessControl.checkAdmin();
+	}
 	
 	@Transactional
 	@RequestMapping(method=DELETE)
 	public @ResponseBody
 	Response delete(@Valid UsersDeleteParameters parameters) {
+		accessControl.checkAdmin();
 		for (int userId : parameters.getUserIds()) {
 			itemManager.deleteById(userId);
 		}

@@ -48,6 +48,7 @@ public abstract class AbstractPersistedObjectEditFormController<I extends Number
 	@RequestMapping(value = "/{id}", method=GET)
 	public @ResponseBody
 	F load(@PathVariable I id) {
+		checkCanRead(id);
 		T item = loadItem(id);
 		F form = createFormInstance(item);
 		return form;
@@ -66,6 +67,7 @@ public abstract class AbstractPersistedObjectEditFormController<I extends Number
 	}
 	
 	protected Response save(@Validated F form, BindingResult result) {
+		checkCanEdit();
 		List<ObjectError> errors = result.getAllErrors();
 		SimpleFormUpdateResponse response;
 		if (errors.isEmpty()) {
@@ -83,6 +85,7 @@ public abstract class AbstractPersistedObjectEditFormController<I extends Number
 	@RequestMapping(value="/{id}/duplicate", method=POST)
 	public @ResponseBody
 	Response duplicate(@RequestParam I itemId, BindingResult result) {
+		checkCanEdit();
 		T item = itemManager.loadById(itemId);
 		T newItem = item; //TODO clone?!
 		newItem.setId(null);
@@ -94,6 +97,7 @@ public abstract class AbstractPersistedObjectEditFormController<I extends Number
 	@RequestMapping(value="validate", method=POST)
 	public @ResponseBody
 	Response validate(@Validated F form, BindingResult result) {
+		checkCanEdit();
 		List<ObjectError> errors = result.getAllErrors();
 		Response response = new SimpleFormUpdateResponse(errors);
 		return response;
@@ -102,6 +106,7 @@ public abstract class AbstractPersistedObjectEditFormController<I extends Number
 	@RequestMapping(value = "/{id}", method=DELETE)
 	public @ResponseBody
 	Response delete(@PathVariable I id) {
+		checkCanEdit();
 		try {
 			T item = loadItem(id);
 			itemManager.delete(item);
@@ -111,6 +116,18 @@ public abstract class AbstractPersistedObjectEditFormController<I extends Number
 		}
 	}
 	
+	/**
+	 * Access check before loading a single item: throw AccessDeniedException to deny it
+	 */
+	protected void checkCanRead(I id) {
+	}
+
+	/**
+	 * Access check before validating, creating, updating or deleting items: throw AccessDeniedException to deny it
+	 */
+	protected void checkCanEdit() {
+	}
+
 	protected T loadOrCreateItem(F form) {
 		if (form.getId() == null) {
 			return createItemInstance();

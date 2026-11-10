@@ -57,11 +57,17 @@ public class BackupRestoreController {
 	private BackupStorageManager backupStorageManager;
 	@Autowired
 	private CollectJobManager jobManager;
+	private final AccessControl accessControl;
 	
 	private SurveyBackupJob backupJob;
 
+	public BackupRestoreController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
+
 	@RequestMapping(value = "survey/{surveyId}/backup/latest/info", method=GET)
 	public @ResponseBody BackupInfo getLatestBackupInfo(@PathVariable("surveyId") int surveyId) {
+		accessControl.checkAdmin();
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		final Date date = backupStorageManager.getLastBackupDate(survey.getName());
 		RecordFilter filter = new RecordFilter(survey);
@@ -73,6 +79,7 @@ public class BackupRestoreController {
 	@RequestMapping(value = "survey/{surveyId}/backup/start", method=POST)
 	@Transactional
 	public @ResponseBody JobProxy startBackup(@PathVariable("surveyId") int surveyId) {
+		accessControl.checkAdmin();
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		return startFullExport(survey, true, false, null, true);
 	}
@@ -104,6 +111,7 @@ public class BackupRestoreController {
 	
 	@RequestMapping(value="survey/{surveyId}/backup/latest.collect-backup", method=GET)
 	public void downloadLatestBackup(@PathVariable("surveyId") int surveyId, HttpServletResponse response) throws FileNotFoundException, IOException {
+		accessControl.checkAdmin();
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		String surveyName = survey.getName();
 		File file = backupStorageManager.getLastBackupFile(surveyName);
@@ -115,6 +123,7 @@ public class BackupRestoreController {
 	
 	@RequestMapping(value="survey/{surveyId}/backup/result", method=GET)
 	public void downloadBackupExportResult(HttpServletResponse response) throws FileNotFoundException, IOException {
+		accessControl.checkAdmin();
 		File file = backupJob.getOutputFile();
 		CollectSurvey survey = backupJob.getSurvey();
 		String surveyName = survey.getName();

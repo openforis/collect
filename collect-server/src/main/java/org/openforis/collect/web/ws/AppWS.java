@@ -4,13 +4,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.openforis.collect.config.CollectConfiguration;
+import org.openforis.collect.manager.RecordAccessControlManager;
 import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserInGroup;
-import org.openforis.collect.model.UserInGroup.UserGroupRole;
 import org.openforis.collect.model.UserRole;
 import org.openforis.collect.web.ws.WebSocketMessageSender.Message;
 import org.springframework.messaging.simp.user.SimpUser;
@@ -24,6 +24,7 @@ public class AppWS {
 	private final SimpUserRegistry userRegistry;
 	private final UserManager userManager;
 	private final UserGroupManager userGroupManager;
+	private final RecordAccessControlManager recordAccessControlManager = new RecordAccessControlManager();
 
 	public AppWS(WebSocketMessageSender messageSender, SimpUserRegistry userRegistry, UserManager userManager,
 			UserGroupManager userGroupManager) {
@@ -101,9 +102,7 @@ public class AppWS {
 		if (userInGroup == null) {
 			return false;
 		}
-		// limited users can see only their own records
-		boolean limited = user.hasRole(UserRole.ENTRY_LIMITED) || userInGroup.getRole() == UserGroupRole.DATA_CLEANER_LIMITED;
-		return !limited || collectRecord.getOwner() != null && user.getId().equals(collectRecord.getOwner().getId());
+		return recordAccessControlManager.canView(user, userInGroup.getRole(), collectRecord.getOwner());
 	}
 
 	public static class SurveyMessage extends Message {

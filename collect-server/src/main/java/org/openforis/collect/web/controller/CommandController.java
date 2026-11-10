@@ -35,6 +35,8 @@ import org.openforis.collect.command.UpdateRealRangeAttributeCommand;
 import org.openforis.collect.command.UpdateTaxonAttributeCommand;
 import org.openforis.collect.command.UpdateTextAttributeCommand;
 import org.openforis.collect.command.UpdateTimeAttributeCommand;
+import org.openforis.collect.manager.RecordAccessControlManager;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.event.EventListener;
 import org.openforis.collect.event.RecordEvent;
 import org.openforis.collect.manager.RecordFileManager;
@@ -111,6 +113,12 @@ public class CommandController {
 	private transient SessionManager sessionManager;
 	@Autowired
 	private transient AppWS appWS;
+	private final AccessControl accessControl;
+	private final RecordAccessControlManager recordAccessControlManager = new RecordAccessControlManager();
+
+	public CommandController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
 
 	@RequestMapping(value = "record", method = POST, consumes = APPLICATION_JSON_VALUE)
 	public @ResponseBody Response createRecord(@RequestBody CreateRecordCommand command) {
@@ -161,6 +169,7 @@ public class CommandController {
 				UpdateAttributeCommandWrapper.class);
 		CollectSurvey survey = getSurvey(commandWrapper);
 		UpdateAttributeCommand<Value> command = commandWrapper.toCommand(survey);
+		checkAccess(command);
 		FileAttributeDefinition attrDef = survey.getSchema().getDefinitionById(command.getNodeDefId());
 		if (multipartFile.getSize() <= attrDef.getMaxSize()) {
 			CollectRecord record = provideRecord(command);
@@ -186,6 +195,7 @@ public class CommandController {
 
 	@RequestMapping(value = "record/attribute/file/delete", method = POST, consumes = APPLICATION_JSON_VALUE)
 	public @ResponseBody Object deleteAttributeFile(@RequestBody DeleteAttributeCommand command) throws Exception {
+		checkAccess(command);
 		CollectRecord record = provideRecord(command);
 		FileAttribute fileAttr = record.findNodeByPath(command.getNodePath());
 		if (record.isPreview()) {
@@ -215,6 +225,7 @@ public class CommandController {
 	}
 
 	private Response submitCommand(RecordCommand command) {
+		checkAccess(command);
 		String username = sessionManager.getLoggedUsername();
 		command.setUsername(username);
 		CollectRecord record = provideRecord(command);
@@ -238,6 +249,7 @@ public class CommandController {
 	}
 
 	private List<RecordEventView> submitCommandSync(RecordCommand command) throws Exception {
+		checkAccess(command);
 		command.setUsername(sessionManager.getLoggedUsername());
 		List<RecordEvent> events = commandDispatcher.submitSync(command);
 		CollectRecord record = provideRecord(command);
@@ -246,6 +258,23 @@ public class CommandController {
 			result.add(new RecordEventView(event, record));
 		}
 		return result;
+	}
+
+	private void checkAccess(RecordCommand command) {
+		CollectSurvey survey = getSurvey(command);
+		Integer recordId = command.getRecordId();
+		if (command instanceof CreateRecordPreviewCommand || recordId == null && !(command instanceof CreateRecordCommand)) {
+			// preview record, kept in session and never stored
+			accessControl.checkCanAccessSurvey(survey);
+		} else if (command instanceof CreateRecordCommand) {
+			accessControl.checkSurveyPermission(survey, recordAccessControlManager::canCreateRecords);
+		} else if (command instanceof DeleteRecordCommand) {
+			CollectRecordSummary summary = accessControl.checkCanViewRecord(survey, recordId);
+			accessControl.checkSurveyPermission(survey, (user, role) -> 
+				recordAccessControlManager.canDeleteRecords(user, role, Collections.singletonList(summary)));
+		} else {
+			accessControl.checkCanEditRecord(survey, recordId);
+		}
 	}
 
 	private CollectSurvey getSurvey(RecordCommand command) {

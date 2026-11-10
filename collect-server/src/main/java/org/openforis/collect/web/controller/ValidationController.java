@@ -28,6 +28,7 @@ import org.openforis.collect.utils.MediaTypes;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.commons.collection.Visitor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -50,9 +51,15 @@ public class ValidationController extends BasicController {
 	private SurveyManager surveyManager;
 	@Autowired
 	private SpringMessageSource messageContextHolder;
+	private final AccessControl accessControl;
 	
+	public ValidationController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
+
 	@RequestMapping(value = "/validateAllRecords.htm", method = RequestMethod.GET)
 	public void validateAllRecords(HttpServletRequest request, HttpServletResponse response, @RequestParam String s, @RequestParam String r) throws IOException {
+		accessControl.checkRole(UserRole.DESIGN);
 		final ServletOutputStream outputStream = response.getOutputStream();
 		try {
 			if ( s == null || r == null) {
@@ -68,6 +75,7 @@ public class ValidationController extends BasicController {
 				print(outputStream, "Survey not found");
 				return;
 			}
+			accessControl.checkCanAccessSurvey(survey);
 			RecordFilter filter = new RecordFilter(survey);
 			filter.setRootEntityId(survey.getSchema().getRootEntityDefinition(r).getId());
 			final ValidationMessageBuilder validationMessageHelper = ValidationMessageBuilder.createInstance(messageContextHolder);
@@ -93,6 +101,8 @@ public class ValidationController extends BasicController {
 				}
 			});
 			print(outputStream, "End of validation of all records.");
+		} catch (AccessDeniedException e) {
+			throw e; // HTTP 403
 		} catch (Exception e) {
 			outputStream.println("ERROR - Validation of records not completed: " + e.getMessage());
 			LOG.error(e.getMessage(), e);
@@ -119,6 +129,7 @@ public class ValidationController extends BasicController {
 				print(outputStream, "Survey not found");
 				return;
 			}
+			accessControl.checkCanAccessSurvey(survey);
 			String outputFileName = String.format("%s_validation_report_%s.csv", surveyName, Dates.formatDateTime(new Date()));
 			Controllers.setOutputContent(response, outputFileName, MediaTypes.CSV_CONTENT_TYPE);
 			SessionState sessionState = getSessionState(request);
@@ -134,6 +145,8 @@ public class ValidationController extends BasicController {
 					ReportType.CSV, user, sessionId, recordFilter, true, LocaleUtils.toLocale(locale));
 			process.init();
 			process.call();
+		} catch (AccessDeniedException e) {
+			throw e; // HTTP 403
 		} catch (Exception e) {
 			//outputStream.println("ERROR - Validation of records not completed: " + e.getMessage());
 			LOG.error("ERROR - Validation of records not completed: " + e.getMessage(), e);

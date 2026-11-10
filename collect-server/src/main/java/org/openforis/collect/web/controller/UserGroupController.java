@@ -55,6 +55,11 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 	private SessionManager sessionManager;
 	@Autowired
 	private SurveyManager surveyManager;
+	private final AccessControl accessControl;
+
+	public UserGroupController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
@@ -80,12 +85,24 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 		User loggedUser = sessionManager.getLoggedUser();
 		return itemManager.findAllRelatedUserGroups(loggedUser);
 	}
+
+	@Override
+	protected void checkCanRead(Integer id) {
+		accessControl.checkCanAccessUserGroup(id);
+	}
+
+	// user groups management is available only to administrators (as in the UI)
+	@Override
+	protected void checkCanEdit() {
+		accessControl.checkAdmin();
+	}
 	
 	@RequestMapping(value="/{userGroupId}/resources/{resourceType}/{resourceId}", method=POST)
 	public @ResponseBody Response associateToResource(
 			@PathVariable int userGroupId, 
 			@PathVariable String resourceType,
 			@PathVariable String resourceId) {
+		accessControl.checkAdmin();
 		if (StringUtils.isBlank(resourceType) || !resourceType.matches(RESOURCE_TYPE_REGEX)) {
 			throw new IllegalArgumentException("Invalid resource type specified");
 		}
@@ -99,6 +116,7 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 			@PathVariable int userGroupId, 
 			@PathVariable String resourceType,
 			@PathVariable String resourceId) {
+		accessControl.checkAdmin();
 		itemManager.disassociateResource(userGroupId, 
 				SurveyObjects.adjustInternalName(resourceType),
 				SurveyObjects.adjustInternalName(resourceId));
@@ -109,6 +127,7 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 	@RequestMapping(method=DELETE)
 	public @ResponseBody
 	Response delete(@Valid UserGroupsDeleteParameters parameters) {
+		accessControl.checkAdmin();
 		List<SurveySummary> surveys = surveyManager.loadCombinedSummaries(Locale.getDefault().getLanguage(), false,
 				parameters.getLoggedUserId(),
 				new HashSet<Integer>(parameters.getUserGroupIds()), null);

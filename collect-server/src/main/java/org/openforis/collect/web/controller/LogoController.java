@@ -35,10 +35,16 @@ public class LogoController extends BasicController {
 	
 	@Autowired
 	private LogoManager logoManager;
+	private final AccessControl accessControl;
+
+	public LogoController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
 	
 	@RequestMapping(value = "/uploadLogo.htm", method = RequestMethod.POST)
 	public @ResponseBody String uploadLogo(UploadItem uploadItem, BindingResult result, @RequestParam String position) 
 			throws IOException, SurveyImportException, IdmlParseException {
+		accessControl.checkAdmin();
 		CommonsMultipartFile fileData = uploadItem.getFileData();
 		InputStream is = fileData.getInputStream();
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
