@@ -106,6 +106,8 @@ public class DataUnmarshaller {
 	private void initializeReader() {
 		try {
 			SAXParserFactory factory = SAXParserFactory.newInstance();
+			// record files never contain a DTD: rejecting it prevents XXE
+			factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 			// create a parser
 			SAXParser parser = factory.newSAXParser();
 			// create the reader (scanner)
