@@ -50,9 +50,12 @@ public class ValidationController extends BasicController {
 	private SurveyManager surveyManager;
 	@Autowired
 	private SpringMessageSource messageContextHolder;
+	@Autowired
+	private AccessControl accessControl;
 	
 	@RequestMapping(value = "/validateAllRecords.htm", method = RequestMethod.GET)
 	public void validateAllRecords(HttpServletRequest request, HttpServletResponse response, @RequestParam String s, @RequestParam String r) throws IOException {
+		accessControl.checkRole(UserRole.DESIGN);
 		final ServletOutputStream outputStream = response.getOutputStream();
 		try {
 			if ( s == null || r == null) {
@@ -68,6 +71,7 @@ public class ValidationController extends BasicController {
 				print(outputStream, "Survey not found");
 				return;
 			}
+			accessControl.checkCanAccessSurvey(survey);
 			RecordFilter filter = new RecordFilter(survey);
 			filter.setRootEntityId(survey.getSchema().getRootEntityDefinition(r).getId());
 			final ValidationMessageBuilder validationMessageHelper = ValidationMessageBuilder.createInstance(messageContextHolder);
@@ -119,6 +123,7 @@ public class ValidationController extends BasicController {
 				print(outputStream, "Survey not found");
 				return;
 			}
+			accessControl.checkCanAccessSurvey(survey);
 			String outputFileName = String.format("%s_validation_report_%s.csv", surveyName, Dates.formatDateTime(new Date()));
 			Controllers.setOutputContent(response, outputFileName, MediaTypes.CSV_CONTENT_TYPE);
 			SessionState sessionState = getSessionState(request);

@@ -13,7 +13,6 @@ import org.openforis.collect.manager.TaxonSearchParameters;
 import org.openforis.collect.manager.dataexport.species.SpeciesExportProcess;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
-import org.openforis.collect.model.UserRoles;
 import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.utils.MediaTypes;
@@ -21,7 +20,6 @@ import org.openforis.collect.utils.Proxies;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,6 +39,8 @@ public class SpeciesController {
 	@Autowired
 	@Qualifier("sessionManager")
 	private SessionManager sessionManager;
+	@Autowired
+	private AccessControl accessControl;
 
 	@RequestMapping(value = "api/survey/{surveyId}/taxonomy/{taxonomyId}/export.csv", method = RequestMethod.GET)
 	public @ResponseBody String exportSpecies(HttpServletResponse response, @PathVariable("surveyId") Integer surveyId,
@@ -53,7 +53,6 @@ public class SpeciesController {
 		return "ok";
 	}
 
-	@Secured(UserRoles.ENTRY)
 	@RequestMapping(value = "api/survey/{surveyId}/taxonomy/{taxonomyName}/query", method = RequestMethod.POST)
 	public @ResponseBody List<TaxonOccurrenceProxy> findTaxon(@PathVariable("surveyId") int surveyId,
 			@PathVariable("taxonomyName") String taxonomyName, @RequestBody TaxonQuery query) {
@@ -86,6 +85,7 @@ public class SpeciesController {
 
 	private CollectTaxonomy loadTaxonomy(int surveyId, String taxonomyName) {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
+		accessControl.checkCanAccessSurvey(survey);
 		return speciesManager.loadTaxonomyByName(survey, taxonomyName);
 	}
 

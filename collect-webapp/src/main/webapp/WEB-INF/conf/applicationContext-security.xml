@@ -44,6 +44,7 @@
 		<intercept-url access="permitAll" pattern="/uploadData.htm" />
 		<intercept-url access="permitAll" pattern="/uploadFile.htm" />
 
+		<intercept-url access="hasRole('ROLE_CLEANSING')" pattern="/api/datacleansing/**" />
 		<!-- in development mode the React dev server (127.0.0.1:3000) calls the API without logging in -->
 		<intercept-url access="hasRole('ROLE_USER') or (hasIpAddress('127.0.0.1') and T(org.openforis.collect.config.CollectConfiguration).isDevelopmentMode())" pattern="/api/**" />
 

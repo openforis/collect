@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.UserInGroup.UserGroupRole;
+import org.openforis.collect.model.UserRole;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.reporting.ReportingRepositories;
 import org.openforis.collect.reporting.ReportingRepositoriesGeneratorJob;
@@ -37,11 +39,15 @@ public class SaikuController {
 	private CollectJobManager jobManager;
 	@Autowired
 	private SurveyManager surveyManager;
+	@Autowired
+	private AccessControl accessControl;
 	
 	@RequestMapping(value = "datasources/{surveyName}/generate", method=POST)
 	public @ResponseBody JobProxy generateRepository(@PathVariable String surveyName, @RequestParam String language)
 			throws CollectRdbException, SQLException {
 		CollectSurvey survey = surveyManager.get(surveyName);
+		accessControl.checkSurveyPermission(survey, (user, role) -> 
+				user.hasEffectiveRole(UserRole.CLEANSING) && role != UserGroupRole.DATA_CLEANER_LIMITED);
 		ReportingRepositoriesGeneratorJob job = jobManager.createJob(ReportingRepositoriesGeneratorJob.class);
 		job.setInput(new Input(language));
 		job.setSurvey(survey);

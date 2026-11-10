@@ -33,6 +33,7 @@ import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.model.Coordinate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,6 +52,8 @@ public class SamplingPointsController extends BasicController {
 	private SurveyManager surveyManager;
 	@Autowired
 	private CoordinateOperations coordinateOperations;
+	@Autowired
+	private AccessControl accessControl;
 	
 	@RequestMapping(value="api/survey/{surveyId}/sampling_point_data", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
@@ -84,6 +87,12 @@ public class SamplingPointsController extends BasicController {
 	@RequestMapping(value="api/survey/{surveyId}/sampling_point_data", method=POST, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	SamplingDesignItem updateSamplingPointItem(@PathVariable int surveyId, @RequestBody SamplingDesignItem item) {
+		accessControl.checkCanEditSurvey(surveyManager.getOrLoadSurveyById(surveyId));
+		SamplingDesignItem storedItem = item.getId() == null ? null : samplingDesignManager.loadById(item.getId());
+		if (storedItem != null && storedItem.getSurveyId() != surveyId) {
+			throw new AccessDeniedException("Sampling point item not found in survey " + surveyId);
+		}
+		item.setSurveyId(surveyId);
 		samplingDesignManager.save(item);
 		return item;
 	}

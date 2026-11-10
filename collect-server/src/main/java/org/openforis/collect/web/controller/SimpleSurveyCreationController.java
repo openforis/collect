@@ -8,6 +8,7 @@ import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.metamodel.SimpleSurveyCreationParameters;
+import org.openforis.collect.model.UserRole;
 import org.openforis.collect.metamodel.SurveyCreator;
 import org.openforis.collect.metamodel.view.SurveyView;
 import org.openforis.collect.metamodel.view.SurveyViewGenerator;
@@ -36,6 +37,8 @@ public class SimpleSurveyCreationController {
 	private UserGroupManager userGroupManager;
 	@Autowired
 	private CoordinateOperations coordinateOperations;
+	@Autowired
+	private AccessControl accessControl;
 	
 	@Autowired
 	private SimpleSurveyCreationParametersValidator validator;
@@ -49,6 +52,8 @@ public class SimpleSurveyCreationController {
 	@RequestMapping(value="simple", method=POST)
 	public @ResponseBody
 	SurveyView createSimpleSurvey(@RequestBody SimpleSurveyCreationParameters parameters, BindingResult bindingResult) throws Exception {
+		accessControl.checkRole(UserRole.DESIGN);
+		accessControl.checkCanAccessUserGroup(parameters.getUserGroupId());
 		SurveyCreator surveyCreator = new SurveyCreator(surveyManager, samplingDesignManager, userGroupManager, coordinateOperations);
 		CollectSurvey survey = surveyCreator.generateSimpleSurvey(parameters);
 		return generateView(survey, true);

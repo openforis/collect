@@ -46,6 +46,8 @@ public class SessionController extends BasicController {
 	private SurveyManager surveyManager;
 	@Autowired
 	private UserGroupManager userGroupManager;
+	@Autowired
+	private AccessControl accessControl;
 	
 	@RequestMapping(value = "ping", method = GET)
 	public @ResponseBody Response ping(@RequestParam(value="editing", required = false, defaultValue = "false" ) Boolean editing) throws RecordUnlockedException {
@@ -58,6 +60,7 @@ public class SessionController extends BasicController {
 	@RequestMapping(value = "survey", method = POST)
 	public @ResponseBody Response setActiveSurvey(@RequestParam int surveyId) {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
+		accessControl.checkCanAccessSurvey(survey);
 		sessionManager.setActiveSurvey(survey);
 		return new Response();
 	}

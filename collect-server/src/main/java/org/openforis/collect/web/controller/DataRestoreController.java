@@ -10,6 +10,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.zip.ZipException;
 
 import org.apache.commons.io.FileUtils;
@@ -23,7 +25,6 @@ import org.openforis.collect.io.SurveyBackupInfo;
 import org.openforis.collect.io.data.DataRestoreJob;
 import org.openforis.collect.io.data.DataRestoreTask.OverwriteStrategy;
 import org.openforis.collect.manager.ConfigurationManager;
-import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.UserManager;
@@ -31,7 +32,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
-import org.openforis.collect.model.UserRoles;
+import org.openforis.collect.model.UserRole;
 import org.openforis.collect.web.controller.upload.UploadItem;
 import org.openforis.collect.web.ws.AppWS;
 import org.openforis.collect.web.ws.AppWS.MessageType;
@@ -40,7 +41,6 @@ import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Worker.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -67,22 +67,23 @@ public class DataRestoreController extends BasicController {
 	@Autowired
 	private CollectJobManager jobManager;
 	@Autowired
-	private SessionManager sessionManager;
-	@Autowired
 	private UserManager userManager;
 	@Autowired
 	private UserGroupManager userGroupManager;
 	@Autowired
 	private AppWS appWS;
+	@Autowired
+	private AccessControl accessControl;
 	
-	@Secured(UserRoles.ENTRY)
 	@RequestMapping(value = "/surveys/restore/data", method=POST, consumes=MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody JobStatusResponse restoreData(@RequestParam("file") MultipartFile multipartFile, 
 			@RequestParam(required=false) String surveyName,
 			@RequestParam(required=false, defaultValue="true") boolean validateRecords,
 			@RequestParam(required=false, defaultValue="false") boolean deleteAllRecordsBeforeImport,
 			@RequestParam(required=false, defaultValue="OVERWRITE_OLDER") String recordOverwriteStrategy) throws IOException {
-		User loggedUser = sessionManager.getLoggedUser();
+		// creating a survey or deleting all its records requires ADMIN; restoring records (e.g. Collect Mobile uploads) requires ENTRY
+		User loggedUser = surveyName == null || deleteAllRecordsBeforeImport ? accessControl.checkAdmin()
+				: accessControl.checkRole(UserRole.ENTRY);
 		try {
 			DataRestoreJob job = startRestoreJob(multipartFile.getInputStream(), surveyName == null, surveyName, loggedUser,
 					validateRecords, deleteAllRecordsBeforeImport, OverwriteStrategy.valueOf(recordOverwriteStrategy));
@@ -102,7 +103,9 @@ public class DataRestoreController extends BasicController {
 			@RequestParam String restoreKey) {
 		RemoteDataRestoreResponse response = new RemoteDataRestoreResponse();
 		String allowedRestoreKey = configurationManager.getConfiguration().get(ConfigurationItem.ALLOWED_RESTORE_KEY);
-		if (StringUtils.isBlank(allowedRestoreKey) || allowedRestoreKey.equals(restoreKey)) {
+		// remote restore (performed as admin) is allowed only when a restore key has been configured
+		if (StringUtils.isNotBlank(allowedRestoreKey) && restoreKey != null && MessageDigest.isEqual(
+				allowedRestoreKey.getBytes(StandardCharsets.UTF_8), restoreKey.getBytes(StandardCharsets.UTF_8))) {
 			try {
 				User user = userManager.loadAdminUser();
 				boolean newSurvey = surveyManager.get(surveyName) == null;
@@ -122,7 +125,6 @@ public class DataRestoreController extends BasicController {
 		return response;
 	}
 	
-	@Secured(UserRoles.ENTRY)
 	@RequestMapping(value = "/surveys/data/restorejobs/{jobId}/status.json", method=GET)
 	public @ResponseBody RemoteDataRestoreResponse getRestoreDataRemotelyStatus(@PathVariable String jobId) throws IOException {
 		RemoteDataRestoreResponse response;
@@ -132,6 +134,7 @@ public class DataRestoreController extends BasicController {
 			response.setErrorStatus();
 			response.setErrorMessage("Job not found");
 		} else {
+			checkCanAccessRestoreJob((DataRestoreJob) job);
 			response = createRemoteDataRestoreResponse(job);
 		}
 		return response;
@@ -146,12 +149,21 @@ public class DataRestoreController extends BasicController {
 			response.setErrorStatus();
 			response.setErrorMessage("Job not found");
 		} else {
+			checkCanAccessRestoreJob((DataRestoreJob) job);
 			job.abort();
 			response = createRemoteDataRestoreResponse(job);
 		}
 		return response;
 	}
 	
+	private void checkCanAccessRestoreJob(DataRestoreJob job) {
+		// the user who started the restore (e.g. a Collect Mobile upload) can follow or abort it
+		User jobUser = job.getUser();
+		if (jobUser == null || !jobUser.getId().equals(accessControl.getLoggedUser().getId())) {
+			accessControl.checkAdmin();
+		}
+	}
+
 	private JobStatusResponse createResponse(Job job) {
 		JobStatusResponse response = new JobStatusResponse();
 		fillResponse(response, job);
@@ -185,6 +197,10 @@ public class DataRestoreController extends BasicController {
 				checkPackagedNewSurveyValidity(info);
 			} else {
 				checkPackagedSurveyValidity(info, expectedSurveyName);
+				// the target survey is the one in the backup file: non-admins must have access to it
+				if (!user.hasEffectiveRole(UserRole.ADMIN)) {
+					accessControl.checkCanAccessSurvey(publishedSurvey);
+				}
 			}
 			UserGroup newSurveyUserGroup = userGroupManager.getDefaultPublicUserGroup();
 			

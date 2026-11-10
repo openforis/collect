@@ -55,6 +55,8 @@ import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserInGroup;
+import org.openforis.collect.model.UserInGroup.UserGroupRole;
+import org.openforis.collect.model.UserRole;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.relational.print.RDBPrintJob;
@@ -128,6 +130,8 @@ public class SurveyController extends BasicController {
 	private SurveyService surveyService;
 	@Autowired
 	private AppWS appWS;
+	@Autowired
+	private AccessControl accessControl;
 
 	// validators
 	@Autowired
@@ -175,8 +179,11 @@ public class SurveyController extends BasicController {
 			@RequestParam(value = "includeTemporary", required = false) boolean includeTemporary,
 			@RequestParam(value = "langCode", required = false, defaultValue = "en") String langCode) throws Exception {
 		String languageCode = Locale.ENGLISH.getLanguage();
-		if (userId == null) {
+		if (userId == null || !accessControl.isAdmin()) {
 			userId = sessionManager.getLoggedUser().getId();
+		}
+		if (groupId != null) {
+			accessControl.checkCanAccessUserGroup(groupId);
 		}
 		Set<Integer> groupIds = getAvailableUserGroupIds(userId, groupId);
 
@@ -209,12 +216,14 @@ public class SurveyController extends BasicController {
 			@RequestParam(value = "includeCodeListValues", required = false, defaultValue = "true") boolean includeCodeListValues,
 			@RequestParam(value = "langCode", required = false, defaultValue = "en") String langCode) throws Exception {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
+		accessControl.checkCanAccessSurvey(survey);
 		return generateView(survey, includeCodeListValues, langCode);
 	}
 	
 	@RequestMapping(value = "files/{surveyId}", method = GET)
 	public @ResponseBody List<SurveyFileView> loadSurveyFiles(@PathVariable int surveyId) throws Exception {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
+		accessControl.checkCanAccessSurvey(survey);
 		List<SurveyFile> fileSummaries = surveyManager.loadSurveyFileSummaries(survey);
 		List<SurveyFileView> fileViews = Views.fromObjects(fileSummaries,SurveyFileView.class);
 		return fileViews;
@@ -224,12 +233,14 @@ public class SurveyController extends BasicController {
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public @ResponseBody Response createSurvey(@Valid SurveyCreationParameters params, BindingResult bindingResult)
 			throws Exception {
+		accessControl.checkRole(UserRole.DESIGN);
 		if (bindingResult.hasErrors()) {
 			Response res = new Response();
 			res.setErrorStatus();
 			res.addObject("errors", bindingResult.getFieldErrors());
 			return res;
 		}
+		accessControl.checkCanAccessUserGroup(params.getUserGroupId());
 		CollectSurvey survey = surveyService.createNewSurvey(params);
 
 		SurveySummary surveySummary = SurveySummary.createFromSurvey(survey);
@@ -247,6 +258,7 @@ public class SurveyController extends BasicController {
 		Response response = new Response();
 		User loggedUser = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
+		accessControl.checkCanEditSurvey(survey);
 		if (survey.isPublished()) {
 			String surveyUri = survey.getUri();
 			CollectSurvey temporarySurvey = surveyManager.createTemporarySurveyFromPublished(surveyUri, loggedUser);
@@ -273,6 +285,7 @@ public class SurveyController extends BasicController {
 			@RequestParam(value = "langCode", required = false, defaultValue = "en") String langCode)
 			throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
+		accessControl.checkCanEditSurvey(survey);
 		CollectSurvey publishedSurvey = survey.isPublished() ? surveyManager.getByUri(survey.getUri()) : null;
 		SurveyValidator validator = getSurveyValidator(survey);
 		ValidationParameters validationParameters = new ValidationParameters();
@@ -299,6 +312,7 @@ public class SurveyController extends BasicController {
 	public @ResponseBody SurveyView unpublishSurvey(@PathVariable int id,
 			@RequestParam(value = "langCode", required = false, defaultValue = "en") String langCode)
 			throws SurveyStoreException {
+		accessControl.checkCanEditSurvey(surveyManager.getOrLoadSurveyById(id));
 		User activeUser = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.unpublish(id, activeUser);
 		sendSurveyMessage(AppWS.MessageType.SURVEY_UNPUBLISHED, id);
@@ -311,6 +325,7 @@ public class SurveyController extends BasicController {
 			@RequestParam(value = "langCode", required = false, defaultValue = "en") String langCode)
 			throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
+		accessControl.checkCanEditSurvey(survey);
 		surveyManager.close(survey);
 		sendSurveysUpdatedMessage();
 		return generateView(survey, false, langCode);
@@ -322,6 +337,7 @@ public class SurveyController extends BasicController {
 			@RequestParam(value = "langCode", required = false, defaultValue = "en") String langCode)
 			throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
+		accessControl.checkCanEditSurvey(survey);
 		surveyManager.archive(survey);
 		sendSurveysUpdatedMessage();
 		return generateView(survey, false, langCode);
@@ -330,6 +346,7 @@ public class SurveyController extends BasicController {
 	@RequestMapping(value = "delete/{id}", method = POST)
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public @ResponseBody Response deleteSurvey(@PathVariable int id) throws SurveyImportException {
+		accessControl.checkCanEditSurvey(surveyManager.getOrLoadSurveyById(id));
 		surveyManager.deleteSurvey(id);
 		sendSurveyMessage(AppWS.MessageType.SURVEY_DELETED, id);
 		return new Response();
@@ -338,6 +355,8 @@ public class SurveyController extends BasicController {
 	@RequestMapping(value = "clone", method = POST)
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public @ResponseBody JobView cloneSurvey(@Valid SurveyCloneParameters params) {
+		accessControl.checkRole(UserRole.DESIGN);
+		accessControl.checkCanAccessSurveyGroup(surveyManager.loadSummaryByName(params.originalSurveyName).getUserGroupId());
 		surveyCloneJob = new SurveyCloneJob(surveyManager);
 		surveyCloneJob.setOriginalSurveyName(params.originalSurveyName);
 		surveyCloneJob.setNewName(params.newSurveyName);
@@ -373,6 +392,7 @@ public class SurveyController extends BasicController {
 
 	@RequestMapping(value = "prepareimport", method = POST, consumes = MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody Response prepareSurveyImport(@RequestParam("file") MultipartFile multipartFile) {
+		accessControl.checkRole(UserRole.DESIGN);
 		Response response = new Response();
 		try {
 			String fileName = multipartFile.getOriginalFilename();
@@ -426,11 +446,19 @@ public class SurveyController extends BasicController {
 	@RequestMapping(value = "startimport", method = POST)
 	public @ResponseBody Response startSurveyFileImport(@Valid SurveyImportParameters params,
 			BindingResult bindingResult) {
+		accessControl.checkRole(UserRole.DESIGN);
 		if (bindingResult.hasErrors()) {
 			Response res = new Response();
 			res.setErrorStatus();
 			res.addObject("errors", bindingResult.getFieldErrors());
 			return res;
+		}
+		accessControl.checkCanAccessUserGroup(params.getUserGroupId());
+		// importing a new version of an existing survey requires access to it
+		SurveySummary existingSummary = uploadedSurveyInfo == null ? null
+				: surveyManager.loadSummaryByUri(uploadedSurveyInfo.getSurveyUri());
+		if (existingSummary != null) {
+			accessControl.checkCanAccessSurveyGroup(existingSummary.getUserGroupId());
 		}
 		String surveyName = params.getName();
 		UserGroup userGroup = userGroupManager.loadById(params.getUserGroupId());
@@ -481,6 +509,10 @@ public class SurveyController extends BasicController {
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public @ResponseBody SurveySummary changeSurveyUserGroup(@PathVariable String surveyName,
 			@RequestParam int userGroupId) throws SurveyStoreException {
+		accessControl.checkRole(UserRole.DESIGN);
+		accessControl.checkSurveyGroupPermission(surveyManager.loadSummaryByName(surveyName).getUserGroupId(),
+				(user, role) -> role == UserGroupRole.OWNER || role == UserGroupRole.ADMINISTRATOR);
+		accessControl.checkCanAccessUserGroup(userGroupId);
 		SurveySummary surveySummary = surveyManager.updateUserGroup(surveyName, userGroupId);
 		sendSurveysUpdatedMessage();
 		return surveySummary;
@@ -500,6 +532,7 @@ public class SurveyController extends BasicController {
 		} else {
 			loadedSurvey = surveyManager.getByUri(uri);
 		}
+		accessControl.checkCanEditSurvey(loadedSurvey);
 		switch (params.getOutputFormat()) {
 		case EARTH: {
 //			if (skipValidation || collectEarthSurveyValidator.validate(loadedSurvey).isOk()) {
