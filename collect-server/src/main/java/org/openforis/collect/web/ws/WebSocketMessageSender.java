@@ -14,7 +14,11 @@ public class WebSocketMessageSender {
 	public void send(Message message) {
 		this.simpMessagingTemplate.convertAndSend(DESTINATION, message);
 	}
-	
+
+	public void sendToUser(String username, Message message) {
+		this.simpMessagingTemplate.convertAndSendToUser(username, DESTINATION, message);
+	}
+
 	public static class Message {
 		
 		private String type;
