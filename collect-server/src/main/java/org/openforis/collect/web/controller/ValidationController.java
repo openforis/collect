@@ -28,6 +28,7 @@ import org.openforis.collect.utils.MediaTypes;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.commons.collection.Visitor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -97,6 +98,8 @@ public class ValidationController extends BasicController {
 				}
 			});
 			print(outputStream, "End of validation of all records.");
+		} catch (AccessDeniedException e) {
+			throw e; // HTTP 403
 		} catch (Exception e) {
 			outputStream.println("ERROR - Validation of records not completed: " + e.getMessage());
 			LOG.error(e.getMessage(), e);
@@ -139,6 +142,8 @@ public class ValidationController extends BasicController {
 					ReportType.CSV, user, sessionId, recordFilter, true, LocaleUtils.toLocale(locale));
 			process.init();
 			process.call();
+		} catch (AccessDeniedException e) {
+			throw e; // HTTP 403
 		} catch (Exception e) {
 			//outputStream.println("ERROR - Validation of records not completed: " + e.getMessage());
 			LOG.error("ERROR - Validation of records not completed: " + e.getMessage(), e);

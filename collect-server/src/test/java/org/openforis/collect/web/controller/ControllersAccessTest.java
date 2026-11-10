@@ -168,11 +168,12 @@ public class ControllersAccessTest {
 		verify(accessControl).checkRole(UserRole.DESIGN);
 		verify(accessControl, times(2)).checkCanAccessSurvey(survey);
 
-		// access denied errors are wrapped
+		// access denied errors are not wrapped, so they become HTTP 403
 		doThrow(new AccessDeniedException("denied")).when(accessControl).checkCanAccessSurvey(survey);
-		RuntimeException e = assertThrows(RuntimeException.class,
+		assertThrows(AccessDeniedException.class,
 				() -> controller.validateAllRecords(request, new MockHttpServletResponse(), SURVEY_NAME, "plot"));
-		assertTrue(e.getCause() instanceof AccessDeniedException);
+		assertThrows(AccessDeniedException.class,
+				() -> controller.validationReport(request, new MockHttpServletResponse(), SURVEY_NAME, 3, "en", null, null));
 	}
 
 	private <C> C inject(C controller) {
