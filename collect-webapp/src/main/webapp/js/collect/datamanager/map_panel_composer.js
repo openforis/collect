@@ -237,7 +237,7 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 }
 
 Collect.DataManager.MapPanelComposer.prototype.createNodeInfoBalloon = function(survey, nodeInfo) {
-	const { x, y, recordData, attrDefId, recId, recStep, recKeys, distance } = nodeInfo
+	const { x, y, recordData, attrDefId, recStep, recKeys, distance } = nodeInfo
 	const hasLocation = Boolean(x) && Boolean(y);
 	// record values and labels are user input: never insert them as HTML
 	const esc = value => OF.Strings.escapeHtml(String(value));
