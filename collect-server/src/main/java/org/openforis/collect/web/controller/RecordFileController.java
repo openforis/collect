@@ -51,15 +51,14 @@ public class RecordFileController extends BasicController implements Serializabl
 	@Autowired
 	private SessionRecordProvider recordProvider;
 	@Autowired
-	private AccessControl accessControl;
+	private transient AccessControl accessControl;
 
 	@RequestMapping(value = "/survey/{surveyId}/data/records/{recordId}/{recordStep}/file", method = RequestMethod.GET)
 	public void downloadFile(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable("surveyId") int surveyId, @PathVariable("recordId") int recordId,
 			@PathVariable("recordStep") Step recordStep, @RequestParam("nodePath") String nodePath) throws IOException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
-		CollectRecord record = provideRecord(survey, recordId, recordStep);
-		FileAttribute fileAttribute = record.getNodeByPath(nodePath);
+		FileAttribute fileAttribute = provideRecord(survey, recordId, recordStep).getNodeByPath(nodePath);
 		File file = getFile(fileAttribute);
 		String outputFileName = determineOutputFileName(survey, fileAttribute, file);
 		Controllers.writeFileToResponse(response, file, outputFileName);
@@ -70,8 +69,7 @@ public class RecordFileController extends BasicController implements Serializabl
 			@PathVariable("surveyId") int surveyId, @PathVariable("recordId") int recordId,
 			@PathVariable("recordStep") Step recordStep, @RequestParam("nodePath") String nodePath) throws IOException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
-		CollectRecord record = provideRecord(survey, recordId, recordStep);
-		FileAttribute node = record.getNodeByPath(nodePath);
+		FileAttribute node = provideRecord(survey, recordId, recordStep).getNodeByPath(nodePath);
 		File file = getFile(node);
 		try {
 			String extension = FilenameUtils.getExtension(file.getName());

@@ -170,7 +170,7 @@ public class RecordController extends BasicController implements Serializable {
 	@Autowired
 	private AppWS appWS;
 	@Autowired
-	private AccessControl accessControl;
+	private transient AccessControl accessControl;
 	private final RecordAccessControlManager recordAccessControlManager = new RecordAccessControlManager();
 
 	private CSVDataExportJob csvDataExportJob;

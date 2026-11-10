@@ -43,12 +43,7 @@ public class RecordAccessControlManager {
 			return false;
 		}
 		switch (roleInSurveyGroup) {
-		case OWNER:
-		case ADMINISTRATOR:
-		case SUPERVISOR:
-		case DATA_CLEANER_LIMITED:
-		case DATA_ANALYZER:
-		case OPERATOR:
+		case OWNER, ADMINISTRATOR, SUPERVISOR, DATA_CLEANER_LIMITED, DATA_ANALYZER, OPERATOR:
 			return true;
 		default:
 			return false;
@@ -91,10 +86,7 @@ public class RecordAccessControlManager {
 			return false;
 		}
 		switch (roleInSurveyGroup) {
-		case OWNER:
-		case ADMINISTRATOR:
-		case SUPERVISOR:
-		case DATA_ANALYZER:
+		case OWNER, ADMINISTRATOR, SUPERVISOR, DATA_ANALYZER:
 			return true;
 		default:
 			return false;
