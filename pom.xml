@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>4.0.111-SNAPSHOT</version>
+	<version>4.0.111</version>
 	<packaging>pom</packaging>
 
 	<name>Open Foris Collect</name>
@@ -38,7 +38,7 @@
 		<sonar.coverage.exclusions>**/earthFiles/**</sonar.coverage.exclusions>
 		<jacoco.version>0.8.12</jacoco.version>
 		<!-- Set by jacoco:prepare-agent; empty when JaCoCo is skipped, so that @{argLine} below still resolves -->
-		<argLine></argLine>
+		<argLine />
 	</properties>
 
 	<distributionManagement>
@@ -56,7 +56,7 @@
 		<url>https://github.com/openforis/collect</url>
 		<connection>scm:git:git@github.com:openforis/collect.git</connection>
 		<developerConnection>scm:git:git@github.com:openforis/collect.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>collect-4.0.111</tag>
 	</scm>
 
 	<licenses>
