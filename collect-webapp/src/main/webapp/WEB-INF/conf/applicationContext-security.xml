@@ -44,7 +44,8 @@
 		<intercept-url access="permitAll" pattern="/uploadData.htm" />
 		<intercept-url access="permitAll" pattern="/uploadFile.htm" />
 
-		<intercept-url access="hasRole('ROLE_USER') or hasIpAddress('127.0.0.1')" pattern="/api/**" />
+		<!-- in development mode the React dev server (127.0.0.1:3000) calls the API without logging in -->
+		<intercept-url access="hasRole('ROLE_USER') or (hasIpAddress('127.0.0.1') and T(org.openforis.collect.config.CollectConfiguration).isDevelopmentMode())" pattern="/api/**" />
 
 		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/codelist/export/**/*" />
 		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/codelist/import/**/*" />
@@ -52,6 +53,7 @@
 		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/editSurvey.htm" />
 		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/importSurvey.htm" />
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/logoUpload" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/uploadLogo.htm" />
 		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/rdbpublish" />
 		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/saiku/**/*" />
 		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/samplingdesign/export/*" />
