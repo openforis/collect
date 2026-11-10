@@ -13,6 +13,7 @@
 			<websocket:sockjs
 				client-library-url="../assets/js/sockjs/1.6.0/sockjs.min.js" />
 		</websocket:stomp-endpoint>
-		<websocket:simple-broker />
+		<!-- the prefix leaves /user/** destinations to the user destination handler (it resolves /user/events to /events-user{sessionId}) -->
+		<websocket:simple-broker prefix="/events" />
 	</websocket:message-broker>
 </beans>

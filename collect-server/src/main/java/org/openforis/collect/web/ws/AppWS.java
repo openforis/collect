@@ -3,6 +3,7 @@ package org.openforis.collect.web.ws;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.openforis.collect.config.CollectConfiguration;
 import org.openforis.collect.web.ws.WebSocketMessageSender.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,6 +40,15 @@ public class AppWS {
 			}, delay);
 		} else {
 			messageSender.send(message);
+		}
+	}
+
+	public void sendMessageToUser(String username, Message message) {
+		if (CollectConfiguration.isDevelopmentMode()) {
+			// the dev frontend is not logged in, so its WebSocket session has no user
+			messageSender.send(message);
+		} else {
+			messageSender.sendToUser(username, message);
 		}
 	}
 
