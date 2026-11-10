@@ -18,7 +18,7 @@
 <!-- 	</global-method-security> -->
 
 	<http access-decision-manager-ref="accessDecisionManager" use-expressions="true">
-		<csrf disabled="true"/>
+		<csrf token-repository-ref="csrfTokenRepository" request-matcher-ref="csrfProtectionMatcher" />
 		<http-basic />
 		<headers>
 			<frame-options disabled="true" />
@@ -76,6 +76,10 @@
 			logout-success-url="/login.html?logout=true" />
 	</http>
 	
+	<!-- XSRF-TOKEN cookie readable by the JS clients, which send it back in the X-XSRF-TOKEN header (or _csrf parameter) -->
+	<b:bean id="csrfTokenRepository" class="org.springframework.security.web.csrf.CookieCsrfTokenRepository" factory-method="withHttpOnlyFalse" />
+	<b:bean id="csrfProtectionMatcher" class="org.openforis.collect.web.filter.CsrfProtectionMatcher" />
+
 	<!-- See 15.3.2 Built-In Expression @http://static.springsource.org/spring-security/site/docs/3.0.x/reference/el-access.html#el-permission-evaluator -->
 	<b:bean id="expressionHandler" class="org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler">
 		<!-- To use hasPermission() in expressions, configure a PermissionEvaluator -->

@@ -60,7 +60,9 @@ public class CollectEarthBalloonPreviewController extends AbstractPlacemarkDataC
 	public void showCollectEarthBalloonPreview(HttpServletResponse response,
 			@RequestParam("surveyId") Integer surveyId, @RequestParam("lang") String languageCode) throws IOException  {
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
-		CollectEarthBalloonGenerator generator = new CollectEarthBalloonGenerator(survey, languageCode, true);
+		// the language code is written into the generated HTML: accept only the survey languages
+		String lang = survey.getLanguages().contains(languageCode) ? languageCode : survey.getDefaultLanguage();
+		CollectEarthBalloonGenerator generator = new CollectEarthBalloonGenerator(survey, lang, true);
 		String html = generator.generateHTML();
 		html = html.replace("earth.js", "earth_new.js");
 		writeHtmlToResponse(response, html);

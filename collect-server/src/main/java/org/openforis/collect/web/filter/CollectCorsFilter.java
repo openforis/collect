@@ -19,7 +19,7 @@ public class CollectCorsFilter extends OncePerRequestFilter {
 			response.addHeader("Access-Control-Allow-Origin", CollectConfiguration.DEV_FRONTEND_ORIGIN);
 			response.setHeader("Access-Control-Allow-Methods", "DELETE, GET, OPTIONS, PATCH, POST, PUT");
 			response.setHeader("Access-Control-Allow-Credentials", "true");
-			response.setHeader("Access-Control-Allow-Headers", "credentials, Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+			response.setHeader("Access-Control-Allow-Headers", "credentials, Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, X-XSRF-TOKEN");
 		}
 		filterChain.doFilter(request, response);
 	}

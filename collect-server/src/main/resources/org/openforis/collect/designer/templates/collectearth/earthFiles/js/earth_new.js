@@ -29,6 +29,16 @@ var currentStepIndex = null;
 var ajaxTimeout = null;
 var consoleBox = null;
 
+// The Survey Designer preview is served by Collect, which requires its CSRF token (XSRF-TOKEN cookie) on POST requests
+if (PREVIEW) {
+	$.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+		var csrfToken = /(?:^|;\s*)XSRF-TOKEN=([^;]*)/.exec(document.cookie);
+		if (csrfToken) {
+			jqXHR.setRequestHeader("X-XSRF-TOKEN", csrfToken[1]);
+		}
+	});
+}
+
 $(function() {
 	if (DEBUG) {
 		initLogConsole();

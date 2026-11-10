@@ -5,6 +5,7 @@ package org.openforis.idm.metamodel;
 
 import static org.junit.Assert.assertEquals;
 
+import org.apache.commons.jxpath.JXPathException;
 import org.junit.Test;
 import org.openforis.idm.AbstractTest;
 import org.openforis.idm.metamodel.expression.SchemaPathExpression;
@@ -33,6 +34,12 @@ public class SchemaExpressionTest extends AbstractTest {
 
 		EntityDefinition tree = (EntityDefinition) obj;
 		assertEquals("tree", tree.getName());
+	}
+
+	@Test(expected = JXPathException.class)
+	public void testJavaMethodCallNotAllowed() {
+		EntityDefinition cluster = survey.getSchema().getFirstRootEntityDefinition();
+		new SchemaPathExpression("java.lang.System.getProperty('user.home')").evaluate(cluster, cluster);
 	}
 	/*
 	 * @Test public void testSODGetMethod() { EntityDefinition cluster = survey.getSchema().getRootEntityDefinitions().get(0); EntityDefinition tree =

@@ -34,8 +34,9 @@
 		<sonar.language>java</sonar.language>
 		<sonar.organization>openforis</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-		<!-- The Collect Earth balloon assets run inside Google Earth; no test of the Maven build can execute them -->
-		<sonar.coverage.exclusions>**/earthFiles/**</sonar.coverage.exclusions>
+		<!-- The Collect Earth balloon assets run inside Google Earth and the legacy jQuery pages (webapp/js) have no JavaScript
+			test setup: no test of the Maven build can execute them -->
+		<sonar.coverage.exclusions>**/earthFiles/**,**/webapp/js/**</sonar.coverage.exclusions>
 		<jacoco.version>0.8.12</jacoco.version>
 		<!-- Set by jacoco:prepare-agent; empty when JaCoCo is skipped, so that @{argLine} below still resolves -->
 		<argLine />
