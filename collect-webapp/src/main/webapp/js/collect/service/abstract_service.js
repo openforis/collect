@@ -32,6 +32,7 @@ Collect.AbstractService.prototype.send = function(url, data, method, onSuccess, 
 		url: $this.contextPath + url,
 		cache: false,
 		method: method ? method: "GET",
+		headers: {"X-XSRF-TOKEN": OF.csrfToken()},
 		data: data ? $this.param(data) : null
 	}).done(function(response, textStatus, jqXHR) {
 		if (! response || ! response.hasOwnProperty("statusOk") || response.statusOk) {
