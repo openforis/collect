@@ -105,7 +105,19 @@ public class RecordFileManager extends BaseStorageManager {
 	
 	private boolean isUniqueFileName(String fileName) {
 		String baseName = FilenameUtils.getBaseName(fileName);
-		return UUID_REGEX.matcher(baseName).matches(); 
+		return isPlainFileName(fileName) && UUID_REGEX.matcher(baseName).matches();
+	}
+
+	private static boolean isPlainFileName(String fileName) {
+		return fileName.equals(FilenameUtils.getName(fileName)) && !fileName.equals("..") && !fileName.equals(".");
+	}
+
+	private java.io.File getRepositoryFile(java.io.File repositoryDir, String fileName) {
+		// file names come from record data (client or imported files): they must not point outside the repository
+		if (!isPlainFileName(fileName)) {
+			throw new IllegalArgumentException("Invalid record file name: " + fileName);
+		}
+		return new java.io.File(repositoryDir, fileName);
 	}
 	
 	private String generateUniqueRepositoryFileName(FileAttribute fileAttribute, java.io.File file) {
@@ -174,9 +186,7 @@ public class RecordFileManager extends BaseStorageManager {
 	}
 
 	protected java.io.File getRepositoryFile(FileAttributeDefinition fileAttributeDefn, String fileName) {
-		java.io.File repositoryDir = getRepositoryDir(fileAttributeDefn);
-		java.io.File file = new java.io.File(repositoryDir, fileName);
-		return file;
+		return getRepositoryFile(getRepositoryDir(fileAttributeDefn), fileName);
 	}
 
 	public String getRepositoryFileAbsolutePath(FileAttribute fileAttribute) {
@@ -191,9 +201,7 @@ public class RecordFileManager extends BaseStorageManager {
 	}
 	
 	public String getRepositoryFileAbsolutePath(FileAttributeDefinition fileAttributeDefn, String fileName) {
-		java.io.File repositoryDir = getRepositoryDir(fileAttributeDefn);
-		java.io.File file = new java.io.File(repositoryDir, fileName);
-		return file.getAbsolutePath();
+		return getRepositoryFile(fileAttributeDefn, fileName).getAbsolutePath();
 	}
 		
 }
