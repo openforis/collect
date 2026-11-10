@@ -51,6 +51,7 @@ public class RecordAccessControlManagerTest {
 		assertTrue(manager.canEdit(cleanser, OPERATOR, CLEANSING, other));
 		assertFalse(manager.canEdit(cleanser, OPERATOR, ANALYSIS, null));
 		assertFalse(manager.canDemote(cleanser, OPERATOR, ANALYSIS, null));
+		assertTrue(manager.canDemote(cleanser, OPERATOR, CLEANSING, other));
 		assertTrue(manager.canDemote(user(2, UserRole.ANALYSIS), OPERATOR, ANALYSIS, null));
 	}
 
