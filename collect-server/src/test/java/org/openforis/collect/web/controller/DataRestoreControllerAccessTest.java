@@ -21,7 +21,6 @@ import java.util.zip.ZipOutputStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.openforis.collect.concurrency.CollectJobManager;
@@ -52,7 +51,8 @@ public class DataRestoreControllerAccessTest {
 	private static final String JOB_ID = "job";
 	private static final String OVERWRITE_OLDER = "OVERWRITE_OLDER";
 
-	private final DataRestoreJob job = mock(DataRestoreJob.class);
+	@Mock
+	private DataRestoreJob job;
 	private final Configuration configuration = new Configuration();
 
 	@Mock
@@ -67,15 +67,16 @@ public class DataRestoreControllerAccessTest {
 	private ConfigurationManager configurationManager;
 	@Mock
 	private UserManager userManager;
-	@InjectMocks
 	private DataRestoreController controller;
 
 	@Before
 	public void init() {
-		AccessControl accessControl = new AccessControl();
-		ReflectionTestUtils.setField(accessControl, "sessionManager", sessionManager);
-		ReflectionTestUtils.setField(accessControl, "userGroupManager", userGroupManager);
-		ReflectionTestUtils.setField(controller, "accessControl", accessControl);
+		controller = new DataRestoreController(new AccessControl(sessionManager, userGroupManager, null));
+		ReflectionTestUtils.setField(controller, "surveyManager", surveyManager);
+		ReflectionTestUtils.setField(controller, "jobManager", jobManager);
+		ReflectionTestUtils.setField(controller, "configurationManager", configurationManager);
+		ReflectionTestUtils.setField(controller, "userManager", userManager);
+		ReflectionTestUtils.setField(controller, "userGroupManager", userGroupManager);
 		CollectSurvey survey = mock(CollectSurvey.class);
 		when(survey.getUserGroupId()).thenReturn(SURVEY_GROUP_ID);
 		when(surveyManager.getByUri(SURVEY_URI)).thenReturn(survey);
@@ -102,10 +103,9 @@ public class DataRestoreControllerAccessTest {
 	@Test
 	public void adminIsRequiredToRestoreNewSurveyOrToDeleteAllRecords() throws Exception {
 		login(1, UserRole.CLEANSING);
-		assertThrows(AccessDeniedException.class,
-				() -> controller.restoreData(backupFile(), null, true, false, OVERWRITE_OLDER));
-		assertThrows(AccessDeniedException.class,
-				() -> controller.restoreData(backupFile(), SURVEY_NAME, true, true, OVERWRITE_OLDER));
+		MockMultipartFile file = backupFile();
+		assertThrows(AccessDeniedException.class, () -> controller.restoreData(file, null, true, false, OVERWRITE_OLDER));
+		assertThrows(AccessDeniedException.class, () -> controller.restoreData(file, SURVEY_NAME, true, true, OVERWRITE_OLDER));
 
 		login(2, UserRole.ADMIN);
 		assertTrue(controller.restoreData(backupFile(), SURVEY_NAME, true, true, OVERWRITE_OLDER).isStatusOk());

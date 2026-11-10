@@ -113,9 +113,12 @@ public class CommandController {
 	private transient SessionManager sessionManager;
 	@Autowired
 	private transient AppWS appWS;
-	@Autowired
-	private transient AccessControl accessControl;
+	private final AccessControl accessControl;
 	private final RecordAccessControlManager recordAccessControlManager = new RecordAccessControlManager();
+
+	public CommandController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
 
 	@RequestMapping(value = "record", method = POST, consumes = APPLICATION_JSON_VALUE)
 	public @ResponseBody Response createRecord(@RequestBody CreateRecordCommand command) {

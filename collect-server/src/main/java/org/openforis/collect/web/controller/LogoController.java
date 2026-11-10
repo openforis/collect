@@ -35,8 +35,11 @@ public class LogoController extends BasicController {
 	
 	@Autowired
 	private LogoManager logoManager;
-	@Autowired
-	private AccessControl accessControl;
+	private final AccessControl accessControl;
+
+	public LogoController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
 	
 	@RequestMapping(value = "/uploadLogo.htm", method = RequestMethod.POST)
 	public @ResponseBody String uploadLogo(UploadItem uploadItem, BindingResult result, @RequestParam String position) 

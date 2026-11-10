@@ -50,8 +50,11 @@ public class RecordFileController extends BasicController implements Serializabl
 	private SessionRecordFileManager sessionRecordFileManager;
 	@Autowired
 	private SessionRecordProvider recordProvider;
-	@Autowired
-	private transient AccessControl accessControl;
+	private final transient AccessControl accessControl;
+
+	public RecordFileController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
 
 	@RequestMapping(value = "/survey/{surveyId}/data/records/{recordId}/{recordStep}/file", method = RequestMethod.GET)
 	public void downloadFile(HttpServletRequest request, HttpServletResponse response,

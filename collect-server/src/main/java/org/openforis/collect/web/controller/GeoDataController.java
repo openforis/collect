@@ -54,10 +54,13 @@ public class GeoDataController {
 	private CollectJobManager jobManager;
 	@Autowired
 	private CoordinateOperations coordinateOperations;
-	@Autowired
-	private AccessControl accessControl;
+	private final AccessControl accessControl;
 
 	
+	public GeoDataController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
+
 	@RequestMapping(value = "geo/coordinate/convert.json", method=GET)
 	public @ResponseBody Coordinate convertCoordinateTo(
 			@RequestParam double x, 

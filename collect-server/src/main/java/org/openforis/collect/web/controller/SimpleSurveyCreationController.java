@@ -37,12 +37,15 @@ public class SimpleSurveyCreationController {
 	private UserGroupManager userGroupManager;
 	@Autowired
 	private CoordinateOperations coordinateOperations;
-	@Autowired
-	private AccessControl accessControl;
+	private final AccessControl accessControl;
 	
 	@Autowired
 	private SimpleSurveyCreationParametersValidator validator;
 	
+	public SimpleSurveyCreationController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
+
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 		binder.setValidator(validator);

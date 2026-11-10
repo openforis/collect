@@ -23,7 +23,6 @@ import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.model.UserInGroup.UserGroupRole;
 import org.openforis.collect.model.UserRole;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.test.util.ReflectionTestUtils;
 
 public class AccessControlTest {
 
@@ -36,14 +35,12 @@ public class AccessControlTest {
 
 	@Before
 	public void init() {
-		accessControl = new AccessControl();
-		ReflectionTestUtils.setField(accessControl, "sessionManager", new SessionManager() {
+		accessControl = new AccessControl(new SessionManager() {
 			@Override
 			public User getLoggedUser() {
 				return loggedUser;
 			}
-		});
-		ReflectionTestUtils.setField(accessControl, "userGroupManager", new LocalUserGroupManager() {
+		}, new LocalUserGroupManager() {
 			@Override
 			public List<UserGroup> findAllRelatedUserGroups(User user) {
 				UserGroup group = new UserGroup();
@@ -60,8 +57,7 @@ public class AccessControlTest {
 				userInGroup.setRole(UserGroupRole.OPERATOR);
 				return userInGroup;
 			}
-		});
-		ReflectionTestUtils.setField(accessControl, "recordManager", recordManager);
+		}, recordManager);
 	}
 
 	@Test
@@ -101,12 +97,14 @@ public class AccessControlTest {
 	@Test
 	public void surveyEditingRequiresDesignRoleAndSurveyAccess() {
 		loggedUser = user(1, UserRole.DESIGN);
-		accessControl.checkCanEditSurvey(survey(RELATED_GROUP_ID));
-		accessControl.checkSurveyPermission(survey(RELATED_GROUP_ID), (user, role) -> role == UserGroupRole.OPERATOR);
-		assertThrows(AccessDeniedException.class, () -> accessControl.checkCanEditSurvey(survey(OTHER_GROUP_ID)));
+		CollectSurvey relatedSurvey = survey(RELATED_GROUP_ID);
+		CollectSurvey otherSurvey = survey(OTHER_GROUP_ID);
+		accessControl.checkCanEditSurvey(relatedSurvey);
+		accessControl.checkSurveyPermission(relatedSurvey, (user, role) -> role == UserGroupRole.OPERATOR);
+		assertThrows(AccessDeniedException.class, () -> accessControl.checkCanEditSurvey(otherSurvey));
 
 		loggedUser = user(1, UserRole.ENTRY);
-		assertThrows(AccessDeniedException.class, () -> accessControl.checkCanEditSurvey(survey(RELATED_GROUP_ID)));
+		assertThrows(AccessDeniedException.class, () -> accessControl.checkCanEditSurvey(relatedSurvey));
 	}
 
 	@Test

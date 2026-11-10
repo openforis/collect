@@ -6,7 +6,6 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openforis.collect.web.controller.UserControllerTest.user;
@@ -17,7 +16,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.openforis.collect.io.SurveyBackupInfo;
@@ -47,19 +45,21 @@ public class SurveyControllerAccessTest {
 
 	private final AccessControlMock accessControlMock = new AccessControlMock();
 	private final AccessControl accessControl = accessControlMock.accessControl;
-	private final CollectSurvey survey = mock(CollectSurvey.class, RETURNS_DEEP_STUBS);
+	@Mock(answer = RETURNS_DEEP_STUBS)
+	private CollectSurvey survey;
 	private final User loggedUser = user(3, UserRole.DESIGN);
 
 	@Mock(answer = RETURNS_DEEP_STUBS)
 	private SurveyManager surveyManager;
 	@Mock
 	private SessionManager sessionManager;
-	@InjectMocks
 	private SurveyController controller;
 
 	@Before
 	public void init() {
-		ReflectionTestUtils.setField(controller, "accessControl", accessControl);
+		controller = new SurveyController(accessControl);
+		ReflectionTestUtils.setField(controller, "surveyManager", surveyManager);
+		ReflectionTestUtils.setField(controller, "sessionManager", sessionManager);
 		when(surveyManager.getOrLoadSurveyById(SURVEY_ID)).thenReturn(survey);
 		when(surveyManager.getByUri(SURVEY_URI)).thenReturn(survey);
 		SurveySummary summary = new SurveySummary(SURVEY_ID, SURVEY_NAME, SURVEY_URI);

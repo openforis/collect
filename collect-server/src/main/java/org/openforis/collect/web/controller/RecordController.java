@@ -169,8 +169,7 @@ public class RecordController extends BasicController implements Serializable {
 	private transient EventQueue eventQueue;
 	@Autowired
 	private AppWS appWS;
-	@Autowired
-	private transient AccessControl accessControl;
+	private final transient AccessControl accessControl;
 	private final RecordAccessControlManager recordAccessControlManager = new RecordAccessControlManager();
 
 	private CSVDataExportJob csvDataExportJob;
@@ -178,6 +177,10 @@ public class RecordController extends BasicController implements Serializable {
 	private DataRestoreSummaryJob dataRestoreSummaryJob;
 	private CSVDataImportJob csvDataImportJob;
 	private ValidationReportJob validationReportJob;
+
+	public RecordController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
 
 	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}/binary_data.json", method = GET)
 	public @ResponseBody Map<String, Object> loadData(@PathVariable("surveyId") int surveyId,

@@ -52,9 +52,12 @@ public class SamplingPointsController extends BasicController {
 	private SurveyManager surveyManager;
 	@Autowired
 	private CoordinateOperations coordinateOperations;
-	@Autowired
-	private AccessControl accessControl;
+	private final AccessControl accessControl;
 	
+	public SamplingPointsController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
+
 	@RequestMapping(value="api/survey/{surveyId}/sampling_point_data", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	List<SamplingDesignItem> loadSamplingPoints(@PathVariable int surveyId, 

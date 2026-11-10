@@ -130,8 +130,7 @@ public class SurveyController extends BasicController {
 	private SurveyService surveyService;
 	@Autowired
 	private AppWS appWS;
-	@Autowired
-	private AccessControl accessControl;
+	private final AccessControl accessControl;
 
 	// validators
 	@Autowired
@@ -153,6 +152,10 @@ public class SurveyController extends BasicController {
 	private AbstractSurveyRestoreJob surveyImportJob;
 	private Job surveyBackupJob;
 	private SurveyCloneJob surveyCloneJob;
+
+	public SurveyController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
 
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {

@@ -46,9 +46,12 @@ public class SessionController extends BasicController {
 	private SurveyManager surveyManager;
 	@Autowired
 	private UserGroupManager userGroupManager;
-	@Autowired
-	private AccessControl accessControl;
+	private final AccessControl accessControl;
 	
+	public SessionController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
+
 	@RequestMapping(value = "ping", method = GET)
 	public @ResponseBody Response ping(@RequestParam(value="editing", required = false, defaultValue = "false" ) Boolean editing) throws RecordUnlockedException {
 		if ( editing ) {

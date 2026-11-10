@@ -72,9 +72,12 @@ public class DataRestoreController extends BasicController {
 	private UserGroupManager userGroupManager;
 	@Autowired
 	private AppWS appWS;
-	@Autowired
-	private AccessControl accessControl;
+	private final AccessControl accessControl;
 	
+	public DataRestoreController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
+
 	@RequestMapping(value = "/surveys/restore/data", method=POST, consumes=MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody JobStatusResponse restoreData(@RequestParam("file") MultipartFile multipartFile, 
 			@RequestParam(required=false) String surveyName,

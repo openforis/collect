@@ -39,8 +39,11 @@ public class SpeciesController {
 	@Autowired
 	@Qualifier("sessionManager")
 	private SessionManager sessionManager;
-	@Autowired
-	private AccessControl accessControl;
+	private final AccessControl accessControl;
+
+	public SpeciesController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
 
 	@RequestMapping(value = "api/survey/{surveyId}/taxonomy/{taxonomyId}/export.csv", method = RequestMethod.GET)
 	public @ResponseBody String exportSpecies(HttpServletResponse response, @PathVariable("surveyId") Integer surveyId,

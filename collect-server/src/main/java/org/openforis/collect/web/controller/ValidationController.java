@@ -51,9 +51,12 @@ public class ValidationController extends BasicController {
 	private SurveyManager surveyManager;
 	@Autowired
 	private SpringMessageSource messageContextHolder;
-	@Autowired
-	private AccessControl accessControl;
+	private final AccessControl accessControl;
 	
+	public ValidationController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
+
 	@RequestMapping(value = "/validateAllRecords.htm", method = RequestMethod.GET)
 	public void validateAllRecords(HttpServletRequest request, HttpServletResponse response, @RequestParam String s, @RequestParam String r) throws IOException {
 		accessControl.checkRole(UserRole.DESIGN);

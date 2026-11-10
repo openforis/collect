@@ -39,9 +39,12 @@ public class SaikuController {
 	private CollectJobManager jobManager;
 	@Autowired
 	private SurveyManager surveyManager;
-	@Autowired
-	private AccessControl accessControl;
+	private final AccessControl accessControl;
 	
+	public SaikuController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
+
 	@RequestMapping(value = "datasources/{surveyName}/generate", method=POST)
 	public @ResponseBody JobProxy generateRepository(@PathVariable String surveyName, @RequestParam String language)
 			throws CollectRdbException, SQLException {

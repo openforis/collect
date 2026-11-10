@@ -61,7 +61,7 @@ public class ControllersAccessTest {
 
 	@Test
 	public void backupsRequireAdmin() {
-		BackupRestoreController controller = inject(new BackupRestoreController());
+		BackupRestoreController controller = inject(new BackupRestoreController(accessControl));
 		setField(controller, "recordManager", mock(RecordManager.class));
 		accessControlMock.assertChecked(() -> controller.getLatestBackupInfo(SURVEY_ID));
 		verify(accessControl).checkAdmin();
@@ -73,8 +73,7 @@ public class ControllersAccessTest {
 		accessControlMock.assertChecked(() -> controller.downloadBackupExportResult(new MockHttpServletResponse()));
 		verify(accessControl).checkAdmin();
 
-		DataBackupController dataBackupController = new DataBackupController();
-		setField(dataBackupController, "accessControl", accessControl);
+		DataBackupController dataBackupController = new DataBackupController(accessControl);
 		accessControlMock.assertChecked(
 				() -> dataBackupController.downloadLastBackup(new MockHttpServletResponse(), SURVEY_NAME));
 		verify(accessControl).checkAdmin();
@@ -82,7 +81,7 @@ public class ControllersAccessTest {
 
 	@Test
 	public void surveyDataRequiresSurveyAccess() {
-		GeoDataController geoDataController = inject(new GeoDataController());
+		GeoDataController geoDataController = inject(new GeoDataController(accessControl));
 		accessControlMock.assertChecked(() -> geoDataController.loadCoordinateValues(SURVEY_ID, 3, "EPSG:4326", 0, 10));
 		verify(accessControl).checkCanAccessSurvey(survey);
 		accessControlMock.assertChecked(() -> geoDataController.loadGeometryValues(SURVEY_ID, 3, "EPSG:4326", 0, 10));
@@ -91,18 +90,18 @@ public class ControllersAccessTest {
 				() -> geoDataController.createCoordinateValuesKML(SURVEY_ID, 1, 3, new MockHttpServletResponse()));
 		verify(accessControl).checkCanAccessSurvey(survey);
 
-		SessionController sessionController = inject(new SessionController());
+		SessionController sessionController = inject(new SessionController(accessControl));
 		accessControlMock.assertChecked(() -> sessionController.setActiveSurvey(SURVEY_ID));
 		verify(accessControl).checkCanAccessSurvey(survey);
 
-		SpeciesController speciesController = inject(new SpeciesController());
+		SpeciesController speciesController = inject(new SpeciesController(accessControl));
 		accessControlMock.assertChecked(() -> speciesController.findTaxon(SURVEY_ID, "species", new TaxonQuery()));
 		verify(accessControl).checkCanAccessSurvey(survey);
 	}
 
 	@Test
 	public void recordFilesRequireRecordAccess() {
-		RecordFileController controller = inject(new RecordFileController());
+		RecordFileController controller = inject(new RecordFileController(accessControl));
 		SessionRecordProvider recordProvider = mock(SessionRecordProvider.class);
 		when(recordProvider.provide(any(), any(), any())).thenReturn(mock(CollectRecord.class));
 		setField(controller, "recordProvider", recordProvider);
@@ -117,7 +116,7 @@ public class ControllersAccessTest {
 
 	@Test
 	public void reportingRepositoryRequiresCleansingRoleAndNotLimitedGroupRole() {
-		SaikuController controller = inject(new SaikuController());
+		SaikuController controller = inject(new SaikuController(accessControl));
 		accessControlMock.assertChecked(() -> controller.generateRepository(SURVEY_NAME, "en"));
 		BiPredicate<User, UserGroupRole> permission = accessControlMock.verifiedSurveyPermission();
 		assertTrue(permission.test(user(3, UserRole.CLEANSING), UserGroupRole.OPERATOR));
@@ -127,7 +126,7 @@ public class ControllersAccessTest {
 
 	@Test
 	public void samplingPointsCanBeUpdatedOnlyInEditableSurvey() {
-		SamplingPointsController controller = inject(new SamplingPointsController());
+		SamplingPointsController controller = inject(new SamplingPointsController(accessControl));
 		SamplingDesignManager samplingDesignManager = mock(SamplingDesignManager.class);
 		setField(controller, "samplingDesignManager", samplingDesignManager);
 		SamplingDesignItem item = new SamplingDesignItem();
@@ -147,7 +146,7 @@ public class ControllersAccessTest {
 
 	@Test
 	public void simpleSurveyCreationRequiresDesignRoleAndUserGroupAccess() {
-		SimpleSurveyCreationController controller = inject(new SimpleSurveyCreationController());
+		SimpleSurveyCreationController controller = inject(new SimpleSurveyCreationController(accessControl));
 		SimpleSurveyCreationParameters parameters = new SimpleSurveyCreationParameters();
 		parameters.setUserGroupId(10);
 		accessControlMock.assertChecked(() -> controller.createSimpleSurvey(parameters, null));
@@ -157,7 +156,7 @@ public class ControllersAccessTest {
 
 	@Test
 	public void recordsValidationRequiresDesignRoleAndSurveyAccess() throws Exception {
-		ValidationController controller = inject(new ValidationController());
+		ValidationController controller = inject(new ValidationController(accessControl));
 		setField(controller, "recordManager", mock(RecordManager.class));
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		request.getSession().setAttribute(SessionState.SESSION_ATTRIBUTE_NAME,
@@ -169,15 +168,15 @@ public class ControllersAccessTest {
 		verify(accessControl, times(2)).checkCanAccessSurvey(survey);
 
 		// access denied errors are not wrapped, so they become HTTP 403
+		MockHttpServletResponse response = new MockHttpServletResponse();
 		doThrow(new AccessDeniedException("denied")).when(accessControl).checkCanAccessSurvey(survey);
 		assertThrows(AccessDeniedException.class,
-				() -> controller.validateAllRecords(request, new MockHttpServletResponse(), SURVEY_NAME, "plot"));
+				() -> controller.validateAllRecords(request, response, SURVEY_NAME, "plot"));
 		assertThrows(AccessDeniedException.class,
-				() -> controller.validationReport(request, new MockHttpServletResponse(), SURVEY_NAME, 3, "en", null, null));
+				() -> controller.validationReport(request, response, SURVEY_NAME, 3, "en", null, null));
 	}
 
 	private <C> C inject(C controller) {
-		setField(controller, "accessControl", accessControl);
 		setField(controller, "surveyManager", surveyManager);
 		return controller;
 	}

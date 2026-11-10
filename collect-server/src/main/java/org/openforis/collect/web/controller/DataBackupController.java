@@ -23,9 +23,12 @@ public class DataBackupController extends BasicController {
 
 	@Autowired
 	private BackupStorageManager backupStorageManager;
-	@Autowired
-	private AccessControl accessControl;
+	private final AccessControl accessControl;
 	
+	public DataBackupController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
+
 	@RequestMapping(value = "/surveys/{surveyName}/data/backup/last", method = RequestMethod.GET)
 	public void downloadLastBackup(HttpServletResponse response, @PathVariable String surveyName) throws IOException {
 		accessControl.checkAdmin();

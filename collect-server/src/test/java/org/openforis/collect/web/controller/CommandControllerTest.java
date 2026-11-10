@@ -69,9 +69,8 @@ public class CommandControllerTest {
 		CollectRecord collectRecord = new CollectRecord(survey, null, rootEntityDefn, false);
 		collectRecord.setPreview(preview);
 
-		CommandController controller = new CommandController();
 		// access checks are tested in CommandControllerAccessTest
-		ReflectionTestUtils.setField(controller, "accessControl", mock(AccessControl.class));
+		CommandController controller = new CommandController(mock(AccessControl.class));
 		ReflectionTestUtils.setField(controller, "sessionManager", new SessionManager() {
 			@Override
 			public String getLoggedUsername() {

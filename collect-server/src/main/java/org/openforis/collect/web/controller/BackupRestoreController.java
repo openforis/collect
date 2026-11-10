@@ -57,10 +57,13 @@ public class BackupRestoreController {
 	private BackupStorageManager backupStorageManager;
 	@Autowired
 	private CollectJobManager jobManager;
-	@Autowired
-	private AccessControl accessControl;
+	private final AccessControl accessControl;
 	
 	private SurveyBackupJob backupJob;
+
+	public BackupRestoreController(AccessControl accessControl) {
+		this.accessControl = accessControl;
+	}
 
 	@RequestMapping(value = "survey/{surveyId}/backup/latest/info", method=GET)
 	public @ResponseBody BackupInfo getLatestBackupInfo(@PathVariable("surveyId") int surveyId) {
