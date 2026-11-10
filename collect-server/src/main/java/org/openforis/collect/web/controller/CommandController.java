@@ -218,10 +218,16 @@ public class CommandController {
 		String username = sessionManager.getLoggedUsername();
 		command.setUsername(username);
 		CollectRecord record = provideRecord(command);
-		// events contain record values: send them only to the user editing the record
 		commandDispatcher.submit(command, new EventListener() {
 			public void onEvent(RecordEvent event) {
-				appWS.sendMessageToUser(username, new RecordEventMessage(new RecordEventView(event, record)));
+				RecordEventMessage message = new RecordEventMessage(new RecordEventView(event, record));
+				if (record.isPreview()) {
+					// preview records exist only in the session of the user
+					appWS.sendMessageToUser(username, message);
+				} else {
+					// events contain record values: only users who can view the record get them
+					appWS.sendRecordMessage(record, message);
+				}
 			}
 		}, new ExceptionHandler() {
 			public void onException(Exception e) {

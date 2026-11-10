@@ -32,28 +32,41 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 public class CommandControllerTest {
 
+	private static final String RECORD_VIEWERS = "users who can view the record";
+
 	private final List<String> recipients = new ArrayList<String>();
 	private final List<Message> messages = new ArrayList<Message>();
 
 	@Test
-	public void testRecordEventsSentOnlyToCommandUser() {
-		CommandController controller = createController();
+	public void testRecordEventsSentToRecordViewersAndErrorsToCommandUser() {
+		CommandController controller = createController(false);
 
 		controller.addEntity(createCommand());
 
 		assertEquals(2, messages.size());
-		assertEquals("entry1", recipients.get(0));
+		assertEquals(RECORD_VIEWERS, recipients.get(0));
 		assertTrue(messages.get(0) instanceof RecordEventMessage);
 		assertEquals("entry1", recipients.get(1));
 		assertTrue(messages.get(1) instanceof RecordUpdateErrorMessage);
 	}
 
-	private CommandController createController() {
+	@Test
+	public void testPreviewRecordEventsSentOnlyToCommandUser() {
+		CommandController controller = createController(true);
+
+		controller.addEntity(createCommand());
+
+		assertEquals("entry1", recipients.get(0));
+		assertTrue(messages.get(0) instanceof RecordEventMessage);
+	}
+
+	private CommandController createController(boolean preview) {
 		CollectSurvey survey = (CollectSurvey) new CollectSurveyContext().createSurvey();
 		EntityDefinition rootEntityDefn = survey.getSchema().createEntityDefinition();
 		rootEntityDefn.setName("plot");
 		survey.getSchema().addRootEntityDefinition(rootEntityDefn);
 		CollectRecord record = new CollectRecord(survey, null, rootEntityDefn, false);
+		record.setPreview(preview);
 
 		CommandController controller = new CommandController();
 		ReflectionTestUtils.setField(controller, "sessionManager", new SessionManager() {
@@ -91,6 +104,12 @@ public class CommandControllerTest {
 			@Override
 			public void sendMessageToUser(String username, Message message) {
 				recipients.add(username);
+				messages.add(message);
+			}
+
+			@Override
+			public void sendRecordMessage(CollectRecord record, Message message) {
+				recipients.add(RECORD_VIEWERS);
 				messages.add(message);
 			}
 
