@@ -74,7 +74,14 @@ const AppWebSocket = () => {
     dispatch(handler(message))
   }
 
-  return <SockJsClient url={`${Constants.BASE_URL}ws`} topics={[eventsDestination]} onMessage={onMessage} />
+  // record update events are sent only to the user editing the record (user destination)
+  return (
+    <SockJsClient
+      url={`${Constants.BASE_URL}ws`}
+      topics={[eventsDestination, `/user${eventsDestination}`]}
+      onMessage={onMessage}
+    />
+  )
 }
 
 export default AppWebSocket

@@ -215,15 +215,23 @@ public class CommandController {
 	}
 
 	private Response submitCommand(RecordCommand command) {
-		command.setUsername(sessionManager.getLoggedUsername());
+		String username = sessionManager.getLoggedUsername();
+		command.setUsername(username);
 		CollectRecord record = provideRecord(command);
 		commandDispatcher.submit(command, new EventListener() {
 			public void onEvent(RecordEvent event) {
-				appWS.sendMessage(new RecordEventMessage(new RecordEventView(event, record)));
+				RecordEventMessage message = new RecordEventMessage(new RecordEventView(event, record));
+				if (record.isPreview()) {
+					// preview records exist only in the session of the user
+					appWS.sendMessageToUser(username, message);
+				} else {
+					// events contain record values: only users who can view the record get them
+					appWS.sendRecordMessage(record, message);
+				}
 			}
 		}, new ExceptionHandler() {
 			public void onException(Exception e) {
-				appWS.sendMessage(new RecordUpdateErrorMessage(e.getMessage(), ExceptionUtils.getStackTrace(e)));
+				appWS.sendMessageToUser(username, new RecordUpdateErrorMessage(e.getMessage(), ExceptionUtils.getStackTrace(e)));
 			}
 		});
 		return new Response();
