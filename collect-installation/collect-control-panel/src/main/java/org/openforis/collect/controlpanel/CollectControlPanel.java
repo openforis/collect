@@ -45,7 +45,7 @@ public class CollectControlPanel extends JFrame implements ControlPanel {
 	private static final String LOGO_PATH = "of-collect-logo.png";
 	private static final Image LOGO_IMAGE = Toolkit.getDefaultToolkit()
 			.getImage(CollectControlPanel.class.getResource(LOGO_PATH));
-	private static final String ONLINE_MANUAL_URL = "http://www.openforis.org/tools/collect.html";
+	private static final String ONLINE_MANUAL_URL = "https://www.openforis.org/tools/collect.html";
 	private static final String CHANGELOG_URL = "https://github.com/openforis/collect/blob/master/CHANGELOG.md";
 
 	private static final Font ERROR_MSG_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 15);

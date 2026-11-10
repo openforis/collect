@@ -45,7 +45,7 @@ public class AboutDialog extends JDialog {
 
 		JPanel form = new JPanel(new SpringLayout());
 
-		addFormItem(form, "Created by", new JHyperlinkLabel("http://www.openforis.org", "Open Foris"));
+		addFormItem(form, "Created by", new JHyperlinkLabel("https://www.openforis.org", "Open Foris"));
 		addFormItem(form, "Version", new JLabel(Collect.VERSION.toString()));
 		addFormItem(form, "Java version", new JLabel(Environment.getJREVersion()));
 
